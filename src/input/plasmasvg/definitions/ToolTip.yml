@@ -1,0 +1,145 @@
+tooltip: &tooltip
+    type: ToolTip
+    colorSet: Tooltip
+    path: widgets/tooltip
+    padding: &tooltip-padding
+        left:
+            property: element-width
+            element: hint-left-margin
+        right:
+            property: element-width
+            element: hint-right-margin
+        top:
+            property: element-height
+            element: hint-top-margin
+        bottom:
+            property: element-height
+            element: hint-bottom-margin
+    border: &tooltip-border
+        left: &tooltip-border-left
+            element: left
+            size:
+                property: element-width
+            image:
+                property: element-image
+        right: &tooltip-border-right
+            element: right
+            size:
+                property: element-width
+            image:
+                property: element-image
+        top: &tooltip-border-top
+            element: top
+            size:
+                property: element-height
+            image:
+                property: element-image
+        bottom: &tooltip-border-bottom
+            element: bottom
+            size:
+                property: element-height
+            image:
+                property: element-image
+    corners: &tooltip-corners
+        top-left: &tooltip-corner-top-left
+            element: topleft
+            size:
+                property: element-size
+            image:
+                property: element-image
+        top-right: &tooltip-corner-top-right
+            element: topright
+            size:
+                property: element-size
+            image:
+                property: element-image
+        bottom-left: &tooltip-corner-bottom-left
+            element: bottomleft
+            size:
+                property: element-size
+            image:
+                property: element-image
+        bottom-right: &tooltip-corner-bottom-right
+            element: bottomright
+            size:
+                property: element-size
+            image:
+                property: element-image
+    background: &tooltip-background
+        element: center
+        size:
+            property: element-size
+        image:
+            property: element-image
+    shadow: &tooltip-shadow
+        prefix: shadow
+        offsets: &tooltip-shadow-offsets
+            left:
+                property: element-width
+                element: hint-left-margin
+                invert: true
+            right:
+                property: element-width
+                element: hint-right-margin
+                invert: true
+            top:
+                property: element-height
+                element: hint-top-margin
+                invert: true
+            bottom:
+                property: element-height
+                element: hint-bottom-margin
+                invert: true
+        left: &tooltip-shadow-left
+            element: left
+            size:
+                property: element-width
+            image:
+                property: element-image
+        right: &tooltip-shadow-right
+            element: right
+            size:
+                property: element-width
+            image:
+                property: element-image
+        top: &tooltip-shadow-top
+            element: top
+            size:
+                property: element-height
+            image:
+                property: element-image
+        bottom: &tooltip-shadow-bottom
+            element: bottom
+            size:
+                property: element-height
+            image:
+                property: element-image
+        top-left: &tooltip-shadow-top-left
+            element: topleft
+            size:
+                property: element-size
+            image:
+                property: element-image
+        top-right: &tooltip-shadow-top-right
+            element: topright
+            size:
+                property: element-size
+            image:
+                property: element-image
+        bottom-left: &tooltip-shadow-bottom-left
+            element: bottomleft
+            size:
+                property: element-size
+            image:
+                property: element-image
+        bottom-right: &tooltip-shadow-bottom-right
+            element: bottomright
+            size:
+                property: element-size
+            image:
+                property: element-image
+    text:
+        align:
+            horizontal: left
+            vertical: center
+        font: system-normal
