@@ -4,6 +4,7 @@
         <file alias="TabBar.yml">definitions/TabBar.yml</file>
         <file alias="TabButton.yml">definitions/TabButton.yml</file>
         <file alias="TextField.yml">definitions/TextField.yml</file>
+        <file alias="ToolBar.yml">definitions/ToolBar.yml</file>
         <file alias="ToolButton.yml">definitions/ToolButton.yml</file>
     </qresource>
 </RCC>
