@@ -1,0 +1,134 @@
+toolbutton: &toolbutton
+    type: ToolButton
+    colorSet: Button
+    path: widgets/button
+    prefix: toolbutton
+    padding: &toolbutton-padding
+        prefix: hover
+        left:
+            property: element-width
+            element: hint-left-margin
+        right:
+            property: element-width
+            element: hint-right-margin
+        top:
+            property: element-height
+            element: hint-top-margin
+        bottom:
+            property: element-height
+            element: hint-bottom-margin
+    text:
+        align:
+            horizontal: center
+            vertical: center
+        font: system-normal
+
+toolbutton-hovered: &toolbutton-hovered
+    <<: *toolbutton
+    state: Hovered
+    border: &toolbutton-hovered-border
+        prefix: hover
+        left: &toolbutton-hovered-border-left
+            element: left
+            size:
+                property: element-width
+            image:
+                property: element-image
+        right: &toolbutton-hovered-border-right
+            element: right
+            size:
+                property: element-width
+            image:
+                property: element-image
+        top: &toolbutton-hovered-border-top
+            element: top
+            size:
+                property: element-height
+            image:
+                property: element-image
+        bottom: &toolbutton-hovered-border-bottom
+            element: bottom
+            size:
+                property: element-height
+            image:
+                property: element-image
+    corners: &toolbutton-hovered-corners
+        prefix: hover
+        top-left: &toolbutton-hovered-corner-top-left
+            element: topleft
+            size:
+                property: element-size
+            image:
+                property: element-image
+        top-right: &toolbutton-hovered-corner-top-right
+            element: topright
+            size:
+                property: element-size
+            image:
+                property: element-image
+        bottom-left: &toolbutton-hovered-corner-bottom-left
+            element: bottomleft
+            size:
+                property: element-size
+            image:
+                property: element-image
+        bottom-right: &toolbutton-hovered-corner-bottom-right
+            element: bottomright
+            size:
+                property: element-size
+            image:
+                property: element-image
+    background: &toolbutton-hovered-background
+        prefix: hover
+        element: center
+        size:
+            property: element-size
+        image:
+            property: element-image
+
+toolbutton-focus:
+    <<: *toolbutton
+    state: VisualFocus
+    margins:
+        prefix: focus
+        left:
+            property: element-width
+            element: hint-left-margin
+            invert: true
+        right:
+            property: element-width
+            element: hint-right-margin
+            invert: true
+        top:
+            property: element-height
+            element: hint-top-margin
+            invert: true
+        bottom:
+            property: element-height
+            element: hint-bottom-margin
+            invert: true
+    border:
+        <<: *toolbutton-hovered-border
+        prefix: focus
+    corners:
+        <<: *toolbutton-hovered-corners
+        prefix: focus
+    background:
+        <<: *toolbutton-hovered-background
+        prefix: focus
+
+toolbutton-pressed:
+    <<: *toolbutton
+    state: Pressed
+    padding:
+        <<: *toolbutton-padding
+        prefix: pressed
+    border:
+        <<: *toolbutton-hovered-border
+        prefix: pressed
+    corners:
+        <<: *toolbutton-hovered-corners
+        prefix: pressed
+    background:
+        <<: *toolbutton-hovered-background
+        prefix: pressed
