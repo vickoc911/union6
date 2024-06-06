@@ -12,6 +12,7 @@ ecm_target_qml_sources(UnionQuickStyle SOURCES
     style/ApplicationWindow.qml
     style/Button.qml
     style/TextField.qml
+    style/TabBar.qml
     style/ToolBar.qml
     style/ToolButton.qml
 )
