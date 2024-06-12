@@ -1,0 +1,143 @@
+base: &base
+    type: RadioIndicator
+    path: widgets/radiobutton
+    background: &base-background
+        element: hint-size
+        size:
+            property: element-size
+
+unchecked: &unchecked
+    <<: *base
+    attributes: {checked: false}
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [shadow, normal]
+
+unchecked-pressed:
+    <<: *unchecked
+    state: Pressed
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [normal, checked]
+
+unchecked-focused:
+    <<: *unchecked
+    state: VisualFocus
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [shadow, normal, focus]
+
+# unchecked-focused-pressed:
+#     <<: *unchecked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [normal, checked, focus]
+
+unchecked-hovered:
+    <<: *unchecked
+    state: Hovered
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [shadow, normal, hover]
+
+# unchecked-hovered-pressed:
+#     <<: *unchecked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [normal, checked, hover]
+# 
+# unchecked-hovered-focused:
+#     <<: *unchecked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [shadow, normal, focus, hover]
+# 
+# unchecked-hovered-focused-pressed:
+#     <<: *unchecked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [normal, checked, focus, hover]
+
+checked: &checked
+    <<: *base
+    attributes: {checked: true}
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [shadow, normal, checked, symbol]
+
+checked-pressed:
+    <<: *checked
+    state: Pressed
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [normal, checked, symbol]
+
+checked-focused:
+    <<: *checked
+    state: VisualFocus
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [shadow, normal, focus, symbol]
+
+# checked-focused-pressed:
+#     <<: *checked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [normal, checked, focus, symbol]
+
+checked-hovered:
+    <<: *checked
+    state: Hovered
+    background:
+        <<: *base-background
+        image:
+            property: element-image-blend
+            elements: [shadow, normal, checked, hover, symbol]
+
+# checked-hovered-pressed:
+#     <<: *checked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [normal, checked, checked, hover, symbol]
+# 
+# checked-hovered-focused:
+#     <<: *checked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [shadow, normal, checked, focus, hover, symbol]
+# 
+# checked-hovered-focused-pressed:
+#     <<: *checked
+#     background:
+#         <<: *base-background
+#         image:
+#             property: element-image-blend
+#             elements: [normal, checked, checked, focus, hover, symbol]
