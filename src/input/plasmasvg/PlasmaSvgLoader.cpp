@@ -291,13 +291,77 @@ Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext 
     }
 
     if (node.has_child("state")) {
+        const auto stateNode = node["state"];
         auto stateEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("State"));
-        selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeToString(node["state"]).toUtf8().data()))));
+        // Support value or list
+        if (stateNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(stateNode.val().str))));
+        } else if (stateNode.is_seq() && stateNode.has_children()) {
+            SelectorList allOfList;
+            for (auto child : stateNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                allOfList.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(child.val().str))));
+            }
+            selectors.append(Selector::create<SelectorType::AllOf>(allOfList));
+        }
+    }
+
+    if (node.has_child("hints")) {
+        const auto hintsNode = node["hints"];
+        // Support value or list
+        if (hintsNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::Hint>(QString::fromLatin1(hintsNode.val())));
+        } else if (hintsNode.is_seq() && hintsNode.has_children()) {
+            SelectorList allOfList;
+            for (auto child : hintsNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                allOfList.append(Selector::create<SelectorType::Hint>(QString::fromLatin1(child.val())));
+            }
+            selectors.append(Selector::create<SelectorType::AllOf>(allOfList));
+        }
+    }
+
+    if (node.has_child("attributes")) {
+        const auto attributesNode = node["attributes"];
+        if (attributesNode.has_children()) {
+            SelectorList allOfList;
+            for (auto child : attributesNode.children()) {
+                if (!child.has_key() || !child.has_val()) {
+                    continue;
+                }
+                // clang-format off
+                allOfList.append(Selector::create<SelectorType::Attribute>(
+                    std::make_pair<QString, QVariant>(QString::fromLatin1(child.key()),
+                                                      QString::fromLatin1(child.val()))
+                ));
+                // clang-format on
+            }
+            selectors.append(Selector::create<SelectorType::AllOf>(allOfList));
+        }
     }
 
     if (node.has_child("colorSet")) {
+        const auto colorSetNode = node["colorSet"];
         auto colorSetEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("ColorSet"));
-        selectors.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(nodeToString(node["colorSet"]).toUtf8().data()))));
+        // Support value or list
+        if (colorSetNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(colorSetNode.val().str))));
+        } else if (colorSetNode.is_seq() && colorSetNode.has_children()) {
+            // You can't display multiple color sets at once,
+            // but you could show the same appearance for multiple color sets.
+            SelectorList anyOfList;
+            for (auto child : colorSetNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                anyOfList.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(child.val().str))));
+            }
+            selectors.append(Selector::create<SelectorType::AnyOf>(anyOfList));
+        }
     }
 
     SelectorList currentSelectors = context.selectors();
