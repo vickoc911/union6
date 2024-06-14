@@ -329,14 +329,74 @@ Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext 
         selectors.append(Selector::create<SelectorType::Id>(nodeValue<QString>(node["id"])));
     }
 
-    if (node.has_child("state")) {
+    if (auto stateNode = node.find_child("state"); stateNode.valid()) {
         auto stateEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("State"));
-        selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeValue<CStringWrapper>(node["state"])))));
+        // Support value or list
+        if (stateNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeValue<CStringWrapper>(stateNode)))));
+        } else if (stateNode.is_seq() && stateNode.has_children()) {
+            SelectorList allOfList;
+            for (auto child : stateNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                allOfList.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeValue<CStringWrapper>(child)))));
+            }
+            selectors.append(Selector::create<SelectorType::AllOf>(allOfList));
+        }
     }
 
-    if (node.has_child("colorSet")) {
+    if (auto hintsNode = node.find_child("hints"); hintsNode.valid()) {
+        // Support value or list
+        if (hintsNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::Hint>(nodeValue<QString>(hintsNode)));
+        } else if (hintsNode.is_seq() && hintsNode.has_children()) {
+            SelectorList allOfList;
+            for (auto child : hintsNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                allOfList.append(Selector::create<SelectorType::Hint>(nodeValue<QString>(child)));
+            }
+            selectors.append(Selector::create<SelectorType::AllOf>(allOfList));
+        }
+    }
+
+    if (auto attributesNode = node.find_child("attributes"); attributesNode.valid()) {
+        if (attributesNode.has_children()) {
+            SelectorList allOfList;
+            for (auto child : attributesNode.children()) {
+                if (!child.is_keyval()) {
+                    continue;
+                }
+                // clang-format off
+                allOfList.append(Selector::create<SelectorType::Attribute>(
+                    std::make_pair<QString, QVariant>(QString::fromLatin1(child.key()),
+                                                      QString::fromLatin1(child.val()))
+                ));
+                // clang-format on
+            }
+            selectors.append(Selector::create<SelectorType::AllOf>(allOfList));
+        }
+    }
+
+    if (auto colorSetNode = node.find_child("colorSet"); colorSetNode.valid()) {
         auto colorSetEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("ColorSet"));
-        selectors.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(nodeValue<CStringWrapper>(node["colorSet"])))));
+        // Support value or list
+        if (colorSetNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(nodeValue<CStringWrapper>(colorSetNode)))));
+        } else if (colorSetNode.is_seq() && colorSetNode.has_children()) {
+            // You can't display multiple color sets at once,
+            // but you could show the same appearance for multiple color sets.
+            SelectorList anyOfList;
+            for (auto child : colorSetNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                anyOfList.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(nodeValue<CStringWrapper>(child)))));
+            }
+            selectors.append(Selector::create<SelectorType::AnyOf>(anyOfList));
+        }
     }
 
     SelectorList currentSelectors = context.selectors();
