@@ -291,8 +291,51 @@ Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext 
     }
 
     if (node.has_child("state")) {
+        const auto stateNode = node["state"];
         auto stateEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("State"));
-        selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeToString(node["state"]).toUtf8().data()))));
+        // Support value or list
+        if (stateNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(stateNode.val().str))));
+        } else if (stateNode.is_seq() && stateNode.has_children()) {
+            for (auto child : stateNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(child.val().str))));
+            }
+        }
+    }
+
+    if (node.has_child("hints")) {
+        const auto hintsNode = node["hints"];
+        // Support value or list
+        if (hintsNode.has_val()) {
+            selectors.append(Selector::create<SelectorType::Hint>(QString::fromLatin1(hintsNode.val())));
+        } else if (hintsNode.is_seq() && hintsNode.has_children()) {
+            for (auto child : hintsNode.children()) {
+                if (!child.has_val()) {
+                    continue;
+                }
+                selectors.append(Selector::create<SelectorType::Hint>(QString::fromLatin1(child.val())));
+            }
+        }
+    }
+
+    if (node.has_child("attributes")) {
+        const auto attributesNode = node["attributes"];
+        if (attributesNode.has_children()) {
+            for (auto child : attributesNode.children()) {
+                if (!child.has_key() || !child.has_val()) {
+                    continue;
+                }
+                // clang-format off
+                selectors.append(Selector::create<SelectorType::Attribute>(
+                    std::make_pair<QString, QVariant>(QString::fromLatin1(child.key()),
+                                                      QString::fromLatin1(child.val()))
+                ));
+                // clang-format on
+            }
+        }
     }
 
     if (node.has_child("colorSet")) {
