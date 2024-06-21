@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: CC0-1.0
 
 include:
-  - https://invent.kde.org/sysadmin/ci-utilities/raw/master/gitlab-templates/linux.yml
-  #- https://invent.kde.org/sysadmin/ci-utilities/raw/master/gitlab-templates/android.yml
-  #- https://invent.kde.org/sysadmin/ci-utilities/raw/master/gitlab-templates/freebsd.yml
-  #- https://invent.kde.org/sysadmin/ci-utilities/raw/master/gitlab-templates/windows.yml
+  - project: sysadmin/ci-utilities
+    file:
+      # TODO: Uncomment at least the Linux pipeline when all dependencies can be found by the CI.
+      #- /gitlab-templates/linux-qt6.yml
+      #- /gitlab-templates/freebsd-qt6.yml
