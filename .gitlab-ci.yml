@@ -1,9 +1,0 @@
-# SPDX-FileCopyrightText: 2020 Volker Krause <vkrause@kde.org>
-# SPDX-License-Identifier: CC0-1.0
-
-# TODO: Uncomment at least the Linux pipeline when all dependencies can be found by the CI.
-# include:
-  # - project: sysadmin/ci-utilities
-    # file:
-      # - /gitlab-templates/linux-qt6.yml
-      # - /gitlab-templates/freebsd-qt6.yml
