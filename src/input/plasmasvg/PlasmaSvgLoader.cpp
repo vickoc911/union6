@@ -30,18 +30,57 @@ using namespace std::string_literals;
 
 constexpr char16_t PluginName[] = u"plasmasvg";
 
-QString nodeToString(ryml::ConstNodeRef node)
+// Default implementation for types constructible with c4::csubstr.
+// NOTE: The raw data for a string view will not be null terminated at the
+// position where the string view is supposed to end. It cannot be used directly
+// with APIs that expect a C-style string without specifying a string length.
+template<typename T> T nodeValue(ryml::ConstNodeRef node)
 {
     if (!node.has_val()) {
-        return QString{};
+        return {};
     }
-
-    std::string tmp;
-    node >> tmp;
-    return QString::fromStdString(tmp);
+    return node.val();
 }
 
-Qt::Alignment nodeToAlignment(ryml::ConstNodeRef node)
+template<>
+QByteArray nodeValue<QByteArray>(ryml::ConstNodeRef node)
+{
+    return nodeValue<QByteArrayView>(node).toByteArray();
+}
+
+template<>
+QString nodeValue<QString>(ryml::ConstNodeRef node)
+{
+    return QString::fromLatin1(nodeValue<QByteArrayView>(node));
+}
+
+// Makes it possible to get a C-style string from a QByteArray without calling
+// QByteArray::constData() directly.
+// We don't want to return QByteArray::constData() in a function creating
+// a QByteArray because the data would be freed after the function ended.
+struct CStringWrapper : public QByteArray {
+    CStringWrapper(QByteArray &&other)
+        : QByteArray(other)
+    {
+    }
+    CStringWrapper(const QByteArray &other)
+        : QByteArray(other)
+    {
+    }
+    operator const char *() const
+    {
+        return this->constData();
+    }
+};
+
+template<>
+CStringWrapper nodeValue<CStringWrapper>(ryml::ConstNodeRef node)
+{
+    return nodeValue<QByteArray>(node);
+}
+
+template<>
+Qt::Alignment nodeValue<Qt::Alignment>(ryml::ConstNodeRef node)
 {
     Qt::Alignment align;
 
@@ -50,23 +89,23 @@ Qt::Alignment nodeToAlignment(ryml::ConstNodeRef node)
     }
 
     if (node.has_child("horizontal")) {
-        auto alignHorizontal = nodeToString(node["horizontal"]);
-        if (alignHorizontal == u"left") {
+        auto alignHorizontal = nodeValue<c4::csubstr>(node["horizontal"]);
+        if (alignHorizontal == "left") {
             align |= Qt::AlignLeft;
-        } else if (alignHorizontal == u"center") {
+        } else if (alignHorizontal == "center") {
             align |= Qt::AlignHCenter;
-        } else if (alignHorizontal == u"right") {
+        } else if (alignHorizontal == "right") {
             align |= Qt::AlignRight;
         }
     }
 
     if (node.has_child("vertical")) {
-        auto alignVertical = nodeToString(node["vertical"]);
-        if (alignVertical == u"top") {
+        auto alignVertical = nodeValue<c4::csubstr>(node["vertical"]);
+        if (alignVertical == "top") {
             align |= Qt::AlignTop;
-        } else if (alignVertical == u"center") {
+        } else if (alignVertical == "center") {
             align |= Qt::AlignVCenter;
-        } else if (alignVertical == u"bottom") {
+        } else if (alignVertical == "bottom") {
             align |= Qt::AlignBottom;
         }
     }
@@ -161,23 +200,23 @@ struct LoadingContext {
         }
 
         if (node.has_child("path")) {
-            data.paths.push(nodeToString(node["path"]));
+            data.paths.push(nodeValue<QString>(node["path"]));
             cleanup.flags |= ContextCleanup::CleanupFlag::Path;
         }
 
         if (node.has_child("prefix")) {
-            data.prefixes.push(nodeToString(node["prefix"]));
+            data.prefixes.push(nodeValue<QString>(node["prefix"]));
             cleanup.flags |= ContextCleanup::CleanupFlag::Prefix;
         }
 
         if (node.has_child("element")) {
-            data.elementNames.push(nodeToString(node["element"]));
+            data.elementNames.push(nodeValue<QString>(node["element"]));
             cleanup.flags |= ContextCleanup::CleanupFlag::ElementName;
         }
 
         if (node.has_child("colorSet")) {
             auto colorSetEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("ColorSet"));
-            data.colorSets.push(Element::ColorSet(colorSetEnum.keyToValue(nodeToString(node["colorSet"]).toUtf8().data())));
+            data.colorSets.push(Element::ColorSet(colorSetEnum.keyToValue(nodeValue<CStringWrapper>(node["colorSet"]))));
         }
 
         return cleanup;
@@ -283,21 +322,21 @@ Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext 
     auto style = Style::create();
 
     if (node.has_child("type")) {
-        selectors.append(Selector::create<SelectorType::Type>(nodeToString(node["type"])));
+        selectors.append(Selector::create<SelectorType::Type>(nodeValue<QString>(node["type"])));
     }
 
     if (node.has_child("id")) {
-        selectors.append(Selector::create<SelectorType::Id>(nodeToString(node["id"])));
+        selectors.append(Selector::create<SelectorType::Id>(nodeValue<QString>(node["id"])));
     }
 
     if (node.has_child("state")) {
         auto stateEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("State"));
-        selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeToString(node["state"]).toUtf8().data()))));
+        selectors.append(Selector::create<SelectorType::State>(Element::State(stateEnum.keyToValue(nodeValue<CStringWrapper>(node["state"])))));
     }
 
     if (node.has_child("colorSet")) {
         auto colorSetEnum = Element::staticMetaObject.enumerator(Element::staticMetaObject.indexOfEnumerator("ColorSet"));
-        selectors.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(nodeToString(node["colorSet"]).toUtf8().data()))));
+        selectors.append(Selector::create<SelectorType::ColorSet>(Element::ColorSet(colorSetEnum.keyToValue(nodeValue<CStringWrapper>(node["colorSet"])))));
     }
 
     SelectorList currentSelectors = context.selectors();
@@ -522,28 +561,28 @@ std::optional<Union::TextDefinition> PlasmaSvgLoader::createTextDefinition(ryml:
     Union::TextDefinition text;
 
     if (node.has_child("align")) {
-        text.alignment = nodeToAlignment(node["align"]);
+        text.alignment = nodeValue<Qt::Alignment>(node["align"]);
     }
 
     if (node.has_child("font")) {
         if (node.has_val()) {
-            auto fontName = nodeToString(node["font"]);
+            auto fontName = nodeValue<c4::csubstr>(node["font"]);
 
             auto config = KSharedConfig::openConfig(u"kdeglobals"_s);
             auto group = config->group(u"General"_s);
             QFont font;
 
-            if (fontName == u"system-normal") {
+            if (fontName == "system-normal") {
                 text.font = group.readEntry("font", QFont());
-            } else if (fontName == u"system-fixed") {
+            } else if (fontName == "system-fixed") {
                 text.font = group.readEntry("fixed", QFont());
-            } else if (fontName == u"system-small") {
+            } else if (fontName == "system-small") {
                 text.font = group.readEntry("smallestReadableFont", QFont());
-            } else if (fontName == u"system-toolbar") {
+            } else if (fontName == "system-toolbar") {
                 text.font = group.readEntry("toolBarFont", QFont());
-            } else if (fontName == u"system-menu") {
+            } else if (fontName == "system-menu") {
                 text.font = group.readEntry("menuFont", QFont());
-            } else if (fontName == u"system-window") {
+            } else if (fontName == "system-window") {
                 text.font = group.readEntry("activeFont", QFont());
             }
         }
@@ -672,7 +711,7 @@ QImage PlasmaSvgLoader::elementImageBlend(ryml::ConstNodeRef node, LoadingContex
     int maxWidth = 0;
     int maxHeight = 0;
     for (auto child : node["elements"].children()) {
-        context.data.elementNames.push(nodeToString(child));
+        context.data.elementNames.push(nodeValue<QString>(child));
         auto image = elementImage(node, context);
         context.data.elementNames.pop();
 
@@ -683,7 +722,7 @@ QImage PlasmaSvgLoader::elementImageBlend(ryml::ConstNodeRef node, LoadingContex
 
     Qt::Alignment align;
     if (node.has_child("align")) {
-        align = nodeToAlignment(node["align"]);
+        align = nodeValue<Qt::Alignment>(node["align"]);
     }
 
     QImage result(maxWidth, maxHeight, QImage::Format_ARGB32);
