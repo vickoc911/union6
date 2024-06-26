@@ -319,12 +319,12 @@ void PlasmaSvgLoader::createStyles(ryml::ConstNodeRef node, LoadingContext &cont
 SelectorList createSelectors(ryml::ConstNodeRef node)
 {
     SelectorList selectors;
-    if (node.has_child("type")) {
-        selectors.append(Selector::create<SelectorType::Type>(nodeValue<QString>(node["type"])));
+    if (auto typeNode = node.find_child("type"); typeNode.valid()) {
+        selectors.append(Selector::create<SelectorType::Type>(nodeValue<QString>(typeNode)));
     }
 
-    if (node.has_child("id")) {
-        selectors.append(Selector::create<SelectorType::Id>(nodeValue<QString>(node["id"])));
+    if (auto idNode = node.find_child("id"); idNode.valid()) {
+        selectors.append(Selector::create<SelectorType::Id>(nodeValue<QString>(idNode)));
     }
 
     if (auto stateNode = node.find_child("state"); stateNode.valid()) {
