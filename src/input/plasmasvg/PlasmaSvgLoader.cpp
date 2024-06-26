@@ -316,11 +316,9 @@ void PlasmaSvgLoader::createStyles(ryml::ConstNodeRef node, LoadingContext &cont
     }
 }
 
-Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext &context)
+SelectorList createSelectors(ryml::ConstNodeRef node)
 {
     SelectorList selectors;
-    auto style = Style::create();
-
     if (node.has_child("type")) {
         selectors.append(Selector::create<SelectorType::Type>(nodeValue<QString>(node["type"])));
     }
@@ -398,7 +396,13 @@ Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext 
             selectors.append(Selector::create<SelectorType::AnyOf>(anyOfList));
         }
     }
+    return selectors;
+}
 
+Style::Ptr PlasmaSvgLoader::createStyle(ryml::ConstNodeRef node, LoadingContext &context)
+{
+    auto style = Style::create();
+    SelectorList selectors = createSelectors(node);
     SelectorList currentSelectors = context.selectors();
     if (selectors.size() == 1) {
         currentSelectors.append(selectors.first());
