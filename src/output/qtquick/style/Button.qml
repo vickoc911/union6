@@ -9,9 +9,6 @@
 import QtQuick
 import QtQuick.Controls.impl as QCCImpl
 import QtQuick.Templates as T
-
-// import org.kde.kirigami 2.12 as Kirigami
-
 import org.kde.union.impl as Union
 
 T.Button {
@@ -49,8 +46,19 @@ T.Button {
     font: Union.Style.text.font
 
     spacing: 6
-    icon.width: 16
-    icon.height: 16
+    icon {
+        color: Union.Style.icon.color
+        width: Union.Style.icon.width
+        height: Union.Style.icon.height
+        name: {
+            console.log(this, "name", Union.Style.icon.name)
+            return Union.Style.icon.name
+        }
+        source: {
+            console.log(this, "source", Union.Style.icon.source)
+            return Union.Style.icon.source
+        }
+    }
 
     contentItem: QCCImpl.IconLabel {
         spacing: control.spacing
