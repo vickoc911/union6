@@ -37,6 +37,7 @@ ApplicationWindow {
         Button {
             Layout.preferredWidth: 200
             Layout.preferredHeight: 50
+            icon.name: "document-new"
             text: "Test"
             icon.name: "document-save"
         }
@@ -44,6 +45,7 @@ ApplicationWindow {
         PC.Button {
             Layout.preferredWidth: 200
             Layout.preferredHeight: 50
+            icon.name: "document-new"
             text: "Test"
             icon.name: "document-save"
         }
