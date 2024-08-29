@@ -112,6 +112,12 @@ inline qreal constantValue<qreal>(ryml::ConstNodeRef node)
 }
 
 template<>
+inline int constantValue<int>(ryml::ConstNodeRef node)
+{
+    return value<int>(node);
+}
+
+template<>
 inline QString constantValue<QString>(ryml::ConstNodeRef node)
 {
     return value<QString>(node);
