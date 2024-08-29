@@ -7,7 +7,7 @@
 */
 
 import QtQuick
-import QtQuick.Controls.impl as QCCImpl
+import QtQuick.Controls.impl as QQCImpl
 import QtQuick.Templates as T
 import org.kde.union.impl as Union
 
@@ -27,7 +27,7 @@ T.Button {
         hovered: control.hovered
         activeFocus: control.activeFocus
         visualFocus: control.visualFocus
-        pressed: control.pressed
+        pressed: control.down
         checked: control.checked
         enabled: control.enabled
         highlighted: control.highlighted
@@ -56,17 +56,29 @@ T.Button {
         source: Union.Style.properties.icon.source
     }
 
-    contentItem: QCCImpl.IconLabel {
-        spacing: control.spacing
-        mirrored: control.mirrored
-        display: control.display
-        icon: control.icon
-        text: control.text
-        font: control.font
-        color: Union.Style.properties.text.color
-        alignment: Union.Style.properties.text.alignment
+    contentItem: Union.Positioner {
+        container: control
+
+        QQCImpl.IconImage {
+            Union.Positioner.source: Union.PositionerSource.Icon
+            width: control.icon.width
+            height: control.icon.height
+
+            name: control.icon.name
+            color: control.icon.color
+            visible: name.length > 0
+        }
+
+        Text {
+            Union.Positioner.source: Union.PositionerSource.Text
+
+            text: control.text
+            font: control.font
+            color: Union.Style.properties.text.color
+
+            renderType: Text.NativeRendering
+        }
     }
 
-    background: Union.StyledRectangle {
-    }
+    background: Union.StyledRectangle { }
 }
