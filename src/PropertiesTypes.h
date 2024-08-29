@@ -42,6 +42,20 @@ enum class LineStyle {
 };
 Q_ENUM_NS(LineStyle)
 
+enum class AlignmentContainer {
+    Item,
+    Content,
+    Background,
+};
+Q_ENUM_NS(AlignmentContainer)
+
+enum class Alignment {
+    Start,
+    Center,
+    End,
+    Fill,
+};
+Q_ENUM_NS(Alignment)
 }
 }
 
