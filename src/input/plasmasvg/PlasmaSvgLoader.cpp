@@ -293,7 +293,7 @@ std::optional<LayoutProperty> PlasmaSvgLoader::createLayoutProperty(ryml::ConstN
         }
     });
     with_child(node, "alignment", [&](auto node) {
-        layout.setAlignment(value<Qt::Alignment>(node));
+        layout.setAlignment(createAlignmentProperty(node, context));
     });
     with_child(node, "padding", [&](auto node) {
         layout.setPadding(createSizeProperty(node, context));
@@ -315,7 +315,7 @@ std::optional<TextProperty> PlasmaSvgLoader::createTextProperty(ryml::ConstNodeR
 
     TextProperty text;
     with_child(node, "alignment", [&](auto node) {
-        text.setAlignment(value<Qt::Alignment>(node));
+        text.setAlignment(createAlignmentProperty(node, context));
     });
     with_child(node, "font", [&](auto node) {
         auto fontName = node.val();
@@ -338,6 +338,9 @@ std::optional<Union::Properties::IconProperty> PlasmaSvgLoader::createIconProper
     auto cleanup = context.pushFromNode(node);
 
     IconProperty icon;
+    with_child(node, "alignment", [&](auto node) {
+        icon.setAlignment(createAlignmentProperty(node, context));
+    });
     with_child(node, "width", [&](auto node) {
         auto value = PropertyFunctions::elementProperty<qreal>(node, context);
         if (value.has_value()) {
@@ -417,6 +420,30 @@ std::optional<BackgroundProperty> PlasmaSvgLoader::createBackgroundProperty(ryml
     });
 
     return background;
+}
+
+std::optional<Union::Properties::AlignmentProperty> PlasmaSvgLoader::createAlignmentProperty(ryml::ConstNodeRef node, LoadingContext &context)
+{
+    if (!node.is_map()) {
+        return std::nullopt;
+    }
+
+    auto cleanup = context.pushFromNode(node);
+
+    Union::Properties::AlignmentProperty alignment;
+    with_child(node, "container", [&](auto node) {
+        alignment.setContainer(value<Union::Properties::AlignmentContainer>(node));
+    });
+    with_child(node, "horizontal", [&](auto node) {
+        alignment.setHorizontal(value<Union::Properties::Alignment>(node));
+    });
+    with_child(node, "vertical", [&](auto node) {
+        alignment.setVertical(value<Union::Properties::Alignment>(node));
+    });
+    with_child(node, "order", [&](auto node) {
+        alignment.setOrder(value<int>(node));
+    });
+    return alignment;
 }
 
 std::optional<SizeProperty> PlasmaSvgLoader::createSizeProperty(ryml::ConstNodeRef node, LoadingContext &context)
