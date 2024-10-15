@@ -139,7 +139,7 @@ inline T value(ryml::ConstNodeRef node)
 template<>
 inline QByteArrayView value<QByteArrayView>(ryml::ConstNodeRef node)
 {
-    return node.val();
+    return QByteArrayView(node.val().data(), node.val().size());
 }
 
 template<>

@@ -9,11 +9,15 @@
 #include <QPainter>
 #include <QVariant>
 
+#include <KConfigGroup>
+#include <KSharedConfig>
+
 #include "PlasmaSvgRenderer.h"
 
 #include "plasmasvg_logging.h"
 
 using namespace PropertyFunctions;
+using namespace Qt::StringLiterals;
 
 PropertyFunctionResult PropertyFunctions::elementSize(ryml::ConstNodeRef node, LoadingContext &context)
 {
@@ -77,7 +81,11 @@ PropertyFunctionResult PropertyFunctions::elementImageBlend(ryml::ConstNodeRef n
 {
     auto elementsNode = node.find_child("elements");
     if (!elementsNode.readable()) {
-        return QImage{};
+        return Error("Could not find key 'elements'");
+    }
+
+    if (!elementsNode.has_children()) {
+        return Error("Key 'elements' is empty");
     }
 
     QList<QImage> images;
@@ -175,4 +183,50 @@ PropertyFunctionResult PropertyFunctions::sum(ryml::ConstNodeRef node, LoadingCo
     }
 
     return result;
+}
+
+PropertyFunctionResult PropertyFunctions::fontFromName(ryml::ConstNodeRef node, LoadingContext &context)
+{
+    auto cleanup = context.pushFromNode(node);
+
+    QFont font;
+    with_child(node, "name", [&](auto node) {
+        font = constantValue<QFont>(node);
+    });
+
+    if (font.exactMatch()) {
+        return font;
+    } else {
+        return Error{"Could not find font"};
+    }
+}
+
+PropertyFunctionResult PropertyFunctions::iconSizeFromName(ryml::ConstNodeRef node, LoadingContext &context)
+{
+    auto cleanup = context.pushFromNode(node);
+
+    QByteArrayView name;
+    with_child(node, "name", [&](auto node) {
+        name = value<QByteArrayView>(node);
+    });
+
+    if (name.isEmpty()) {
+        return Error{"Could not find key 'name'"};
+    }
+
+    if (name == "small") {
+        return 16;
+    } else if (name == "small-medium") {
+        return 22;
+    } else if (name == "medium") {
+        return 32;
+    } else if (name == "large") {
+        return 48;
+    } else if (name == "huge") {
+        return 64;
+    } else if (name == "enormous") {
+        return 128;
+    } else {
+        return Error{"Invalid name given for icon size: " + name};
+    }
 }

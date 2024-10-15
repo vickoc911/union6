@@ -34,32 +34,6 @@ using namespace std::string_literals;
 
 constexpr char16_t PluginName[] = u"plasmasvg";
 
-QFont fontFromName(c4::csubstr name)
-{
-    auto config = KSharedConfig::openConfig(u"kdeglobals"_s);
-    auto group = config->group(u"General"_s);
-
-    QFont font;
-
-    if (name == "system-normal") {
-        font = group.readEntry("font", QFont());
-    } else if (name == "system-fixed") {
-        font = group.readEntry("fixed", QFont());
-    } else if (name == "system-small") {
-        font = group.readEntry("smallestReadableFont", QFont());
-    } else if (name == "system-toolbar") {
-        font = group.readEntry("toolBarFont", QFont());
-    } else if (name == "system-menu") {
-        font = group.readEntry("menuFont", QFont());
-    } else if (name == "system-window") {
-        font = group.readEntry("activeFont", QFont());
-    } else {
-        font = QFont(QString::fromUtf8(name));
-    }
-
-    return font;
-}
-
 void logError(QByteArrayView property, QByteArrayView value, const PropertyFunctions::Error &error, const LoadingContext &context)
 {
     qCWarning(UNION_PLASMASVG) << "Failed setting value" << value << "of property" << property << "of rule" << context.selectors() << ":"
@@ -298,6 +272,9 @@ std::optional<LayoutProperty> PlasmaSvgLoader::createLayoutProperty(ryml::ConstN
     with_child(node, "padding", [&](auto node) {
         layout.setPadding(createSizeProperty(node, context));
     });
+    with_child(node, "inset", [&](auto node) {
+        layout.setInset(createSizeProperty(node, context));
+    });
     with_child(node, "margins", [&](auto node) {
         layout.setMargins(createSizeProperty(node, context));
     });
@@ -318,12 +295,12 @@ std::optional<TextProperty> PlasmaSvgLoader::createTextProperty(ryml::ConstNodeR
         text.setAlignment(createAlignmentProperty(node, context));
     });
     with_child(node, "font", [&](auto node) {
-        auto fontName = node.val();
-        if (fontName.empty()) {
-            return;
+        auto value = PropertyFunctions::elementProperty<QFont>(node, context);
+        if (value.has_value()) {
+            text.setFont(value.value());
+        } else {
+            logError("text", "font", value.error(), context);
         }
-
-        text.setFont(fontFromName(fontName));
     });
 
     return text;

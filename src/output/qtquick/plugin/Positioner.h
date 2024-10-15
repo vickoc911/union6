@@ -73,18 +73,16 @@ public:
     static PositionerContainer *qmlAttachedProperties(QObject *parent);
 
 private:
-    using LayoutList = QList<std::pair<QQuickItem *, AlignmentPropertyGroup *>>;
-
-    struct PositionerItemBinding {
-        QQuickItem *item = nullptr;
-        QPropertyNotifier widthObserver;
-        QPropertyNotifier heightObserver;
-    };
-
-    QRectF layoutItems(const QRectF &bounds, qreal spacing, const LayoutList &items);
+    // struct PositionerItemBinding {
+    //     QQuickItem *item = nullptr;
+    //     QPropertyNotifier widthObserver;
+    //     QPropertyNotifier heightObserver;
+    //     QMetaObject::Connection visibleObserver;
+    // };
 
     QQuickItem *m_parentItem = nullptr;
-    std::vector<PositionerItemBinding> m_items;
+    // std::vector<PositionerItemBinding> m_items;
+    std::vector<QQuickItem *> m_items;
     bool m_layoutDirty = true;
 };
 

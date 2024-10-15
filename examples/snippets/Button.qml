@@ -59,6 +59,20 @@ ApplicationWindow {
             Layout.preferredHeight: 50
             text: "Test 2"
         }
+
+        Button {
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: 50
+            text: "Test 3"
+
+            Element.hints: ["align-right"];
+        }
+
+        PC.Button {
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: 50
+            text: "Test 3"
+        }
     }
 
     footer: ToolBar {

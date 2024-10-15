@@ -12,6 +12,76 @@
 
 using namespace Union;
 
+struct LayoutItem {
+    QRectF geometry;
+    Properties::Alignment verticalAlignment = Properties::Alignment::Start;
+    int order = 0;
+    QMarginsF margins;
+    QQuickItem *item = nullptr;
+};
+
+struct LayoutBucket {
+    QRectF geometry;
+    qreal spacing = 0.0;
+    QList<LayoutItem> items;
+};
+
+struct LayoutContainer {
+    QRectF geometry;
+
+    LayoutBucket start;
+    LayoutBucket center;
+    LayoutBucket end;
+    LayoutBucket fill;
+};
+
+void layoutBucket(LayoutBucket &bucket);
+
+void layoutContainer(LayoutContainer &container)
+{
+    for (auto bucket : {&container.start, &container.end, &container.center, &container.fill}) {
+        bucket->geometry.setY(container.geometry.y());
+        bucket->geometry.setHeight(container.geometry.height());
+        layoutBucket(*bucket);
+    }
+
+    QRectF placementRect = container.geometry;
+    container.start.geometry.moveLeft(placementRect.x());
+    placementRect.moveLeft(container.start.geometry.right());
+    placementRect.setWidth(placementRect.width() - container.end.geometry.width());
+    container.end.geometry.moveLeft(placementRect.right());
+    container.center.geometry.moveLeft(placementRect.center().x() - container.center.geometry.width() / 2);
+    container.fill.geometry = placementRect;
+}
+
+void layoutBucket(LayoutBucket &bucket)
+{
+    qreal x = 0.0;
+    for (auto &item : bucket.items) {
+        x += item.margins.left();
+        item.geometry.moveLeft(x);
+        x += item.geometry.width() + item.margins.right() + bucket.spacing;
+
+        switch (item.verticalAlignment) {
+        case Properties::Alignment::Start:
+            item.geometry.moveTop(0);
+            break;
+        case Properties::Alignment::Center:
+            item.geometry.moveTop(bucket.geometry.height() / 2 - item.geometry.height() / 2);
+            break;
+        case Properties::Alignment::End:
+            item.geometry.moveTop(bucket.geometry.height() - item.geometry.height());
+            break;
+        case Properties::Alignment::Fill:
+            item.geometry.moveTop(0);
+            item.geometry.setHeight(bucket.geometry.height());
+            break;
+        }
+    }
+
+    bucket.geometry.setWidth(x);
+}
+
 PositionerSource::Source PositionerAttached::source() const
 {
     return m_source;
@@ -47,27 +117,29 @@ PositionerContainer::PositionerContainer(QObject *parent)
 
 void PositionerContainer::addItem(QQuickItem *item)
 {
-    auto &binding = m_items.emplace_back(item);
-    binding.widthObserver = item->bindableWidth().addNotifier([this]() {
+    auto changeHandler = [this, item]() {
         m_layoutDirty = true;
-        m_parentItem->polish();
-    });
-    binding.heightObserver = item->bindableHeight().addNotifier([this]() {
-        m_layoutDirty = true;
-        m_parentItem->polish();
-    });
+        item->parentItem()->polish();
+    };
+
+    connect(item, &QQuickItem::implicitWidthChanged, this, changeHandler);
+    connect(item, &QQuickItem::implicitHeightChanged, this, changeHandler);
+    connect(item, &QQuickItem::visibleChanged, this, changeHandler);
+
+    m_items.push_back(item);
 
     m_layoutDirty = true;
 }
 
 void PositionerContainer::removeItem(QQuickItem *item)
 {
-    m_items.erase(std::remove_if(m_items.begin(),
-                                 m_items.end(),
-                                 [item](const auto &entry) {
-                                     return entry.item == item;
-                                 }),
-                  m_items.end());
+    auto itr = std::find(m_items.begin(), m_items.end(), item);
+    if (itr == m_items.end()) {
+        return;
+    }
+
+    (*itr)->disconnect(this);
+    m_items.erase(itr);
     m_layoutDirty = true;
 }
 
@@ -77,21 +149,23 @@ void PositionerContainer::layout()
         return;
     }
 
-    LayoutList itemRelative;
-    LayoutList contentRelative;
-    LayoutList backgroundRelative;
+    LayoutContainer itemRelative;
+    LayoutContainer contentRelative;
+    LayoutContainer backgroundRelative;
 
     for (auto &item : m_items) {
         auto source = PositionerSource::Source::Layout;
 
-        auto positionerAttached = qobject_cast<PositionerAttached *>(qmlAttachedPropertiesObject<Positioner>(item.item, false));
+        if (!item->isVisible()) {
+            continue;
+        }
+
+        auto positionerAttached = qobject_cast<PositionerAttached *>(qmlAttachedPropertiesObject<Positioner>(item, false));
         if (positionerAttached) {
             source = positionerAttached->source();
         }
 
-        qDebug() << source;
-
-        auto styleAttached = qobject_cast<QuickStyle *>(qmlAttachedPropertiesObject<QuickStyle>(item.item, true));
+        auto styleAttached = qobject_cast<QuickStyle *>(qmlAttachedPropertiesObject<QuickStyle>(item, true));
         AlignmentPropertyGroup *alignment = nullptr;
         switch (source) {
         case PositionerSource::Source::Layout:
@@ -109,15 +183,43 @@ void PositionerContainer::layout()
             continue;
         }
 
+        LayoutItem layoutItem{
+            .geometry = QRectF{0, 0, item->implicitWidth(), item->implicitHeight()},
+            .verticalAlignment = alignment->vertical(),
+            .order = alignment->order(),
+            .margins = QMarginsF{},
+            .item = item,
+        };
+
+        if (source == PositionerSource::Source::Layout) {
+            auto margins = styleAttached->properties()->layout()->margins();
+            layoutItem.margins = QMarginsF(margins->left(), margins->top(), margins->right(), margins->bottom());
+        }
+
+        LayoutContainer *container = &itemRelative;
         switch (alignment->container()) {
-        case Union::Properties::AlignmentContainer::Item:
-            itemRelative.append(std::make_pair(item.item, alignment));
+        case Properties::AlignmentContainer::Content:
+            container = &contentRelative;
             break;
-        case Union::Properties::AlignmentContainer::Content:
-            contentRelative.append(std::make_pair(item.item, alignment));
+        case Properties::AlignmentContainer::Background:
+            container = &backgroundRelative;
             break;
-        case Union::Properties::AlignmentContainer::Background:
-            backgroundRelative.append(std::make_pair(item.item, alignment));
+        case Properties::AlignmentContainer::Item:
+            break;
+        }
+
+        switch (alignment->horizontal()) {
+        case Properties::Alignment::Start:
+            container->start.items.append(layoutItem);
+            break;
+        case Properties::Alignment::Center:
+            container->center.items.append(layoutItem);
+            break;
+        case Properties::Alignment::End:
+            container->end.items.append(layoutItem);
+            break;
+        case Properties::Alignment::Fill:
+            container->fill.items.append(layoutItem);
             break;
         }
     }
@@ -125,19 +227,50 @@ void PositionerContainer::layout()
     auto styleAttached = qobject_cast<QuickStyle *>(qmlAttachedPropertiesObject<QuickStyle>(m_parentItem, true));
     qreal spacing = styleAttached->properties()->layout()->spacing();
 
-    QRectF result = layoutItems(m_parentItem->boundingRect(), spacing, itemRelative);
+    auto sort = [](auto &container) {
+        std::stable_sort(container.begin(), container.end(), [](auto first, auto second) {
+            return first.order < second.order;
+        });
+    };
 
-    QRectF backgroundBounds = result;
+    for (auto container : {&itemRelative, &contentRelative, &backgroundRelative}) {
+        container->start.spacing = spacing;
+        container->center.spacing = spacing;
+        container->end.spacing = spacing;
+        container->fill.spacing = spacing;
+
+        sort(container->start.items);
+        sort(container->center.items);
+        sort(container->end.items);
+        sort(container->fill.items);
+    }
+
+    itemRelative.geometry = m_parentItem->boundingRect();
+
+    layoutContainer(itemRelative);
+    QRectF remaining = itemRelative.geometry.adjusted(itemRelative.start.geometry.width(), 0.0, itemRelative.end.geometry.width(), 0.0);
+
     auto inset = styleAttached->properties()->layout()->inset();
-    backgroundBounds.adjust(-inset->left(), -inset->top(), -inset->right(), -inset->bottom());
-    layoutItems(backgroundBounds, spacing, backgroundRelative);
+    backgroundRelative.geometry = remaining.adjusted(inset->left(), inset->top(), -inset->right(), -inset->bottom());
+    layoutContainer(backgroundRelative);
 
-    QRectF contentBounds = result;
     auto padding = styleAttached->properties()->layout()->padding();
-    contentBounds.adjust(-padding->left(), -padding->top(), -padding->right(), -padding->bottom());
-    layoutItems(contentBounds, spacing, contentRelative);
+    contentRelative.geometry = remaining.adjusted(padding->left(), padding->top(), -padding->right(), -padding->bottom());
+    layoutContainer(contentRelative);
 
-    m_layoutDirty = false;
+    for (auto container : {&itemRelative, &backgroundRelative, &contentRelative}) {
+        for (auto bucket : {&container->start, &container->end, &container->center, &container->fill}) {
+            auto geometry = bucket->geometry;
+            for (auto item : bucket->items) {
+                auto position = QPointF(geometry.left() + item.geometry.left(), geometry.top() + item.geometry.top());
+                auto mapped = m_parentItem->mapToItem(item.item, position);
+                item.item->setX(std::round(mapped.x()));
+                item.item->setY(std::round(mapped.y()));
+                item.item->setWidth(std::round(item.geometry.width()));
+                item.item->setHeight(std::round(item.geometry.height()));
+            }
+        }
+    }
 }
 
 PositionerContainer *PositionerContainer::qmlAttachedProperties(QObject *parent)
@@ -148,109 +281,6 @@ PositionerContainer *PositionerContainer::qmlAttachedProperties(QObject *parent)
     }
 
     return new PositionerContainer(parent);
-}
-
-QRectF PositionerContainer::layoutItems(const QRectF &bounds, qreal spacing, const LayoutList &items)
-{
-    if (items.isEmpty()) {
-        return bounds;
-    }
-
-    LayoutList start;
-    LayoutList center;
-    LayoutList end;
-    LayoutList fill;
-    for (auto entry : items) {
-        switch (entry.second->horizontal()) {
-        case Union::Properties::Alignment::Start:
-            start.append(entry);
-            break;
-        case Union::Properties::Alignment::Center:
-            center.append(entry);
-            break;
-        case Union::Properties::Alignment::End:
-            end.append(entry);
-            break;
-        case Union::Properties::Alignment::Fill:
-            fill.append(entry);
-            break;
-        }
-    }
-
-    auto compare = [](auto first, auto second) {
-        return first.second->order() < second.second->order();
-    };
-    std::stable_sort(start.begin(), start.end(), compare);
-    std::stable_sort(center.begin(), center.end(), compare);
-    std::stable_sort(end.begin(), end.end(), compare);
-    std::stable_sort(fill.begin(), fill.end(), compare);
-
-    auto setPosition = [this](auto item, auto x, auto y) {
-        auto mapped = m_parentItem->mapToItem(item, x, y);
-        item->setX(mapped.x());
-        item->setY(mapped.y());
-    };
-
-    auto setY = [this](auto bounds, auto x, auto item, auto alignment) {
-        switch (alignment->vertical()) {
-        case Union::Properties::Alignment::Start:
-            item->setY(bounds.y());
-            break;
-        case Union::Properties::Alignment::Center: {
-            auto y = bounds.y() + (bounds.height() - item->height()) / 2;
-            auto mapped = m_parentItem->mapToItem(item, x, y);
-            item->setX(mapped.x());
-            item->setY(mapped.y());
-            break;
-        }
-        case Union::Properties::Alignment::End:
-            item->setY(bounds.y() + bounds.height() - item->height());
-            break;
-        case Union::Properties::Alignment::Fill:
-            item->setY(bounds.y());
-            item->setHeight(bounds.height());
-            break;
-        }
-    };
-
-    QRectF resultBounds = bounds;
-
-    for (auto [item, alignment] : start) {
-        auto x = resultBounds.x();
-        resultBounds.moveLeft(item->width());
-        setY(resultBounds, x, item, alignment);
-    }
-
-    for (auto [item, alignment] : end) {
-        resultBounds.moveRight(-item->width());
-        auto x = resultBounds.right();
-        setY(resultBounds, x, item, alignment);
-    }
-
-    qreal width = 0.0;
-    qreal height = 0.0;
-    for (auto [item, alignment] : center) {
-        width += item->width();
-        height = std::max(height, item->height());
-    }
-
-    QRectF centerArea{resultBounds.x() + (resultBounds.width() - width) / 2.0, //
-                      resultBounds.y() + (resultBounds.height() - height) / 2.0,
-                      width,
-                      height};
-
-    auto x = centerArea.x();
-    for (auto [item, alignment] : center) {
-        setPosition(item, x, centerArea.y());
-        x += item->width();
-    }
-
-    for (auto [item, alignment] : fill) {
-        item->setWidth(resultBounds.width());
-        setY(resultBounds, resultBounds.x(), item, alignment);
-    }
-
-    return resultBounds;
 }
 
 Positioner::Positioner(QQuickItem *parentItem)

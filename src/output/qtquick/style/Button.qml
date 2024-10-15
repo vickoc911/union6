@@ -59,17 +59,14 @@ T.Button {
     contentItem: Union.Positioner {
         container: control
 
-        Rectangle {
+        QQCImpl.IconImage {
             Union.Positioner.source: Union.PositionerSource.Icon
             width: control.icon.width
             height: control.icon.height
-            color: Qt.rgba(1, 0, 0, 0.1)
 
-            QQCImpl.IconImage {
-                anchors.fill: parent
-                name: control.icon.name
-                color: control.icon.color
-            }
+            name: control.icon.name
+            color: control.icon.color
+            visible: name.length > 0
         }
 
         Text {
@@ -78,6 +75,8 @@ T.Button {
             text: control.text
             font: control.font
             color: Union.Style.properties.text.color
+
+            renderType: Text.NativeRendering
         }
     }
 

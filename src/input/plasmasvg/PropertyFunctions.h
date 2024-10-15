@@ -10,6 +10,9 @@
 
 #include <QHash>
 
+#include <KConfigGroup>
+#include <KSharedConfig>
+
 #include <ryml.hpp>
 
 #include "LoadingContext.h"
@@ -89,6 +92,8 @@ PropertyFunctionResult elementHeight(ryml::ConstNodeRef node, LoadingContext &co
 PropertyFunctionResult elementImage(ryml::ConstNodeRef node, LoadingContext &context);
 PropertyFunctionResult elementImageBlend(ryml::ConstNodeRef node, LoadingContext &context);
 PropertyFunctionResult sum(ryml::ConstNodeRef node, LoadingContext &context);
+PropertyFunctionResult fontFromName(ryml::ConstNodeRef node, LoadingContext &context);
+PropertyFunctionResult iconSizeFromName(ryml::ConstNodeRef node, LoadingContext &context);
 
 inline static QHash<QByteArray, PropertyFunction> propertyFunctions{
     {"element-size", elementSize},
@@ -97,6 +102,8 @@ inline static QHash<QByteArray, PropertyFunction> propertyFunctions{
     {"element-image", elementImage},
     {"element-image-blend", elementImageBlend},
     {"sum", sum},
+    {"font-name", fontFromName},
+    {"icon-size", iconSizeFromName},
 };
 
 template<typename T>
@@ -135,6 +142,34 @@ inline QUrl constantValue<QUrl>(ryml::ConstNodeRef node)
     return value<QUrl>(node);
 }
 
+template<>
+inline QFont constantValue<QFont>(ryml::ConstNodeRef node)
+{
+    using namespace Qt::StringLiterals;
+
+    auto config = KSharedConfig::openConfig(u"kdeglobals"_s);
+    auto group = config->group(u"General"_s);
+
+    auto name = value<QByteArrayView>(node);
+    QFont font;
+    if (name == "system-normal") {
+        font = group.readEntry("font", QFont());
+    } else if (name == "system-fixed") {
+        font = group.readEntry("fixed", QFont());
+    } else if (name == "system-small") {
+        font = group.readEntry("smallestReadableFont", QFont());
+    } else if (name == "system-toolbar") {
+        font = group.readEntry("toolBarFont", QFont());
+    } else if (name == "system-menu") {
+        font = group.readEntry("menuFont", QFont());
+    } else if (name == "system-window") {
+        font = group.readEntry("activeFont", QFont());
+    } else {
+        font = QFont(QString::fromUtf8(name));
+    }
+    return font;
+}
+
 template<typename T>
 Result<T> elementProperty(ryml::ConstNodeRef node, LoadingContext &context)
 {
@@ -147,7 +182,7 @@ Result<T> elementProperty(ryml::ConstNodeRef node, LoadingContext &context)
         return Error{"Key 'property' not found"};
     }
 
-    auto name = value<QByteArray>(propertyNode);
+    auto name = value<QByteArrayView>(propertyNode);
     if (name.isEmpty()) {
         return Error{"Key 'property' is empty"};
     }
@@ -157,15 +192,19 @@ Result<T> elementProperty(ryml::ConstNodeRef node, LoadingContext &context)
         return valueNode.readable() ? Result{constantValue<T>(valueNode)} : Error{"Key 'value' not found"};
     }
 
-    if (!propertyFunctions.contains(name)) {
+    auto itr = std::find_if(propertyFunctions.keyValueBegin(), propertyFunctions.keyValueEnd(), [name](auto entry) {
+        return name == entry.first;
+    });
+
+    if (itr == propertyFunctions.keyValueEnd()) {
         return Error{"No property function named " + name + " could be found"};
     }
 
     auto cleanup = context.pushFromNode(node);
 
-    auto result = propertyFunctions.value(name)(node, context);
+    auto result = itr->second(node, context);
     if (result.has_value()) {
-        return result.value<T>();
+        return result.template value<T>();
     } else {
         return result.error();
     }
