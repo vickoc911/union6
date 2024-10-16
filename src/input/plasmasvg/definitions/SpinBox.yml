@@ -1,0 +1,32 @@
+spinbox:
+    type: SpinBox
+
+    children:
+        increase: &spinbox-indicator
+            type: Increase
+
+            layout: &spinbox-indicator-layout
+                width:
+                height:
+
+                alignment:
+                    container: Item
+                    horizontal: Start
+                    vertical: Fill
+
+            background:
+
+        decrease:
+            <<: *spinbox-indicator
+
+            type: Decrease
+
+            layout:
+                <<: *spinbox-indicator-layout
+
+                alignment:
+                    container: Item
+                    horizontal: End
+                    vertical: Fill
+
+    background:

@@ -5,6 +5,8 @@ import QtQuick
 import QtQuick.Controls.impl
 import QtQuick.Templates as T
 
+import org.kde.union.impl as Union
+
 T.SpinBox {
     id: control
 
@@ -15,8 +17,23 @@ T.SpinBox {
                              implicitContentHeight + topPadding + bottomPadding,
                              up.implicitIndicatorHeight, down.implicitIndicatorHeight)
 
-    leftPadding: padding + (control.mirrored ? (up.indicator ? up.indicator.width : 0) : (down.indicator ? down.indicator.width : 0))
-    rightPadding: padding + (control.mirrored ? (down.indicator ? down.indicator.width : 0) : (up.indicator ? up.indicator.width : 0))
+    // leftPadding: padding + (control.mirrored ? (up.indicator ? up.indicator.width : 0) : (down.indicator ? down.indicator.width : 0))
+    // rightPadding: padding + (control.mirrored ? (down.indicator ? down.indicator.width : 0) : (up.indicator ? up.indicator.width : 0))
+
+
+
+    hoverEnabled: true
+
+    Union.Element.type: "SpinBox"
+    /*Union.Element.states {
+        hovered: control.hovered
+        activeFocus: control.activeFocus
+        visualFocus: control.visualFocus
+        pressed: control.down
+        checked: control.checked
+        enabled: control.enabled
+        highlighted: control.highlighted
+    }*/
 
     validator: IntValidator {
         locale: control.locale.name
@@ -24,34 +41,62 @@ T.SpinBox {
         top: Math.max(control.from, control.to)
     }
 
-    contentItem: TextInput {
-        z: 2
-        text: control.displayText
-        clip: width < implicitWidth
-        padding: 6
+    // contentItem: TextInput {
+    //     z: 2
+    //     text: control.displayText
+    //     clip: width < implicitWidth
+    //     padding: 6
+    //
+    //     font: control.font
+    //     color: control.palette.text
+    //     selectionColor: control.palette.highlight
+    //     selectedTextColor: control.palette.highlightedText
+    //     horizontalAlignment: Qt.AlignHCenter
+    //     verticalAlignment: Qt.AlignVCenter
+    //
+    //     readOnly: !control.editable
+    //     validator: control.validator
+    //     inputMethodHints: control.inputMethodHints
+    //
+    //     Rectangle {
+    //         width: parent.width
+    //         height: parent.height
+    //         visible: control.activeFocus
+    //         color: "transparent"
+    //         border.color: control.palette.highlight
+    //         border.width: 2
+    //     }
+    // }
 
-        font: control.font
-        color: control.palette.text
-        selectionColor: control.palette.highlight
-        selectedTextColor: control.palette.highlightedText
-        horizontalAlignment: Qt.AlignHCenter
-        verticalAlignment: Qt.AlignVCenter
+    contentItem: Union.Positioner {
+        container: control
 
-        readOnly: !control.editable
-        validator: control.validator
-        inputMethodHints: control.inputMethodHints
+        TextInput {
 
-        Rectangle {
-            width: parent.width
-            height: parent.height
-            visible: control.activeFocus
-            color: "transparent"
-            border.color: control.palette.highlight
-            border.width: 2
         }
     }
 
-    up.indicator: Rectangle {
+    up.indicator: Union.Positioner {
+        Union.Element.type: "Increase"
+
+        container: control
+
+        Union.StyledRectangle {
+
+        }
+    }
+
+    down.indicator: Union.Positioner {
+        Union.Element.type: "Decrease"
+
+        container: control
+
+        Union.StyledRectangle {
+
+        }
+    }
+
+    /*Rectangle {
         x: control.mirrored ? 0 : control.width - width
         height: control.height
         implicitWidth: 40
@@ -88,11 +133,7 @@ T.SpinBox {
             height: 2
             color: enabled ? control.palette.buttonText : control.palette.mid
         }
-    }
+    }*/
 
-    background: Rectangle {
-        implicitWidth: 140
-        color: enabled ? control.palette.base : control.palette.button
-        border.color: control.palette.button
-    }
+    background: Union.StyledRectangle { }
 }
