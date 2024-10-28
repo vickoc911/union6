@@ -124,3 +124,27 @@ private:
     PositionerContainer *m_containerAttached = nullptr;
     QPropertyNotifier m_containerNotifier;
 };
+
+class PositionedItem : public QQuickItem
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    PositionedItem(QQuickItem *parentItem = nullptr);
+
+    Q_PROPERTY(QQuickItem *container READ container WRITE setContainer NOTIFY containerChanged)
+    QQuickItem *container() const;
+    void setContainer(QQuickItem *newContainer);
+    Q_SIGNAL void containerChanged();
+
+protected:
+    void itemChange(ItemChange change, const ItemChangeData &data) override;
+    void updatePolish() override;
+
+private:
+    void updateImplicitSize();
+
+    QQuickItem *m_container = nullptr;
+    PositionerContainer *m_containerAttached = nullptr;
+};

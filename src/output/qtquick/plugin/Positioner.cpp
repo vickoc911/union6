@@ -403,3 +403,73 @@ void Positioner::updatePolish()
         m_containerAttached->layout();
     }
 }
+
+PositionedItem::PositionedItem(QQuickItem *parentItem)
+    : QQuickItem(parentItem)
+{
+}
+
+QQuickItem *PositionedItem::container() const
+{
+    return m_container;
+}
+
+void PositionedItem::setContainer(QQuickItem *newContainer)
+{
+    if (newContainer == m_container) {
+        return;
+    }
+
+    auto newContainerAttached = qobject_cast<PositionerContainer *>(qmlAttachedPropertiesObject<PositionerContainer>(newContainer, true));
+    if (newContainerAttached == m_containerAttached) {
+        return;
+    }
+
+    if (m_containerAttached) {
+        m_containerAttached->removeItem(this);
+    }
+
+    m_container = newContainer;
+    m_containerAttached = newContainerAttached;
+    if (m_containerAttached) {
+        m_containerAttached->addItem(this);
+    }
+    polish();
+}
+
+void PositionedItem::itemChange(ItemChange change, const ItemChangeData &data)
+{
+    if (change == ItemChildAddedChange) {
+        connect(data.item, &QQuickItem::implicitWidthChanged, this, &PositionedItem::updateImplicitSize);
+        connect(data.item, &QQuickItem::implicitHeightChanged, this, &PositionedItem::updateImplicitSize);
+        updateImplicitSize();
+    }
+
+    if (change == ItemChildRemovedChange) {
+        disconnect(data.item, &QQuickItem::implicitWidthChanged, this, &PositionedItem::updateImplicitSize);
+        disconnect(data.item, &QQuickItem::implicitHeightChanged, this, &PositionedItem::updateImplicitSize);
+        updateImplicitSize();
+    }
+
+    QQuickItem::itemChange(change, data);
+}
+
+void PositionedItem::updatePolish()
+{
+    if (m_containerAttached) {
+        m_containerAttached->layout();
+    }
+}
+
+void PositionedItem::updateImplicitSize()
+{
+    qreal width = 0.0;
+    qreal height = 0.0;
+
+    const auto children = childItems();
+    for (auto child : children) {
+        width = std::max(width, child->implicitWidth());
+        height = std::max(height, child->implicitHeight());
+    }
+    setImplicitSize(width, height);
+}
