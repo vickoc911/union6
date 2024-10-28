@@ -168,3 +168,37 @@ private:
     QQuickItem *m_container = nullptr;
     PositionerContainer *m_containerAttached = nullptr;
 };
+
+/**
+ * An item that will be placed according to the style-provided alignment properties.
+ *
+ * In constrast to Positioner, PositionedItem will itself be positioned. This is
+ * mainly intended for controls that have sub controls that are exposed as
+ * singular item properties, such as `indicator`.
+ */
+class PositionedItem : public QQuickItem
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    PositionedItem(QQuickItem *parentItem = nullptr);
+
+    /**
+     * The container item to use as root for the layout.
+     */
+    Q_PROPERTY(QQuickItem *container READ container WRITE setContainer NOTIFY containerChanged)
+    QQuickItem *container() const;
+    void setContainer(QQuickItem *newContainer);
+    Q_SIGNAL void containerChanged();
+
+protected:
+    void itemChange(ItemChange change, const ItemChangeData &data) override;
+    void updatePolish() override;
+
+private:
+    void updateImplicitSize();
+
+    QQuickItem *m_container = nullptr;
+    PositionerContainer *m_containerAttached = nullptr;
+};
