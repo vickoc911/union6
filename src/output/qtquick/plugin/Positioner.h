@@ -11,6 +11,7 @@
 #include <QQuickItem>
 #include <qqmlregistration.h>
 
+#include <PropertiesTypes.h>
 #include <properties/StyleProperty.h>
 
 #include "properties/AlignmentPropertyGroup.h"
@@ -45,18 +46,47 @@ class PositionerAttached : public QObject
 public:
     using QObject::QObject;
 
-    Q_PROPERTY(PositionerSource::Source source READ source WRITE setSource BINDABLE bindableSource NOTIFY sourceChanged)
+    /**
+     * Which property to use as source for this item's alignment.
+     *
+     * This can be used to indicate the item is meant to represent an icon or
+     * text element of the control and those alignment properties should be used
+     * for aligning this item.
+     */
+    Q_PROPERTY(PositionerSource::Source source READ source WRITE setSource NOTIFY sourceChanged)
     PositionerSource::Source source() const;
     void setSource(PositionerSource::Source newSource);
-    QBindable<PositionerSource::Source> bindableSource();
     Q_SIGNAL void sourceChanged();
 
+    /**
+     * An override of the style-provided horizontal alignment value.
+     *
+     * Use this to force the alignment to a certain value, in case you want to
+     * use the style's alignment for something else. For example, when you want
+     * to have a text field fill the control and use the text's alignment
+     * properties to control the alignment of the text inside the text field.
+     */
+    Q_PROPERTY(Union::Properties::Alignment horizontalAlignment READ horizontalAlignment WRITE setHorizontalAlignment RESET resetHorizontalAlignment //
+                   NOTIFY horizontalAlignmentChanged)
+    Union::Properties::Alignment horizontalAlignment() const;
+    void setHorizontalAlignment(Union::Properties::Alignment newAlignment);
+    void resetHorizontalAlignment();
+    Q_SIGNAL void horizontalAlignmentChanged();
+
+    /**
+     * An override of the style-provided vertical alignment value.
+     */
+    Q_PROPERTY(Union::Properties::Alignment verticalAlignment READ verticalAlignment WRITE setVerticalAlignment RESET resetVerticalAlignment //
+                   NOTIFY verticalAlignmentChanged)
+    Union::Properties::Alignment verticalAlignment() const;
+    void setVerticalAlignment(Union::Properties::Alignment newAlignment);
+    void resetVerticalAlignment();
+    Q_SIGNAL void verticalAlignmentChanged();
+
 private:
-    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(PositionerAttached,
-                                         PositionerSource::Source,
-                                         m_source,
-                                         PositionerSource::Source::Layout,
-                                         &PositionerAttached::sourceChanged)
+    PositionerSource::Source m_source = PositionerSource::Source::Layout;
+    Union::Properties::Alignment m_horizontalAlignment = Union::Properties::Alignment::Unspecified;
+    Union::Properties::Alignment m_verticalAlignment = Union::Properties::Alignment::Unspecified;
 };
 
 /**
