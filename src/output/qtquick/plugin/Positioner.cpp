@@ -14,7 +14,7 @@ using namespace Union;
 
 struct LayoutItem {
     QRectF geometry;
-    Properties::Alignment verticalAlignment = Properties::Alignment::Start;
+    Union::Properties::Alignment verticalAlignment = Union::Properties::Alignment::Unspecified;
     int order = 0;
     QMarginsF margins;
     QQuickItem *item = nullptr;
@@ -74,16 +74,18 @@ void layoutBucket(LayoutBucket &bucket)
         x += item.geometry.width() + item.margins.right() + bucket.spacing;
 
         switch (item.verticalAlignment) {
-        case Properties::Alignment::Start:
+        case Union::Properties::Alignment::Unspecified:
+        case Union::Properties::Alignment::Start:
             item.geometry.moveTop(0);
             break;
-        case Properties::Alignment::Center:
+        case Union::Properties::Alignment::Center:
             item.geometry.moveTop(bucket.geometry.height() / 2 - item.geometry.height() / 2);
             break;
-        case Properties::Alignment::End:
+        case Union::Properties::Alignment::End:
             item.geometry.moveTop(bucket.geometry.height() - item.geometry.height());
             break;
-        case Properties::Alignment::Fill:
+        case Union::Properties::Alignment::Stack:
+        case Union::Properties::Alignment::Fill:
             item.geometry.moveTop(0);
             item.geometry.setHeight(bucket.geometry.height());
             break;
@@ -103,9 +105,44 @@ void PositionerAttached::setSource(PositionerSource::Source newSource)
     m_source = newSource;
 }
 
-QBindable<PositionerSource::Source> PositionerAttached::bindableSource()
+Union::Properties::Alignment PositionerAttached::horizontalAlignment() const
 {
-    return QBindable<PositionerSource::Source>(&m_source);
+    return m_horizontalAlignment;
+}
+
+void PositionerAttached::setHorizontalAlignment(Union::Properties::Alignment newAlignment)
+{
+    if (newAlignment == m_horizontalAlignment) {
+        return;
+    }
+
+    m_horizontalAlignment = newAlignment;
+    Q_EMIT horizontalAlignmentChanged();
+}
+
+void PositionerAttached::resetHorizontalAlignment()
+{
+    setHorizontalAlignment(Union::Properties::Alignment::Unspecified);
+}
+
+Union::Properties::Alignment PositionerAttached::verticalAlignment() const
+{
+    return m_verticalAlignment;
+}
+
+void PositionerAttached::setVerticalAlignment(Union::Properties::Alignment newAlignment)
+{
+    if (newAlignment == m_verticalAlignment) {
+        return;
+    }
+
+    m_verticalAlignment = newAlignment;
+    Q_EMIT verticalAlignmentChanged();
+}
+
+void PositionerAttached::resetVerticalAlignment()
+{
+    setVerticalAlignment(Union::Properties::Alignment::Unspecified);
 }
 
 PositionerContainer::PositionerContainer(QObject *parent)
@@ -194,9 +231,22 @@ void PositionerContainer::layout()
             continue;
         }
 
+        auto horizontalAlignment = alignment->horizontal();
+        auto verticalAlignment = alignment->vertical();
+
+        if (positionerAttached) {
+            if (positionerAttached->horizontalAlignment() != Union::Properties::Alignment::Unspecified) {
+                horizontalAlignment = positionerAttached->horizontalAlignment();
+            }
+
+            if (positionerAttached->verticalAlignment() != Union::Properties::Alignment::Unspecified) {
+                verticalAlignment = positionerAttached->verticalAlignment();
+            }
+        }
+
         LayoutItem layoutItem{
             .geometry = QRectF{0, 0, item->implicitWidth(), item->implicitHeight()},
-            .verticalAlignment = alignment->vertical(),
+            .verticalAlignment = verticalAlignment,
             .order = alignment->order(),
             .margins = QMarginsF{},
             .item = item,
@@ -209,27 +259,29 @@ void PositionerContainer::layout()
 
         LayoutContainer *container = &itemRelative;
         switch (alignment->container()) {
-        case Properties::AlignmentContainer::Content:
+        case Union::Properties::AlignmentContainer::Content:
             container = &contentRelative;
             break;
-        case Properties::AlignmentContainer::Background:
+        case Union::Properties::AlignmentContainer::Background:
             container = &backgroundRelative;
             break;
-        case Properties::AlignmentContainer::Item:
+        case Union::Properties::AlignmentContainer::Item:
             break;
         }
 
-        switch (alignment->horizontal()) {
-        case Properties::Alignment::Start:
+        switch (horizontalAlignment) {
+        case Union::Properties::Alignment::Unspecified:
+        case Union::Properties::Alignment::Start:
             container->start.items.append(layoutItem);
             break;
-        case Properties::Alignment::Center:
+        case Union::Properties::Alignment::Center:
             container->center.items.append(layoutItem);
             break;
-        case Properties::Alignment::End:
+        case Union::Properties::Alignment::End:
             container->end.items.append(layoutItem);
             break;
-        case Properties::Alignment::Fill:
+        case Union::Properties::Alignment::Stack:
+        case Union::Properties::Alignment::Fill:
             container->fill.items.append(layoutItem);
             break;
         }
