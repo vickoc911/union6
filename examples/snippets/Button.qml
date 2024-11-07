@@ -61,9 +61,23 @@ ApplicationWindow {
         }
 
         SpinBox {
+            value: 3
         }
 
         PC.SpinBox {
+            value: 3
+        }
+
+        ItemDelegate {
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: 50
+            text: "Test 4"
+        }
+
+        PC.ItemDelegate {
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: 50
+            text: "Test 4"
         }
     }
 
