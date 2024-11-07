@@ -65,6 +65,18 @@ ApplicationWindow {
 
         PC.SpinBox {
         }
+
+        ItemDelegate {
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: 50
+            text: "Test 4"
+        }
+
+        PC.ItemDelegate {
+            Layout.preferredWidth: 200
+            Layout.preferredHeight: 50
+            text: "Test 4"
+        }
     }
 
     footer: ToolBar {
