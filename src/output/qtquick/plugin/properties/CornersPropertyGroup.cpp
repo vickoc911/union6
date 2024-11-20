@@ -17,30 +17,33 @@ CornersPropertyGroup::CornersPropertyGroup()
 
 void CornersPropertyGroup::update(const CornersProperty &newState)
 {
+    m_state = newState;
     m_topLeft->update(newState.topLeft().value_or(CornerProperty{}));
     m_topRight->update(newState.topRight().value_or(CornerProperty{}));
     m_bottomLeft->update(newState.bottomLeft().value_or(CornerProperty{}));
     m_bottomRight->update(newState.bottomRight().value_or(CornerProperty{}));
+
+    Q_EMIT updated();
 }
 
 CornerPropertyGroup *CornersPropertyGroup::topLeft() const
 {
-    return m_topLeft.get();
+    return m_topLeft;
 }
 
 CornerPropertyGroup *CornersPropertyGroup::topRight() const
 {
-    return m_topRight.get();
+    return m_topRight;
 }
 
 CornerPropertyGroup *CornersPropertyGroup::bottomLeft() const
 {
-    return m_bottomLeft.get();
+    return m_bottomLeft;
 }
 
 CornerPropertyGroup *CornersPropertyGroup::bottomRight() const
 {
-    return m_bottomRight.get();
+    return m_bottomRight;
 }
 
 #include "moc_CornersPropertyGroup.cpp"

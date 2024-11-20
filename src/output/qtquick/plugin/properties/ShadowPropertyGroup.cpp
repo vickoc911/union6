@@ -22,6 +22,7 @@ ShadowPropertyGroup::ShadowPropertyGroup()
 
 void ShadowPropertyGroup::update(const ShadowProperty &newState)
 {
+    m_state = newState;
     m_offsets->update(newState.offsets().value_or(SizeProperty{}));
     m_left->update(newState.left().value_or(LineProperty{}));
     m_right->update(newState.right().value_or(LineProperty{}));
@@ -31,51 +32,53 @@ void ShadowPropertyGroup::update(const ShadowProperty &newState)
     m_topRight->update(newState.topRight().value_or(CornerProperty{}));
     m_bottomLeft->update(newState.bottomLeft().value_or(CornerProperty{}));
     m_bottomRight->update(newState.bottomRight().value_or(CornerProperty{}));
+
+    Q_EMIT updated();
 }
 
 SizePropertyGroup *ShadowPropertyGroup::offsets() const
 {
-    return m_offsets.get();
+    return m_offsets;
 }
 
 LinePropertyGroup *ShadowPropertyGroup::left() const
 {
-    return m_left.get();
+    return m_left;
 }
 
 LinePropertyGroup *ShadowPropertyGroup::right() const
 {
-    return m_right.get();
+    return m_right;
 }
 
 LinePropertyGroup *ShadowPropertyGroup::top() const
 {
-    return m_top.get();
+    return m_top;
 }
 
 LinePropertyGroup *ShadowPropertyGroup::bottom() const
 {
-    return m_bottom.get();
+    return m_bottom;
 }
 
 CornerPropertyGroup *ShadowPropertyGroup::topLeft() const
 {
-    return m_topLeft.get();
+    return m_topLeft;
 }
 
 CornerPropertyGroup *ShadowPropertyGroup::topRight() const
 {
-    return m_topRight.get();
+    return m_topRight;
 }
 
 CornerPropertyGroup *ShadowPropertyGroup::bottomLeft() const
 {
-    return m_bottomLeft.get();
+    return m_bottomLeft;
 }
 
 CornerPropertyGroup *ShadowPropertyGroup::bottomRight() const
 {
-    return m_bottomRight.get();
+    return m_bottomRight;
 }
 
 #include "moc_ShadowPropertyGroup.cpp"

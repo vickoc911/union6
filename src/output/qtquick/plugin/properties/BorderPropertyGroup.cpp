@@ -17,30 +17,33 @@ BorderPropertyGroup::BorderPropertyGroup()
 
 void BorderPropertyGroup::update(const BorderProperty &newState)
 {
+    m_state = newState;
     m_left->update(newState.left().value_or(LineProperty{}));
     m_right->update(newState.right().value_or(LineProperty{}));
     m_top->update(newState.top().value_or(LineProperty{}));
     m_bottom->update(newState.bottom().value_or(LineProperty{}));
+
+    Q_EMIT updated();
 }
 
 LinePropertyGroup *BorderPropertyGroup::left() const
 {
-    return m_left.get();
+    return m_left;
 }
 
 LinePropertyGroup *BorderPropertyGroup::right() const
 {
-    return m_right.get();
+    return m_right;
 }
 
 LinePropertyGroup *BorderPropertyGroup::top() const
 {
-    return m_top.get();
+    return m_top;
 }
 
 LinePropertyGroup *BorderPropertyGroup::bottom() const
 {
-    return m_bottom.get();
+    return m_bottom;
 }
 
 #include "moc_BorderPropertyGroup.cpp"

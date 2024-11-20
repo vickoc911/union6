@@ -17,46 +17,39 @@ BackgroundPropertyGroup::BackgroundPropertyGroup()
 
 void BackgroundPropertyGroup::update(const BackgroundProperty &newState)
 {
-    m_color = newState.color().value_or(QColor{});
+    m_state = newState;
+    Q_EMIT colorChanged();
     m_image->update(newState.image().value_or(ImageProperty{}));
     m_border->update(newState.border().value_or(BorderProperty{}));
     m_corners->update(newState.corners().value_or(CornersProperty{}));
     m_shadow->update(newState.shadow().value_or(ShadowProperty{}));
+
+    Q_EMIT updated();
 }
 
 QColor BackgroundPropertyGroup::color() const
 {
-    return m_color;
-}
-
-void BackgroundPropertyGroup::setColor(const QColor &newValue)
-{
-    m_color = newValue;
-}
-
-QBindable<QColor> BackgroundPropertyGroup::bindableColor()
-{
-    return QBindable<QColor>(&m_color);
+    return m_state.color().value_or(QColor{});
 }
 
 ImagePropertyGroup *BackgroundPropertyGroup::image() const
 {
-    return m_image.get();
+    return m_image;
 }
 
 BorderPropertyGroup *BackgroundPropertyGroup::border() const
 {
-    return m_border.get();
+    return m_border;
 }
 
 CornersPropertyGroup *BackgroundPropertyGroup::corners() const
 {
-    return m_corners.get();
+    return m_corners;
 }
 
 ShadowPropertyGroup *BackgroundPropertyGroup::shadow() const
 {
-    return m_shadow.get();
+    return m_shadow;
 }
 
 #include "moc_BackgroundPropertyGroup.cpp"

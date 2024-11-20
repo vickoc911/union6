@@ -18,36 +18,39 @@ StylePropertyGroup::StylePropertyGroup()
 
 void StylePropertyGroup::update(const StyleProperty &newState)
 {
+    m_state = newState;
     m_palette->update(newState.palette().value_or(PaletteProperty{}));
     m_layout->update(newState.layout().value_or(LayoutProperty{}));
     m_text->update(newState.text().value_or(TextProperty{}));
     m_icon->update(newState.icon().value_or(IconProperty{}));
     m_background->update(newState.background().value_or(BackgroundProperty{}));
+
+    Q_EMIT updated();
 }
 
 PalettePropertyGroup *StylePropertyGroup::palette() const
 {
-    return m_palette.get();
+    return m_palette;
 }
 
 LayoutPropertyGroup *StylePropertyGroup::layout() const
 {
-    return m_layout.get();
+    return m_layout;
 }
 
 TextPropertyGroup *StylePropertyGroup::text() const
 {
-    return m_text.get();
+    return m_text;
 }
 
 IconPropertyGroup *StylePropertyGroup::icon() const
 {
-    return m_icon.get();
+    return m_icon;
 }
 
 BackgroundPropertyGroup *StylePropertyGroup::background() const
 {
-    return m_background.get();
+    return m_background;
 }
 
 #include "moc_StylePropertyGroup.cpp"
