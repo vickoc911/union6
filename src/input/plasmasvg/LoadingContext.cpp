@@ -40,6 +40,10 @@ ContextCleanup::~ContextCleanup() noexcept
     if (flags & CleanupFlag::PropertyName && !data.propertyNames.isEmpty()) {
         data.propertyNames.pop();
     }
+
+    if (flags & CleanupFlag::ColorGroup && !data.colorGroups.isEmpty()) {
+        data.colorGroups.pop();
+    }
 }
 
 LoadingContext::LoadingContext(Theme::Ptr _theme, ryml::Parser *_parser)
@@ -73,6 +77,10 @@ ContextCleanup LoadingContext::pushFromNode(ryml::ConstNodeRef node)
 
     with_child(node, "colorSet", [&](auto node) {
         data.colorSets.push(value<Element::ColorSet>(node));
+    });
+
+    with_child(node, "colorGroup", [&](auto node) {
+        data.colorGroups.push(value<QPalette::ColorGroup>(node));
     });
 
     return cleanup;
@@ -132,6 +140,11 @@ QString LoadingContext::path() const
 Element::ColorSet LoadingContext::colorSet() const
 {
     return data.colorSets.isEmpty() ? Element::ColorSet::None : data.colorSets.top();
+}
+
+QPalette::ColorGroup LoadingContext::colorGroup() const
+{
+    return data.colorGroups.isEmpty() ? QPalette::ColorGroup::Active : data.colorGroups.top();
 }
 
 QByteArrayView LoadingContext::propertyName() const
