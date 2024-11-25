@@ -4,6 +4,12 @@ checkdelegate-indicator-checked:
         child:
             type: Indicator
     layout:
+        width:
+            property: icon-size
+            name: small
+        height:
+            property: icon-size
+            name: small
         alignment:
             container: Item
             horizontal: End
