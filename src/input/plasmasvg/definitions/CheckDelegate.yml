@@ -14,6 +14,8 @@ checkdelegate-indicator-checked:
             container: Item
             horizontal: End
             vertical: Center
+        margins:
+            right: 6
 
 checkdelegate-indicator-checked:
     selectors:
