@@ -86,3 +86,27 @@ checkbox-indicator-checked:
         image:
             property: element-image
             element: checkbox
+        
+        border:
+            left:
+                size: 0
+            right:
+                size: 0
+            top:
+                size: 0
+            bottom:
+                size: 0
+
+        corners:
+            top-left:
+                width: 0
+                height: 0
+            top-right:
+                width: 0
+                height: 0
+            bottom-left:
+                width: 0
+                height: 0
+            bottom-right:
+                width: 0
+                height: 0
