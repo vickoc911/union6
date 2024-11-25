@@ -39,7 +39,19 @@ checkbox-display-textundericon:
         alignment:
             horizontal: Start
             vertical: Stack
+checkbox-indicator:
+    selectors:
+    -   type: CheckBox
+        child:
+            type: Indicator
 
+    layout:
+        width:
+            property: icon-size
+            name: small
+        height:
+            property: icon-size
+            name: small
 checkbox-indicator-checked:
     selectors:
     -   type: CheckBox
