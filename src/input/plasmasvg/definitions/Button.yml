@@ -1,6 +1,9 @@
 button:
     selectors:
     -   type: Button
+    -   type: MenuItem
+        child:
+            type: Indicator
 
     path: widgets/button
     prefix: normal
@@ -22,7 +25,9 @@ button:
             -   center
             -   hint-bottom-margin
 
-        spacing: 4
+        spacing:
+            property: named-value
+            name: small-spacing
 
         padding: &button-padding
             left:
@@ -176,6 +181,10 @@ button-hovered:
     selectors:
     -   type: Button
         state: Hovered
+    -   type: MenuItem
+        state: Hovered
+        child:
+            type: Indicator
 
     path: widgets/button
     colorSet: Button
@@ -244,6 +253,10 @@ button-focus:
     selectors:
     -   type: Button
         state: VisualFocus
+    -   type: MenuItem
+        state: VisualFocus
+        child:
+            type: Indicator
 
     path: widgets/button
     colorSet: Button
@@ -411,6 +424,15 @@ button-pressed:
         state: Pressed
     -   type: Button
         state: Checked
+    -   type: MenuItem
+        state: Pressed
+        child:
+            type: Indicator
+    -   type: MenuItem
+        state: Checked
+        child:
+            type: Indicator
+
 
     path: widgets/button
     colorSet: Button
@@ -420,11 +442,7 @@ button-pressed:
             <<: *button-padding
             prefix: pressed
 
-        inset:
-            left: 0
-            right: 0
-            top: 0
-            bottom: 0
+        inset: empty
 
     background:
         image:
@@ -503,22 +521,7 @@ button-pressed:
                     -   normal-bottomright
                     -   pressed-bottomright
 
-        shadow:
-            offsets:
-                left: 0
-                right: 0
-                top: 0
-                bottom: 0
-
-            border:
-                left:
-                    size: 0
-                right:
-                    size: 0
-                top:
-                    size: 0
-                bottom:
-                    size: 0
+        shadow: empty
 
 button-disabled:
     selectors:
@@ -579,22 +582,7 @@ button-disabled:
                 image:
                     property: element-image
 
-        shadow:
-            offsets:
-                left: 0
-                right: 0
-                top: 0
-                bottom: 0
-
-            border:
-                left:
-                    size: 0
-                right:
-                    size: 0
-                top:
-                    size: 0
-                bottom:
-                    size: 0
+        shadow: empty
 
 button-with-icon:
     selectors:
