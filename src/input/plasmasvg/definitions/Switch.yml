@@ -1,0 +1,50 @@
+switch:
+    selectors:
+    -   type: Switch
+
+    path: widgets/switch
+
+    # layout:
+    #     width:
+    #         property: element-width
+    #         element: hint-bar-size
+    #     height:
+    #         property: element-height
+    #         element: hint-bar-size
+
+switch-indicator:
+    selectors:
+    -   type: Switch
+        child:
+            type: Indicator
+
+    path: widgets/switch
+
+    layout:
+        width:
+            property: element-width
+            element: hint-bar-size
+        height:
+            property: element-height
+            element: hint-bar-size
+
+    background:
+        prefix: inactive
+        image:
+            property: element-image
+            element: center
+
+        border:
+            left:
+                element: left
+                size:
+                    property: element-width
+                image:
+                    property: element-image
+            right:
+                element: right
+                size:
+                    property: element-width
+                image:
+                    property: element-image
+
