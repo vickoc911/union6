@@ -218,10 +218,18 @@ ApplicationWindow {
                 onClicked: cycleButtonDisplay(this)
             }
 
-            MenuItem {
-                text: "Menu Item"
-                enabled: !button1.checked
-                icon.name: "application-exit-symbolic"
+            // MenuItem {
+            //     text: "Menu Item"
+            //     enabled: !button1.checked
+            //     icon.name: "application-exit-symbolic"
+            // }
+
+            Switch {
+                text: "Test Switch"
+            }
+
+            PC.Switch {
+                text: "Test Switch"
             }
         }
     }
