@@ -23,7 +23,6 @@ T.Switch {
         pressed: control.down
         checked: control.checked
         enabled: control.enabled
-        highlighted: control.highlighted
     }
 
     leftPadding: Union.Positioner.padding.left
@@ -48,7 +47,7 @@ T.Switch {
 
     Union.Positioner.positionItems: [indicator, contentItem]
 
-    indicator: T.Control {
+    indicator: Item {
         Union.Element.type: "Indicator"
         Union.Element.states {
             hovered: control.hovered
@@ -57,11 +56,30 @@ T.Switch {
             pressed: control.down
             checked: control.checked
             enabled: control.enabled
-            highlighted: control.highlighted
         }
 
-        contentItem: Union.StyledRectangle { }
-        background: Union.StyledRectangle { }
+        implicitWidth: Union.Style.properties.layout.width ?? 0
+        implicitHeight: Union.Style.properties.layout.height ?? 0
+
+        Union.StyledRectangle { anchors.fill: parent }
+
+        Union.StyledRectangle {
+            Union.Element.type: "Handle"
+            Union.Element.states {
+                hovered: control.hovered
+                activeFocus: control.activeFocus
+                visualFocus: control.visualFocus
+                pressed: control.down
+                checked: control.checked
+                enabled: control.enabled
+            }
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            property real minimumX: Union.Style.properties.layout.margins.left ?? 0
+            property real maximumX: parent.width - width - (Union.Style.properties.layout.margins.right ?? 0)
+            x: Math.max(minimumX, Math.min(maximumX, minimumX + control.visualPosition * (maximumX - minimumX)))
+        }
     }
 
     contentItem: Item {
@@ -74,7 +92,7 @@ T.Switch {
             name: control.icon.name
             source: control.icon.source
             color: control.icon.color
-            visible: control.display !== T.AbstractButton.TextOnly
+            visible: control.display !== T.AbstractButton.TextOnly && (name || source.toString())
         }
         Text {
             Union.PositionedItem.source: Union.PositionerSource.Text
