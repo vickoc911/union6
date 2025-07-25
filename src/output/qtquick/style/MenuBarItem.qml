@@ -36,8 +36,7 @@ T.MenuBarItem {
 
     Union.Positioner.positionItems: [contentItem]
 
-    contentItem: Label {
-        Union.PositionedItem.positionChildren: true
+    contentItem: T.Label {
         Union.PositionedItem.source: Union.PositionerSource.Text
 
         text: control.text
