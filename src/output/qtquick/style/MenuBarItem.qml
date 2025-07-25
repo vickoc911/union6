@@ -39,16 +39,13 @@ T.MenuBarItem {
     leftPadding: Union.Style.properties.layout.padding.left
     rightPadding: Union.Style.properties.layout.padding.right
 
-    Union.Positioner.positionItems: [contentItem]
-
     contentItem: T.Label {
-        Union.PositionedItem.source: Union.PositionerSource.Text
-
         text: control.text
         font: control.font
         color: control.palette.buttonText
-
         visible: control.display != T.AbstractButton.IconOnly
+        horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
+        verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
     }
 
     background: Union.StyledRectangle {}
