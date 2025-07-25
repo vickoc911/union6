@@ -63,4 +63,7 @@ menubaritem {
         background-color: var(--focus-color);
         border: 1px solid var(--highlight-color);
     }
+    text-alignment-horizontal: center;
+    text-alignment-vertical: center;
+
 }

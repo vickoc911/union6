@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightText: 2025 Akseli Lahtinen <akselmo@akselmo.dev>
 
 import QtQuick
+import QtQuick.Controls.impl as QQCImpl
 import QtQuick.Controls.impl
 import QtQuick.Templates as T
 
@@ -33,20 +34,17 @@ T.MenuBarItem {
     leftPadding: Union.Style.properties.layout.padding.left
     rightPadding: Union.Style.properties.layout.padding.right
 
-    icon.width: Union.Style.properties.icon.width
-    icon.height: Union.Style.properties.icon.height
-    icon.color: control.palette.buttonText
+    Union.Positioner.positionItems: [contentItem]
 
-    contentItem: IconLabel {
-        font: control.font
-        spacing: control.spacing
-        mirrored: control.mirrored
-        display: control.display
-        alignment: Qt.AlignLeft
+    contentItem: Label {
+        Union.PositionedItem.positionChildren: true
+        Union.PositionedItem.source: Union.PositionerSource.Text
 
-        icon: control.icon
         text: control.text
+        font: control.font
         color: control.palette.buttonText
+
+        visible: control.display != T.AbstractButton.IconOnly
     }
 
     background: Union.StyledRectangle {}
