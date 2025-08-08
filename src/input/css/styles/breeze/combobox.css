@@ -1,0 +1,56 @@
+/*
+ * SPDX-License-Identifier: BSD-2-Clause
+ * SPDX-FileCopyrightText: 2025 Akseli Lahtinen <akselmo@akselmo.dev>
+ */
+
+combobox {
+	width: var(--medium-element-size);
+	layout-alignment: content fill fill 0;
+	text-alignment: content fill fill 0;
+	padding-left: var(--large-spacing);
+	padding-right: var(--large-spacing);
+	border-radius: var(--corner-radius);
+	color: var(--button-text-color);
+	background-color: var(--button-background-color);
+
+	&.flat {
+		border: 0px solid transparent;
+		background-color: transparent;
+		box-shadow: 0px 0px 0px 0px transparent;
+	}
+
+	&:hovered {
+		border-color: var(--highlight-color);
+		border: 1px solid var(--highlight-color);
+	}
+
+	&:visual-focus {
+		border-color: var(--highlight-color);
+		outline: var(--focus-outline);
+	}
+
+	box-shadow: var(--button-shadow);
+
+	icon-name: "arrow-down-symbolic";
+}
+
+combobox:pressed {
+	border: 1px solid var(--highlight-color);
+	background-color: var(--button-highlight-color);
+	box-shadow: 0px 0px 0px 0px transparent;
+}
+
+combobox indicator {
+	width: var(--large-element-size);
+	height: var(--large-element-size);
+	border-radius: var(--corner-radius);
+	border-color: var(--button-border-color);
+	color: var(--button-text-color);
+
+	layout-alignment-container: item;
+	layout-alignment-vertical: fill;
+}
+
+combobox contentitem {
+	color: var(--button-text-color);
+}
