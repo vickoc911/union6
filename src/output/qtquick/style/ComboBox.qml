@@ -28,14 +28,20 @@ T.ComboBox {
         }
         return result;
     }
+    Union.Positioner.positionItems: [contentItem, indicator]
 
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, implicitContentWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, implicitContentHeight + topPadding + bottomPadding, implicitIndicatorHeight + topPadding + bottomPadding)
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, Union.Positioner.implicitWidth)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, Union.Positioner.implicitHeight)
 
     leftPadding: Union.Positioner.padding.left + (!control.mirrored || !indicator || !indicator.visible ? 0 : indicator.width + spacing)
     rightPadding: Union.Positioner.padding.right + (control.mirrored || !indicator || !indicator.visible ? 0 : indicator.width + spacing)
     topPadding: Union.Positioner.padding.top
     bottomPadding: Union.Positioner.padding.bottom
+
+    leftInset: Union.Style.properties.layout.inset.left
+    rightInset: Union.Style.properties.layout.inset.right
+    topInset: Union.Style.properties.layout.inset.top
+    bottomInset: Union.Style.properties.layout.inset.bottom
 
     font: Union.Style.properties.text.font
     spacing: Union.Style.properties.layout.spacing
@@ -52,8 +58,6 @@ T.ComboBox {
     }
 
     indicator: IconImage {
-        x: control.mirrored ? Union.Positioner.padding.left : control.width - width - Union.Positioner.padding.right
-        y: control.topPadding + (control.availableHeight - height) / 2
         Union.PositionedItem.source: Union.PositionerSource.Icon
         name: Union.Style.properties.icon.name ?? ""
         palette: control.palette

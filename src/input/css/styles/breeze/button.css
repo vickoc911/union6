@@ -84,7 +84,9 @@ toolbutton
 
 combobox {
     padding: 0px;
-    text-alignment-horizontal: start;
+    padding-left: var(--large-spacing);
+    padding-right: var(--large-spacing);
+    text-alignment-horizontal: fill;
     icon-alignment-horizontal: start;
     icon-name: "arrow-down-symbolic";
 }
