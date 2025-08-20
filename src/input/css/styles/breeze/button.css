@@ -9,7 +9,8 @@ checkbox indicator,
 checkdelegate indicator,
 menuitem indicator,
 radiobutton indicator,
-radiodelegate indicator
+radiodelegate indicator,
+combobox
 {
     width: var(--medium-element-size);
     height: var(--medium-element-size);
@@ -60,7 +61,8 @@ button
 }
 
 button:pressed,
-toolbutton:pressed
+toolbutton:pressed,
+combobox:pressed
 {
     border: 1px solid var(--highlight-color);
     background-color: var(--button-highlight-color);
@@ -77,4 +79,22 @@ toolbutton
     border-color: transparent;
     background-color: transparent;
     box-shadow: 0px 0px 0px 0px transparent;
+}
+
+combobox {
+    padding: 0px;
+    layout-alignment: content fill fill 0;
+    text-alignment: content fill fill 0;
+    icon-name: "arrow-down-symbolic";
+}
+
+combobox indicator {
+    width: var(--large-element-size);
+    height: var(--large-element-size);
+    border-radius: var(--corner-radius);
+    border-color: var(--button-border-color);
+    color: var(--button-text-color);
+
+    layout-alignment-container: item;
+    layout-alignment-vertical: fill;
 }
