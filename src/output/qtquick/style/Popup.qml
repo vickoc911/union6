@@ -29,7 +29,13 @@ T.Popup {
 
 	background: Union.StyledRectangle {}
 
-	T.Overlay.modal: Union.StyledRectangle {}
+	T.Overlay.modal: Union.StyledRectangle {
+		Union.Element.type: "Overlay"
+		Union.Element.hints: ["modal"]
+	}
 
-	T.Overlay.modeless: Union.StyledRectangle {}
+	T.Overlay.modeless: Union.StyledRectangle {
+		Union.Element.type: "Overlay"
+		Union.Element.hints: ["modeless"]
+	}
 }
