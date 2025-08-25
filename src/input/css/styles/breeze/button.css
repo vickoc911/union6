@@ -10,8 +10,7 @@ checkdelegate indicator,
 menuitem indicator,
 radiobutton indicator,
 radiodelegate indicator,
-combobox,
-combobox indicator
+combobox
 {
     width: var(--medium-element-size);
     height: var(--medium-element-size);
