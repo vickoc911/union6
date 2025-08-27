@@ -12,9 +12,8 @@ T.Slider {
 	id: control
 
 	Union.Element.type: "Slider"
-	Union.Element.attributes: {
-		"orientation": control.horizontal ? "horizontal" : "vertical"
-	}
+	Union.Element.hints: control.horizontal ? ["horizontal"] : ["vertical"]
+
 	implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
 							implicitHandleWidth + leftPadding + rightPadding)
 	implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
@@ -51,19 +50,16 @@ T.Slider {
 
 	background: Union.StyledRectangle {
 		Union.Element.type: "SliderBackground"
+		Union.Element.hints: control.Union.Element.hints
 		x: control.leftPadding + (control.horizontal ? 0 : (control.availableWidth - width) / 2)
 		y: control.topPadding + (control.horizontal ? (control.availableHeight - height) / 2 : 0)
 
 		Union.StyledRectangle {
 			Union.Element.type: "SliderBackgroundFill"
 			y: control.horizontal ? 0 : control.visualPosition * parent.height
-			width: control.horizontal ? control.position * parent.width : parent.height
-			height: control.horizontal ? parent.width : control.position * parent.height
+			width: control.horizontal ? control.position * parent.width : parent.width
+			height: control.horizontal ? parent.height : control.position * parent.height
 		}
-	}
-
-	Component.onCompleted: {
-		console.warn("bg", background.width, background.implicitWidth, background.height, background.implicitHeight, control.availableHeight, control.availableWidth);
 	}
 
 }

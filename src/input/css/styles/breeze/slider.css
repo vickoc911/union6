@@ -1,13 +1,14 @@
-slider.horizontal {
-	width: 200px;
-	height: 6px;
-	background-color: #aaaa00;
-}
+slider sliderbackground {
 
-slider.vertical {
-	width: 6px;
-	height: 200px;
-	background-color: #aaaaff;
+	&.horizontal {
+		width: 200px;
+		height: 6px;
+	}
+
+	&.vertical {
+		width: 6px;
+		height: 200px;
+	}
 }
 
 sliderbackgroundfill {
