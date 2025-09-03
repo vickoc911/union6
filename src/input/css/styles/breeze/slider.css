@@ -25,7 +25,7 @@ slider fill, rangeslider fill {
 }
 
 
-slider handle, rangeslider handle.first, rangeslider handle.second {
+slider handle, rangeslider handle{
 	width: var(--medium-element-size);
 	height: var(--medium-element-size);
 	background-color: var(--slider-handle-background-color);
