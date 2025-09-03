@@ -48,15 +48,16 @@ T.Slider {
     }
 
     background: Union.StyledRectangle {
-        Union.Element.hints: control.Union.Element.hints
         x: control.leftPadding + (control.horizontal ? 0 : (control.availableWidth - width) / 2)
         y: control.topPadding + (control.horizontal ? (control.availableHeight - height) / 2 : 0)
+        width: control.implicitBackgroundWidth
+        height: control.implicitBackgroundHeight
 
         Union.StyledRectangle {
             Union.Element.type: "Fill"
             y: control.horizontal ? 0 : control.visualPosition * parent.height
-            width: control.horizontal ? control.position * parent.width : parent.width
-            height: control.horizontal ? parent.height : control.position * parent.height
+            width: control.horizontal ? control.position * parent.width : control.implicitBackgroundWidth
+            height: control.horizontal ? control.implicitBackgroundHeight : control.position * parent.height
         }
     }
 }
