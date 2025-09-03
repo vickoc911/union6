@@ -34,28 +34,26 @@ T.Slider {
     topInset: Union.Style.properties.layout.inset.top
     bottomInset: Union.Style.properties.layout.inset.bottom
 
-    palette: Union.Style.properties.palette.quickPalette
-
     handle: Union.StyledRectangle {
-        Union.Element.type: "SliderHandle"
+        Union.Element.type: "Handle"
         Union.Element.states {
             hovered: control.hovered
-            activeFocus: control.activeFocus
+            activeFocus: control.handle.activeFocus
             visualFocus: control.visualFocus
-            enabled: control.enabled
+            enabled: control.handle.enabled
+            pressed: control.pressed
         }
         x: control.leftPadding + (control.horizontal ? control.visualPosition * (control.availableWidth - width) : (control.availableWidth - width) / 2)
         y: control.topPadding + (control.horizontal ? (control.availableHeight - height) / 2 : control.visualPosition * (control.availableHeight - height))
     }
 
     background: Union.StyledRectangle {
-        Union.Element.type: "SliderBackground"
         Union.Element.hints: control.Union.Element.hints
         x: control.leftPadding + (control.horizontal ? 0 : (control.availableWidth - width) / 2)
         y: control.topPadding + (control.horizontal ? (control.availableHeight - height) / 2 : 0)
 
         Union.StyledRectangle {
-            Union.Element.type: "SliderBackgroundFill"
+            Union.Element.type: "Fill"
             y: control.horizontal ? 0 : control.visualPosition * parent.height
             width: control.horizontal ? control.position * parent.width : parent.width
             height: control.horizontal ? parent.height : control.position * parent.height

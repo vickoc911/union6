@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: 2025 Akseli Lahtinen <akselmo@akselmo.dev>
  */
 
-sliderbackground {
+slider, rangeslider {
 	&.horizontal {
 		width: 200px;
 		height: 6px;
@@ -16,18 +16,16 @@ sliderbackground {
 
 	background-color: var(--slider-background-color);
 	border: 1px solid var(--slider-border-color);
-}
-
-sliderbackgroundfill {
-	background-color: var(--slider-fill-color);
-}
-
-sliderbackground,
-sliderbackgroundfill {
 	border-radius: var(--corner-radius);
 }
 
-sliderhandle {
+slider fill, rangeslider fill {
+	background-color: var(--slider-fill-color);
+	border-radius: var(--corner-radius);
+}
+
+
+slider handle, rangeslider handle.first, rangeslider handle.second {
 	width: var(--medium-element-size);
 	height: var(--medium-element-size);
 	background-color: var(--slider-handle-background-color);
