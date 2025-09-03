@@ -32,11 +32,6 @@ slider handle, rangeslider handle{
 	border: 1px solid var(--slider-border-color);
 	border-radius: var(--small-element-size);
 
-	&:pressed {
-		background-color: var(--slider-handle-highlight-color);
-		border-color: var(--highlight-color);
-	}
-
 	&:hovered {
 		border-color: var(--highlight-color);
 	}
@@ -45,4 +40,9 @@ slider handle, rangeslider handle{
 		border-color: var(--highlight-color);
 		outline: var(--focus-outline);
 	}
+}
+
+slider:pressed handle, rangeslider handle:pressed {
+	background-color: var(--slider-handle-highlight-color);
+	border-color: var(--highlight-color);
 }
