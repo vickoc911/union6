@@ -29,6 +29,7 @@
 
     --window-text-color: #232629;
     --window-background-color: #eff0f1;
+    --window-background-alternate-color: #b1b2b2;
     --window-border-color: mix(var(--window-background-color), var(--window-text-color), 0.3);
     --window-highlight-color: mix(var(--window-background-color), var(--highlight-color), 0.5);
 
@@ -40,6 +41,7 @@
 
     --view-text-color: #232629;
     --view-background-color: #ffffff;
+    --view-background-alternate-color: #c9c9c9;
     --view-border-color: mix(var(--view-background-color), var(--view-text-color), 0.3);
     --view-highlight-color: mix(var(--view-background-color), var(--highlight-color), 0.5);
 
