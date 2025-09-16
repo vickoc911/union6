@@ -27,7 +27,7 @@ combobox
 
     &.flat
     {
-        border: 0px solid transparent;
+        border-color: transparent;
         background-color: transparent;
         box-shadow: 0px 0px 0px 0px transparent;
     }
