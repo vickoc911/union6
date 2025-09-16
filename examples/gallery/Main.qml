@@ -61,6 +61,10 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: "Menus"
                 onTriggered: application.pushPage("Menus")
+            },
+            Kirigami.Action {
+                text: "Tables"
+                onTriggered: application.pushPage("Tables")
             }
         ]
     }
