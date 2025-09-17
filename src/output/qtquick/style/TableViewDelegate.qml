@@ -77,10 +77,10 @@ T.TableViewDelegate {
 		Component.onCompleted: textField.selectAll()
 		
 		TextField {
+			id: textField
 			Union.Element.type: "EditField"
 			horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
 			verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
-			id: textField
 			anchors.fill: parent
 			text: control.model.edit ?? control.model.display ?? ""
 			focus: true

@@ -19,12 +19,20 @@ tableviewdelegate {
 	}
 }
 
+editfield {
+	color: var(--view-text-color);
+	background-color: var(--view-background-color);
+	inset: 0px;
+	padding: var(--small-spacing);
+	border-radius: 0px;
+	border: 1px solid var(--highlight-color);
+}
+
 verticalheaderview, horizontalheaderview {
 	border: var(--button-border);
 	background-color: var(--button-background-color);
 	padding: 0px;
 	inset: 0px;
-	margin: 0px;
 	text-alignment-horizontal: center;
 	text-alignment-vertical: center;
 }
@@ -33,6 +41,7 @@ headerviewlabel {
 	color: var(--button-text-color);
 	text-alignment-horizontal: center;
 	text-alignment-vertical: center;
+	padding: var(--small-spacing);
 }
 
 selectionrectangle {
