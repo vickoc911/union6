@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+// SPDX-FileCopyrightText: 2025 Akseli Lahtinen <akselmo@akselmo.dev>
+
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
@@ -21,6 +24,7 @@ Kirigami.Page {
             anchors.top: parent.top
             syncView: tableView
             clip: true
+            textRole: "display"
         }
         
         Controls.VerticalHeaderView {
@@ -29,6 +33,7 @@ Kirigami.Page {
             anchors.left: parent.left
             syncView: tableView
             clip: true
+            textRole: "display"
         }
         
         TableView {
@@ -62,14 +67,7 @@ Kirigami.Page {
                 ]
             }
             
-            delegate: Rectangle {
-                implicitWidth: 100
-                implicitHeight: 20
-                color: palette.base
-                Controls.Label {
-                    text: display
-                }
-            }
+            delegate: Controls.TableViewDelegate {}
         }
     }
 }

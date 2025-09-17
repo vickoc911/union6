@@ -5,7 +5,6 @@
 import QtQuick
 import Qt.labs.qmlmodels as QtLabsQmlModels
 import QtQuick.Templates as T
-// make also treeviewdelegate
 
 import org.kde.union.impl as Union
 
