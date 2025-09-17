@@ -3,6 +3,10 @@
  * SPDX-FileCopyrightText: 2025 Arjen Hiemstra <ahiemstra@heimr.nl>
  */
 
+/*
+ * Bar-like controls such as progress bars and sliders.
+ */
+
 busyindicator
 {
     width: 36px;
