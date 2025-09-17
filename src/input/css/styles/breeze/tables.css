@@ -35,6 +35,8 @@ verticalheaderview, horizontalheaderview {
 	inset: 0px;
 	text-alignment-horizontal: center;
 	text-alignment-vertical: center;
+	width: var(--large-element-size);
+	height: var(--large-element-size);
 }
 
 headerviewlabel { 
