@@ -11,9 +11,10 @@ import org.kde.union.impl as Union
 T.TableViewDelegate {
 	id: control
 	Union.Element.type: "TableViewDelegate"
+	Union.Element.hints: control.tableView.alternatingRows && control.row % 2 ? ["alternatingRows"] : []
 	Union.Element.states {
 		hovered: control.hovered
-		activeFocus: control.activeFocus
+		activeFocus: control.activeFocus || control.current
 		visualFocus: control.visualFocus
 		pressed: control.down
 		enabled: control.enabled
@@ -41,14 +42,13 @@ T.TableViewDelegate {
 	required property int row
 	required property var model
 	
-	background: Union.StyledRectangle { 
-	}
+	background: Union.StyledRectangle { }
 	
 	contentItem: Label {
+		Union.Element.type: "DisplayField"
 		clip: false
 		text: control.model.display ?? ""
 		elide: Text.ElideRight
-		color: control.highlighted ? control.palette.highlightedText : control.palette.buttonText
 		visible: !control.editing
 	}
 	
@@ -77,6 +77,9 @@ T.TableViewDelegate {
 		Component.onCompleted: textField.selectAll()
 		
 		TextField {
+			Union.Element.type: "EditField"
+			horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
+			verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
 			id: textField
 			anchors.fill: parent
 			text: control.model.edit ?? control.model.display ?? ""

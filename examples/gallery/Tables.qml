@@ -43,9 +43,7 @@ Kirigami.Page {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             clip: true
-            
-            columnSpacing: 1
-            rowSpacing: 1
+            alternatingRows: true
             
             model: TableModel {
                 TableModelColumn { display: "name" }
@@ -63,6 +61,14 @@ Kirigami.Page {
                     {
                         "name": "bird",
                         "color": "white"
+                    },
+                    {
+                        "name": "lizard",
+                        "color": "green"
+                    },
+                    {
+                        "name": "fish",
+                        "color": "blue"
                     }
                 ]
             }
