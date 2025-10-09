@@ -52,6 +52,7 @@ ecm_target_qml_sources(UnionQuickStyle SOURCES
     style/TabButton.qml
     style/TabBar.qml
     style/TableViewDelegate.qml
+    style/TreeViewDelegate.qml
     style/TextArea.qml
     style/TextField.qml
     style/ToolBar.qml
