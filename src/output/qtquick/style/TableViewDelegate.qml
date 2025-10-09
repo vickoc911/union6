@@ -11,7 +11,16 @@ import org.kde.union.impl as Union
 T.TableViewDelegate {
     id: control
     Union.Element.type: "TableViewDelegate"
-    Union.Element.hints: control.tableView.alternatingRows && control.row % 2 ? ["alternatingRows"] : []
+    Union.Element.hints: {
+        let hints = [];
+        if (control.tableView.alternatingRows && control.row % 2){
+            hints.push("alternatingRows");
+        }
+        if (control.editing){
+            hints.push("editing");
+        }
+        return hints;
+    }
     Union.Element.states {
         hovered: control.hovered
         activeFocus: control.activeFocus || control.current
@@ -42,14 +51,16 @@ T.TableViewDelegate {
     required property int row
     required property var model
     
-    background: Union.StyledRectangle { }
-    
-    contentItem: Label {
-        Union.Element.type: "DisplayField"
+    background: Union.StyledRectangle {}
+
+    contentItem: Text {
         clip: false
         text: control.model.display ?? ""
         elide: Text.ElideRight
         visible: !control.editing
+        color: Union.Style.properties.text.color
+        horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
+        verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
     }
     
     TableView.editDelegate: FocusScope {
@@ -78,12 +89,13 @@ T.TableViewDelegate {
         
         TextField {
             id: textField
-            Union.Element.type: "EditField"
             horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
             verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
             anchors.fill: parent
             text: control.model.edit ?? control.model.display ?? ""
             focus: true
+            // Remove the TextField background, we want to use the Control background.
+            background: Item {}
         }
     }
 }
