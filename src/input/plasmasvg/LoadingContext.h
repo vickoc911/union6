@@ -67,7 +67,11 @@ struct LoadingContext {
 
     inline QDebug logLocation(ryml::ConstNodeRef node) const
     {
+#if RYML_VERSION_MINOR >= 10
+        auto loc = node.location(*parser);
+#else
         auto loc = parser->location(node);
+#endif
         return (QMessageLogger(nullptr, 0, nullptr).warning(UNION_PLASMASVG).nospace().noquote() << loc.name.data() << "@" << loc.line << ":").space().quote();
     }
 
