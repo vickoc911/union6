@@ -46,8 +46,7 @@ editfield {
     border: 1px solid var(--highlight-color);
 }
 
-verticalheaderview,
-horizontalheaderview {
+headerviewdelegate {
     border: 1px solid var(--button-active-border-color);
     background-color: var(--button-active-background-color);
     padding: var(--small-spacing);

@@ -12,7 +12,7 @@ import org.kde.union.impl as Union
 T.VerticalHeaderView {
     id: control
     
-    Union.Element.type: "VerticalHeaderView"
+    Union.Element.type: "HeaderViewDelegate"
     Union.Element.states {
         activeFocus: control.activeFocus
         enabled: control.enabled
