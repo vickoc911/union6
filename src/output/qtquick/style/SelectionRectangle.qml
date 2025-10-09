@@ -35,6 +35,7 @@ T.SelectionRectangle {
     bottomRightHandle: Handle {}
     
     component Handle : Union.StyledRectangle {
+        // This is not a descendant of the main selection rectangle, so it needs it's own type
         Union.Element.type: "SelectionRectangleHandle"
         Union.Element.states {
             enabled: SelectionRectangle.control.enabled
