@@ -46,8 +46,8 @@ editfield {
     border: 1px solid var(--highlight-color);
 }
 
-verticalheaderview,
-horizontalheaderview {
+headerview,
+headerviewdelegate {
     border: 1px solid var(--button-active-border-color);
     background-color: var(--button-active-background-color);
     padding: var(--small-spacing);
@@ -58,10 +58,8 @@ horizontalheaderview {
     height: var(--large-element-size);
 }
 
-headerviewlabel {
+headerviewdelegate {
     color: var(--button-active-text-color);
-    text-alignment-horizontal: center;
-    text-alignment-vertical: center;
 }
 
 selectionrectangle {

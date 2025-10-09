@@ -11,7 +11,7 @@ import org.kde.union.impl as Union
 
 T.HorizontalHeaderView {
     id: control
-    Union.Element.type: "HorizontalHeaderView"
+    Union.Element.type: "HeaderView"
     Union.Element.states {
         activeFocus: control.activeFocus
         enabled: control.enabled
@@ -22,15 +22,15 @@ T.HorizontalHeaderView {
     
     delegate: Union.StyledRectangle {
         id: delegate
-        
+        Union.Element.type: "HeaderViewDelegate"
+
         required property var model
-        
+
         implicitWidth: text.implicitWidth
         implicitHeight: Math.max(control.height, text.implicitHeight)
-        
+
         Label {
             id: text
-            Union.Element.type: "HeaderViewLabel"
             anchors.fill: parent
             horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
             verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
