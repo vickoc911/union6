@@ -29,7 +29,7 @@ T.HorizontalHeaderView {
         implicitWidth: text.implicitWidth
         implicitHeight: Math.max(control.height, text.implicitHeight)
 
-        T.Label {
+        Text {
             id: text
             anchors.fill: parent
             horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
