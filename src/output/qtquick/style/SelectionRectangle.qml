@@ -36,9 +36,8 @@ T.SelectionRectangle {
     
     component Handle : Union.StyledRectangle {
         Union.Element.type: "SelectionRectangleHandle"
-        property Item control: SelectionRectangle.control
         Union.Element.states {
-            enabled: control.enabled
+            enabled: SelectionRectangle.control.enabled
             visualFocus: SelectionRectangle.dragging
         }
         visible: SelectionRectangle.control.active
