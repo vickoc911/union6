@@ -52,14 +52,11 @@ headerviewdelegate {
     background-color: var(--button-active-background-color);
     padding: var(--small-spacing);
     inset: var(--small-spacing);
+    color: var(--button-active-text-color);
     text-alignment-horizontal: center;
     text-alignment-vertical: center;
     width: var(--large-element-size);
     height: var(--large-element-size);
-}
-
-headerviewdelegate {
-    color: var(--button-active-text-color);
 }
 
 selectionrectangle {

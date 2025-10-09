@@ -29,12 +29,13 @@ T.HorizontalHeaderView {
         implicitWidth: text.implicitWidth
         implicitHeight: Math.max(control.height, text.implicitHeight)
 
-        Label {
+        T.Label {
             id: text
             anchors.fill: parent
             horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
             verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
             text: delegate.model[control.textRole]
+            color: Union.Style.properties.text.color
         }
     }
 }
