@@ -48,7 +48,7 @@ treeviewdelegate {
         icon-name: "arrow-right-symbolic";
     }
 
-    &:expanded indicator {
+    &.expanded indicator {
         icon-name: "arrow-down-symbolic"
     }
 }
