@@ -8,7 +8,7 @@ import org.kde.kirigami as Kirigami
 import Qt.labs.qmlmodels
 
 Kirigami.Page {
-    title: "Tables QtQuick.Controls"
+    title: "TreeView QtQuick.Controls"
 
     Kirigami.ColumnView.interactiveResizeEnabled: true
     Kirigami.ColumnView.minimumWidth: Kirigami.Units.gridUnit * 10
