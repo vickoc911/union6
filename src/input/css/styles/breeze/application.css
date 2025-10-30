@@ -47,3 +47,20 @@ scrollview {
         padding-bottom: var(--scrollbar-size);
     }
 }
+
+pageindicator,
+pageindicatordelegate {
+    background-color: var(--indicator-color);
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    spacing: var(--small-spacing);
+
+    .pressed {
+        background-color: var(--indicator-hover-color);
+    }
+
+    .current {
+        background-color: var(--indicator-current-color);
+    }
+}
