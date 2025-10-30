@@ -53,7 +53,6 @@ treeviewdelegate {
     }
 }
 
-
 headerview,
 headerviewdelegate {
     border: 1px solid var(--button-active-border-color);

@@ -54,7 +54,7 @@ T.TreeViewDelegate {
 
     indicator: Union.Icon {
         Union.Element.type: "Indicator"
-        readonly property real __indicatorIndent: control.leftMargin + (control.depth * control.indentation) - (width / 2)
+        readonly property real __indicatorIndent: control.leftMargin + (control.depth * control.indentation)
         x: !control.mirrored ? __indicatorIndent : control.width - __indicatorIndent - width
         y: (control.height - height) / 2
         color: Union.Style.properties.icon.color
