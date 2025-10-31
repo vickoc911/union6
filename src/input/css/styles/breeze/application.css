@@ -48,13 +48,15 @@ scrollview {
     }
 }
 
-pageindicator,
+pageindicator {
+    spacing: var(--small-spacing);
+}
+
 pageindicatordelegate {
     background-color: var(--indicator-color);
     width: 8px;
     height: 8px;
     border-radius: 4px;
-    spacing: var(--small-spacing);
 
     &:pressed {
         background-color: var(--indicator-press-color);
