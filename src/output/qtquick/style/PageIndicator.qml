@@ -37,10 +37,10 @@ T.PageIndicator {
         id: delegate
         required property int index
         Union.Element.type: "PageIndicatorDelegate"
+        Union.Element.states {
+            pressed: pressed
+        }
         Union.Element.hints: {
-            if (pressed) {
-                return ["pressed"];
-            }
             if (index === control.currentIndex) {
                 return ["current"];
             } else {
