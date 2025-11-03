@@ -41,3 +41,15 @@ Or with [kde-builder][]:
 ```bash
 kde-builder union
 ```
+
+To allow building the code examples, use:
+
+```bash
+cmake -B build --install-prefix /usr -DBUILD_EXAMPLES=ON
+```
+
+Or:
+
+```bash
+kde-builder union --cmake-options=-DBUILD_EXAMPLES=ON
+```
