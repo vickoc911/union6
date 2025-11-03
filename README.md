@@ -54,3 +54,7 @@ Or:
 kde-builder union
 kde-builder union --no-include-dependencies --cmake-options=-DBUILD_EXAMPLES=ON
 ```
+
+## Get Involved
+
+You may contact the Union developers in the [Union room](https://go.kde.org/matrix/#/#union:kde.org) on [Matrix](https://community.kde.org/Matrix).
