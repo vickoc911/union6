@@ -53,3 +53,7 @@ Or:
 ```bash
 kde-builder union --cmake-options=-DBUILD_EXAMPLES=ON
 ```
+
+## Get Involved
+
+You may contact the Union developers in the [Union room](https://go.kde.org/matrix/#/#union:kde.org) on [Matrix](https://community.kde.org/Matrix).
