@@ -8,11 +8,6 @@
 
 #include "kcolorscheme_logging.h"
 
-struct FrameRolePair {
-    KColorScheme::ForegroundRole fgRole;
-    KColorScheme::BackgroundRole bgRole;
-};
-
 std::optional<QPalette::ColorGroup> colorGroupFromString(const QString &group)
 {
     if (group.compare(u"active", Qt::CaseInsensitive) == 0) {
@@ -93,18 +88,6 @@ std::optional<KColorScheme::ForegroundRole> foregroundRoleFromString(const QStri
     return std::nullopt;
 }
 
-std::optional<FrameRolePair> frameRolesFromString(const QString &role)
-{
-    auto pair = FrameRolePair();
-    if (role.compare(u"normal", Qt::CaseInsensitive) == 0) {
-        pair.fgRole = KColorScheme::ForegroundRole::NormalText;
-        pair.bgRole = KColorScheme::BackgroundRole::NormalBackground;
-        return pair;
-    }
-
-    return std::nullopt;
-}
-
 std::optional<KColorScheme::DecorationRole> decorationRoleFromString(const QString &role)
 {
     if (role.compare(u"hover", Qt::CaseInsensitive) == 0) {
@@ -173,23 +156,19 @@ std::optional<Union::ColorProvider::Rgba> KColorSchemeProvider::color(const QStr
             qCWarning(UNION_KCOLORSCHEME) << "Invalid arguments for KColorScheme color provider, foreground role" << arguments.at(3) << "does not exist";
         }
     } else if (roleType.compare(u"decoration", Qt::CaseInsensitive) == 0) {
-        auto role = decorationRoleFromString(arguments.at(3));
-        if (role) {
-            value = rgbaFromQColor(colorScheme.decoration(role.value()).color());
-        } else {
-            qCWarning(UNION_KCOLORSCHEME) << "Invalid arguments for KColorScheme color provider, decoration role" << arguments.at(3) << "does not exist";
-        }
-    } else if (roleType.compare(u"frame", Qt::CaseInsensitive) == 0) {
-        auto frameRolePair = frameRolesFromString(arguments.at(3));
-        if (frameRolePair) {
-            QColor framecolor = KColorUtils::mix(colorScheme.background(frameRolePair.value().bgRole).color(),
-                                                 colorScheme.foreground(frameRolePair.value().fgRole).color(),
+        if (arguments.at(3) == u"frame") {
+            QColor framecolor = KColorUtils::mix(colorScheme.background(KColorScheme::BackgroundRole::NormalBackground).color(),
+                                                 colorScheme.foreground(KColorScheme::ForegroundRole::NormalText).color(),
                                                  KColorScheme::frameContrast());
             value = rgbaFromQColor(framecolor);
         } else {
-            qCWarning(UNION_KCOLORSCHEME) << "Invalid arguments for KColorScheme frame provider, decoration role" << arguments.at(3) << "does not exist";
+            auto role = decorationRoleFromString(arguments.at(3));
+            if (role) {
+                value = rgbaFromQColor(colorScheme.decoration(role.value()).color());
+            } else {
+                qCWarning(UNION_KCOLORSCHEME) << "Invalid arguments for KColorScheme color provider, decoration role" << arguments.at(3) << "does not exist";
+            }
         }
-
     } else {
         qCWarning(UNION_KCOLORSCHEME) << "Invalid arguments for KColorScheme color provider, role type" << roleType << "does not exist";
     }
