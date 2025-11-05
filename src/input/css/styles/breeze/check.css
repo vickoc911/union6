@@ -72,7 +72,7 @@ switch
 switch indicator,
 switchdelegate indicator
 {
-    layout-alignment-container: item;
+    layout-alignment-container: content;
     layout-alignment-horizontal: start;
 
     width: 36px;
