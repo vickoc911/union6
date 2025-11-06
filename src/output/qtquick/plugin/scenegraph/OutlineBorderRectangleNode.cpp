@@ -136,8 +136,17 @@ void OutlineBorderRectangleNode::update()
         }
     }
 
-    if (m_background.image().has_value() && !m_background.image()->isEmpty()) {
+    auto imageProperties = m_background.image_or_new();
+    auto image = imageProperties.imageData();
+
+    auto maskColor = QColor(Qt::GlobalColor::transparent);
+
+    if (image.has_value()) {
         shaderName += u"-texture"_s;
+        if (imageProperties.flags().has_value() && imageProperties.flags().value().testFlag(ImageFlag::Mask)) {
+            shaderName += u"-mask"_s;
+            maskColor = QColor(Qt::GlobalColor::green);
+        }
     }
 
     setShader(shaderName);
@@ -167,7 +176,7 @@ void OutlineBorderRectangleNode::update()
            << outlineSize / minDimension // outline_width
            << m_radius / minDimension // radius
            << ShaderNode::toPremultiplied(backgroundColor) // color
-           << ShaderNode::toPremultiplied(Qt::GlobalColor::green); // mask-color TODO: Temp color for testing
+           << ShaderNode::toPremultiplied(maskColor); // mask-color
 
     if (m_background.image().has_value() && !m_background.image()->isEmpty()) {
         setTexture(0, m_background.image()->imageData().value(), m_window);
