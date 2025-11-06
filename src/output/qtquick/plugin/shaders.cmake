@@ -42,6 +42,9 @@ macro(name_to_define ARG_NAME ARG_OUTPUT)
     if ("${ARG_NAME}" STREQUAL "texture")
         set(${ARG_OUTPUT} ENABLE_TEXTURE=1)
     endif()
+    if ("${ARG_NAME}" STREQUAL "mask")
+        set(${ARG_OUTPUT} ENABLE_MASK=1)
+    endif()
 endmacro()
 
 set(_variants
@@ -52,6 +55,7 @@ set(_variants
     "outline"
     "outline-texture"
     "texture"
+    "mask"
 )
 
 add_shaders("styledrectangle" INPUT styledrectangle)
