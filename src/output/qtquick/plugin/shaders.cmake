@@ -56,6 +56,9 @@ set(_variants
     "outline-texture"
     "texture"
     "mask"
+    "texture-mask"
+    "border-texture-mask"
+    "border-outline-texture-mask"
 )
 
 add_shaders("styledrectangle" INPUT styledrectangle)

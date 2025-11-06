@@ -109,7 +109,7 @@ void OutlineBorderRectangleNode::update()
     }
 
     setShader(shaderName);
-    setUniformBufferSize(sizeof(float) * 36);
+    setUniformBufferSize(sizeof(float) * 40);
 
     auto aspect = m_itemRect.width() > m_itemRect.height() ? QVector2D{float(m_itemRect.width() / m_itemRect.height()), 1.0}
                                                            : QVector2D{1.0, float(m_itemRect.height() / m_itemRect.width())};
