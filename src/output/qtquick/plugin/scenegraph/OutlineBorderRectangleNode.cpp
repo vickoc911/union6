@@ -166,7 +166,8 @@ void OutlineBorderRectangleNode::update()
            << borderSize / minDimension // border_width
            << outlineSize / minDimension // outline_width
            << m_radius / minDimension // radius
-           << ShaderNode::toPremultiplied(backgroundColor); // color
+           << ShaderNode::toPremultiplied(backgroundColor) // color
+           << ShaderNode::toPremultiplied(Qt::GlobalColor::green); // mask-color TODO: Temp color for testing
 
     if (m_background.image().has_value() && !m_background.image()->isEmpty()) {
         setTexture(0, m_background.image()->imageData().value(), m_window);
