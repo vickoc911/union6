@@ -29,12 +29,21 @@ T.Dialog {
     leftPadding: Union.Style.properties.layout.padding.left
     rightPadding: Union.Style.properties.layout.padding.right
 
+    leftInset: Union.Style.properties.layout.inset.left
+    rightInset: Union.Style.properties.layout.inset.right
+    topInset: Union.Style.properties.layout.inset.top
+    bottomInset: Union.Style.properties.layout.inset.bottom
+
     background: Union.StyledRectangle { }
 
-    header: Label {
+    header: Kirigami.Heading {
         Union.Element.hints: ["header"]
         text: control.title
         visible: control.title
+        topPadding: Union.Style.properties.layout.padding.top
+        bottomPadding: Union.Style.properties.layout.padding.bottom
+        leftPadding: Union.Style.properties.layout.padding.left
+        rightPadding: Union.Style.properties.layout.padding.right
     }
 
     footer: DialogButtonBox {
