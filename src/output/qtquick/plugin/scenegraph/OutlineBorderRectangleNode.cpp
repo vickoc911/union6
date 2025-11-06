@@ -105,7 +105,7 @@ void OutlineBorderRectangleNode::update()
 
     auto image = m_background.image_or_new().imageData();
     if (image.has_value()) {
-        shaderName += u"-texture"_s;
+        shaderName += u"-texture-mask"_s;
     }
 
     setShader(shaderName);
@@ -140,7 +140,8 @@ void OutlineBorderRectangleNode::update()
            << borderSize / minDimension // border_width
            << outlineSize / minDimension // outline_width
            << m_radius / minDimension // radius
-           << ShaderNode::toPremultiplied(backgroundColor); // color
+           << ShaderNode::toPremultiplied(backgroundColor) // color
+           << ShaderNode::toPremultiplied(Qt::GlobalColor::green); // mask-color TODO: Temp color for testing
 
     if (image.has_value()) {
         setTexture(0, image.value(), m_window);
