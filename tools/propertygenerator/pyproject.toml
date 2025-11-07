@@ -1,8 +1,10 @@
+# SPDX-License-Identifier: CC0-1.0
+# SPDX-FileCopyrightText: None
+
 [project]
 name = "propertygenerator"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "Generates properties for union"
 requires-python = ">=3.13"
 dependencies = [
     "jinja2>=3.1.6",
