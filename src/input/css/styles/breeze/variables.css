@@ -47,10 +47,6 @@
     --header-background-color: custom-color("kcolorscheme", "active", "header", "background", "normal");
     --header-border-color: mix(var(--header-background-color), var(--header-text-color), 0.3);
 
-    --tooltip-text-color: custom-color("kcolorscheme", "active", "tooltip", "foreground", "text");
-    --tooltip-background-color: custom-color("kcolorscheme", "active", "tooltip", "background", "normal");
-    --tooltip-border-color: mix(var(--tooltip-background-color), var(--tooltip-text-color), 0.3);
-
     --card-background-color: var(--view-background-color);
     --card-text-color: var(--view-text-color);
     --card-border-color: var(--view-border-color);
