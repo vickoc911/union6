@@ -65,7 +65,6 @@ T.CheckBox {
         height: Union.Style.properties.icon.height
         name: Union.Style.properties.icon.name
         source: Union.Style.properties.icon.source
-
     }
 
     Union.Positioner.positionItems: [contentItem, indicator]

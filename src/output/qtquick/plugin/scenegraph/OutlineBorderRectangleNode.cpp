@@ -143,9 +143,13 @@ void OutlineBorderRectangleNode::update()
 
     if (image.has_value()) {
         shaderName += u"-texture"_s;
-        if (imageProperties.flags().has_value() && imageProperties.flags().value().testFlag(ImageFlag::Mask)) {
-            shaderName += u"-mask"_s;
-            maskColor = QColor(Qt::GlobalColor::green);
+        if (imageProperties.flags().has_value()) {
+            if (imageProperties.flags().value().testFlag(ImageFlag::Mask)) {
+                shaderName += u"-mask"_s;
+            } else if (imageProperties.flags().value().testFlag(ImageFlag::InvertedMask)) {
+                shaderName += u"-invertedmask"_s;
+            }
+            maskColor = imageProperties.maskColor().value_or(Color{}).toQColor();
         }
     }
 
