@@ -164,9 +164,20 @@ inline T toEnumValue(const std::string &value)
 template<typename T>
 inline void setImage(T &output, const fs::path &rootPath, const cssparser::Property &property)
 {
-    auto path = rootPath / to_path(property.value());
-
     QImage imageData;
+    std::filesystem::path path;
+    QString mask;
+    Color maskColor;
+
+    if (property.values.size() > 1) {
+        path = rootPath / to_path(property.values.at(0));
+
+        mask = to_qvariant(property.values.at(1)).toString();
+        maskColor = to_color(property.values.at(2));
+    } else {
+        path = rootPath / to_path(property.value());
+    }
+
     if (!imageData.load(QString::fromStdString(path))) {
         qCWarning(UNION_CSS) << "Could not load image" << path.string();
         return;
@@ -176,6 +187,12 @@ inline void setImage(T &output, const fs::path &rootPath, const cssparser::Prope
     image.setImageData(imageData);
     image.setWidth(imageData.width());
     image.setHeight(imageData.height());
+    if (mask == u"mask") {
+        image.setFlags(ImageFlag::Mask);
+    } else if (mask == u"inverted-mask") {
+        image.setFlags(ImageFlag::InvertedMask);
+    }
+    image.setMaskColor(maskColor);
     output.setImage(image);
 }
 
@@ -523,34 +540,38 @@ void CssLoader::setBackgroundProperty(StyleProperty &output, const cssparser::Pr
     }
 
     if (property.name == "background-image") {
-        std::filesystem::path path;
-        QString mask;
-        Color maskColor;
-
-        if (property.values.size() > 1) {
-            path = m_stylePath / to_path(property.values.at(0));
-            mask = to_qvariant(property.values.at(1)).toString();
-            maskColor = to_color(property.values.at(2));
+        if (matches_keyword(property.value(), u"none"_s)) {
+            background.setImage(ImageProperty::empty());
         } else {
-            path = m_stylePath / to_path(property.value());
-        }
+            std::filesystem::path path;
+            QString mask;
+            Color maskColor;
 
-        QImage imageData;
-        if (!imageData.load(QString::fromStdString(path))) {
-            qCWarning(UNION_CSS) << "Could not load image" << path.string();
-        }
+            if (property.values.size() > 1) {
+                path = m_stylePath / to_path(property.values.at(0));
+                mask = to_qvariant(property.values.at(1)).toString();
+                maskColor = to_color(property.values.at(2));
+            } else {
+                path = m_stylePath / to_path(property.value());
+            }
 
-        auto image = background.image_or_new();
-        image.setImageData(imageData);
-        image.setWidth(imageData.width());
-        image.setHeight(imageData.height());
-        if (mask == u"mask") {
-            image.setFlags(ImageFlag::Mask);
-        } else if (mask == u"inverted-mask") {
-            image.setFlags(ImageFlag::InvertedMask);
+            QImage imageData;
+            if (!imageData.load(QString::fromStdString(path))) {
+                qCWarning(UNION_CSS) << "Could not load image" << path.string();
+            }
+
+            auto image = background.image_or_new();
+            image.setImageData(imageData);
+            image.setWidth(imageData.width());
+            image.setHeight(imageData.height());
+            if (mask == u"mask") {
+                image.setFlags(ImageFlag::Mask);
+            } else if (mask == u"inverted-mask") {
+                image.setFlags(ImageFlag::InvertedMask);
+            }
+            image.setMaskColor(maskColor);
+            background.setImage(image);
         }
-        image.setMaskColor(maskColor);
-        background.setImage(image);
     }
 
     if (background.hasAnyValue()) {
