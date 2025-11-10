@@ -166,13 +166,6 @@ inline void setImage(T &output, const fs::path &rootPath, const cssparser::Prope
 {
     QImage imageData;
     std::filesystem::path path = rootPath / to_path(property.value());
-    QString mask;
-    Color maskColor;
-
-    if (property.values.size() > 1) {
-        mask = to_qvariant(property.values.at(1)).toString();
-        maskColor = to_color(property.values.at(2));
-    }
 
     if (!imageData.load(QString::fromStdString(path))) {
         qCWarning(UNION_CSS) << "Could not load image" << path.string();
@@ -183,12 +176,16 @@ inline void setImage(T &output, const fs::path &rootPath, const cssparser::Prope
     image.setImageData(imageData);
     image.setWidth(imageData.width());
     image.setHeight(imageData.height());
-    if (mask == u"mask") {
-        image.setFlags(ImageFlag::Mask);
-    } else if (mask == u"inverted-mask") {
-        image.setFlags(ImageFlag::InvertedMask);
+    if (property.values.size() > 1) {
+        auto value = property.values.at(1);
+        if (matches_keyword(value, u"mask"_s)) {
+            image.setFlags(ImageFlag::Mask);
+        } else if (matches_keyword(value, u"inverted-mask"_s)) {
+            image.setFlags(ImageFlag::InvertedMask);
+        }
+        image.setMaskColor(to_color(property.values.at(2)));
     }
-    image.setMaskColor(maskColor);
+
     output.setImage(image);
 }
 
