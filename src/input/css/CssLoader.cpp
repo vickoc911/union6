@@ -543,34 +543,7 @@ void CssLoader::setBackgroundProperty(StyleProperty &output, const cssparser::Pr
         if (matches_keyword(property.value(), u"none"_s)) {
             background.setImage(ImageProperty::empty());
         } else {
-            std::filesystem::path path;
-            QString mask;
-            Color maskColor;
-
-            if (property.values.size() > 1) {
-                path = m_stylePath / to_path(property.values.at(0));
-                mask = to_qvariant(property.values.at(1)).toString();
-                maskColor = to_color(property.values.at(2));
-            } else {
-                path = m_stylePath / to_path(property.value());
-            }
-
-            QImage imageData;
-            if (!imageData.load(QString::fromStdString(path))) {
-                qCWarning(UNION_CSS) << "Could not load image" << path.string();
-            }
-
-            auto image = background.image_or_new();
-            image.setImageData(imageData);
-            image.setWidth(imageData.width());
-            image.setHeight(imageData.height());
-            if (mask == u"mask") {
-                image.setFlags(ImageFlag::Mask);
-            } else if (mask == u"inverted-mask") {
-                image.setFlags(ImageFlag::InvertedMask);
-            }
-            image.setMaskColor(maskColor);
-            background.setImage(image);
+            setImage(background, m_stylePath, property);
         }
     }
 
