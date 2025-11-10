@@ -165,17 +165,13 @@ template<typename T>
 inline void setImage(T &output, const fs::path &rootPath, const cssparser::Property &property)
 {
     QImage imageData;
-    std::filesystem::path path;
+    std::filesystem::path path = rootPath / to_path(property.value());
     QString mask;
     Color maskColor;
 
     if (property.values.size() > 1) {
-        path = rootPath / to_path(property.values.at(0));
-
         mask = to_qvariant(property.values.at(1)).toString();
         maskColor = to_color(property.values.at(2));
-    } else {
-        path = rootPath / to_path(property.value());
     }
 
     if (!imageData.load(QString::fromStdString(path))) {
