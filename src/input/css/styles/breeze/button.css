@@ -208,9 +208,7 @@ toolseparator {
 }
 
 tabbutton {
-    layout-alignment: content fill center 0;
-    text-alignment: content fill center 0;
-    icon-alignment: content end center 0;
+    icon-alignment: content start center 0;
     background-color: var(--window-background-color);
     &:checked
     {
@@ -250,6 +248,5 @@ tabbutton {
 }
 
 tabbar {
-    padding: var(--small-spacing);
     spacing: 0px;
 }
