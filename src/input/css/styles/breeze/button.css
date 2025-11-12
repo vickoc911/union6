@@ -38,6 +38,8 @@
     --button-spacing: 4px;
 
     --toolbutton-padding: 6px;
+
+    --tab-highlight-size: 3px;
 }
 
 button,
@@ -49,7 +51,8 @@ radiobutton indicator,
 radiodelegate indicator,
 combobox,
 roundbutton,
-toolbutton.raised
+toolbutton.raised,
+tabbutton
 {
     width: var(--button-default-size);
     height: var(--button-default-size);
@@ -104,7 +107,8 @@ button:pressed,
 toolbutton:pressed,
 combobox:pressed,
 roundbutton:pressed,
-toolbutton.raised:pressed
+toolbutton.raised:pressed,
+tabbutton:pressed
 {
     border-color: var(--button-active-border-highlight-color);
     background-color: var(--button-active-highlight-color);
@@ -206,4 +210,50 @@ toolseparator {
         height: var(--large-element-size);
         inset: var(--small-spacing) 0px;
     }
+}
+
+tabbutton {
+    icon-alignment: content start center 0;
+    background-color: var(--view-background-color);
+    border: 1px solid var(--view-background-color);
+
+    &[direction="top"] {
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+        border-bottom: var(--button-border);
+    }
+
+    &[direction="bottom"] {
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        border-top: var(--button-border);
+    }
+
+    &:hovered
+    {
+        background-color: var(--button-active-highlight-color);
+        border: 1px solid var(--button-active-highlight-color);
+    }
+}
+
+
+tabbutton:checked {
+    background-color: var(--window-background-color);
+    border: var(--button-border);
+
+    &[direction="top"] {
+        border-top-width: var(--tab-highlight-size);
+        border-top-color: var(--highlight-color);
+        border-bottom-color: var(--window-background-color);
+    }
+
+    &[direction="bottom"] {
+        border-bottom-width: var(--tab-highlight-size);
+        border-bottom-color: var(--highlight-color);
+        border-top-color: var(--window-background-color);
+    }
+}
+
+tabbar {
+    spacing: 0px;
 }
