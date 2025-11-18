@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Akseli Lahtinen <akselmo@akselmo.dev>
 
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 
@@ -15,7 +16,7 @@ Kirigami.Page {
     
 
     header: Controls.TabBar {
-        id: tabBar
+        id: tabBarHeader
 
         Controls.TabButton {
             text: "First"
@@ -28,8 +29,29 @@ Kirigami.Page {
         }
     }
 
-    Controls.TextArea {
-        readOnly: true
-        text: tabBar.currentIndex
+    RowLayout {
+        Controls.TextArea {
+            readOnly: true
+            text: tabBarHeader.currentIndex
+        }
+
+        Controls.TextArea {
+            readOnly: true
+            text: tabBarFooter.currentIndex
+        }
+    }
+
+    footer: Controls.TabBar {
+        id: tabBarFooter
+
+        Controls.TabButton {
+            text: "Fourth"
+        }
+        Controls.TabButton {
+            text: "Fifth"
+        }
+        Controls.TabButton {
+            text: "Sixth"
+        }
     }
 }

@@ -54,9 +54,9 @@ T.TabButton {
                 break
         }
         if (control.T.TabBar.position === T.TabBar.Footer){
-            result.direction = "south"
+            result.direction = "bottom"
         } else {
-            result.direction = "north"
+            result.direction = "top"
         }
         return result
     }
