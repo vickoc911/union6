@@ -94,48 +94,11 @@ KT.OverlayDrawer {
                     }
                 }
             }
-            Loader {
+            Kirigami.Icon {
                 anchors.centerIn: handleGraphics
                 width: height
                 height: Kirigami.Units.iconSizes.smallMedium
-
-                Kirigami.Theme.colorSet: handleGraphics.Kirigami.Theme.colorSet
-                Kirigami.Theme.backgroundColor: handleGraphics.Kirigami.Theme.backgroundColor
-                Kirigami.Theme.textColor: handleGraphics.Kirigami.Theme.textColor
-
-                asynchronous: true
-
-                source: {
-                    let edge = control.edge;
-                    if (Qt.application.layoutDirection === Qt.RightToLeft) {
-                        if (edge === Qt.LeftEdge) {
-                            edge = Qt.RightEdge;
-                        } else {
-                            edge = Qt.LeftEdge;
-                        }
-                    }
-
-                    // TODO: those 3 still resolve because templates files are installed on
-                    // the same place, but we should probably eventually just use normal icons
-                    // and drop that custom morphing animation
-                    if ((control.handleClosedIcon.source || control.handleClosedIcon.name)
-                        && (control.handleOpenIcon.source || control.handleOpenIcon.name)) {
-                        return Qt.resolvedUrl("templates/private/GenericDrawerIcon.qml");
-                    } else if (edge === Qt.LeftEdge) {
-                        return Qt.resolvedUrl("templates/private/MenuIcon.qml");
-                    } else if (edge === Qt.RightEdge && control instanceof Kirigami.ContextDrawer) {
-                        return Qt.resolvedUrl("templates/private/ContextIcon.qml");
-                    } else {
-                        return "";
-                    }
-                }
-                onItemChanged: {
-                    if (item) {
-                        item.drawer = control;
-                        item.color = Qt.binding(() => control.handle.pressed
-                            ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor);
-                    }
-                }
+                source: control.drawerOpen ? control.handleOpenIcon.name : control.handleClosedIcon.name
             }
         }
 
