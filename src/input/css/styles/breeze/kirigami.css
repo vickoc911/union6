@@ -173,4 +173,9 @@ overlaydrawer
         border-color: var(--header-border-color);
         border-bottom: 1px solid var(--header-border-color);
     }
+
+    toolbutton {
+        background-color: var(--window-background-color);
+        color: var(--view-text-color);
+    }
 }
