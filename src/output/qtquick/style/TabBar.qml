@@ -22,7 +22,7 @@ T.TabBar {
         enabled: control.enabled
     }
     Union.Element.attributes: position === T.TabBar.Footer ?
-        {"tab-position": "south"} : {"tab-position": "north"}
+        {"tab-position": "bottom"} : {"tab-position": "top"}
 
     leftPadding: Union.Style.properties.layout.padding.left
     rightPadding: Union.Style.properties.layout.padding.right

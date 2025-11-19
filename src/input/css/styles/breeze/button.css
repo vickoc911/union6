@@ -38,6 +38,8 @@
     --button-spacing: 4px;
 
     --toolbutton-padding: 6px;
+
+    --tab-highlight-size: 3px;
 }
 
 button,
@@ -209,44 +211,50 @@ toolseparator {
 
 tabbutton {
     icon-alignment: content start center 0;
-    background-color: var(--window-background-color);
-    &:checked
-    {
-        background-color: var(--window-background-color);
-    }
+    background-color: var(--view-background-color);
+    border: 1px solid var(--view-background-color);
 
     &[direction="top"] {
-        /* shouldnt this be border-bottom-left? */
+        /* Shouldnt this be border-bottom-left? We want the bottom radius to be off. */
         border-top-left-radius: 0px;
         border-top-right-radius: 0px;
-        border-bottom: 0px solid transparent;
-        corners-bottom-left-color: transparent;
-        corners-bottom-right-color: transparent;
-        corners-bottom-left-width: 0px;
-        corners-bottom-right-width: 0px;
-        &:checked
-        {
-            border-top-width: 4px;
-            border-top-color: var(--highlight-color);
-        }
+        border-bottom: var(--button-border);
     }
 
     &[direction="bottom"] {
+        /* Same here but in reverse */
         border-bottom-left-radius: 0px;
         border-bottom-right-radius: 0px;
-        border-top: 0px solid transparent;
-        corners-top-left-color: transparent;
-        corners-top-right-color: transparent;
-        corners-top-left-width: 0px;
-        corners-top-right-width: 0px;
-        &:checked
-        {
-            border-bottom-width: 4px;
-            border-bottom-color: var(--highlight-color);
-        }
+        border-top: var(--button-border);
+    }
+
+    &:hovered
+    {
+        background-color: var(--button-active-highlight-color);
+        border: 1px solid var(--button-active-highlight-color);
+    }
+}
+
+
+tabbutton:checked {
+    background-color: var(--window-background-color);
+    border: 1px solid var(--window-background-color);
+    border: var(--button-border);
+
+    &[direction="top"] {
+        border-top-width: var(--tab-highlight-size);
+        border-top-color: var(--highlight-color);
+        border-bottom-color: var(--window-background-color);
+    }
+
+    &[direction="bottom"] {
+        border-bottom-width: var(--tab-highlight-size);
+        border-bottom-color: var(--highlight-color);
+        border-top-color: var(--window-background-color);
     }
 }
 
 tabbar {
     spacing: 0px;
+    background-color: var(--view-background-color);
 }
