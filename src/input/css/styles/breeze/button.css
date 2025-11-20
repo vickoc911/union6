@@ -39,8 +39,8 @@
 
     --toolbutton-padding: 6px;
 
-    --tab-background-color: mix(var(--view-background-color), var(--window-background-color), 0.3);
-    --tab-text-color: var(--view-text-color);
+    --tab-background-color: var(--header-background-color);
+    --tab-text-color: var(--header-text-color);
     --tab-open-background-color: var(--window-background-color);
     --tab-open-text-color: var(--window-text-color);
     --tab-disabled-text-color: var(--button-disabled-text-color);
