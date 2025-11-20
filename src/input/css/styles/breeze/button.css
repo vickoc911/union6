@@ -39,6 +39,13 @@
 
     --toolbutton-padding: 6px;
 
+    --tab-background-color: mix(var(--view-background-color), var(--window-background-color), 0.3);
+    --tab-text-color: var(--view-text-color);
+    --tab-open-background-color: var(--window-background-color);
+    --tab-open-text-color: var(--window-text-color);
+    --tab-disabled-text-color: var(--button-disabled-text-color);
+    --tab-disabled-background-color: var(--button-disabled-background-color);
+
     --tab-highlight-size: 3px;
 }
 
@@ -51,8 +58,7 @@ radiobutton indicator,
 radiodelegate indicator,
 combobox,
 roundbutton,
-toolbutton.raised,
-tabbutton
+toolbutton.raised
 {
     width: var(--button-default-size);
     height: var(--button-default-size);
@@ -107,8 +113,7 @@ button:pressed,
 toolbutton:pressed,
 combobox:pressed,
 roundbutton:pressed,
-toolbutton.raised:pressed,
-tabbutton:pressed
+toolbutton.raised:pressed
 {
     border-color: var(--button-active-border-highlight-color);
     background-color: var(--button-active-highlight-color);
@@ -213,9 +218,18 @@ toolseparator {
 }
 
 tabbutton {
+    width: var(--button-default-size);
+    height: var(--button-default-size);
+    spacing: 0px;
+    padding: 0px;
+    border-radius: var(--corner-radius);
+    background-color: var(--tab-background-color);
+    border: 1px solid var(--tab-background-color);
+    color: var(--tab-text-color);
+
     icon-alignment: content start center 0;
-    background-color: var(--view-background-color);
-    border: 1px solid var(--view-background-color);
+    text-alignment-horizontal: center;
+    icon-alignment-horizontal: center;
 
     &[direction="top"] {
         border-bottom-left-radius: 0px;
@@ -229,28 +243,41 @@ tabbutton {
         border-top: var(--button-border);
     }
 
+    &:disabled {
+        background-color: var(--tab-disabled-background-color);
+        color: var(--button-disabled-text-color);
+    }
+
     &:hovered
     {
         background-color: var(--button-active-highlight-color);
         border: 1px solid var(--button-active-highlight-color);
     }
-}
 
-
-tabbutton:checked {
-    background-color: var(--window-background-color);
-    border: var(--button-border);
-
-    &[direction="top"] {
-        border-top-width: var(--tab-highlight-size);
-        border-top-color: var(--highlight-color);
-        border-bottom-color: var(--window-background-color);
+    &:pressed
+    {
+        border-color: var(--button-active-border-highlight-color);
+        background-color: var(--button-active-highlight-color);
+        box-shadow: none;
     }
 
-    &[direction="bottom"] {
-        border-bottom-width: var(--tab-highlight-size);
-        border-bottom-color: var(--highlight-color);
-        border-top-color: var(--window-background-color);
+    &:checked
+    {
+        background-color: var(--tab-open-background-color);
+        color: var(--tab-open-text-color);
+        border: var(--button-border);
+
+        &[direction="top"] {
+            border-top-width: var(--tab-highlight-size);
+            border-top-color: var(--highlight-color);
+            border-bottom-color: var(--tab-open-background-color);
+        }
+
+        &[direction="bottom"] {
+            border-bottom-width: var(--tab-highlight-size);
+            border-bottom-color: var(--highlight-color);
+            border-top-color: var(--tab-open-background-color);
+        }
     }
 }
 
