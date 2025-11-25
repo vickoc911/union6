@@ -24,7 +24,7 @@ PlatformTheme::PlatformTheme(QObject *parent)
 {
     setSupportsIconColoring(true);
     // TODO Find some way of maintaining inherit while using the correct colors.
-    setInherit(false);
+    setInherit(true);
     syncColorSchemeColors();
 }
 
@@ -154,6 +154,4 @@ void PlatformTheme::syncColorSchemeColors()
     // decoration
     setHoverColor(Color::custom(u"kcolorscheme"_s, {group, set, u"decoration"_s, u"hover"_s}).toQColor());
     setFocusColor(Color::custom(u"kcolorscheme"_s, {group, set, u"decoration"_s, u"focus"_s}).toQColor());
-
-    syncColors();
 }
