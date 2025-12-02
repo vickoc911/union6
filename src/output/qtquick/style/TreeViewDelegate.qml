@@ -52,6 +52,8 @@ T.TreeViewDelegate {
     topInset: Union.Style.properties.layout.inset.top
     bottomInset: Union.Style.properties.layout.inset.bottom
 
+    spacing: Union.Style.properties.layout.spacing
+
     highlighted: control.selected || control.current || ((control.treeView.selectionBehavior === TableView.SelectRows || control.treeView.selectionBehavior === TableView.SelectionDisabled) && control.row === control.treeView.currentRow)
 
     Item {
