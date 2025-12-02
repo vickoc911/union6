@@ -32,18 +32,19 @@ T.TreeViewDelegate {
         enabled: control.enabled
         highlighted: control.highlighted
     }
+    Union.Positioner.positionItems: [indentItem, indicator, contentItem]
 
     required property var model
     required property int row
     readonly property real __contentIndent: !isTreeNode ? 0 : (depth * indentation) + (indicator ? indicator.width + spacing : 0)
 
-    implicitWidth: leftPadding + __contentIndent + implicitContentWidth + rightPadding
-    implicitHeight: Math.max(indicator ? indicator.height : 0, implicitContentHeight) + topPadding + bottomPadding
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, Union.Positioner.implicitWidth) + __contentIndent
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, Union.Positioner.implicitHeight)
 
-    topPadding: Union.Style.properties.layout.padding.top
-    rightPadding: Union.Style.properties.layout.padding.right
-    leftPadding: !mirrored ? Union.Style.properties.layout.padding.left + __contentIndent : width - Union.Style.properties.layout.padding.left - __contentIndent - implicitContentWidth
-    bottomPadding: Union.Style.properties.layout.padding.bottom
+    leftPadding: Union.Positioner.padding.left
+    rightPadding: Union.Positioner.padding.right
+    topPadding: Union.Positioner.padding.top
+    bottomPadding: Union.Positioner.padding.bottom
 
     leftInset: Union.Style.properties.layout.inset.left
     rightInset: Union.Style.properties.layout.inset.right
@@ -52,30 +53,38 @@ T.TreeViewDelegate {
 
     highlighted: control.selected || control.current || ((control.treeView.selectionBehavior === TableView.SelectRows || control.treeView.selectionBehavior === TableView.SelectionDisabled) && control.row === control.treeView.currentRow)
 
+    Item {
+        id: indentItem
+        visible: control.__contentIndent > 0
+        Union.PositionedItem.source: Union.PositionerSource.Icon
+        readonly property real __indicatorIndent: control.leftMargin + (control.depth * control.indentation)
+        implicitHeight: Union.Style.properties.icon.height
+        implicitWidth: __indicatorIndent
+    }
+
     indicator: Union.Icon {
         Union.Element.type: "Indicator"
-        readonly property real __indicatorIndent: control.leftMargin + (control.depth * control.indentation)
-        x: !control.mirrored ? __indicatorIndent : control.width - __indicatorIndent - width
-        y: (control.height - height) / 2
+        Union.PositionedItem.source: Union.PositionerSource.Icon
         color: Union.Style.properties.icon.color
-        width: Union.Style.properties.icon.width
-        height: Union.Style.properties.icon.height
+        implicitWidth: Union.Style.properties.icon.width
+        implicitHeight: Union.Style.properties.icon.height
         name: Union.Style.properties.icon.name
     }
 
     background: Union.StyledRectangle {}
 
     contentItem: Text {
+        Union.PositionedItem.source: Union.PositionerSource.Text
         clip: false
         text: control.model.display ?? ""
         elide: Text.ElideRight
         visible: !control.editing
         color: Union.Style.properties.text.color
-        horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
-        verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
     }
 
     TableView.editDelegate: FocusScope {
+        Union.PositionedItem.source: Union.PositionerSource.Text
+
         width: parent.width
         height: parent.height
 
@@ -92,8 +101,6 @@ T.TreeViewDelegate {
             verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
             // Remove the TextField background, we want to use the Control background.
             background: Item {}
-            x: control.contentItem.x
-            y: (parent.height - height) / 2
             width: control.contentItem.width
             text: control.treeView.model.data(control.treeView.index(row, column), __role)
             focus: true
