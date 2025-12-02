@@ -10,19 +10,24 @@ import org.kde.union.impl as Union
 
 T.TreeViewDelegate {
     id: control
+
+    required property var model
+    required property int row
+    readonly property real __contentIndent: !isTreeNode ? 0 : (depth * indentation) + (indicator ? indicator.width + spacing : 0)
+
     Union.Element.type: "TreeViewDelegate"
     Union.Element.hints: {
-        let hints = [];
-        if (control.treeView.alternatingRows && control.row % 2) {
-            hints.push("alternatingRows");
+        let result = [];
+        if (control.treeView.alternatingRows && control.row % 2 !== 0) {
+            result.push("alternatingRows");
         }
         if (control.expanded) {
-            hints.push("expanded");
+            result.push("expanded");
         }
         if (control.editing) {
-            hints.push("editing");
+            result.push("editing");
         }
-        return hints;
+        return result;
     }
     Union.Element.states {
         hovered: control.hovered
@@ -33,10 +38,6 @@ T.TreeViewDelegate {
         highlighted: control.highlighted
     }
     Union.Positioner.positionItems: [indentItem, indicator, contentItem]
-
-    required property var model
-    required property int row
-    readonly property real __contentIndent: !isTreeNode ? 0 : (depth * indentation) + (indicator ? indicator.width + spacing : 0)
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, Union.Positioner.implicitWidth) + __contentIndent
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, Union.Positioner.implicitHeight)
@@ -80,6 +81,8 @@ T.TreeViewDelegate {
         elide: Text.ElideRight
         visible: !control.editing
         color: Union.Style.properties.text.color
+        horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
+        verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
     }
 
     TableView.editDelegate: FocusScope {

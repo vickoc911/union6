@@ -9,7 +9,7 @@ tableviewdelegate {
     background-color: var(--view-background-color);
     spacing: var(--small-spacing);
 
-    .alternatingRows {
+    &.alternatingRows {
         background-color: var(--view-background-alternate-color);
     }
 
@@ -35,7 +35,7 @@ tableviewdelegate {
         background-color: var(--highlight-color);
     }
 
-    .editing {
+    &.editing {
         border: 1px solid var(--highlight-color);
     }
 
