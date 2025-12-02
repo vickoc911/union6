@@ -58,9 +58,8 @@ T.TreeViewDelegate {
         id: indentItem
         visible: control.isTreeNode
         Union.PositionedItem.source: Union.PositionerSource.Icon
-        readonly property real __indicatorIndent: control.leftMargin + (control.depth * control.indentation)
         implicitHeight: Union.Style.properties.icon.height
-        implicitWidth: __indicatorIndent
+        implicitWidth: control.leftMargin + (control.depth * control.indentation)
     }
 
     indicator: Union.Icon {
