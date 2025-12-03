@@ -61,8 +61,9 @@ void main()
     rect = adjusted_rect(rect, ubuf.borderWidth );
 
     // Adjust corner radius for the amount the border makes the inner rectangle
-    // smaller.
-    corner_radius = adjusted_radius(corner_radius, ubuf.borderWidth);
+    // smaller. A small correction factor is added to make sure the radius
+    // matches what we expect visually.
+    corner_radius = adjusted_radius(corner_radius, ubuf.borderWidth + 0.05);
 #endif
     // Finally, render the inner rectangle.
     mediump float sdf = sdf_rounded_rectangle(rect.xy, rect.zw, corner_radius);
