@@ -94,7 +94,7 @@ T.TreeViewDelegate {
 
         readonly property int __role: {
             let model = control.treeView.model;
-            let index = control.treeView.index(row, column);
+            let index = control.treeView.index(control.row, control.column);
             let editText = model.data(index, Qt.EditRole);
             return editText !== undefined ? Qt.EditRole : Qt.DisplayRole;
         }
@@ -106,12 +106,12 @@ T.TreeViewDelegate {
             // Remove the TextField background, we want to use the Control background.
             background: Item {}
             width: control.contentItem.width
-            text: control.treeView.model.data(control.treeView.index(row, column), __role)
+            text: control.treeView.model.data(control.treeView.index(control.row, control.column), parent.__role)
             focus: true
         }
 
         TableView.onCommit: {
-            let index = TableView.view.index(row, column);
+            let index = TableView.view.index(control.row, control.column);
             TableView.view.model.setData(index, textField.text, __role);
         }
 
