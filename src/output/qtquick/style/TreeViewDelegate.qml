@@ -61,7 +61,7 @@ T.TreeViewDelegate {
         visible: control.isTreeNode
         Union.PositionedItem.source: Union.PositionerSource.Icon
         implicitHeight: Union.Style.properties.icon.height
-        implicitWidth: control.leftMargin + (control.depth * control.indentation)
+        implicitWidth: (control.depth * control.indentation) + (control.indicator.visible ? 0 : control.indicator.width + control.leftPadding)
     }
 
     indicator: Union.Icon {
