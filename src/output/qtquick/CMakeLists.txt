@@ -75,6 +75,7 @@ ecm_target_qml_sources(UnionQuickStyle SOURCES
     style/ToolSeparator.qml
     style/ToolTip.qml
     style/VerticalHeaderView.qml
+    style/TextFieldContextMenu.qml
 )
 
 target_link_libraries(UnionQuickStyle PRIVATE UnionQuickImpl)
