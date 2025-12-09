@@ -2,6 +2,7 @@
  *    SPDX-FileCopyrightText: 2020 Devin Lin <espidev@gmail.com>
  *    SPDX-FileCopyrightText: 2021 Carl Schwan <carlschwan@kde.org>
  *    SPDX-FileCopyrightText: 2023 ivan tkachenko <me@ratijas.tk>
+ *    SPDX-FileCopyrightText: 2025 Akseli Lahtinen <akselmo@akselmo.dev>
  *
  *    SPDX-License-Identifier: LGPL-2.0-or-later
  */
@@ -16,11 +17,6 @@ Menu {
     id: root
 
     property Item target
-    property bool deselectWhenMenuClosed: true
-    property int restoredCursorPosition: 0
-    property int restoredSelectionStart
-    property int restoredSelectionEnd
-    property bool persistentSelectionSetting
 
     // assuming that Instantiator::active is bound to target.Kirigami.SpellCheck.enabled
     property Instantiator/*<Sonnet.SpellcheckHighlighter>*/ spellcheckHighlighterInstantiator
@@ -31,58 +27,11 @@ Menu {
 
     property /*list<string>*/var spellcheckSuggestions: []
 
-    Component.onCompleted: persistentSelectionSetting = persistentSelectionSetting // break binding
-
-    property var runOnMenuClose: () => {}
-
-    function storeCursorAndSelection() {
-        restoredCursorPosition = target.cursorPosition;
-        restoredSelectionStart = target.selectionStart;
-        restoredSelectionEnd = target.selectionEnd;
-    }
-
-    // target is pressed with mouse
-    function targetClick(
-        handlerPoint,
-        target,
-        spellcheckHighlighterInstantiator,
-        mousePosition,
-    ) {
-        if (!(target instanceof TextInput || target instanceof TextEdit)) {
-            console.warn("Target not supported by standard context menu:", target);
-            return;
-        }
-        if (handlerPoint.pressedButtons === Qt.RightButton) { // only accept just right click
-            if (visible) {
-                deselectWhenMenuClosed = false; // don't deselect text if menu closed by right click on textfield
-                dismiss();
-            } else {
-                this.target = target;
-                target.persistentSelection = true; // persist selection when menu is opened
-
-                this.spellcheckHighlighterInstantiator = spellcheckHighlighterInstantiator;
-
-                spellcheckSuggestions = (spellcheckHighlighter && mousePosition)
-                ? spellcheckHighlighter.suggestions(mousePosition)
-                : [];
-
-                storeCursorAndSelection();
-                popup(target);
-                // slightly locate context menu away from mouse so no item is selected when menu is opened
-                x += 1
-                y += 1
-            }
-        } else {
-            dismiss();
-        }
-    }
-
     // context menu keyboard key
     function targetKeyPressed(event, target) {
         if (event.modifiers === Qt.NoModifier && event.key === Qt.Key_Menu) {
             this.target = target;
             target.persistentSelection = true; // persist selection when menu is opened
-            storeCursorAndSelection();
             const targetCursorRectangle = target.cursorRectangle;
             popup(target, targetCursorRectangle.right, targetCursorRectangle.bottom);
         }
@@ -124,44 +73,6 @@ Menu {
 
     modal: true
 
-    // deal with whether text should be deselected
-    onClosed: {
-        // reset parent, so OverlayZStacking could refresh z order next time
-        // this menu is about to open for the same item that might have been
-        // reparented to a different popup.
-        parent = null;
-
-        // restore text field's original persistent selection setting
-        target.persistentSelection = persistentSelectionSetting
-        // deselect text field text if menu is closed not because of a right click on the text field
-        if (deselectWhenMenuClosed) {
-            target.deselect();
-        }
-        deselectWhenMenuClosed = true;
-
-        // restore cursor position
-        target.forceActiveFocus();
-        target.cursorPosition = restoredCursorPosition;
-        target.select(restoredSelectionStart, restoredSelectionEnd);
-
-        // run action, and free memory
-        try {
-            runOnMenuClose();
-        } catch (e) {
-            console.error(e);
-            console.trace();
-        }
-        runOnMenuClose = () => {};
-
-        // clean up spellchecker
-        spellcheckHighlighterInstantiator = null;
-        spellcheckSuggestions = [];
-    }
-
-    onOpened: {
-        runOnMenuClose = () => {};
-    }
-
     Instantiator {
         active: root.__showSpellcheckActions()
 
@@ -172,10 +83,8 @@ Menu {
             text: modelData
 
             onClicked: {
-                root.deselectWhenMenuClosed = false;
-                root.runOnMenuClose = () => {
-                    root.spellcheckHighlighter.replaceWord(modelData);
-                };
+                root.target.persistentSelection = true;
+                root.spellcheckHighlighter.replaceWord(modelData);
             }
         }
         onObjectAdded: (index, object) => {
@@ -210,10 +119,7 @@ Menu {
             : ""
 
             onTriggered: {
-                root.deselectWhenMenuClosed = false;
-                root.runOnMenuClose = () => {
-                    root.spellcheckHighlighter.addWordToDictionary(root.spellcheckHighlighter.wordUnderMouse);
-                };
+                root.spellcheckHighlighter.addWordToDictionary(root.spellcheckHighlighter.wordUnderMouse);
             }
         }
     }
@@ -223,10 +129,7 @@ Menu {
         action: T.Action {
             text: qsTr("Ignore")
             onTriggered: {
-                root.deselectWhenMenuClosed = false;
-                root.runOnMenuClose = () => {
-                    root.spellcheckHighlighter.ignoreWord(root.spellcheckHighlighter.wordUnderMouse);
-                };
+                root.spellcheckHighlighter.ignoreWord(root.spellcheckHighlighter.wordUnderMouse);
             }
         }
     }
@@ -259,10 +162,7 @@ Menu {
         visible: root.__showPasswordRestrictedEditingActions()
         enabled: root.target?.canUndo ?? false
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.undo();
-            };
+            root.target.undo();
         }
     }
     MenuItem {
@@ -274,10 +174,7 @@ Menu {
         visible: root.__showPasswordRestrictedEditingActions()
         enabled: root.target?.canRedo ?? false
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.redo();
-            };
+            root.target.redo();
         }
     }
     MenuSeparator {
@@ -292,10 +189,7 @@ Menu {
         visible: root.__showPasswordRestrictedEditingActions()
         enabled: root.__hasSelectedText()
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.cut();
-            };
+            root.target.cut();
         }
     }
     MenuItem {
@@ -307,10 +201,7 @@ Menu {
         visible: root.__showPasswordRestrictedActions()
         enabled: root.__hasSelectedText()
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.copy();
-            };
+            root.target.copy();
         }
     }
     MenuItem {
@@ -322,10 +213,7 @@ Menu {
         visible: root.__editable()
         enabled: target?.canPaste ?? false
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.paste();
-            };
+            root.target.paste();
         }
     }
     MenuItem {
@@ -337,10 +225,7 @@ Menu {
         visible: root.__editable()
         enabled: root.__hasSelectedText()
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.remove(root.target.selectionStart, root.target.selectionEnd);
-            };
+            root.target.remove(root.target.selectionStart, root.target.selectionEnd);
         }
     }
     MenuSeparator {
@@ -355,10 +240,7 @@ Menu {
         }
         visible: root.target !== null
         onTriggered: {
-            root.deselectWhenMenuClosed = false;
-            root.runOnMenuClose = () => {
-                root.target.selectAll();
-            };
+            root.target.selectAll();
         }
     }
 }
