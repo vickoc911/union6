@@ -13,9 +13,9 @@ T.ItemDelegate {
     id: control
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            Math.max(Union.Positioner.implicitWidth, implicitContentWidth + leftPadding + rightPadding))
+                            Math.max(Union.Positioner.implicitWidth, implicitContentWidth  + leftPadding + rightPadding))
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             Math.max(Union.Positioner.implicitHeight, implicitContentHeight + topPadding + bottomPadding))
+                             Math.max(Union.Positioner.implicitHeight, implicitContentHeight  + topPadding + bottomPadding))
 
     hoverEnabled: Application.styleHints.useHoverEffects
 
@@ -82,6 +82,7 @@ T.ItemDelegate {
     Union.Positioner.positionItems: [contentItem]
 
     contentItem: Item {
+        anchors.fill: parent
         Union.PositionedItem.positionChildren: true
         Union.Icon {
             Union.PositionedItem.source: Union.PositionerSource.Icon
