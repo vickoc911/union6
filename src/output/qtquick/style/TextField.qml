@@ -7,6 +7,7 @@ import QtQuick.Controls.impl
 import QtQuick.Controls.Basic
 import QtQuick.Templates as T
 import org.kde.union.impl as Union
+import "private"
 
 T.TextField {
     id: control
