@@ -104,7 +104,6 @@ std::optional<KColorScheme::DecorationRole> decorationRoleFromString(const QStri
 KColorSchemeProvider::KColorSchemeProvider(QObject *parent)
     : ColorProvider(parent)
 {
-    qApp->installEventFilter(this);
 }
 
 bool KColorSchemeProvider::eventFilter(QObject *obj, QEvent *event)
