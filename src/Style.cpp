@@ -23,6 +23,7 @@
 using namespace Union;
 using namespace Qt::StringLiterals;
 
+UNION_EXPORT QEvent::Type StyleChangedEvent::s_type = QEvent::None;
 static EventTypeRegistration<StyleChangedEvent> styleChangedEventRegistration;
 
 class Union::StylePrivate

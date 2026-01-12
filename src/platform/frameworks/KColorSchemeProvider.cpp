@@ -111,7 +111,6 @@ bool KColorSchemeProvider::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::ApplicationPaletteChange) {
         m_cache.clear();
-        return true;
     }
     return QObject::eventFilter(obj, event);
 }
