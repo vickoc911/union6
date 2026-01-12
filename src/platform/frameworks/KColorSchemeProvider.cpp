@@ -4,6 +4,7 @@
 #include "KColorSchemeProvider.h"
 
 #include <KColorUtils>
+#include <QGuiApplication>
 #include <QMetaEnum>
 
 #include "kcolorscheme_logging.h"
@@ -102,6 +103,15 @@ std::optional<KColorScheme::DecorationRole> decorationRoleFromString(const QStri
 KColorSchemeProvider::KColorSchemeProvider(QObject *parent)
     : ColorProvider(parent)
 {
+    qGuiApp->installEventFilter(this);
+}
+
+bool KColorSchemeProvider::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::ApplicationPaletteChange) {
+        m_cache.clear();
+    }
+    return QObject::eventFilter(obj, event);
 }
 
 std::optional<Union::ColorProvider::Rgba> KColorSchemeProvider::color(const QStringList &arguments) const
