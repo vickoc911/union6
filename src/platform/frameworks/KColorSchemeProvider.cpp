@@ -109,9 +109,9 @@ KColorSchemeProvider::KColorSchemeProvider(QObject *parent)
 
 bool KColorSchemeProvider::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == Union::StyleChangedEvent::s_type) {
-        qWarning() << "clearing cache";
+    if (event->type() == QEvent::ApplicationPaletteChange) {
         m_cache.clear();
+        return true;
     }
     return QObject::eventFilter(obj, event);
 }
