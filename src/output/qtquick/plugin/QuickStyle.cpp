@@ -71,7 +71,8 @@ bool QuickStyle::event(QEvent *event)
 bool QuickStyle::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == StyleChangedEvent::s_type) {
-        qWarning() << "AAAAAAAAAAAAAA";
+        update();
+        return false;
     }
 
     if (watched == m_element && event->type() == QuickElementUpdatedEvent::s_type) {
