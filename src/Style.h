@@ -108,6 +108,6 @@ class StyleChangedEvent : public QEvent
 public:
     StyleChangedEvent();
 
-    inline static QEvent::Type s_type = QEvent::None;
+    static QEvent::Type s_type;
 };
 }
