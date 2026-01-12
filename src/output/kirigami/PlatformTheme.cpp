@@ -4,6 +4,7 @@
 #include "PlatformTheme.h"
 
 #include <KIconColors>
+#include <Style.h>
 
 #include <Color.h>
 
@@ -91,6 +92,12 @@ bool PlatformTheme::event(QEvent *event)
 
 bool PlatformTheme::eventFilter(QObject *target, QEvent *event)
 {
+    if (event->type() == StyleChangedEvent::s_type) {
+        qWarning() << "Syncing colorschemecolors";
+        syncColorSchemeColors();
+        return false;
+    }
+
     if (event->type() == QuickStyleUpdatedEvent::s_type) {
         syncColors();
         return false;

@@ -5,6 +5,7 @@
 
 #include <filesystem>
 
+#include <EventHelper.h>
 #include <QCoreApplication>
 #include <QGlobalStatic>
 #include <QMetaObject>
@@ -21,6 +22,8 @@
 
 using namespace Union;
 using namespace Qt::StringLiterals;
+
+static EventTypeRegistration<StyleChangedEvent> styleChangedEventRegistration;
 
 class Union::StylePrivate
 {
@@ -44,9 +47,19 @@ Style::Style(std::unique_ptr<StylePrivate> &&d)
     : QObject(nullptr)
     , d(std::move(d))
 {
+    qApp->installEventFilter(this);
 }
 
 Style::~Style() = default;
+
+bool Style::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::ApplicationPaletteChange) {
+        StyleChangedEvent event;
+        QCoreApplication::sendEvent(this, &event);
+    }
+    return QObject::eventFilter(obj, event);
+}
 
 QString Style::name() const
 {
@@ -108,4 +121,9 @@ QList<StyleRule::Ptr> Union::Style::matches(const QList<Element::Ptr> &elements)
 std::shared_ptr<Style> Style::create(const QString &pluginName, const QString &styleName, std::unique_ptr<StyleLoader> &&loader)
 {
     return std::make_shared<Style>(std::make_unique<StylePrivate>(pluginName, styleName, std::move(loader)));
+}
+
+StyleChangedEvent::StyleChangedEvent()
+    : QEvent(s_type)
+{
 }

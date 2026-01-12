@@ -4,8 +4,9 @@
 #include "KColorSchemeProvider.h"
 
 #include <KColorUtils>
-#include <QGuiApplication>
+#include <QCoreApplication>
 #include <QMetaEnum>
+#include <Style.h>
 
 #include "kcolorscheme_logging.h"
 
@@ -103,12 +104,13 @@ std::optional<KColorScheme::DecorationRole> decorationRoleFromString(const QStri
 KColorSchemeProvider::KColorSchemeProvider(QObject *parent)
     : ColorProvider(parent)
 {
-    qGuiApp->installEventFilter(this);
+    qApp->installEventFilter(this);
 }
 
 bool KColorSchemeProvider::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == QEvent::ApplicationPaletteChange) {
+    if (event->type() == Union::StyleChangedEvent::s_type) {
+        qWarning() << "clearing cache";
         m_cache.clear();
     }
     return QObject::eventFilter(obj, event);
