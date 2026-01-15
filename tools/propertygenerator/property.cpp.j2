@@ -109,7 +109,6 @@ void {{ type_name }}::set{{ property.name | ucfirst }}(const std::optional<{{ pr
 
 {% endif %}
 {% endfor %}
-
 bool {{ type_name }}::hasAnyValue() const
 {
 {% for property in properties %}

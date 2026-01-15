@@ -46,8 +46,8 @@ QFont testQFontInstance()
 {% for type in types %}
 std::unique_ptr<{{ type.type_name }}> test{{ type.type_name }}Instance();
 {% endfor %}
-
 {% for type in types %}
+
 std::unique_ptr<{{ type.type_name }}> test{{type.type_name}}Instance()
 {
     auto instance = std::make_unique<{{ type.type_name }}>();
@@ -68,7 +68,6 @@ std::unique_ptr<{{ type.type_name }}> test{{type.type_name}}Instance()
 
     return instance;
 }
-
 {% endfor %}
 }
 }
