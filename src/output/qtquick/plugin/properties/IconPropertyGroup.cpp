@@ -20,7 +20,7 @@ IconPropertyGroup::IconPropertyGroup(QuickStyle *style)
     m_alignment = std::make_unique<AlignmentPropertyGroup>(m_style);
 }
 
-void IconPropertyGroup::update(const std::optional<IconProperty> &newState)
+void IconPropertyGroup::update(IconProperty *newState)
 {
     if (newState == m_state) {
         return;
@@ -29,9 +29,9 @@ void IconPropertyGroup::update(const std::optional<IconProperty> &newState)
     m_state = newState;
 
     if (!newState) {
-        m_alignment->update(std::nullopt);
+        m_alignment->update(nullptr);
     } else {
-        m_alignment->update(newState.value().alignment());
+        m_alignment->update(newState->alignment());
     }
 
     Q_EMIT widthChanged();
@@ -53,7 +53,7 @@ QJSValue IconPropertyGroup::width() const
         return QJSValue(QJSValue::UndefinedValue);
     }
 
-    auto value = m_state.value().width();
+    auto value = m_state->width();
     if (value) {
         return m_style->engine()->toScriptValue(value.value());
     }
@@ -67,7 +67,7 @@ QJSValue IconPropertyGroup::height() const
         return QJSValue(QJSValue::UndefinedValue);
     }
 
-    auto value = m_state.value().height();
+    auto value = m_state->height();
     if (value) {
         return m_style->engine()->toScriptValue(value.value());
     }
@@ -81,7 +81,7 @@ QJSValue IconPropertyGroup::name() const
         return QJSValue(QJSValue::UndefinedValue);
     }
 
-    auto value = m_state.value().name();
+    auto value = m_state->name();
     if (value) {
         return m_style->engine()->toScriptValue(value.value());
     }
@@ -95,7 +95,7 @@ QJSValue IconPropertyGroup::source() const
         return QJSValue(QJSValue::UndefinedValue);
     }
 
-    auto value = m_state.value().source();
+    auto value = m_state->source();
     if (value) {
         return m_style->engine()->toScriptValue(value.value());
     }
@@ -109,7 +109,7 @@ QJSValue IconPropertyGroup::color() const
         return QJSValue(QJSValue::UndefinedValue);
     }
 
-    auto value = m_state.value().color();
+    auto value = m_state->color();
     if (value) {
         return m_style->engine()->toScriptValue(value.value().toQColor());
     }

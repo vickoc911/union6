@@ -65,6 +65,7 @@ void OffsetProperty::setHorizontal(const std::optional<qreal> &newValue)
 
     d->horizontal = newValue;
 }
+
 std::optional<qreal> OffsetProperty::vertical() const
 {
     return d->vertical;
@@ -106,21 +107,25 @@ bool OffsetProperty::isEmpty() const
     return true;
 }
 
-void OffsetProperty::resolveProperties(const OffsetProperty &source, OffsetProperty &destination)
+void OffsetProperty::resolveProperties(const OffsetProperty *source, OffsetProperty *destination)
 {
-    if (!destination.d->horizontal.has_value()) {
-        destination.d->horizontal = source.d->horizontal;
+    if (!source || !destination) {
+        return;
     }
-    if (!destination.d->vertical.has_value()) {
-        destination.d->vertical = source.d->vertical;
+
+    if (!destination->d->horizontal.has_value()) {
+        destination->d->horizontal = source->d->horizontal;
+    }
+    if (!destination->d->vertical.has_value()) {
+        destination->d->vertical = source->d->vertical;
     }
 }
 
-OffsetProperty OffsetProperty::empty()
+std::unique_ptr<OffsetProperty> OffsetProperty::empty()
 {
-    OffsetProperty result;
-    result.d->horizontal = emptyValue<qreal>();
-    result.d->vertical = emptyValue<qreal>();
+    auto result = std::make_unique<OffsetProperty>();
+    result->d->horizontal = emptyValue<qreal>();
+    result->d->vertical = emptyValue<qreal>();
     return result;
 }
 
@@ -144,8 +149,10 @@ QDebug operator<<(QDebug debug, const Union::Properties::OffsetProperty &type)
 {
     QDebugStateSaver saver(debug);
     debug.nospace() << "OffsetProperty(" //
-                    << "horizontal: " << type.horizontal() //
-                    << ", vertical: " << type.vertical() //
+                    << "horizontal: " //
+                    << type.horizontal() //
+                    << ", vertical: " //
+                    << type.vertical() //
                     << ")";
     return debug;
 }

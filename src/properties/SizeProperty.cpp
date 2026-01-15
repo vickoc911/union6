@@ -71,6 +71,7 @@ void SizeProperty::setLeft(const std::optional<qreal> &newValue)
 
     d->left = newValue;
 }
+
 std::optional<qreal> SizeProperty::right() const
 {
     return d->right;
@@ -84,6 +85,7 @@ void SizeProperty::setRight(const std::optional<qreal> &newValue)
 
     d->right = newValue;
 }
+
 std::optional<qreal> SizeProperty::top() const
 {
     return d->top;
@@ -97,6 +99,7 @@ void SizeProperty::setTop(const std::optional<qreal> &newValue)
 
     d->top = newValue;
 }
+
 std::optional<qreal> SizeProperty::bottom() const
 {
     return d->bottom;
@@ -150,29 +153,33 @@ bool SizeProperty::isEmpty() const
     return true;
 }
 
-void SizeProperty::resolveProperties(const SizeProperty &source, SizeProperty &destination)
+void SizeProperty::resolveProperties(const SizeProperty *source, SizeProperty *destination)
 {
-    if (!destination.d->left.has_value()) {
-        destination.d->left = source.d->left;
+    if (!source || !destination) {
+        return;
     }
-    if (!destination.d->right.has_value()) {
-        destination.d->right = source.d->right;
+
+    if (!destination->d->left.has_value()) {
+        destination->d->left = source->d->left;
     }
-    if (!destination.d->top.has_value()) {
-        destination.d->top = source.d->top;
+    if (!destination->d->right.has_value()) {
+        destination->d->right = source->d->right;
     }
-    if (!destination.d->bottom.has_value()) {
-        destination.d->bottom = source.d->bottom;
+    if (!destination->d->top.has_value()) {
+        destination->d->top = source->d->top;
+    }
+    if (!destination->d->bottom.has_value()) {
+        destination->d->bottom = source->d->bottom;
     }
 }
 
-SizeProperty SizeProperty::empty()
+std::unique_ptr<SizeProperty> SizeProperty::empty()
 {
-    SizeProperty result;
-    result.d->left = emptyValue<qreal>();
-    result.d->right = emptyValue<qreal>();
-    result.d->top = emptyValue<qreal>();
-    result.d->bottom = emptyValue<qreal>();
+    auto result = std::make_unique<SizeProperty>();
+    result->d->left = emptyValue<qreal>();
+    result->d->right = emptyValue<qreal>();
+    result->d->top = emptyValue<qreal>();
+    result->d->bottom = emptyValue<qreal>();
     return result;
 }
 
@@ -202,10 +209,14 @@ QDebug operator<<(QDebug debug, const Union::Properties::SizeProperty &type)
 {
     QDebugStateSaver saver(debug);
     debug.nospace() << "SizeProperty(" //
-                    << "left: " << type.left() //
-                    << ", right: " << type.right() //
-                    << ", top: " << type.top() //
-                    << ", bottom: " << type.bottom() //
+                    << "left: " //
+                    << type.left() //
+                    << ", right: " //
+                    << type.right() //
+                    << ", top: " //
+                    << type.top() //
+                    << ", bottom: " //
+                    << type.bottom() //
                     << ")";
     return debug;
 }
