@@ -142,6 +142,8 @@ struct std::formatter<Union::Properties::{{ type.type_name }} *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {

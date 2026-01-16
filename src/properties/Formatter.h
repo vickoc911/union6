@@ -144,6 +144,8 @@ struct std::formatter<Union::Properties::StyleProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -307,6 +309,8 @@ struct std::formatter<Union::Properties::LayoutProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -439,6 +443,8 @@ struct std::formatter<Union::Properties::AlignmentProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -517,6 +523,8 @@ template<>
 struct std::formatter<Union::Properties::SizeProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
+
+    formatter() = default;
 
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
@@ -597,6 +605,8 @@ struct std::formatter<Union::Properties::TextProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -669,6 +679,8 @@ template<>
 struct std::formatter<Union::Properties::IconProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
+
+    formatter() = default;
 
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
@@ -776,6 +788,8 @@ struct std::formatter<Union::Properties::BackgroundProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -837,6 +851,8 @@ template<>
 struct std::formatter<Union::Properties::ImageProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
+
+    formatter() = default;
 
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
@@ -950,6 +966,8 @@ struct std::formatter<Union::Properties::BorderProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -1049,6 +1067,8 @@ struct std::formatter<Union::Properties::LineProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -1132,6 +1152,8 @@ template<>
 struct std::formatter<Union::Properties::OutlineProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
+
+    formatter() = default;
 
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
@@ -1232,6 +1254,8 @@ struct std::formatter<Union::Properties::CornersProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -1331,6 +1355,8 @@ struct std::formatter<Union::Properties::CornerProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
 
+    formatter() = default;
+
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
     {
@@ -1425,6 +1451,8 @@ template<>
 struct std::formatter<Union::Properties::ShadowProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
+
+    formatter() = default;
 
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
@@ -1637,6 +1665,8 @@ template<>
 struct std::formatter<Union::Properties::OffsetProperty *, char> {
     bool use_newlines = false;
     int indentation = 0;
+
+    formatter() = default;
 
     template<class ParseContext>
     constexpr ParseContext::iterator parse(ParseContext &context)
