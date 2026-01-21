@@ -29,10 +29,16 @@ T.ItemDelegate {
     }
     Union.Element.hints: {
         let result = icon.name || icon.source.toString() ? ["with-icon"] : [];
+        if (ListView?.view) {
+            result.push("insidelist");
+        }
+        if (TableView?.view) {
+            result.push("insidetable");
+        }
         if (TableView.view?.alternatingRows && row % 2) {
-            result.push("useAlternateBackgroundColor");
+            result.push("usealternatebackgroundcolor");
         } else if (Union.OutputProperties.useAlternatingColors && index % 2) {
-            result.push("useAlternateBackgroundColor")
+            result.push("usealternatebackgroundcolor");
         }
         return result;
     }
