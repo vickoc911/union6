@@ -145,7 +145,10 @@ void Element::setHint(const QString &name, bool present)
 
 bool Union::Element::hasHint(const QString &name)
 {
-    return d->hints.contains(name);
+    // Case insensitive matching
+    return std::any_of(d->hints.constBegin(), d->hints.constEnd(), [name](const QString &hint) {
+        return name.contains(hint, Qt::CaseInsensitive);
+    });
 }
 
 QVariantMap Element::attributes() const
