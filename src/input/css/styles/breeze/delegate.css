@@ -43,6 +43,10 @@ swipedelegate
     {
         inset: 0px;
         border-radius: 0px;
+        &.hoverenabled {
+            inset: var(--small-spacing);
+            border-radius: var(--corner-radius);
+        }
     }
 
     &:hovered

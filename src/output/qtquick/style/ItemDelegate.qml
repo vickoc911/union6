@@ -29,6 +29,9 @@ T.ItemDelegate {
     }
     Union.Element.hints: {
         let result = icon.name || icon.source.toString() ? ["with-icon"] : [];
+        if (control.hoverEnabled) {
+            result.push("hoverEnabled");
+        }
         if (ListView?.view) {
             result.push("insideList");
         }
