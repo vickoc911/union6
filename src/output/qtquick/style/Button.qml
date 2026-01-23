@@ -78,6 +78,8 @@ T.Button {
 
     spacing: Union.Style.properties.layout.spacing
 
+    hoverEnabled: Application.styleHints.useHoverEffects
+
     icon {
         color: Union.Style.properties.icon.color
         width: Union.Style.properties.icon.width
