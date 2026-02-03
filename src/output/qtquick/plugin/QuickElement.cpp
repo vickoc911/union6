@@ -18,6 +18,62 @@ using namespace Union;
 
 static EventTypeRegistration<QuickElementUpdatedEvent> quickElementRegistration;
 
+template<typename T, QList<T *> QuickElement::*member, void (QuickElement::*changeSignal)()>
+struct ListFunctions {
+    static void append(QQmlListProperty<T> *property, T *value)
+    {
+        if (!value) {
+            return;
+        }
+
+        auto element = static_cast<QuickElement *>(property->object);
+        auto list = &(element->*member);
+        list->append(value);
+        value->setElement(element);
+        (element->*changeSignal)();
+    }
+
+    static qsizetype count(QQmlListProperty<T> *property)
+    {
+        auto list = static_cast<QuickElement *>(property->object)->*member;
+        return list.count();
+    }
+
+    static T *at(QQmlListProperty<T> *property, qsizetype index)
+    {
+        auto list = static_cast<QuickElement *>(property->object)->*member;
+        return list.at(index);
+    }
+
+    static void clear(QQmlListProperty<T> *property)
+    {
+        auto element = static_cast<QuickElement *>(property->object);
+        auto list = &(element->*member);
+        list->clear();
+        (element->*changeSignal)();
+    }
+
+    static void replace(QQmlListProperty<T> *property, qsizetype index, T *value)
+    {
+        if (!value) {
+            return;
+        }
+
+        auto element = static_cast<QuickElement *>(property->object);
+        auto list = &(element->*member);
+        list->replace(index, value);
+        (element->*changeSignal)();
+    }
+
+    static void removeLast(QQmlListProperty<T> *property)
+    {
+        auto element = static_cast<QuickElement *>(property->object);
+        auto list = &(element->*member);
+        list->removeLast();
+        (element->*changeSignal)();
+    }
+};
+
 StatesGroup::StatesGroup(QuickElement *parent)
     : m_parent(parent)
 {
@@ -150,6 +206,89 @@ void StatesGroup::emitStateChange(Union::Element::States states)
     }
 }
 
+Hint::Hint(QObject *parent)
+    : QObject(parent)
+{
+}
+
+QString Hint::name() const
+{
+    return m_name;
+}
+
+void Hint::setName(const QString &newName)
+{
+    if (newName == m_name) {
+        return;
+    }
+
+    m_name = newName;
+    update();
+    Q_EMIT nameChanged();
+}
+
+bool Hint::when() const
+{
+    return m_when;
+}
+
+void Hint::setWhen(bool newWhen)
+{
+    if (newWhen == m_when) {
+        return;
+    }
+
+    m_when = newWhen;
+    update();
+    Q_EMIT whenChanged();
+}
+
+void Hint::setElement(QuickElement *element)
+{
+    m_element = element;
+    update();
+}
+
+void Hint::update()
+{
+    if (m_element) {
+        m_element->updateHints();
+    }
+}
+
+Attribute::Attribute(QObject *parent)
+    : Hint(parent)
+{
+}
+
+QVariant Attribute::value() const
+{
+    return m_value;
+}
+
+void Attribute::setValue(const QVariant &newValue)
+{
+    if (newValue == m_value) {
+        return;
+    }
+
+    m_value = newValue;
+    update();
+    Q_EMIT valueChanged();
+}
+
+void Attribute::update()
+{
+    if (m_element) {
+        m_element->updateAttributes();
+    }
+}
+
+void Attribute::resetValue()
+{
+    setValue(QVariant{});
+}
+
 QuickElement::QuickElement(QObject *parent)
     : QQuickAttachedPropertyPropagator(parent)
 {
@@ -184,35 +323,32 @@ void QuickElement::setElementId(const QString &newId)
     m_element->setId(newId);
 }
 
-Union::Element::ColorSet QuickElement::colorSet() const
+QQmlListProperty<Hint> QuickElement::hints()
 {
-    return m_element->colorSet();
+    using HintFunctions = ListFunctions<Hint, &QuickElement::m_hints, &QuickElement::hintsChanged>;
+
+    return QQmlListProperty<Hint>(this,
+                                  nullptr,
+                                  &HintFunctions::append,
+                                  &HintFunctions::count,
+                                  &HintFunctions::at,
+                                  &HintFunctions::clear,
+                                  &HintFunctions::replace,
+                                  &HintFunctions::removeLast);
 }
 
-void QuickElement::setColorSet(Union::Element::ColorSet newColorSet)
+QQmlListProperty<Attribute> QuickElement::attributes()
 {
-    m_element->setColorSet(Element::ColorSet(newColorSet));
-}
+    using AttributeFunctions = ListFunctions<Attribute, &QuickElement::m_attributes, &QuickElement::attributesChanged>;
 
-QStringList QuickElement::hints() const
-{
-    const auto h = m_element->hints();
-    return QStringList(h.begin(), h.end());
-}
-
-void QuickElement::setHints(const QStringList &newHints)
-{
-    m_element->setHints(newHints);
-}
-
-QVariantMap QuickElement::attributes() const
-{
-    return m_element->attributes();
-}
-
-void QuickElement::setAttributes(const QVariantMap &newAttributes)
-{
-    m_element->setAttributes(newAttributes);
+    return QQmlListProperty<Attribute>(this,
+                                       nullptr,
+                                       &AttributeFunctions::append,
+                                       &AttributeFunctions::count,
+                                       &AttributeFunctions::at,
+                                       &AttributeFunctions::clear,
+                                       &AttributeFunctions::replace,
+                                       &AttributeFunctions::removeLast);
 }
 
 StatesGroup *QuickElement::states() const
@@ -274,6 +410,8 @@ void QuickElement::classBegin()
 void QuickElement::componentComplete()
 {
     m_completed = true;
+    updateHints();
+    updateAttributes();
     update();
 }
 
@@ -285,6 +423,43 @@ void QuickElement::setActiveStates(Union::Element::States newActiveStates)
 std::shared_ptr<Union::Style> QuickElement::style() const
 {
     return m_style;
+}
+
+void QuickElement::updateHints()
+{
+    if (!m_completed) {
+        return;
+    }
+
+    QStringList activeHints;
+    for (auto hint : m_hints) {
+        // Important: We may have duplicate hint declarations in the list. When
+        // that happens, we need to override the previous declaration, either by
+        // adding the hint if it was not there, or removing it if it is.
+        if (hint->when()) {
+            activeHints.append(hint->name());
+        } else {
+            activeHints.removeAll(hint->name());
+        }
+    }
+    m_element->setHints(activeHints);
+}
+
+void QuickElement::updateAttributes()
+{
+    if (!m_completed) {
+        return;
+    }
+
+    QVariantMap activeAttributes;
+    for (auto attribute : m_attributes) {
+        if (attribute->when() && attribute->value().isValid()) {
+            activeAttributes.insert(attribute->name(), attribute->value());
+        } else {
+            activeAttributes.remove(attribute->name());
+        }
+    }
+    m_element->setAttributes(activeAttributes);
 }
 
 void QuickElement::update()

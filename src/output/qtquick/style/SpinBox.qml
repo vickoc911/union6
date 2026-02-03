@@ -11,11 +11,6 @@ import org.kde.union.impl as Union
 T.SpinBox {
     id: control
 
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, Union.Positioner.implicitWidth)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, Union.Positioner.implicitHeight)
-
-    hoverEnabled: Application.styleHints.useHoverEffects
-
     Union.Element.type: "SpinBox"
     Union.Element.states {
         hovered: control.hovered
@@ -23,19 +18,15 @@ T.SpinBox {
         visualFocus: control.visualFocus
         enabled: control.enabled
     }
-    Union.Element.hints: {
-        let result = []
+    Union.Element.hints: [
+        Union.Hint { name: "editable"; when: control.editable },
+        Union.Hint { name: "constrained"; when: priv.constrained },
+    ]
 
-        if (control.editable) {
-            result.push("editable")
-        }
+    hoverEnabled: Application.styleHints.useHoverEffects
 
-        if (priv.constrained) {
-            result.push("constrained")
-        }
-
-        return result
-    }
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset, Union.Positioner.implicitWidth)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset, Union.Positioner.implicitHeight)
 
     leftPadding: Union.Positioner.padding.left
     rightPadding: Union.Positioner.padding.right

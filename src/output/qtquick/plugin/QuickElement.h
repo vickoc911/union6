@@ -5,7 +5,7 @@
 
 #include <QEvent>
 #include <QObject>
-#include <QProperty>
+#include <QQmlListProperty>
 #include <QQmlParserStatus>
 #include <QQuickAttachedPropertyPropagator>
 #include <qqmlregistration.h>
@@ -148,6 +148,69 @@ private:
 };
 
 /*!
+ */
+class Hint : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    explicit Hint(QObject *parent = nullptr);
+
+    /*!
+     * \qmlproperty string Hint::name
+     */
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    QString name() const;
+    void setName(const QString &newName);
+    Q_SIGNAL void nameChanged();
+
+    /*!
+     * \qmlproperty bool Hint::when
+     */
+    Q_PROPERTY(bool when READ when WRITE setWhen NOTIFY whenChanged)
+    bool when() const;
+    void setWhen(bool newWhen);
+    Q_SIGNAL void whenChanged();
+
+    void setElement(QuickElement *element);
+
+protected:
+    virtual void update();
+    QuickElement *m_element = nullptr;
+
+private:
+    QString m_name;
+    bool m_when = true;
+};
+
+/*!
+ */
+class Attribute : public Hint
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    explicit Attribute(QObject *parent = nullptr);
+
+    /*!
+     * \qmlproperty var Attribute::value
+     */
+    Q_PROPERTY(QVariant value READ value WRITE setValue RESET resetValue NOTIFY valueChanged)
+    QVariant value() const;
+    void setValue(const QVariant &newValue);
+    void resetValue();
+    Q_SIGNAL void valueChanged();
+
+protected:
+    void update() override;
+
+private:
+    QVariant m_value;
+};
+
+/*!
  * \qmltype Element
  * \inqmlmodule org.kde.union.impl
  * \ingroup qtquick-core
@@ -251,42 +314,26 @@ public:
     StatesGroup *states() const;
 
     /*!
-     * \qmlattachedproperty ColorSet Element::colorSet
-     *
-     * The color set to use for this element.
-     *
-     * The color set determines a specific set of system colors that should be
-     * used in the appropriate context.
-     *
-     * \sa Union::Element::ColorSet
-     */
-    Q_PROPERTY(Union::Element::ColorSet colorSet READ colorSet WRITE setColorSet NOTIFY colorSetChanged)
-    Union::Element::ColorSet colorSet() const;
-    void setColorSet(Union::Element::ColorSet newColorSet);
-    Q_SIGNAL void colorSetChanged();
-
-    /**
+     * \qmlattachedproperty list<Hint> Element::hints
      * A list of extra hints to provide to the theme.
      *
      * These should be set if there are extra criteria to be used to style an
      * element, for example error/warning/information variants.
      */
-    Q_PROPERTY(QStringList hints READ hints WRITE setHints NOTIFY hintsChanged)
-    QStringList hints() const;
-    void setHints(const QStringList &newHints);
+    Q_PROPERTY(QQmlListProperty<Hint> hints READ hints NOTIFY hintsChanged)
+    QQmlListProperty<Hint> hints();
     Q_SIGNAL void hintsChanged();
 
     /*!
-     * \qmlattachedproperty QVariantMap Element::attributes
+     * \qmlattachedproperty list<Attribute> Element::attributes
      * A map of extra attributes to provide to the theme.
      *
      * These can be used to provide extra criteria to be used to style an
      * element. They can be used to do things like select a specific theme to
      * use for an element.
      */
-    Q_PROPERTY(QVariantMap attributes READ attributes WRITE setAttributes NOTIFY attributesChanged)
-    QVariantMap attributes() const;
-    void setAttributes(const QVariantMap &newAttributes);
+    Q_PROPERTY(QQmlListProperty<Attribute> attributes READ attributes NOTIFY attributesChanged)
+    QQmlListProperty<Attribute> attributes();
     Q_SIGNAL void attributesChanged();
 
     /**
@@ -319,12 +366,19 @@ protected:
 
 private:
     friend class StatesGroup;
+    friend class Hint;
+    friend class Attribute;
 
     void setActiveStates(Union::Element::States newActiveStates);
+    void updateHints();
+    void updateAttributes();
     void update();
 
     std::shared_ptr<Union::Element> m_element;
     std::unique_ptr<StatesGroup> m_statesGroup;
+
+    QList<Hint *> m_hints;
+    QList<Attribute *> m_attributes;
 
     std::unique_ptr<Union::ElementQuery> m_query;
     std::shared_ptr<Union::Style> m_style;
@@ -337,7 +391,5 @@ class QuickElementUpdatedEvent : public QEvent
 public:
     QuickElementUpdatedEvent();
 
-    // Todo: Use registerEventType() instead of a hardcoded random offset
-    // inline static QEvent::Type s_type = QEvent::Type(QEvent::User + 21860);
     inline static QEvent::Type s_type = QEvent::None;
 };

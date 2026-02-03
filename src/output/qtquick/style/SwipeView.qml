@@ -17,7 +17,10 @@ T.SwipeView {
         visualFocus: control.visualFocus
         enabled: control.enabled
     }
-    Union.Element.hints: orientation === Qt.Horizontal ? ["horizontal"] : ["vertical"]
+    Union.Element.hints: [
+        Union.Hint { name: "horizontal"; when: control.orientation === Qt.Horizontal },
+        Union.Hint { name: "vertical"; when: control.orientation === Qt.Vertical },
+    ]
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)

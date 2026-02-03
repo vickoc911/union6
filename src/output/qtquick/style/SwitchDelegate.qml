@@ -12,11 +12,6 @@ import "private" as P
 T.SwitchDelegate {
     id: control
 
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            Union.Positioner.implicitWidth)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             Union.Positioner.implicitHeight)
-
     Union.Element.type: "SwitchDelegate"
     Union.Element.states {
         hovered: control.hovered
@@ -27,6 +22,21 @@ T.SwitchDelegate {
         enabled: control.enabled
         highlighted: control.highlighted
     }
+    Union.Element.hints: [
+        Union.Hint { name: "with-icon"; when: control.icon.name || control.icon.source.toString() },
+        Union.Hint { name: "hover-enabled"; when: control.hoverEnabled },
+        Union.Hint { name: "inside-list"; when: control.ListView?.view },
+        Union.Hint { name: "inside-table"; when: control.TableView?.view },
+        Union.Hint {
+            name: "alternating-colors"
+            when: (TableView.view?.alternatingRows && control.row % 2) || (Union.OutputProperties.useAlternatingColors && control.index % 2)
+        }
+    ]
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            Union.Positioner.implicitWidth)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             Union.Positioner.implicitHeight)
 
     leftPadding: Union.Positioner.padding.left
     rightPadding: Union.Positioner.padding.right
