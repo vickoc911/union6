@@ -31,8 +31,13 @@ T.ItemDelegate {
         Union.ElementHint { name: "inside-table"; when: control.TableView?.view },
         Union.ElementHint {
             name: "alternating-colors"
-            when: (TableView.view?.alternatingRows && control.row % 2)
-                  || (Union.OutputProperties.useAlternatingColors && control.index % 2)
+            when: {
+                if (control.TableView.view?.alternatingRows || control.Union.OutputProperties.useAlternatingColors) {
+                    let row = (control?.index ?? (control?.row ?? control.indexingModel?.row));
+                    return row % 2;
+                }
+                return false;
+            }
         }
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
