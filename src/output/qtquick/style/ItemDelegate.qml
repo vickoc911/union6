@@ -14,6 +14,8 @@ import "private" as P
 T.ItemDelegate {
     id: control
 
+    property int __index: (control.index ?? (control.row ?? control.indexingModel?.row)) ?? 0
+
     Union.Element.type: "ItemDelegate"
     Union.Element.states {
         hovered: control.hovered
@@ -31,8 +33,12 @@ T.ItemDelegate {
         Union.ElementHint { name: "inside-table"; when: control.TableView?.view },
         Union.ElementHint {
             name: "alternating-colors"
-            when: (TableView.view?.alternatingRows && control.row % 2)
-                  || (Union.OutputProperties.useAlternatingColors && control.index % 2)
+            when: {
+                if (control.TableView.view?.alternatingRows || control.Union.OutputProperties.useAlternatingColors) {
+                    return control.__index % 2;
+                }
+                return false;
+            }
         }
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
