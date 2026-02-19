@@ -9,6 +9,26 @@
 #include "ShaderMaterial.h"
 #include "TextureCache.h"
 
+class DummyMaterial : public QSGMaterial
+{
+public:
+    DummyMaterial()
+    {
+    }
+
+    QSGMaterialType *type() const override
+    {
+        return &Type;
+    }
+
+    QSGMaterialShader *createShader([[maybe_unused]] QSGRendererInterface::RenderMode renderMode) const override
+    {
+        return nullptr;
+    }
+
+    inline static QSGMaterialType Type;
+};
+
 struct VertexLayout {
     using RectPropertyFunction = qreal (QRectF::*)() const;
     using DataProperty = QVector4D(ShaderNode::DataChannel::*);
@@ -39,6 +59,10 @@ ShaderNode::ShaderNode()
     : m_rect(QRectF{0.0, 0.0, 1.0, 1.0})
     , m_uvs(16, QRectF{0.0, 0.0, 1.0, 1.0})
 {
+    // Dummy geometry and material, to prevent QSGNode::addChildNode() from asserting.
+    setGeometry(new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 0));
+    setMaterial(new DummyMaterial{});
+
     setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::UsePreprocess);
 }
 
@@ -50,9 +74,7 @@ ShaderNode::~ShaderNode() noexcept
         }
     }
 
-    setGeometry(nullptr);
-    delete[] m_attributeSet->attributes;
-    delete m_attributeSet;
+    cleanupGeometry();
 }
 
 void ShaderNode::preprocess()
@@ -150,9 +172,7 @@ void ShaderNode::setUvChannels(unsigned char count)
     m_uvChannels = std::clamp(count, uint8_t(1), uint8_t(16));
 
     if (geometry()) {
-        setGeometry(nullptr);
-        delete[] m_attributeSet->attributes;
-        delete m_attributeSet;
+        cleanupGeometry();
     }
 
     while (m_textures.size() > count) {
@@ -255,9 +275,7 @@ void ShaderNode::setExtraDataChannels(unsigned char count)
     m_extraChannelData.resize(count);
 
     if (geometry()) {
-        setGeometry(nullptr);
-        delete[] m_attributeSet->attributes;
-        delete m_attributeSet;
+        cleanupGeometry();
     }
 
     m_geometryUpdateNeeded = true;
@@ -306,7 +324,7 @@ void ShaderNode::update()
     if (m_geometryUpdateNeeded) {
         const auto attributeCount = 1 + m_uvChannels + m_extraChannels;
 
-        if (!geometry()) {
+        if (m_geometryRebuildNeeded) {
             QSGGeometry::Attribute *attributes = new QSGGeometry::Attribute[attributeCount];
             attributes[0] = QSGGeometry::Attribute::createWithAttributeType(0, 2, QSGGeometry::FloatType, QSGGeometry::PositionAttribute);
 
@@ -411,4 +429,14 @@ void ShaderNode::preprocessTexture(const TextureInfo &info)
     if (QSGDynamicTexture *dynamic_texture = qobject_cast<QSGDynamicTexture *>(provider->texture())) {
         dynamic_texture->updateTexture();
     }
+}
+
+void ShaderNode::cleanupGeometry()
+{
+    setGeometry(nullptr);
+    if (m_attributeSet) {
+        delete[] m_attributeSet->attributes;
+        delete m_attributeSet;
+    }
+    m_geometryRebuildNeeded = true;
 }
