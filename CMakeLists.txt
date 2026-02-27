@@ -31,6 +31,9 @@ include(CMakeDependentOption)
 option(BUILD_TOOLS "Build tools that are useful for development" ON)
 option(BUILD_EXAMPLES "Build example applications" OFF)
 
+# Build parts depending on certain KDE frameworks
+option(BUILD_WITH_KDEFRAMEWORKS "Build parts depending on KDE Frameworks" ON)
+
 # Options to control building platform integrations
 option(BUILD_PLATFORM_FRAMEWORKS "Build KDE frameworks platform integration" ON)
 
