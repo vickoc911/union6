@@ -20,6 +20,7 @@ target_link_libraries(org.kde.union
         UnionQuickImpl
 )
 
+
 install(TARGETS org.kde.union DESTINATION ${KDE_INSTALL_PLUGINDIR}/kf6/kirigami/platform)
 
 install(FILES
@@ -29,6 +30,7 @@ install(FILES
     Heading.qml
     InlineMessage.qml
     NavigationTabBar.qml
+    NavigationTabButton.qml
     OverlayDrawer.qml
     DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/kirigami/styles/org.kde.union
 )
