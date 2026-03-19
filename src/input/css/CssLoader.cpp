@@ -381,11 +381,15 @@ bool CssLoader::load(Style::Ptr theme)
     styleSheet.setRootPath(defaultsPath);
     styleSheet.parseFile("default.css"s);
 
+    theme->addCachePath(defaultsPath / "default.css"s);
+
     auto path = QStandardPaths::locate(QStandardPaths::GenericDataLocation, u"union/css/styles/"_s + theme->name(), QStandardPaths::LocateDirectory);
     m_stylePath = fs::path(path.toStdString());
 
     styleSheet.setRootPath(m_stylePath);
     styleSheet.parseFile("style.css"s);
+
+    theme->addCachePath(m_stylePath / "style.css"s);
 
     if (styleSheet.errors().size() > 0) {
         qCWarning(UNION_CSS) << "Errors encountered while parsing CSS:";
