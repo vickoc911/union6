@@ -68,7 +68,8 @@ progressbar
 }
 
 slider,
-rangeslider
+rangeslider,
+dial
 {
     background-color: var(--bar-active-background-color);
     border: 1px solid var(--bar-active-border-color);
@@ -199,6 +200,20 @@ scrollbar
 
         &:disabled {
             background-color: var(--bar-disabled-background-color);
+            border: 1px solid var(--bar-disabled-border-color);
+        }
+    }
+}
+
+dial {
+    & > fill {
+        background-color: var(--button-active-background-color);
+        width: 184px;
+        height: 184px;
+        border: 1px solid var(--highlight-color);
+        border-radius: 92px;
+        &:disabled {
+            background-color: var(--button-disabled-background-color);
             border: 1px solid var(--bar-disabled-border-color);
         }
     }
