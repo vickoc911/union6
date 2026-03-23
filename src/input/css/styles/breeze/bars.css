@@ -68,7 +68,8 @@ progressbar
 }
 
 slider,
-rangeslider
+rangeslider,
+dial
 {
     background-color: var(--bar-active-background-color);
     border: 1px solid var(--bar-active-border-color);
@@ -189,6 +190,43 @@ scrollbar
         background-color: var(--bar-active-background-color);
         border: 1px solid var(--bar-active-border-color);
         border-radius: var(--small-element-size);
+
+        &:hovered,
+        &:pressed
+        {
+            background-color: var(--bar-track-active-background-color);
+            border-color: var(--bar-track-active-border-color);
+        }
+
+        &:disabled {
+            background-color: var(--bar-disabled-background-color);
+            border: 1px solid var(--bar-disabled-border-color);
+        }
+    }
+}
+
+dial {
+
+    & > fill {
+        background-color: var(--view-background-alternate-color);
+        width: 184px;
+        height: 184px;
+        border-radius: 92px;
+        border-color: var(--view-border-color);
+
+        &:pressed {
+            border-color: var(--bar-track-active-border-color);
+        }
+
+        &:disabled {
+            background-color: var(--view-disabled-alternate-background-color);
+            border-color: var(--view-disabled-border-color);
+        }
+    }
+
+    & > handle {
+        background-color: var(--bar-active-background-color);
+        border-color: var(--bar-active-border-color);
 
         &:hovered,
         &:pressed
