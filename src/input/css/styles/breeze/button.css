@@ -61,6 +61,7 @@ button,
 toolbutton,
 combobox,
 roundbutton,
+delaybutton,
 toolbutton.raised
 {
     width: var(--button-default-size);
@@ -342,4 +343,16 @@ tabbutton {
 
 tabbar {
     spacing: 0px;
+}
+
+delaybutton {
+    & > fill {
+        border-radius: var(--corner-radius);
+        border: var(--button-border-highlight);
+        background-color: var(--highlight-color);
+    }
+
+    & > filltext {
+        color: var(--button-active-text-color);
+    }
 }
