@@ -163,6 +163,29 @@ Kirigami.Page {
             selectTextByMouse: true
         }
 
+        Controls.Frame {
+            id: frame
+            padding: 0
+
+            Row {
+                id: row
+
+                Controls.Tumbler {
+                    id: hoursTumbler
+                    model: 12
+                }
+
+                Controls.Tumbler {
+                    id: minutesTumbler
+                    model: 60
+                }
+
+                Controls.Tumbler {
+                    id: amPmTumbler
+                    model: ["AM", "PM"]
+                }
+            }
+        }
 
         Item {
             Layout.fillHeight: true

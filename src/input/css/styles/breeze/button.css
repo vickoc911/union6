@@ -343,3 +343,10 @@ tabbutton {
 tabbar {
     spacing: 0px;
 }
+
+tumbler {
+    width: 60px;
+    height: 200px;
+    text-alignment-horizontal: center;
+    color: var(--button-active-text-color);
+}
