@@ -353,3 +353,10 @@ delaybutton {
         background-color: var(--highlight-color);
     }
 }
+
+tumbler {
+    width: 60px;
+    height: 200px;
+    text-alignment-horizontal: center;
+    color: var(--button-active-text-color);
+}
