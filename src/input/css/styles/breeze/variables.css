@@ -77,7 +77,6 @@
 
     --view-disabled-text-color: custom-color("kcolorscheme", "disabled", "view", "foreground", "text");
     --view-disabled-background-color: custom-color("kcolorscheme", "disabled", "view", "background", "normal");
-    --view-disabled-alternate-background-color: custom-color("kcolorscheme", "disabled", "view", "background", "alternate");
     --view-disabled-border-color: custom-color("kcolorscheme", "disabled", "view", "decoration", "frame");
 
     --header-disabled-text-color: custom-color("kcolorscheme", "disabled", "header", "foreground", "text");
