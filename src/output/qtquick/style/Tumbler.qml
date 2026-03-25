@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2017 The Qt Company Ltd.
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
+pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Controls.impl
 import QtQuick.Templates as T
 
 import org.kde.union.impl as Union
@@ -23,7 +23,6 @@ T.Tumbler {
 	implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
 							 implicitContentHeight + topPadding + bottomPadding)
 
-
 	leftPadding: Union.Style.properties.layout.padding.left
 	rightPadding: Union.Style.properties.layout.padding.right
 	topPadding: Union.Style.properties.layout.padding.top
@@ -41,35 +40,46 @@ T.Tumbler {
 	readonly property real __delegateHeight: availableHeight / visibleItemCount
 
 	delegate: Text {
-		text: modelData
+		Union.Element.type: "Text"
+		Union.Element.states {
+			highlighted: PathView.isCurrentItem
+		}
 		font: control.font
-		color: control.Union.Style.properties.text.color ?? "black"
-		horizontalAlignment: control.Union.Alignment.toQtHorizontal(control.Union.Style.properties.text.alignment.horizontal)
-		verticalAlignment: control.Union.Alignment.toQtVertical(control.Union.Style.properties.text.alignment.vertical)
-		// TODO: better way to calculate the opacity here so that user can modify it?
-		opacity: 1.0 - Math.abs(Tumbler.displacement) / (control.visibleItemCount / 2)
+		color: Union.Style.properties.text.color ?? "black"
+		horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
+		verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
 		// We use required property here to satisfy qmllint, but that means
 		// we also need to declare the index for the attached properties
 		// (see QQuickTumblerAttachedPrivate::init).
 		required property var modelData
 		required property int index
+		text: modelData
 	}
 
-	contentItem: TumblerView {
+	contentItem: Union.StyledRectangle {
 		implicitWidth: control.Union.Style.properties.layout.width
 		implicitHeight: control.Union.Style.properties.layout.height
-		model: control.model
-		delegate: control.delegate
-		path: Path {
-			startX: control.contentItem.width / 2
-			startY: -control.__delegateHeight / 2
+		clip: true
+		PathView {
+			anchors.fill: parent
+			model: control.model
+			delegate: control.delegate
+			snapMode: PathView.SnapToItem
+			pathItemCount: 5
+			preferredHighlightBegin: 0.5
+			preferredHighlightEnd: 0.5
+			path: Path {
+				startX: control.contentItem.width / 2
+				startY: -control.__delegateHeight / 2
 
-			PathLine {
-				x: control.contentItem.width / 2
-				y: (control.visibleItemCount + 1) * control.__delegateHeight - control.__delegateHeight / 2
+				PathLine {
+					x: control.contentItem.width / 2
+					y: (control.visibleItemCount + 1) * control.__delegateHeight - control.__delegateHeight / 2
+				}
 			}
 		}
 	}
+
 
 	background: Union.StyledRectangle { }
 }

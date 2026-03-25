@@ -357,6 +357,14 @@ delaybutton {
 tumbler {
     width: 60px;
     height: 200px;
-    text-alignment-horizontal: center;
-    color: var(--button-active-text-color);
+    background-color: var(--view-background-color);
+
+    text {
+        text-alignment-horizontal: center;
+        color: mix(var(--view-background-color), var(--view-text-color), 0.75);
+
+        &:highlighted {
+            color: mix(var(--highlight-color), var(--view-text-color), 0.6);
+        }
+    }
 }
