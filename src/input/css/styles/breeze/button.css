@@ -127,6 +127,7 @@ button:pressed,
 toolbutton:pressed,
 combobox:pressed,
 roundbutton:pressed,
+delaybutton:pressed,
 toolbutton.raised:pressed
 {
     border-color: var(--button-active-border-highlight-color);
@@ -350,9 +351,5 @@ delaybutton {
         border-radius: var(--corner-radius);
         border: var(--button-border-highlight);
         background-color: var(--highlight-color);
-    }
-
-    & > filltext {
-        color: var(--button-active-text-color);
     }
 }

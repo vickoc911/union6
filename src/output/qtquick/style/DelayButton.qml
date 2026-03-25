@@ -3,7 +3,6 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 import QtQuick
-import QtQuick.Controls.impl
 import QtQuick.Templates as T
 import org.kde.union.impl as Union
 
@@ -29,7 +28,6 @@ T.DelayButton {
 	]
 	Union.Element.attributes: P.DisplayAttribute { control: control }
 
-	// hoverEnabled is an inherited property if it is not explicitly set.
 	// hoverEnabled is used to disable hover effects of delegates when they're not interactive.
 	// This also means any interactive children of those delegates will inherit hoverEnabled,
 	// and their effects are disabled. For this reason we need to explicitly set it in some delegates.
@@ -56,49 +54,6 @@ T.DelayButton {
 
 	Union.Positioner.positionItems: [contentItem, indicator]
 
-	contentItem: Item {
-		Union.PositionedItem.positionChildren: true
-
-		ItemGroup {
-			Union.PositionedItem.source: Union.PositionerSource.Icon
-			Union.Icon {
-				control: control
-				visible: control.progress < 1 && (name || source.toString()) && control.display != T.AbstractButton.TextOnly
-			}
-			Union.Icon {
-				control: control
-				visible: control.progress > 0 && (name || source.toString()) && control.display != T.AbstractButton.TextOnly
-				color: fillText.color
-			}
-		}
-
-		ItemGroup {
-			Union.PositionedItem.source: Union.PositionerSource.Text
-			ClippedText {
-				clip: control.progress > 0
-				clipX: -control.leftPadding + control.progress * control.width
-				clipWidth: (1.0 - control.progress) * control.width
-				text: control.text
-				font: control.font
-				color: Union.Style.properties.text.color ?? "black"
-				elide: Text.ElideRight
-				visible: control.progress < 1 && control.display != T.AbstractButton.IconOnly && text.length > 0
-			}
-			ClippedText {
-				id: fillText
-				Union.Element.type: "FillText"
-				clip: control.progress > 0
-				clipX: -control.leftPadding
-				clipWidth: control.progress * control.width
-				text: control.text
-				font: control.font
-				color: Union.Style.properties.text.color ?? "black"
-				elide: Text.ElideRight
-				visible: control.progress > 0 && control.display != T.AbstractButton.IconOnly && text.length > 0
-			}
-		}
-	}
-
 	icon {
 		color: Union.Style.properties.icon.color
 		width: Union.Style.properties.icon.width
@@ -106,6 +61,9 @@ T.DelayButton {
 		name: Union.Style.properties.icon.name
 		source: Union.Style.properties.icon.source
 	}
+
+	contentItem: P.DefaultContentItem { control: control }
+
 	indicator: Union.Icon {
 		Union.Element.type: "Indicator"
 		implicitWidth: Union.Style.properties.layout.width ?? 0
