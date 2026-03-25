@@ -16,6 +16,7 @@ T.Dial {
 		activeFocus: control.activeFocus
 		visualFocus: control.visualFocus
 		enabled: control.enabled
+		pressed: control.pressed
 	}
 	implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
 							implicitContentWidth + leftPadding + rightPadding)
