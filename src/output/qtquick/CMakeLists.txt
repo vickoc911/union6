@@ -30,8 +30,8 @@ ecm_target_qml_sources(UnionQuickStyle SOURCES
     style/ComboBox.qml
     style/Container.qml
     style/Control.qml
-    style/Dial.qml
     style/DelayButton.qml
+    style/Dial.qml
     style/Dialog.qml
     style/DialogButtonBox.qml
     style/Drawer.qml
