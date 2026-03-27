@@ -146,7 +146,7 @@ spinbox
     }
 
     &.constrained > indicator {
-        layout-alignment: item end stack 0;
+        layout-alignment: item end stack-fill 0;
 
         width: var(--medium-element-size);
         height: var(--small-element-size);
