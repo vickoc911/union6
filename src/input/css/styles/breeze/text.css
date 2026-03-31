@@ -17,7 +17,8 @@ label {
 
 textfield,
 textarea,
-spinbox
+spinbox,
+searchfield
 {
     height: var(--medium-element-size);
     padding: var(--medium-spacing);
@@ -54,7 +55,8 @@ spinbox
 }
 
 textfield,
-textarea
+textarea,
+searchfield
 {
     text-alignment: content start start 0;
     width: 200px;
@@ -172,4 +174,29 @@ spinbox
             icon-name: "arrow-up";
         }
     }
+}
+
+searchfield {
+
+    & > searchindicator, clearindicator {
+        width: var(--icon-size-smallmedium);
+        height: var(--icon-size-smallmedium);
+    }
+
+    & > searchindicator {
+        layout-alignment: content start center 0;
+        icon-name: "search"
+    }
+
+    & > searchtext {
+        layout-alignment: content fill center 1;
+        width: 200px;
+        height: var(--medium-element-size);
+    }
+
+    & > clearindicator {
+        icon-name: "edit-clear"
+        layout-alignment: content end center 2;
+    }
+    
 }
