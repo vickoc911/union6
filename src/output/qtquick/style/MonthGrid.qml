@@ -37,7 +37,6 @@ T.AbstractMonthGrid {
 	spacing: Union.Style.properties.layout.spacing
 
 	delegate: Label {
-		Union.Element.type: "Text"
 		Union.Element.states {
 			activeFocus: activeFocus
 			enabled: enabled

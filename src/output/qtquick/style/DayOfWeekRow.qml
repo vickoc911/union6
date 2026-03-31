@@ -35,12 +35,7 @@ T.AbstractDayOfWeekRow {
 
 	spacing: Union.Style.properties.layout.spacing
 
-	delegate: Text {
-		Union.Element.type: "Text"
-		Union.Element.states {
-			activeFocus: activeFocus
-			enabled: enabled
-		}
+	delegate: Label {
 		text: shortName
 		font: control.font
 		color: Union.Style.properties.text.color ?? "black"
@@ -48,10 +43,6 @@ T.AbstractDayOfWeekRow {
 		verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
 
 		required property string shortName
-		Union.StyledRectangle {
-			anchors.fill: parent
-			z: -1;
-		}
 	}
 
 	contentItem: Row {
