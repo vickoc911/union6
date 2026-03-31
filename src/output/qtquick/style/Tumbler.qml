@@ -56,7 +56,7 @@ T.Tumbler {
 		text: modelData
 	}
 
-	contentItem: Union.StyledRectangle {
+	contentItem: Item {
 		implicitWidth: control.Union.Style.properties.layout.width
 		implicitHeight: control.Union.Style.properties.layout.height
 		clip: true
