@@ -86,6 +86,8 @@ T.MenuItem {
             }
             control: control
             visible: name
+            width: control.icon.width
+            height: control.icon.height
         }
 
         Text {
