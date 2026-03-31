@@ -84,6 +84,7 @@ private Q_SLOTS:
         QTest::addRow("ScrollBar") << "ScrollBar" << QVariantMap{};
         QTest::addRow("ScrollIndicator") << "ScrollIndicator" << QVariantMap{};
         QTest::addRow("ScrollView") << "ScrollView" << QVariantMap{};
+        QTest::addRow("SearchField") << "SearchField" << QVariantMap{};
         QTest::addRow("SelectionRectangle") << "SelectionRectangle" << QVariantMap{};
         QTest::addRow("Slider") << "Slider" << QVariantMap{};
         QTest::addRow("SpinBox") << "SpinBox" << QVariantMap{};
