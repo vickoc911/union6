@@ -36,12 +36,7 @@ T.AbstractWeekNumberColumn {
 
 	spacing: Union.Style.properties.layout.spacing
 
-	delegate: Text {
-		Union.Element.type: "Text"
-		Union.Element.states {
-			activeFocus: activeFocus
-			enabled: enabled
-		}
+	delegate: Label {
 		text: weekNumber
 		font: control.font
 		color: Union.Style.properties.text.color ?? "black"
@@ -49,10 +44,6 @@ T.AbstractWeekNumberColumn {
 		verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
 
 		required property int weekNumber
-		Union.StyledRectangle {
-			anchors.fill: parent
-			z: -1;
-		}
 	}
 
 	contentItem: Column {
