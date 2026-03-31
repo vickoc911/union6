@@ -48,6 +48,8 @@ T.HorizontalHeaderView {
             text: delegate.model[control.textRole]
             font: Union.Style.properties.text.font ?? Application.font
             color: Union.Style.properties.text.color
+            wrapMode: Text.NoWrap
+            elide: Text.ElideRight
         }
 
         Union.Icon {
