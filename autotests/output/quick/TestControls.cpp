@@ -66,6 +66,9 @@ private Q_SLOTS:
         QTest::addRow("Frame") << "Frame" << QVariantMap{};
         QTest::addRow("GroupBox") << "GroupBox" << QVariantMap{};
         QTest::addRow("HorizontalHeaderView") << "HorizontalHeaderView" << QVariantMap{};
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+        QTest::addRow("HorizontalHeaderViewDelegate") << "HorizontalHeaderViewDelegate" << QVariantMap{};
+#endif
         QTest::addRow("ItemDelegate") << "ItemDelegate" << QVariantMap{};
         QTest::addRow("Label") << "Label" << QVariantMap{};
         QTest::addRow("MenuBarItem") << "MenuBarItem" << QVariantMap{};
@@ -106,6 +109,9 @@ private Q_SLOTS:
         QTest::addRow("Tumbler") << "Tumbler" << QVariantMap{};
         QTest::addRow("VerticalHeaderView") << "VerticalHeaderView" << QVariantMap{};
         QTest::addRow("WeekNumberColumn") << "WeekNumberColumn" << QVariantMap{};
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+        QTest::addRow("VerticalHeaderViewDelegate") << "VerticalHeaderViewDelegate" << QVariantMap{};
+#endif
 
         // These have required properties and thus require initial properties
         // auto testModel = new QStandardItemModel{};
