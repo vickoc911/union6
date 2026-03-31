@@ -36,7 +36,7 @@ T.AbstractMonthGrid {
 
 	spacing: Union.Style.properties.layout.spacing
 
-	delegate: Text {
+	delegate: Label {
 		Union.Element.type: "Text"
 		Union.Element.states {
 			activeFocus: activeFocus
@@ -52,12 +52,7 @@ T.AbstractMonthGrid {
 		font: control.font
 		color: Union.Style.properties.text.color ?? "black"
 
-		z: 1;
 		required property var model
-		Union.StyledRectangle {
-			anchors.fill: parent
-			z: -1;
-		}
 	}
 
 	contentItem: Grid {
