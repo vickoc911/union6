@@ -14,16 +14,17 @@ target_sources(UnionQuickImpl PRIVATE
     QuickStyle.h
     Types.h
     Types.cpp
+    Positioner.cpp
+    Positioner.h
     StyledRectangle.cpp
     StyledRectangle.h
-    Positioner.h
-    Positioner.cpp
-    PositionerLayout.h
-    PositionerLayout.cpp
     Icon.h
     Icon.cpp
     StyleHints.cpp
     StyleHints.h
+
+    positioner/PositionerLayout.h
+    positioner/PositionerLayout.cpp
 
     # scenegraph/UnionNode.cpp
     # scenegraph/UnionNode.h

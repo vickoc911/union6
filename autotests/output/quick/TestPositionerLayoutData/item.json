@@ -1,0 +1,51 @@
+{
+    "layout": {
+        "width": -1,
+        "height": -1,
+        "spacing": 5.0,
+        "item": {
+            "start": {
+                "items": [
+                    {
+                        "width": 10.0,
+                        "height": 10.0
+                    }
+                ]
+            },
+            "center": {
+                "items": [
+                    {
+                        "width": 20.0,
+                        "height": 10.0
+                    }
+                ]
+            },
+            "end": {
+                "items": [
+                    {
+                        "width": 10.0,
+                        "height": 20.0
+                    }
+                ],
+            },
+            "fill": {}
+        },
+        "background": {},
+        "content": {}
+    },
+    "expected": {
+        "item": {
+            "x": 0.0,
+            "y": 0.0,
+            "width": 50.0,
+            "height": 20.0,
+
+            "start": {
+                "x": 0.0,
+                "y": 0.0,
+                "width": 10.0,
+                "height": 20.0,
+            }
+        }
+    }
+}
