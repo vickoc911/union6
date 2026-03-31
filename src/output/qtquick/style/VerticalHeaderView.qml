@@ -20,26 +20,5 @@ T.VerticalHeaderView {
     implicitWidth: Math.max(1, contentWidth)
     implicitHeight: syncView ? syncView.height : 0
     
-    delegate: Union.StyledRectangle {
-        id: delegate
-        Union.Element.type: "HeaderViewDelegate"
-        Union.Element.states {
-            enabled: control.enabled
-        }
-
-        required property var model
-
-        implicitWidth: Math.max(control.width, text.implicitWidth)
-        implicitHeight: text.implicitHeight
-
-        Text {
-            id: text
-            anchors.fill: parent
-            enabled: parent.enabled
-            horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
-            verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
-            text: delegate.model[control.textRole]
-            color: Union.Style.properties.text.color
-        }
-    }
+    delegate: VerticalHeaderViewDelegate { }
 }
