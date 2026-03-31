@@ -44,6 +44,8 @@ T.SearchField {
 
     font: Union.Style.properties.text.font ?? Application.font
 
+    Union.Positioner.positionItems: [searchIndicator.indicator, contentItem, clearIndicator.indicator]
+
     delegate: ItemDelegate {
         width: ListView.view.width
         text: model[control.textRole]
@@ -73,7 +75,6 @@ T.SearchField {
         visible: control.text.length > 0
     }
 
-    Union.Positioner.positionItems: [searchIndicator.indicator, contentItem, clearIndicator.indicator]
     contentItem: T.TextField {
         text: control.text
         placeholderText: control.placeholderText
