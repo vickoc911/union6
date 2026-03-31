@@ -37,7 +37,6 @@ T.Tumbler {
 
 	spacing: Union.Style.properties.layout.spacing
 
-	readonly property real __delegateHeight: availableHeight / visibleItemCount
 
 	delegate: Text {
 		Union.Element.type: "Text"
@@ -57,8 +56,11 @@ T.Tumbler {
 	}
 
 	contentItem: Item {
+		id: pathContainer
 		implicitWidth: control.Union.Style.properties.layout.width
 		implicitHeight: control.Union.Style.properties.layout.height
+		readonly property real delegateHeight: control.availableHeight / control.visibleItemCount
+
 		clip: true
 		PathView {
 			anchors.fill: parent
@@ -70,11 +72,11 @@ T.Tumbler {
 			preferredHighlightEnd: 0.5
 			path: Path {
 				startX: control.contentItem.width / 2
-				startY: -control.__delegateHeight / 2
+				startY: -pathContainer.delegateHeight / 2
 
 				PathLine {
 					x: control.contentItem.width / 2
-					y: (control.visibleItemCount + 1) * control.__delegateHeight - control.__delegateHeight / 2
+					y: (control.visibleItemCount + 1) * pathContainer.delegateHeight - pathContainer.delegateHeight / 2
 				}
 			}
 		}
