@@ -6,10 +6,6 @@ pragma Singleton
 
 import QtQuick.Templates as T
 
-import org.kde.union.impl as Union
-
 T.Calendar {
-	Union.Element.type: "Calendar"
-	
 	id: control
 }
