@@ -85,7 +85,7 @@ T.SearchField {
         horizontalAlignment: Union.Alignment.toQtHorizontal(control.Union.Style.properties.text.alignment.horizontal)
         verticalAlignment: Union.Alignment.toQtVertical(control.Union.Style.properties.text.alignment.vertical)
 
-        PlaceholderText {
+        Text {
             id: placeholder
             x: parent.leftPadding
             y: parent.topPadding
@@ -118,8 +118,10 @@ T.SearchField {
             model: control.delegateModel
             currentIndex: control.highlightedIndex
             highlightMoveDuration: 0
+            boundsBehavior: ListView.StopAtBounds
 
             T.ScrollIndicator.vertical: ScrollIndicator {}
+
         }
     }
 
