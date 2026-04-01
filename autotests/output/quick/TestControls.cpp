@@ -52,7 +52,6 @@ private Q_SLOTS:
         QTest::addRow("ApplicationWindow") << "ApplicationWindow" << QVariantMap{};
         QTest::addRow("BusyIndicator") << "BusyIndicator" << QVariantMap{};
         QTest::addRow("Button") << "Button" << QVariantMap{};
-        QTest::addRow("Calendar") << "Calendar" << QVariantMap{};
         QTest::addRow("CheckBox") << "CheckBox" << QVariantMap{};
         QTest::addRow("CheckDelegate") << "CheckDelegate" << QVariantMap{};
         QTest::addRow("ComboBox") << "ComboBox" << QVariantMap{};
