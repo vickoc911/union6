@@ -77,41 +77,9 @@ Kirigami.Page {
             stepSize: 10
         }
 
-
-        ListModel {
-            id : fruitModel
-            ListElement { name: "Apple"; color: "green" }
-            ListElement { name: "Cherry"; color: "red" }
-            ListElement { name: "Banana"; color: "yellow" }
-            ListElement { name: "Orange"; color: "orange" }
-            ListElement { name: "WaterMelon"; color: "pink" }
-        }
-
-        SortFilterProxyModel {
-            id: fruitFilter
-            model: fruitModel
-            sorters: [
-                RoleSorter {
-                    roleName: "name"
-                }
-            ]
-            filters: [
-                FunctionFilter {
-                    component CustomData: QtObject { property string name }
-                    property var regExp: new RegExp(fruitSearch.text, "i")
-                    onRegExpChanged: invalidate()
-                    function filter(data: CustomData): bool {
-                        return regExp.test(data.name);
-                    }
-                }
-            ]
-        }
-
-        Controls.SearchField {
+        Loader {
             Layout.fillWidth: true
-            id: fruitSearch
-            suggestionModel: fruitFilter
-            textRole: "name"
+            source: "SearchField.qml"
         }
 
         Item {
