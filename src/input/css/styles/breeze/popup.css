@@ -79,6 +79,11 @@ menuitem
 
         layout-alignment: content end center 0;
     }
+
+    & > shortcuttext {
+        spacing: 40px;
+        color: var(--window-disabled-text-color);
+    }
 }
 
 menuseparator {
