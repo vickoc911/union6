@@ -56,6 +56,8 @@ T.ComboBox {
         text: model[control.textRole]
         highlighted: control.highlightedIndex === index
         hoverEnabled: control.hoverEnabled
+
+        LayoutMirroring.enabled: control.mirrored
     }
 
     indicator: Union.Icon {
