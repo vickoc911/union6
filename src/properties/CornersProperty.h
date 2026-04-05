@@ -128,6 +128,13 @@ public:
     bool isEmpty() const;
 
     /*!
+     * Returns if all properties of this property group are equal.
+     *
+     * An empty property group will have all of its properties equal.
+     */
+    bool allEqual() const;
+
+    /*!
      * Returns a string representation of this property group.
      *
      * This is intended for debugging.

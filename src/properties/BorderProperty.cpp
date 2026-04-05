@@ -144,6 +144,25 @@ bool BorderProperty::isEmpty() const
     return true;
 }
 
+bool BorderProperty::allEqual() const
+{
+    if (isEmpty()) {
+        return true;
+    }
+
+    if (*(d->left) != *(d->right)) {
+        return false;
+    }
+    if (*(d->top) != *(d->bottom)) {
+        return false;
+    }
+    if (*(d->left) != *(d->top)) {
+        return false;
+    }
+
+    return true;
+}
+
 QString BorderProperty::toString(int indentation, ToStringFlags flags) const
 {
     if (!hasAnyValue()) {
