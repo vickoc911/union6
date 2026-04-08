@@ -18,6 +18,7 @@ label {
 textfield,
 textarea,
 spinbox,
+doublespinbox,
 searchfield
 {
     height: var(--medium-element-size);
@@ -62,7 +63,8 @@ searchfield
     width: 200px;
 }
 
-spinbox
+spinbox,
+doublespinbox
 {
     width: var(--medium-element-size);
     height: var(--large-element-size);
