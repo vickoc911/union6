@@ -4,4 +4,5 @@
 import QtQuick
 import QtQuick.Templates as T
 
-T.Action { }
+T.Action {
+}
