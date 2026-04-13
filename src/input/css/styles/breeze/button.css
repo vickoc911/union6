@@ -58,6 +58,10 @@
     --combobox-popup-text-color: var(--window-text-color);
 }
 
+action {
+    icon-size: var(--icon-size-small);
+}
+
 button,
 toolbutton,
 combobox,

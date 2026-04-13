@@ -3,5 +3,13 @@
 
 import QtQuick
 import QtQuick.Templates as T
+import org.kde.union.impl as Union
 
-T.Action { }
+T.Action {
+    id: control
+    Union.Element.type: "Action"
+    icon {
+        width: Union.Style.properties.icon.width
+        height: Union.Style.properties.icon.height
+    }
+}
