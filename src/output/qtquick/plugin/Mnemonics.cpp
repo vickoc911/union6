@@ -17,7 +17,7 @@
 
 using namespace Union;
 
-QHash<QKeySequence, MnemonicAttached *> MnemonicAttached::s_sequenceToObject = QHash<QKeySequence, MnemonicAttached *>();
+QHash<QKeySequence, Mnemonics *> Mnemonics::s_sequenceToObject = QHash<QKeySequence, Mnemonics *>();
 
 // If pos points to alphanumeric X in "...(X)...", which is preceded or
 // followed only by non-alphanumerics, then "(X)" gets removed.
@@ -160,19 +160,19 @@ private:
     bool m_altPressed = false;
 };
 
-MnemonicAttached::MnemonicAttached(QObject *parent)
+Mnemonics::Mnemonics(QObject *parent)
     : QObject(parent)
 {
-    connect(&MnemonicEventFilter::instance(), &MnemonicEventFilter::altPressed, this, &MnemonicAttached::onAltPressed);
-    connect(&MnemonicEventFilter::instance(), &MnemonicEventFilter::altReleased, this, &MnemonicAttached::onAltReleased);
+    connect(&MnemonicEventFilter::instance(), &MnemonicEventFilter::altPressed, this, &Mnemonics::onAltPressed);
+    connect(&MnemonicEventFilter::instance(), &MnemonicEventFilter::altReleased, this, &Mnemonics::onAltReleased);
 }
 
-MnemonicAttached::~MnemonicAttached()
+Mnemonics::~Mnemonics()
 {
     s_sequenceToObject.remove(m_sequence);
 }
 
-QWindow *MnemonicAttached::window() const
+QWindow *Mnemonics::window() const
 {
     if (auto *parentItem = qobject_cast<QQuickItem *>(parent())) {
         if (auto *window = parentItem->window()) {
@@ -187,7 +187,7 @@ QWindow *MnemonicAttached::window() const
     return nullptr;
 }
 
-void MnemonicAttached::onAltPressed()
+void Mnemonics::onAltPressed()
 {
     if (m_active || !m_enabled || m_richTextLabel.isEmpty()) {
         return;
@@ -204,7 +204,7 @@ void MnemonicAttached::onAltPressed()
     Q_EMIT activeChanged();
 }
 
-void MnemonicAttached::onAltReleased()
+void Mnemonics::onAltReleased()
 {
     if (!m_active || m_richTextLabel.isEmpty()) {
         return;
@@ -220,7 +220,7 @@ void MnemonicAttached::onAltReleased()
 }
 
 // Algorithm adapted from KAccelString
-void MnemonicAttached::calculateWeights()
+void Mnemonics::calculateWeights()
 {
     m_weights.clear();
 
@@ -290,7 +290,7 @@ void MnemonicAttached::calculateWeights()
     }
 }
 
-void MnemonicAttached::updateSequence()
+void Mnemonics::updateSequence()
 {
     const QKeySequence oldSequence = m_sequence;
 
@@ -329,7 +329,7 @@ void MnemonicAttached::updateSequence()
             QChar c = i.value();
 
             QKeySequence ks(QStringLiteral("Alt+") % c);
-            MnemonicAttached *otherMa = s_sequenceToObject.value(ks);
+            Mnemonics *otherMa = s_sequenceToObject.value(ks);
             Q_ASSERT(otherMa != this);
             if (!otherMa || otherMa->m_weight < m_weight) {
                 // the old shortcut is less valuable than the current: remove it
@@ -372,7 +372,7 @@ void MnemonicAttached::updateSequence()
     Q_EMIT mnemonicLabelChanged();
 }
 
-void MnemonicAttached::setLabel(const QString &text)
+void Mnemonics::setLabel(const QString &text)
 {
     if (m_label == text) {
         return;
@@ -384,7 +384,7 @@ void MnemonicAttached::setLabel(const QString &text)
     Q_EMIT plainTextLabelChanged();
 }
 
-QString MnemonicAttached::richTextLabel() const
+QString Mnemonics::richTextLabel() const
 {
     if (!m_actualRichTextLabel.isEmpty()) {
         return m_actualRichTextLabel;
@@ -393,22 +393,22 @@ QString MnemonicAttached::richTextLabel() const
     }
 }
 
-QString MnemonicAttached::mnemonicLabel() const
+QString Mnemonics::mnemonicLabel() const
 {
     return m_mnemonicLabel;
 }
 
-QString MnemonicAttached::plainTextLabel() const
+QString Mnemonics::plainTextLabel() const
 {
     return removeAcceleratorMarker(m_label);
 }
 
-QString MnemonicAttached::label() const
+QString Mnemonics::label() const
 {
     return m_label;
 }
 
-void MnemonicAttached::setEnabled(bool enabled)
+void Mnemonics::setEnabled(bool enabled)
 {
     if (m_enabled == enabled) {
         return;
@@ -419,12 +419,12 @@ void MnemonicAttached::setEnabled(bool enabled)
     Q_EMIT enabledChanged();
 }
 
-bool MnemonicAttached::enabled() const
+bool Mnemonics::enabled() const
 {
     return m_enabled;
 }
 
-void MnemonicAttached::setControlType(MnemonicAttached::ControlType controlType)
+void Mnemonics::setControlType(Mnemonics::ControlType controlType)
 {
     if (m_controlType == controlType) {
         return;
@@ -458,27 +458,27 @@ void MnemonicAttached::setControlType(MnemonicAttached::ControlType controlType)
     Q_EMIT controlTypeChanged();
 }
 
-MnemonicAttached::ControlType MnemonicAttached::controlType() const
+Mnemonics::ControlType Mnemonics::controlType() const
 {
     return m_controlType;
 }
 
-QKeySequence MnemonicAttached::sequence()
+QKeySequence Mnemonics::sequence()
 {
     return m_sequence;
 }
 
-bool MnemonicAttached::active() const
+bool Mnemonics::active() const
 {
     return m_active;
 }
 
-MnemonicAttached *MnemonicAttached::qmlAttachedProperties(QObject *object)
+Mnemonics *Mnemonics::qmlAttachedProperties(QObject *object)
 {
-    return new MnemonicAttached(object);
+    return new Mnemonics(object);
 }
 
-void MnemonicAttached::setActive(bool active)
+void Mnemonics::setActive(bool active)
 {
     // We can't rely on previous value when it's true since it can be
     // caused by Alt key press and we need to remove the event filter

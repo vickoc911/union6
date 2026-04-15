@@ -76,9 +76,9 @@ KT.NavigationTabButton {
 
     contentItem: Item {
         Union.PositionedItem.positionChildren: true
-        Union.MnemonicData.enabled: control.enabled && control.visible && textItem.visible
-        Union.MnemonicData.controlType: Union.MnemonicData.ActionElement
-        Union.MnemonicData.label: control.text
+        Union.Mnemonics.enabled: control.enabled && control.visible && textItem.visible && control.text.length > 0
+        Union.Mnemonics.controlType: Union.Mnemonics.ActionElement
+        Union.Mnemonics.label: control.text
 
         Union.Icon {
             Union.PositionedItem.source: Union.PositionerSource.Icon
@@ -89,12 +89,12 @@ KT.NavigationTabButton {
         Text {
             id: textItem
             Union.PositionedItem.source: Union.PositionerSource.Text
-            text: parent.Union.MnemonicData.richTextLabel ?? control.text
+            text: parent.Union.Mnemonics.richTextLabel ?? control.text
             font: control.font
             color: Union.Style.properties.text.color ?? "black"
             elide: Text.ElideRight
             wrapMode: Text.NoWrap
-            visible: control.display != T.AbstractButton.IconOnly && text.length > 0
+            visible: control.display != T.AbstractButton.IconOnly
         }
     }
 
