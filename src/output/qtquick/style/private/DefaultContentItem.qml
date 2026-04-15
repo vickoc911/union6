@@ -14,9 +14,9 @@ Item {
     property int wrapMode: Text.NoWrap
 
     Union.PositionedItem.positionChildren: true
-    Union.MnemonicData.enabled: root.control.enabled && root.control.visible && textItem.visible
-    Union.MnemonicData.controlType: Union.MnemonicData.ActionElement
-    Union.MnemonicData.label: root.control.text
+    Union.Mnemonics.enabled: root.control.enabled && root.control.visible && textItem.visible && root.control.text.length > 0
+    Union.Mnemonics.controlType: Union.Mnemonics.ActionElement
+    Union.Mnemonics.label: root.control.text
 
     Union.Icon {
         Union.PositionedItem.source: Union.PositionerSource.Icon
@@ -28,13 +28,13 @@ Item {
         id: textItem
         Union.PositionedItem.source: Union.PositionerSource.Text
 
-        text: root.Union.MnemonicData.richTextLabel ?? root.control.text
+        text: root.Union.Mnemonics.richTextLabel ?? root.control.text
         font: root.control.font
         color: Union.Style.properties.text.color ?? "black"
         elide: root.wrapMode == Text.NoWrap ? Text.ElideRight : Text.ElideNone
         wrapMode: root.wrapMode
 
-        visible: root.control.display != T.AbstractButton.IconOnly && text.length > 0
+        visible: root.control.display != T.AbstractButton.IconOnly
 
         horizontalAlignment: Qt.AlignLeft
     }
