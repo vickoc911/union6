@@ -16,7 +16,7 @@
 namespace Union
 {
 /*!
- * \qmltype MnemonicData
+ * \qmltype Mnemonics
  * \inqmlmodule org.kde.union.impl
  *
  * \brief An attached property used to calculate automated keyboard sequences
@@ -35,15 +35,15 @@ namespace Union
  *
  * Note that this has been directly copied from Kirigami and adjusted for Union
  */
-class MnemonicAttached : public QObject
+class Mnemonics : public QObject
 {
     Q_OBJECT
-    QML_NAMED_ELEMENT(MnemonicData)
-    QML_ATTACHED(MnemonicAttached)
-    QML_UNCREATABLE("Cannot create objects of type MnemonicData, use it as an attached property")
+    QML_ELEMENT
+    QML_ATTACHED(Mnemonics)
+    QML_UNCREATABLE("Cannot create objects of type Mnemonics, use it as an attached property")
 
     /*!
-     * \qmlattachedproperty string MnemonicData::label
+     * \qmlattachedproperty string Mnemonics::label
      *
      * The label of the control we want to compute a mnemonic for, instance
      * "Label:" or "&Ok"
@@ -51,7 +51,7 @@ class MnemonicAttached : public QObject
     Q_PROPERTY(QString label READ label WRITE setLabel NOTIFY labelChanged FINAL)
 
     /*!
-     * \qmlattachedproperty string MnemonicData::richTextLabel
+     * \qmlattachedproperty string Mnemonics::richTextLabel
      *
      * The user-visible final label, which will have the shortcut letter underlined,
      * such as "<u>O</u>k".
@@ -59,7 +59,7 @@ class MnemonicAttached : public QObject
     Q_PROPERTY(QString richTextLabel READ richTextLabel NOTIFY richTextLabelChanged FINAL)
 
     /*!
-     * \qmlattachedproperty string MnemonicData::mnemonicLabel
+     * \qmlattachedproperty string Mnemonics::mnemonicLabel
      *
      * The label with an "&" mnemonic in the place which will have the shortcut
      * assigned, regardless of whether the & was assigned by the user or automatically generated.
@@ -67,14 +67,14 @@ class MnemonicAttached : public QObject
     Q_PROPERTY(QString mnemonicLabel READ mnemonicLabel NOTIFY mnemonicLabelChanged FINAL)
 
     /*!
-     * \qmlattachedproperty string MnemonicData::plainTextLabel
+     * \qmlattachedproperty string Mnemonics::plainTextLabel
      *
      * The label in plain text with no markup nor & markers.
      */
     Q_PROPERTY(QString plainTextLabel READ plainTextLabel NOTIFY plainTextLabelChanged FINAL)
 
     /*!
-     * \qmlattachedproperty bool MnemonicData::enabled
+     * \qmlattachedproperty bool Mnemonics::enabled
      *
      * Only if true this mnemonic will be considered for the global assignment.
      *
@@ -83,23 +83,23 @@ class MnemonicAttached : public QObject
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged FINAL)
 
     /*!
-     * \qmlattachedproperty enumeration MnemonicData::controlType
+     * \qmlattachedproperty enumeration Mnemonics::controlType
      *
      * The type of control this mnemonic is attached: different types of controls have different importance and priority for shortcut assignment.
      *
-     * \qmlenumeratorsfrom MnemonicAttached::ControlType
+     * \qmlenumeratorsfrom Mnemonics::ControlType
      */
-    Q_PROPERTY(MnemonicAttached::ControlType controlType READ controlType WRITE setControlType NOTIFY controlTypeChanged FINAL)
+    Q_PROPERTY(Mnemonics::ControlType controlType READ controlType WRITE setControlType NOTIFY controlTypeChanged FINAL)
 
     /*!
-     * \qmlattachedproperty keysequence MnemonicData::sequence
+     * \qmlattachedproperty keysequence Mnemonics::sequence
      *
      * The final key sequence assigned, if any: it will be Alt+alphanumeric char.
      */
     Q_PROPERTY(QKeySequence sequence READ sequence NOTIFY sequenceChanged FINAL)
 
     /*!
-     * \qmlattachedproperty bool MnemonicData::active
+     * \qmlattachedproperty bool Mnemonics::active
      *
      * True when the user is pressing alt and the accelerators should be shown.
      */
@@ -122,8 +122,8 @@ public:
     };
     Q_ENUM(ControlType)
 
-    explicit MnemonicAttached(QObject *parent = nullptr);
-    ~MnemonicAttached() override;
+    explicit Mnemonics(QObject *parent = nullptr);
+    ~Mnemonics() override;
 
     void setLabel(const QString &text);
     QString label() const;
@@ -135,7 +135,7 @@ public:
     void setEnabled(bool enabled);
     bool enabled() const;
 
-    void setControlType(MnemonicAttached::ControlType controlType);
+    void setControlType(Mnemonics::ControlType controlType);
     ControlType controlType() const;
 
     QKeySequence sequence();
@@ -144,7 +144,7 @@ public:
     bool active() const;
 
     // QML attached property
-    static MnemonicAttached *qmlAttachedProperties(QObject *object);
+    static Mnemonics *qmlAttachedProperties(QObject *object);
 
 protected:
     void updateSequence();
@@ -205,9 +205,9 @@ private:
 
     // global mapping of mnemonics
     // TODO: map by QWindow
-    static QHash<QKeySequence, MnemonicAttached *> s_sequenceToObject;
+    static QHash<QKeySequence, Mnemonics *> s_sequenceToObject;
 };
 }
 
-QML_DECLARE_TYPEINFO(Union::MnemonicAttached, QML_HAS_ATTACHED_PROPERTIES)
+QML_DECLARE_TYPEINFO(Union::Mnemonics, QML_HAS_ATTACHED_PROPERTIES)
 #endif // MNEMONICS_H
