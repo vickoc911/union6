@@ -76,7 +76,7 @@ KT.NavigationTabButton {
 
     contentItem: Item {
         Union.PositionedItem.positionChildren: true
-        Union.MnemonicData.enabled: control.enabled && control.visible
+        Union.MnemonicData.enabled: control.enabled && control.visible && textItem.visible
         Union.MnemonicData.controlType: Union.MnemonicData.ActionElement
         Union.MnemonicData.label: control.text
 
@@ -87,6 +87,7 @@ KT.NavigationTabButton {
         }
 
         Text {
+            id: textItem
             Union.PositionedItem.source: Union.PositionerSource.Text
             text: parent.Union.MnemonicData.richTextLabel ?? control.text
             font: control.font
