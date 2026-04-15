@@ -14,9 +14,8 @@ Item {
     property int wrapMode: Text.NoWrap
 
     Union.PositionedItem.positionChildren: true
-    Union.MnemonicData.enabled: root.control.enabled && root.control.visible
+    Union.MnemonicData.enabled: root.control.enabled && root.control.visible && text.visible
     Union.MnemonicData.controlType: Union.MnemonicData.ActionElement
-    Union.MnemonicData.label: root.control.display !== T.AbstractButton.IconOnly ? root.control.text : ""
 
     Union.Icon {
         Union.PositionedItem.source: Union.PositionerSource.Icon
@@ -25,6 +24,7 @@ Item {
     }
 
     Text {
+        id: text
         Union.PositionedItem.source: Union.PositionerSource.Text
 
         text: root.Union.MnemonicData.richTextLabel ?? root.control.text
