@@ -121,10 +121,6 @@ void PositionerLayout::updatePolish()
 
     Layout layout;
 
-    // LayoutContainer itemRelative;
-    // LayoutContainer contentRelative;
-    // LayoutContainer backgroundRelative;
-
     debug("Performing layout for positioner of", parentItem());
 
     for (const auto &item : std::as_const(m_items)) {
@@ -254,10 +250,23 @@ void PositionerLayout::updatePolish()
     }
 
     auto properties = query->properties();
-    layout.size = parentItem()->size();
-    layout.spacing = properties->layout() ? properties->layout()->spacing().value_or(0.0) : 0.0;
-    layout.inset = properties->layout() && properties->layout()->inset() ? properties->layout()->inset()->toMargins() : QMarginsF{};
-    layout.padding = properties->layout() && properties->layout()->padding() ? properties->layout()->padding()->toMargins() : QMarginsF{};
+    layout.size = containerItem->size();
+
+    if (containerItem->inherits("QQuickControl")) {
+        layout.spacing = containerItem->property("spacing").toReal();
+        layout.inset = QMarginsF{containerItem->property("leftInset").toReal(),
+                                 containerItem->property("topInset").toReal(),
+                                 containerItem->property("rightInset").toReal(),
+                                 containerItem->property("bottomInset").toReal()};
+        layout.padding = QMarginsF{containerItem->property("leftPadding").toReal(),
+                                   containerItem->property("topPadding").toReal(),
+                                   containerItem->property("rightPadding").toReal(),
+                                   containerItem->property("bottomPadding").toReal()};
+    } else {
+        layout.spacing = properties->layout() ? properties->layout()->spacing().value_or(0.0) : 0.0;
+        layout.inset = properties->layout() && properties->layout()->inset() ? properties->layout()->inset()->toMargins() : QMarginsF{};
+        layout.padding = properties->layout() && properties->layout()->padding() ? properties->layout()->padding()->toMargins() : QMarginsF{};
+    }
     layout.layout();
 
     if (layout.implicitSize != m_implicitSize) {
