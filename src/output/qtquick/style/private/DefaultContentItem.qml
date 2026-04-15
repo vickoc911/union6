@@ -17,7 +17,6 @@ Item {
     Union.MnemonicData.enabled: root.control.enabled && root.control.visible
     Union.MnemonicData.controlType: Union.MnemonicData.ActionElement
     Union.MnemonicData.label: root.control.display !== T.AbstractButton.IconOnly ? root.control.text : ""
-    Union.MnemonicData.onActiveChanged: root.control.background?.updateItem()
 
     Union.Icon {
         Union.PositionedItem.source: Union.PositionerSource.Icon

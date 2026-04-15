@@ -79,7 +79,6 @@ KT.NavigationTabButton {
         Union.MnemonicData.enabled: control.enabled && control.visible
         Union.MnemonicData.controlType: Union.MnemonicData.ActionElement
         Union.MnemonicData.label: control.display !== T.AbstractButton.IconOnly ? control.text : ""
-        Union.MnemonicData.onActiveChanged: control.background?.updateItem()
 
         Union.Icon {
             Union.PositionedItem.source: Union.PositionerSource.Icon
