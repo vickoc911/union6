@@ -44,6 +44,7 @@ menuitem
 {
     width: var(--menu-item-width);
     padding: var(--medium-spacing);
+
     spacing: var(--small-spacing);
 
     border-radius: var(--corner-radius);
@@ -93,6 +94,13 @@ menuitem
             color: mix(var(--window-background-color), var(--window-disabled-text-color), 0.5);
         }
     }
+}
+
+/* Menuitems are sometimes used in comboboxes instead of itemdelegates, adjust their padding to
+ * same as itemdelegate in those cases */
+popup.combobox menuitem {
+    padding: var(--large-spacing);
+    inset: var(--small-spacing);
 }
 
 menuseparator {
