@@ -147,6 +147,12 @@ spinbox
         }
     }
 
+    &.constrained {
+        layout-alignment: item start fill 0;
+        text-alignment: item start fill 0;
+        margin-left: var(--small-spacing);
+    }
+
     &.constrained > indicator {
         layout-alignment: item end stack-fill 0;
 
