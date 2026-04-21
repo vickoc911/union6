@@ -442,7 +442,7 @@ private:
     std::unique_ptr<Union::ElementQuery> m_query;
     std::shared_ptr<Union::Style> m_style;
 
-    bool m_completed = false;
+    bool m_completed = true;
 };
 
 class QuickElementUpdatedEvent : public QEvent

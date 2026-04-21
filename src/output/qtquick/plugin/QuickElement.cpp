@@ -406,6 +406,7 @@ bool QuickElement::eventFilter(QObject *watched, QEvent *event)
 
 void QuickElement::classBegin()
 {
+    m_completed = false;
 }
 
 void QuickElement::componentComplete()
