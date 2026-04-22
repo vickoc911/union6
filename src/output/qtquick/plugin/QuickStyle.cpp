@@ -5,6 +5,7 @@
 
 #include <QCoreApplication>
 #include <QQmlEngine>
+#include <QQuickWindow>
 
 #include <Element.h>
 #include <EventHelper.h>
@@ -26,6 +27,16 @@ QuickStyle::QuickStyle(QQmlEngine *engine, QObject *parent)
     , m_engine(engine)
 {
     m_properties = std::make_unique<StylePropertyGroup>(this);
+
+    // NativeTextRendering is still distorted sometimes with fractional scale factors
+    // Given Qt disables all hinting with native rendering when any scaling is used anyway
+    // we can use Qt's rendering throughout
+    // QTBUG-126577
+    if (qApp->devicePixelRatio() == 1.0) {
+        QQuickWindow::setTextRenderType(QQuickWindow::NativeTextRendering);
+    } else {
+        QQuickWindow::setTextRenderType(QQuickWindow::QtTextRendering);
+    }
 
     initialize();
 
