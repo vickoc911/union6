@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Arjen Hiemstra <ahiemstra@heimr.nl>
 
 #include "PlatformPlugin.h"
+#include <QGuiApplication>
+#include <QQuickWindow>
 
 #include <QIcon>
 
@@ -11,6 +13,15 @@ using namespace Qt::StringLiterals;
 PlatformPlugin::PlatformPlugin(QObject *parent)
     : Plugin(parent)
 {
+    // NativeTextRendering is still distorted sometimes with fractional scale factors
+    // Given Qt disables all hinting with native rendering when any scaling is used anyway
+    // we can use Qt's rendering throughout
+    // QTBUG-126577
+    if (qApp->devicePixelRatio() == 1.0) {
+        QQuickWindow::setTextRenderType(QQuickWindow::NativeTextRendering);
+    } else {
+        QQuickWindow::setTextRenderType(QQuickWindow::QtTextRendering);
+    }
 }
 
 QString PlatformPlugin::defaultInputPlugin()
