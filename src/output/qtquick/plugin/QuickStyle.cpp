@@ -5,6 +5,7 @@
 
 #include <QCoreApplication>
 #include <QQmlEngine>
+#include <QQuickWindow>
 
 #include <Element.h>
 #include <EventHelper.h>
