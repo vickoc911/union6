@@ -57,6 +57,19 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         rect.setBottom(rect.bottom() - 2);
 
         drawBackground(painter, rect, properties);
+        if (properties->icon()) {
+            auto iconProperty = properties->icon();
+            auto penColor = iconProperty->color().value_or(Union::Color());
+            auto icon = QIcon::fromTheme(iconProperty->name().value_or(QString()));
+            QSize iconSize = QSize(iconProperty->width().value_or(0), iconProperty->height().value_or(0));
+            auto horizontalAlignment = toQtHorizontal(properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified));
+            auto verticalAlignment = toQtVertical(properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified));
+            if (iconProperty->name().has_value()) {
+                drawIcon(painter, rect, icon);
+            } else {
+                drawIcon(painter, rect, buttonOption->icon);
+            }
+        }
 
         QStyleOptionButton labelOption(*buttonOption);
         labelOption.palette.setColor(QPalette::ButtonText, properties->text()->color().value().toQColor());
