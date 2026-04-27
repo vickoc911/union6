@@ -38,10 +38,10 @@ T.TreeViewDelegate {
     // would end up with an implicit size of 0. TableView doesn't like that and
     // will complain, so in that case, fall back to just querying the implicit
     // size of the content directly.
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            Union.Positioner.implicitWidth > 0 ? Union.Positioner.implicitWidth : contentItem.implicitWidth + leftPadding + rightPadding)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             Union.Positioner.implicitHeight > 0 ? Union.Positioner.implicitHeight : contentItem.implicitHeight + topPadding + bottomPadding)
+    implicitWidth: Math.max(implicitBackgroundWidth + leftPadding + rightPadding,
+                            (Union.Positioner.implicitWidth > 0 ? Union.Positioner.implicitWidth : contentItem.implicitWidth + leftInset + rightInset))
+    implicitHeight: Math.max(Math.max(implicitBackgroundHeight, implicitContentHeight, implicitIndicatorHeight)  + topPadding + bottomPadding,
+                        (Union.Positioner.implicitHeight > 0 ? Union.Positioner.implicitHeight : contentItem.implicitHeight + topInset + bottomInset))
 
     leftPadding: Union.Style.properties.layout.padding.left
     rightPadding: Union.Style.properties.layout.padding.right

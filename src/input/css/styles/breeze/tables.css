@@ -60,6 +60,8 @@ tableviewdelegate {
 treeviewdelegate {
     spacing: 0px;
 
+    layout-alignment: content fill center 0;
+
     & > * {
         layout-alignment: content fill fill 0;
     }
