@@ -108,6 +108,17 @@ enum class ToStringFlag {
 };
 Q_DECLARE_FLAGS(ToStringFlags, ToStringFlag)
 
+/*!
+ * \enum Union::Properties::WrapMode
+ */
+enum class WrapMode {
+    NoWrap,
+    WordWrap,
+    WrapAnywhere,
+    Wrap
+};
+Q_ENUM_NS(WrapMode)
+
 /*
  * A template method to get an empty value of a certain type.
  *
