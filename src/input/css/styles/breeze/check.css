@@ -50,6 +50,10 @@ switch
     text-alignment: content fill center 0;
 }
 
+checkbox, radiobutton {
+    text-wrap-mode: wrap;
+}
+
 checkbox,
 checkdelegate,
 menuitem,

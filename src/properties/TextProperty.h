@@ -13,6 +13,7 @@
 #include <QFont>
 
 #include "../Color.h"
+#include "../PropertiesTypes.h"
 #include "AlignmentProperty.h"
 
 #include "PropertiesTypes.h"
@@ -100,6 +101,18 @@ public:
      * \a newValue The new value or \c{std::nullopt} to unset the value.
      */
     void setColor(const std::optional<Union::Color> &newValue);
+
+    /*!
+     * Returns the value of wrapMode.
+     */
+    std::optional<Union::Properties::WrapMode> wrapMode() const;
+
+    /*!
+     * Set the value of wrapMode.
+     *
+     * \a newValue The new value or \c{std::nullopt} to unset the value.
+     */
+    void setWrapMode(const std::optional<Union::Properties::WrapMode> &newValue);
 
     /*!
      * Returns if this property group has any value set.

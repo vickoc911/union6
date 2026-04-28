@@ -71,6 +71,15 @@ public:
     QJSValue color() const;
     Q_SIGNAL void colorChanged();
 
+    /*!
+     * \qmlproperty Union::Properties::WrapMode TextPropertyGroup::wrapMode
+     *
+     * Exposes TextProperty::wrapMode to QML.
+     */
+    Q_PROPERTY(QJSValue wrapMode READ wrapMode NOTIFY wrapModeChanged)
+    QJSValue wrapMode() const;
+    Q_SIGNAL void wrapModeChanged();
+
 private:
     QuickStyle *m_style = nullptr;
     std::unique_ptr<AlignmentPropertyGroup> m_alignment;
