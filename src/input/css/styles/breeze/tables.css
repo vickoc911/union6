@@ -59,6 +59,7 @@ tableviewdelegate {
 
 treeviewdelegate {
     spacing: 0px;
+    text-wrap-mode: no-wrap;
 
     & > * {
         layout-alignment: content fill fill 0;

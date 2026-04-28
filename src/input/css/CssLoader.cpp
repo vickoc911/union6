@@ -665,6 +665,21 @@ void CssLoader::setTextProperty(StyleProperty *output, const cssparser::Property
     if (property.name() == "color" || property.name() == "text-color") {
         text->setColor(to_color(property.value()));
     }
+
+    if (property.name() == "text-wrap-mode") {
+        const auto wrapMode = property.value().toString();
+        if (!wrapMode.empty()) {
+            if (wrapMode == "no-wrap") {
+                text->setWrapMode(WrapMode::NoWrap);
+            } else if (wrapMode == "word-wrap") {
+                text->setWrapMode(WrapMode::WordWrap);
+            } else if (wrapMode == "wrap-anywhere") {
+                text->setWrapMode(WrapMode::WrapAnywhere);
+            } else if (wrapMode == "wrap") {
+                text->setWrapMode(WrapMode::Wrap);
+            }
+        }
+    }
 }
 
 void CssLoader::setIconProperty(StyleProperty *output, const cssparser::Property &property)
