@@ -125,6 +125,7 @@ std::unique_ptr<TextProperty> testTextPropertyInstance()
     instance->setFont(testQFontInstance());
     instance->setColor(Union::Color{});
     instance->setWrapMode(Union::Properties::WrapMode{});
+    instance->setOverflow(Union::Properties::Overflow{});
 
     return instance;
 }
