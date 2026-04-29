@@ -21,6 +21,7 @@ public:
     std::optional<QFont> font;
     std::optional<Union::Color> color;
     std::optional<Union::Properties::WrapMode> wrapMode;
+    std::optional<Union::Properties::Overflow> overflow;
 };
 
 TextProperty::TextProperty()
@@ -36,6 +37,7 @@ TextProperty::TextProperty(const TextProperty &other)
     d->font = other.d->font;
     d->color = other.d->color;
     d->wrapMode = other.d->wrapMode;
+    d->overflow = other.d->overflow;
 }
 
 TextProperty::TextProperty(TextProperty &&other)
@@ -52,6 +54,7 @@ TextProperty &TextProperty::operator=(const TextProperty &other)
         d->font = other.d->font;
         d->color = other.d->color;
         d->wrapMode = other.d->wrapMode;
+        d->overflow = other.d->overflow;
     }
     return *this;
 }
@@ -114,6 +117,20 @@ void TextProperty::setWrapMode(const std::optional<Union::Properties::WrapMode> 
     d->wrapMode = newValue;
 }
 
+std::optional<Union::Properties::Overflow> TextProperty::overflow() const
+{
+    return d->overflow;
+}
+
+void TextProperty::setOverflow(const std::optional<Union::Properties::Overflow> &newValue)
+{
+    if (newValue == d->overflow) {
+        return;
+    }
+
+    d->overflow = newValue;
+}
+
 bool TextProperty::hasAnyValue() const
 {
     if (d->alignment && d->alignment->hasAnyValue()) {
@@ -126,6 +143,9 @@ bool TextProperty::hasAnyValue() const
         return true;
     }
     if (d->wrapMode.has_value()) {
+        return true;
+    }
+    if (d->overflow.has_value()) {
         return true;
     }
     return false;
@@ -147,6 +167,9 @@ bool TextProperty::isEmpty() const
         return false;
     }
     if (d->wrapMode.has_value() && d->wrapMode.value() != emptyValue<Union::Properties::WrapMode>()) {
+        return false;
+    }
+    if (d->overflow.has_value() && d->overflow.value() != emptyValue<Union::Properties::Overflow>()) {
         return false;
     }
 
@@ -208,6 +231,12 @@ QString TextProperty::toString(int indentation, ToStringFlags flags) const
     } else {
         out << empty << maybeNewLine;
     }
+    out << indent(indentation, multiline, false) << "overflow: ";
+    if (d->overflow) {
+        out << d->overflow.value() << maybeNewLine;
+    } else {
+        out << empty << maybeNewLine;
+    }
 
     if (types) {
         out << indent(indentation - 2, multiline, true) << ")";
@@ -240,6 +269,9 @@ void TextProperty::resolveProperties(const TextProperty *source, TextProperty *d
     if (!destination->d->wrapMode.has_value()) {
         destination->d->wrapMode = source->d->wrapMode;
     }
+    if (!destination->d->overflow.has_value()) {
+        destination->d->overflow = source->d->overflow;
+    }
 }
 
 std::unique_ptr<TextProperty> TextProperty::empty()
@@ -249,6 +281,7 @@ std::unique_ptr<TextProperty> TextProperty::empty()
     result->d->font = emptyValue<QFont>();
     result->d->color = emptyValue<Union::Color>();
     result->d->wrapMode = emptyValue<Union::Properties::WrapMode>();
+    result->d->overflow = emptyValue<Union::Properties::Overflow>();
     return result;
 }
 
@@ -268,6 +301,9 @@ bool Union::Properties::operator==(const TextProperty &left, const TextProperty 
         return false;
     }
     if (left.wrapMode() != right.wrapMode()) {
+        return false;
+    }
+    if (left.overflow() != right.overflow()) {
         return false;
     }
     return true;
@@ -292,6 +328,7 @@ QDataStream &operator<<(QDataStream &stream, const Union::Properties::TextProper
     stream << type->font();
     stream << type->color();
     stream << type->wrapMode();
+    stream << type->overflow();
     return stream;
 }
 
@@ -321,6 +358,11 @@ QDataStream &operator>>(QDataStream &stream, std::unique_ptr<Union::Properties::
         std::optional<Union::Properties::WrapMode> data;
         stream >> data;
         type->setWrapMode(data);
+    }
+    {
+        std::optional<Union::Properties::Overflow> data;
+        stream >> data;
+        type->setOverflow(data);
     }
 
     return stream;

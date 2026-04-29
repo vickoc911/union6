@@ -62,6 +62,7 @@ T.RadioButton {
     contentItem: P.DefaultContentItem {
         control: control
         wrapMode: control.Union.Style.properties.text.wrapMode ?? Text.Wrap
+        elide: control.Union.Style.properties.text.overflow ?? Text.ElideRight
     }
 
     background: Union.StyledRectangle { }
