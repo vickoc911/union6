@@ -49,6 +49,7 @@ page
 
 toolbar
 {
+    height: 45px;
     padding: var(--small-spacing);
     color: var(--window-active-text-color);
     background-color: var(--window-active-background-color);
