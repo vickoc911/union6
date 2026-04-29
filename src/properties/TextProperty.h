@@ -115,6 +115,18 @@ public:
     void setWrapMode(const std::optional<Union::Properties::WrapMode> &newValue);
 
     /*!
+     * Returns the value of overflow.
+     */
+    std::optional<Union::Properties::Overflow> overflow() const;
+
+    /*!
+     * Set the value of overflow.
+     *
+     * \a newValue The new value or \c{std::nullopt} to unset the value.
+     */
+    void setOverflow(const std::optional<Union::Properties::Overflow> &newValue);
+
+    /*!
      * Returns if this property group has any value set.
      *
      * Note that for any property that is also a property group, this will also
