@@ -119,6 +119,10 @@
     syntax: "no-wrap | word-wrap | wrap-anywhere | wrap";
 }
 
+@property text-overflow {
+    syntax: "none | ellipsis-left | ellipsis-middle | ellipsis-right";
+}
+
 
 @property icon-alignment-container {
     syntax: "item | content | background";
