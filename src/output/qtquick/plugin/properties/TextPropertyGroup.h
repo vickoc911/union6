@@ -80,6 +80,15 @@ public:
     QJSValue wrapMode() const;
     Q_SIGNAL void wrapModeChanged();
 
+    /*!
+     * \qmlproperty Union::Properties::Overflow TextPropertyGroup::overflow
+     *
+     * Exposes TextProperty::overflow to QML.
+     */
+    Q_PROPERTY(QJSValue overflow READ overflow NOTIFY overflowChanged)
+    QJSValue overflow() const;
+    Q_SIGNAL void overflowChanged();
+
 private:
     QuickStyle *m_style = nullptr;
     std::unique_ptr<AlignmentPropertyGroup> m_alignment;

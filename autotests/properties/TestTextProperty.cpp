@@ -26,6 +26,7 @@ private Q_SLOTS:
         QVERIFY(!property->font().has_value());
         QVERIFY(!property->color().has_value());
         QVERIFY(!property->wrapMode().has_value());
+        QVERIFY(!property->overflow().has_value());
     }
 
     void testEmpty()
@@ -37,6 +38,7 @@ private Q_SLOTS:
         QCOMPARE(property->font().value(), emptyValue<QFont>());
         QCOMPARE(property->color().value(), emptyValue<Union::Color>());
         QCOMPARE(property->wrapMode().value(), emptyValue<Union::Properties::WrapMode>());
+        QCOMPARE(property->overflow().value(), emptyValue<Union::Properties::Overflow>());
     }
 
     void testHasAnyValue()
@@ -78,6 +80,13 @@ private Q_SLOTS:
             property->setWrapMode(std::nullopt);
             QVERIFY(!property->hasAnyValue());
         }
+        {
+            Union::Properties::Overflow value;
+            property->setOverflow(value);
+            QVERIFY(property->hasAnyValue());
+            property->setOverflow(std::nullopt);
+            QVERIFY(!property->hasAnyValue());
+        }
     }
 
     void testResolveProperties()
@@ -97,6 +106,7 @@ private Q_SLOTS:
         source->setFont(QFont{});
         source->setColor(Union::Color{});
         source->setWrapMode(Union::Properties::WrapMode{});
+        source->setOverflow(Union::Properties::Overflow{});
 
         QVERIFY(source->hasAnyValue());
         QVERIFY(!destination->hasAnyValue());
@@ -109,6 +119,7 @@ private Q_SLOTS:
         QCOMPARE(destination->font(), source->font());
         QCOMPARE(destination->color(), source->color());
         QCOMPARE(destination->wrapMode(), source->wrapMode());
+        QCOMPARE(destination->overflow(), source->overflow());
     }
 
     void testDataStream()

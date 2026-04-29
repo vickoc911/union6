@@ -41,6 +41,7 @@ radiobutton,
 switch
 {
     icon-alignment-horizontal: start;
+    text-wrap-mode: wrap;
 
     padding: var(--small-spacing);
     spacing: var(--small-spacing);
@@ -48,10 +49,6 @@ switch
     color: var(--window-text-color);
 
     text-alignment: content fill center 0;
-}
-
-checkbox, radiobutton {
-    text-wrap-mode: wrap;
 }
 
 checkbox,

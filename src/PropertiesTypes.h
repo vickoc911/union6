@@ -119,6 +119,17 @@ enum class WrapMode {
 };
 Q_ENUM_NS(WrapMode)
 
+/*!
+ * \enum Union::Properties::Overflow
+ */
+enum class Overflow {
+    None,
+    EllipsisLeft,
+    EllipsisMiddle,
+    EllipsisRight
+};
+Q_ENUM_NS(Overflow)
+
 /*
  * A template method to get an empty value of a certain type.
  *
