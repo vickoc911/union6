@@ -58,6 +58,7 @@ text:
     font: QFont
     color: Union::Color
     wrapMode: Union::Properties::WrapMode
+    overflow: Union::Properties::Overflow
 
 icon:
     # \brief A property group containing properties related to an element's icon.

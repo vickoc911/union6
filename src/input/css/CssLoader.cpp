@@ -669,6 +669,10 @@ void CssLoader::setTextProperty(StyleProperty *output, const cssparser::Property
     if (property.name() == "text-wrap-mode") {
         text->setWrapMode(toEnumValue<WrapMode>(property.value<std::string>()));
     }
+
+    if (property.name() == "text-overflow") {
+        text->setOverflow(toEnumValue<Overflow>(property.value<std::string>()));
+    }
 }
 
 void CssLoader::setIconProperty(StyleProperty *output, const cssparser::Property &property)
