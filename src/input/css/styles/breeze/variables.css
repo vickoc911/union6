@@ -28,6 +28,7 @@
     --large-element-size: 32px;
     --scrollbar-size: 20px;
     --menu-item-width: 150px;
+    --text-field-width: 200px;
 
     /* Colors */
     --highlight-color: custom-color("kcolorscheme", "active", "selection", "background", "normal");
