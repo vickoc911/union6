@@ -23,9 +23,10 @@ T.ScrollBar {
     Union.Element.hints: [
         Union.ElementHint { name: "horizontal"; when: control.horizontal },
         Union.ElementHint { name: "vertical"; when: !control.horizontal },
+        Union.ElementHint { name: "noninteractive"; when: !control.interactive },
     ]
 
-    hoverEnabled: Application.styleHints.useHoverEffects
+    hoverEnabled: Application.styleHints.useHoverEffects && control.interactive
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
