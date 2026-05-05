@@ -198,3 +198,15 @@ switchdelegate
         }
     }
 }
+
+radiobutton.changed,
+radiodelegate.changed,
+checkbox.changed,
+checkdelegate.changed,
+switch.changed {
+    indicator {
+        background-color: var(--changed-background);
+        border: 1px solid var(--changed-foreground);
+        border-radius: var(--corner-radius);
+    }
+}
