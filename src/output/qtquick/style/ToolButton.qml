@@ -14,6 +14,8 @@ import "private" as P
 T.ToolButton {
     id: control
 
+    property bool _kde_highlight_neutral: false
+
     Union.Element.type: "ToolButton"
     Union.Element.states {
         hovered: control.hovered
@@ -27,6 +29,7 @@ T.ToolButton {
     Union.Element.hints: [
         Union.ElementHint { name: "raised"; when: !control.flat },
         Union.ElementHint { name: "with-menu"; when: control.Accessible.role === Accessible.ButtonMenu },
+        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
     ]
     Union.Element.attributes: Union.ElementAttribute {
         name: "display"
