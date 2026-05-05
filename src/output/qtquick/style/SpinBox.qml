@@ -11,6 +11,8 @@ import org.kde.union.impl as Union
 T.SpinBox {
     id: control
 
+    property bool _kde_highlight_neutral: false
+
     Union.Element.type: "SpinBox"
     Union.Element.states {
         hovered: control.hovered
@@ -21,6 +23,7 @@ T.SpinBox {
     Union.Element.hints: [
         Union.ElementHint { name: "editable"; when: control.editable },
         Union.ElementHint { name: "constrained"; when: priv.constrained },
+        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
     ]
 
     hoverEnabled: Application.styleHints.useHoverEffects

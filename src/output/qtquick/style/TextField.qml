@@ -12,6 +12,8 @@ import "private" as P
 T.TextField {
     id: control
 
+    property bool _kde_highlight_neutral: false
+
     Union.Element.type: "TextField"
     Union.Element.states {
         hovered: control.hovered
@@ -22,6 +24,7 @@ T.TextField {
                          || control.focusReason === Qt.ShortcutFocusReason)
         enabled: control.enabled
     }
+    Union.Element.hints: Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral }
 
     implicitWidth: implicitBackgroundWidth + leftInset + rightInset
                    || Math.max(contentWidth, placeholder.implicitWidth) + leftPadding + rightPadding

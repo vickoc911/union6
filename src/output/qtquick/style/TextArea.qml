@@ -12,6 +12,8 @@ import "private" as P
 T.TextArea {
     id: control
 
+    property bool _kde_highlight_neutral: false
+
     Union.Element.type: "TextArea"
     Union.Element.states {
         hovered: control.hovered
@@ -22,6 +24,7 @@ T.TextArea {
                          || control.focusReason === Qt.ShortcutFocusReason)
         enabled: control.enabled
     }
+    Union.Element.hints: Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral }
 
     hoverEnabled: Application.styleHints.useHoverEffects
 
