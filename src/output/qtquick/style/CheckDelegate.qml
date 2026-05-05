@@ -14,6 +14,7 @@ T.CheckDelegate {
     id: control
 
     property bool __alternatingColors: (TableView.view?.alternatingRows && typeof row !== "undefined" && row % 2) || (Union.StyleHints.useAlternatingColors && typeof index !== "undefined" && index % 2)
+    property bool _kde_highlight_neutral: false
 
     Union.Element.type: "CheckDelegate"
     Union.Element.states {
@@ -31,6 +32,7 @@ T.CheckDelegate {
         Union.ElementHint { name: "inside-list"; when: control.ListView?.view },
         Union.ElementHint { name: "inside-table"; when: control.TableView?.view },
         Union.ElementHint { name: "alternating-colors"; when: control.__alternatingColors },
+        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
 
