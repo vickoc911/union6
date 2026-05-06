@@ -13,7 +13,7 @@ import "private" as P
 T.RoundButton {
     id: control
 
-    property bool _kde_highlight_neutral: false
+
 
     Union.Element.type: "RoundButton"
     Union.Element.states {
@@ -27,7 +27,7 @@ T.RoundButton {
     }
     Union.Element.hints: [
         Union.ElementHint { name: "flat"; when: control.flat },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        Union.ElementHint { name: "changed"; when: false },
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
 

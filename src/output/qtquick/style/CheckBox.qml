@@ -13,11 +13,6 @@ import "private" as P
 T.CheckBox {
     id: control
 
-    // NOTE: This is used by KCMs. By default, it's false and we can ignore it.
-    // But some KCMs use this property to set colors of the elements to showcase
-    // their change status, so this needs to be declared.
-    property bool _kde_highlight_neutral: false
-
     Union.Element.type: "CheckBox"
     Union.Element.states {
         hovered: control.hovered
@@ -29,7 +24,7 @@ T.CheckBox {
     }
     Union.Element.hints: [
         Union.ElementHint { name: "with-icon"; when: control.icon.name || control.icon.source.toString() },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        Union.ElementHint { name: "changed"; when: false },
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
 

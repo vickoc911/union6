@@ -12,7 +12,7 @@ import "private" as P
 T.RadioButton {
     id: control
 
-    property bool _kde_highlight_neutral: false
+
 
     Union.Element.type: "RadioButton"
     Union.Element.states {
@@ -25,7 +25,7 @@ T.RadioButton {
     }
     Union.Element.hints: [
         Union.ElementHint { name: "with-icon"; when: control.icon.name || control.icon.source.toString() },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        Union.ElementHint { name: "changed"; when: false },
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
 

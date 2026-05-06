@@ -11,7 +11,7 @@ import "private" as P
 T.DelayButton {
     id: control
 
-    property bool _kde_highlight_neutral: false
+
 
     Union.Element.type: "DelayButton"
     Union.Element.states {
@@ -27,7 +27,7 @@ T.DelayButton {
         // Match qqc2-desktop-style's logic.
         // TODO: Figure out how much sense this actually makes, I don't like the text condition here.
         Union.ElementHint { name: "with-menu"; when: control.Accessible.role === Accessible.ButtonMenu && control.text },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        Union.ElementHint { name: "changed"; when: false },
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
 

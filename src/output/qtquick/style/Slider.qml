@@ -13,7 +13,7 @@ import org.kde.union.impl as Union
 T.Slider {
     id: control
 
-    property bool _kde_highlight_neutral: false
+
 
     Union.Element.type: "Slider"
     Union.Element.states {
@@ -26,7 +26,7 @@ T.Slider {
     Union.Element.hints: [
         Union.ElementHint { name: "horizontal"; when: control.horizontal },
         Union.ElementHint { name: "vertical"; when: !control.horizontal },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        Union.ElementHint { name: "changed"; when: false },
     ]
 
     hoverEnabled: Application.styleHints.useHoverEffects

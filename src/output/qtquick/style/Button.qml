@@ -13,7 +13,7 @@ import "private" as P
 T.Button {
     id: control
 
-    property bool _kde_highlight_neutral: false
+
 
     Union.Element.type: "Button"
     Union.Element.states {
@@ -29,7 +29,8 @@ T.Button {
         Union.ElementHint { name: "with-icon"; when: control.icon.name || control.icon.source.toString() },
         Union.ElementHint { name: "flat"; when: control.flat },
         Union.ElementHint { name: "with-menu"; when: control.Accessible.role === Accessible.ButtonMenu },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        // This is changed by KCMUtils by QuickElement::hint
+        Union.ElementHint { name: "changed"; when: false },
     ]
     Union.Element.attributes: P.DisplayAttribute { control: control }
 

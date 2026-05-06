@@ -11,7 +11,7 @@ import org.kde.union.impl as Union
 T.ComboBox {
     id: control
 
-    property bool _kde_highlight_neutral: false
+
 
     Union.Element.type: "ComboBox"
     Union.Element.states {
@@ -25,7 +25,7 @@ T.ComboBox {
     Union.Element.hints: [
         Union.ElementHint { name: "flat"; when: control.flat },
         Union.ElementHint { name: "editable"; when: control.editable },
-        Union.ElementHint { name: "changed"; when: control._kde_highlight_neutral },
+        Union.ElementHint { name: "changed"; when: false },
     ]
 
     Union.Positioner.positionItems: [contentItem, icon, indicator]
