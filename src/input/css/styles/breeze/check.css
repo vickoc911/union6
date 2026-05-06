@@ -57,6 +57,9 @@ menuitem,
 radiobutton,
 radiodelegate
 {
+    width: var(--large-element-size);
+    height: var(--large-element-size);
+
     & > indicator
     {
         width: var(--icon-size-small);
