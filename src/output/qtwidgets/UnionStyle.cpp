@@ -11,12 +11,17 @@
 
 #include <QPainter>
 #include <QPushButton>
+#include <QStyleFactory>
 #include <QStyleOption>
 #include <QWidget>
 
 UnionStyle::UnionStyle()
     : QProxyStyle(QStringLiteral("breeze"))
 {
+    const auto devProxyStyle = qEnvironmentVariable("UNION_PROXY_BASE_STYLE");
+    if (!devProxyStyle.isEmpty()) {
+        setBaseStyle(QStyleFactory::create(devProxyStyle));
+    }
     Union::StyleRegistry::instance()->load();
 }
 
