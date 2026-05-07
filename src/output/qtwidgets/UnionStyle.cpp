@@ -11,10 +11,22 @@
 
 #include <QPainter>
 #include <QPushButton>
+#include <QStyleFactory>
 #include <QStyleOption>
 #include <QWidget>
 
+static QString unionBaseStyle()
+{
+    const auto devProxyStyle = qEnvironmentVariable("UNION_PROXY_BASE_STYLE");
+    if (devProxyStyle.isEmpty()) {
+        return QStringLiteral("breeze");
+    } else {
+        return devProxyStyle;
+    }
+}
+
 UnionStyle::UnionStyle()
+    : QProxyStyle(unionBaseStyle())
 {
     Union::StyleRegistry::instance()->load();
 }
@@ -63,17 +75,17 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 
         // Draw label
         // TODO: union-ize better
-        QCommonStyle::drawControl(CE_PushButtonLabel, &labelOption, painter, widget);
+        QProxyStyle::drawControl(CE_PushButtonLabel, &labelOption, painter, widget);
 
         return;
     }
-    QCommonStyle::drawControl(controlElement, option, painter, widget);
+    QProxyStyle::drawControl(controlElement, option, painter, widget);
 }
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget) const
 {
     if (ct == CT_PushButton) {
-        auto size = QCommonStyle::sizeFromContents(ct, opt, contentsSize, widget);
+        auto size = QProxyStyle::sizeFromContents(ct, opt, contentsSize, widget);
 
         auto element = Union::Element::create();
         element->setType(QStringLiteral("Button"));
@@ -93,7 +105,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
 
         return size;
     }
-    return QCommonStyle::sizeFromContents(ct, opt, contentsSize, widget);
+    return QProxyStyle::sizeFromContents(ct, opt, contentsSize, widget);
 }
 
 int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
@@ -104,13 +116,13 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case PM_ButtonShiftVertical:
         return 0;
     default:
-        return QCommonStyle::pixelMetric(metric, option, widget);
+        return QProxyStyle::pixelMetric(metric, option, widget);
     }
 }
 
 void UnionStyle::polish(QApplication *application)
 {
-    QCommonStyle::polish(application);
+    QProxyStyle::polish(application);
 
     // Set global window color
     auto element = Union::Element::create();
@@ -128,7 +140,7 @@ void UnionStyle::polish(QApplication *application)
 
 void UnionStyle::polish(QWidget *widget)
 {
-    QCommonStyle::polish(widget);
+    QProxyStyle::polish(widget);
 
     if (qobject_cast<QPushButton *>(widget)) {
         widget->setAttribute(Qt::WA_Hover);
