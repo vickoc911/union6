@@ -256,6 +256,11 @@ void PositionerLayout::updatePolish()
             .item = item,
         };
 
+        if (positionedItemAttached) {
+            layoutItem.minimumSize = QSizeF{positionedItemAttached->minimumWidth() > 0.0 ? positionedItemAttached->minimumWidth() : 0.0,
+                                            positionedItemAttached->minimumHeight() > 0.0 ? positionedItemAttached->minimumHeight() : 0.0};
+        }
+
         if (source == PositionerSource::Source::Layout && layoutProperties && layoutProperties->margins()) {
             auto margins = layoutProperties->margins()->toMargins();
             layoutItem.margins = QMarginsF(margins.left(), margins.top(), margins.right(), margins.bottom());
