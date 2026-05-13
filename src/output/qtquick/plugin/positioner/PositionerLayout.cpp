@@ -168,7 +168,7 @@ QSizeF PositionerLayout::implicitSize() const
 
 bool PositionerLayout::eventFilter(QObject *target, QEvent *event)
 {
-    if (event->type() == QuickStyleUpdatedEvent::s_type) {
+    if (event->type() == QuickStyleUpdatedEvent::s_type || event->type() == PositionedItemChangedEvent::s_type) {
         markDirty();
         return false;
     }

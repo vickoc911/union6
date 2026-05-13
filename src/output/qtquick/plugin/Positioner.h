@@ -220,12 +220,24 @@ public:
 
     static PositionedItem *qmlAttachedProperties(QObject *parent);
 
+protected:
+    bool event(QEvent *event) override;
+
 private:
+    void sendChangedEvent();
+
     bool m_positionChildren = false;
     PositionerSource::Source m_source = PositionerSource::Source::Layout;
     Union::Properties::Alignment m_horizontalAlignment = Union::Properties::Alignment::Unspecified;
     Union::Properties::Alignment m_verticalAlignment = Union::Properties::Alignment::Unspecified;
 };
 
+class PositionedItemChangedEvent : public QEvent
+{
+public:
+    PositionedItemChangedEvent();
+
+    static QEvent::Type s_type;
+};
 }
 }
