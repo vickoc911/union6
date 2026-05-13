@@ -218,6 +218,48 @@ void PositionedItem::resetVerticalAlignment()
     setVerticalAlignment(Union::Properties::Alignment::Unspecified);
 }
 
+qreal PositionedItem::minimumWidth() const
+{
+    return m_minimumWidth;
+}
+
+void PositionedItem::setMinimumWidth(qreal newMinimumWidth)
+{
+    if (newMinimumWidth == m_minimumWidth) {
+        return;
+    }
+
+    m_minimumWidth = newMinimumWidth;
+    sendChangedEvent();
+    Q_EMIT minimumWidthChanged();
+}
+
+void PositionedItem::resetMinimumWidth()
+{
+    setMinimumWidth(-1.0);
+}
+
+qreal PositionedItem::minimumHeight() const
+{
+    return m_minimumHeight;
+}
+
+void PositionedItem::setMinimumHeight(qreal newMinimumHeight)
+{
+    if (newMinimumHeight == m_minimumHeight) {
+        return;
+    }
+
+    m_minimumHeight = newMinimumHeight;
+    sendChangedEvent();
+    Q_EMIT minimumHeightChanged();
+}
+
+void PositionedItem::resetMinimumHeight()
+{
+    setMinimumHeight(-1.0);
+}
+
 PositionedItem *PositionedItem::qmlAttachedProperties(QObject *parent)
 {
     return new PositionedItem(parent);
