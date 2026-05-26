@@ -33,7 +33,7 @@ T.Menu {
     topInset: -(Union.Style.properties.layout.margins.top ?? 0)
     bottomInset: -(Union.Style.properties.layout.margins.bottom ?? 0)
 
-    popupType: Qt.application.layoutDirection === Qt.RightToLeft ? T.Popup.Item : T.Popup.Window
+    popupType: T.Popup.Item
 
     delegate: MenuItem { }
 
