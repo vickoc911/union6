@@ -15,7 +15,6 @@ T.Menu {
                    + (-leftInset) + (-rightInset)
     implicitHeight: Math.max(implicitBackgroundHeight + (Union.Style.properties.layout.inset.top ?? 0) + (Union.Style.properties.layout.inset.bottom ?? 0),
                              contentHeight + topPadding + bottomPadding)
-                    + (popupType == T.Popup.Window ? (-topInset) + (-bottomInset) : 0)
 
     Union.Element.type: "Menu"
     Union.Element.states {
@@ -32,8 +31,6 @@ T.Menu {
     rightInset: -(Union.Style.properties.layout.margins.right ?? 0)
     topInset: -(Union.Style.properties.layout.margins.top ?? 0)
     bottomInset: -(Union.Style.properties.layout.margins.bottom ?? 0)
-
-    popupType: Qt.application.layoutDirection === Qt.RightToLeft ? T.Popup.Item : T.Popup.Window
 
     delegate: MenuItem { }
 
