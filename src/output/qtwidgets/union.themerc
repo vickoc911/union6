@@ -3,6 +3,6 @@
 
 [Misc]
 Name=Union
-Comment=Widget style for Union, still in development
+Comment=An in-development style engine intended to unify the various styling systems in KDE.
 [KDE]
 WidgetStyle=Union
