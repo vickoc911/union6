@@ -52,24 +52,7 @@ T.Menu {
         ScrollIndicator.vertical: ScrollIndicator {}
     }
 
-    background: Item {
-        // Workaround for Popup margins not working as expected. We need a window
-        // that is larger than the actual background, but we still want the
-        // background at the right position. We use margins to indicate how much
-        // bigger the background needs to be, then correct for that here by
-        // insetting the actual StyledRectangle background.
-
-        implicitWidth: Union.Style.properties.layout.width ?? 0
-        implicitHeight: Union.Style.properties.layout.height ?? 0
-
-        Union.StyledRectangle {
-            anchors {
-                fill: parent
-                leftMargin: (Union.Style.properties.layout.margins.left ?? 0) + (Union.Style.properties.layout.inset.left ?? 0)
-                rightMargin: (Union.Style.properties.layout.margins.right ?? 0) + (Union.Style.properties.layout.inset.right ?? 0)
-                topMargin: (Union.Style.properties.layout.margins.top ?? 0) + (Union.Style.properties.layout.inset.top ?? 0)
-                bottomMargin: (Union.Style.properties.layout.margins.bottom ?? 0) + (Union.Style.properties.layout.inset.bottom ?? 0)
-            }
-        }
-    }
+    background: Union.StyledRectangle {
+        anchors.fill: parent
+    } 
 }
