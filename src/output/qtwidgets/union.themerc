@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
+
+[Misc]
+Name=Union
+Comment=Widget style for Union, still in development
+[KDE]
+WidgetStyle=Union
