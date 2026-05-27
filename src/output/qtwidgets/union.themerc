@@ -1,0 +1,5 @@
+[Misc]
+Name=Union
+Comment=Widget style for Union, still in development
+[KDE]
+WidgetStyle=Union
