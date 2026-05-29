@@ -89,6 +89,7 @@ void drawBackground(QPainter *painter, const QRect &rect, const Union::Propertie
 
     // Draw borders and corners
     if (const auto border = style->border()) {
+        painter->setRenderHint(QPainter::Antialiasing, true);
         // Make simpler border shapes if complex ones are not necessary
         if (allBordersEqual && allBorderColorsEqual && allCornerRadiiEqual && !borderImage) { // All radii and borders identical, no border image
             QPainterPath rectangularOutline;
