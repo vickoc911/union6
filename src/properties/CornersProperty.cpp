@@ -144,6 +144,25 @@ bool CornersProperty::isEmpty() const
     return true;
 }
 
+bool CornersProperty::allEqual() const
+{
+    if (isEmpty()) {
+        return true;
+    }
+
+    if (*(d->topLeft) != *(d->topRight)) {
+        return false;
+    }
+    if (*(d->bottomLeft) != *(d->bottomRight)) {
+        return false;
+    }
+    if (*(d->topLeft) != *(d->bottomLeft)) {
+        return false;
+    }
+
+    return true;
+}
+
 QString CornersProperty::toString(int indentation, ToStringFlags flags) const
 {
     if (!hasAnyValue()) {
