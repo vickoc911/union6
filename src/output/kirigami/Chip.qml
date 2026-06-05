@@ -64,13 +64,18 @@ KT.Chip {
     Union.Positioner.positionItems: [contentItem, indicator]
 
     contentItem: Item {
+
         Union.PositionedItem.positionChildren: true
+        Union.Mnemonics.enabled: control.enabled && control.visible
+        Union.Mnemonics.controlType: Union.Mnemonics.ActionElement
+        Union.Mnemonics.label: control.text
 
         Union.Icon {
             Union.PositionedItem.source: Union.PositionerSource.Icon
+            Union.PositionedItem.minimumWidth: control.icon?.width ?? 0.0
+            Union.PositionedItem.minimumHeight: control.icon?.height ?? 0.0
 
-            width: control.icon.width
-            height: control.icon.height
+            control: control
 
             name: control.icon.name
             color: control.icon.color
