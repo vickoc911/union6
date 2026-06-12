@@ -150,7 +150,10 @@ pane
 }
 
 frame,
-groupbox
+groupbox,
+framemenu,
+framedockwidget,
+framewindow
 {
     background-color: var(--window-background-color);
     padding: var(--large-spacing);
@@ -158,7 +161,9 @@ groupbox
     border-radius: var(--corner-radius);
 }
 
-groupbox {
+groupbox,
+panel {
+    background-color: var(--window-background-color);
     color: var(--window-text-color);
 
     & > header {
