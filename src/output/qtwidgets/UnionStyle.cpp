@@ -27,18 +27,19 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
 
-    if (controlElement == CE_PushButton) {
+    switch (controlElement) {
+    case QStyle::CE_PushButton: {
         const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
         drawElement(buttonOption, painter, widget);
         drawControl(CE_PushButtonLabel, buttonOption, painter, widget);
-        return;
     }
-    if (controlElement == CE_PushButtonLabel) {
+        return;
+    case QStyle::CE_PushButtonLabel: {
         const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
         drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
-        return;
     }
-    if (controlElement == CE_ToolButtonLabel) {
+        return;
+    case QStyle::CE_ToolButtonLabel: {
         const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
         auto text = buttonOption->text;
         // Skip text drawing for icon only buttons completely
@@ -46,21 +47,70 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             text = QString();
         }
         drawIconText(buttonOption, this, painter, widget, buttonOption->icon, text);
+    }
         return;
+    case QStyle::CE_PushButtonBevel:
+    case QStyle::CE_CheckBox:
+    case QStyle::CE_CheckBoxLabel:
+    case QStyle::CE_RadioButton:
+    case QStyle::CE_RadioButtonLabel:
+    case QStyle::CE_TabBarTab:
+    case QStyle::CE_TabBarTabShape:
+    case QStyle::CE_TabBarTabLabel:
+    case QStyle::CE_ProgressBar:
+    case QStyle::CE_ProgressBarGroove:
+    case QStyle::CE_ProgressBarContents:
+    case QStyle::CE_ProgressBarLabel:
+    case QStyle::CE_MenuItem:
+    case QStyle::CE_MenuScroller:
+    case QStyle::CE_MenuVMargin:
+    case QStyle::CE_MenuHMargin:
+    case QStyle::CE_MenuTearoff:
+    case QStyle::CE_MenuEmptyArea:
+    case QStyle::CE_MenuBarItem:
+    case QStyle::CE_MenuBarEmptyArea:
+    case QStyle::CE_Header:
+    case QStyle::CE_HeaderSection:
+    case QStyle::CE_HeaderLabel:
+    case QStyle::CE_ToolBoxTab:
+    case QStyle::CE_SizeGrip:
+    case QStyle::CE_Splitter:
+    case QStyle::CE_RubberBand:
+    case QStyle::CE_DockWidgetTitle:
+    case QStyle::CE_ScrollBarAddLine:
+    case QStyle::CE_ScrollBarSubLine:
+    case QStyle::CE_ScrollBarAddPage:
+    case QStyle::CE_ScrollBarSubPage:
+    case QStyle::CE_ScrollBarSlider:
+    case QStyle::CE_ScrollBarFirst:
+    case QStyle::CE_ScrollBarLast:
+    case QStyle::CE_FocusFrame:
+    case QStyle::CE_ComboBoxLabel:
+    case QStyle::CE_ToolBar:
+    case QStyle::CE_ToolBoxTabShape:
+    case QStyle::CE_ToolBoxTabLabel:
+    case QStyle::CE_HeaderEmptyArea:
+    case QStyle::CE_ColumnViewGrip:
+    case QStyle::CE_ItemViewItem:
+    case QStyle::CE_ShapedFrame:
+    case QStyle::CE_CustomBase:
+        break;
     }
 
     QProxyStyle::drawControl(controlElement, option, painter, widget);
 }
 
+// Complex controls are bit annoying. We may need to manually handle some things to make sure they work correctly
 void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
-    if (control == CC_ToolButton) {
+    switch (control) {
+    case QStyle::CC_ToolButton: {
         const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
         drawElement(buttonOption, painter, widget);
         drawControl(CE_ToolButtonLabel, buttonOption, painter, widget);
-        return;
     }
-    if (control == CC_GroupBox) {
+        return;
+    case QStyle::CC_GroupBox: {
         const auto groupBoxOption = static_cast<const QStyleOptionGroupBox *>(option);
 
         auto element = Union::Element::create();
@@ -84,7 +134,17 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
                          groupBoxOption->text,
                          textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
         }
+    }
         return;
+    case QStyle::CC_SpinBox:
+    case QStyle::CC_ComboBox:
+    case QStyle::CC_ScrollBar:
+    case QStyle::CC_Slider:
+    case QStyle::CC_TitleBar:
+    case QStyle::CC_Dial:
+    case QStyle::CC_MdiControls:
+    case QStyle::CC_CustomBase:
+        break;
     }
 
     QProxyStyle::drawComplexControl(control, option, painter, widget);

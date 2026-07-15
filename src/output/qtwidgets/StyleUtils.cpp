@@ -460,6 +460,8 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
     // TODO get the order of items, create them rectangles
     // then go through them in order, checking for previous and next rectangle and
     // layouting them
+    // This needs more testing. We may need to make this bit more constrained than qtquick side
+    // if this gets too complicated.
 
     const auto style = Union::StyleRegistry::instance()->defaultStyle();
     const auto query = std::make_unique<Union::ElementQuery>(style);
