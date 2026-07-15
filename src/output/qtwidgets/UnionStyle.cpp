@@ -40,7 +40,12 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
     if (controlElement == CE_ToolButtonLabel) {
         const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
-        drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
+        auto text = buttonOption->text;
+        // Skip text drawing for icon only buttons completely
+        if (buttonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {
+            text = QString();
+        }
+        drawIconText(buttonOption, this, painter, widget, buttonOption->icon, text);
         return;
     }
 

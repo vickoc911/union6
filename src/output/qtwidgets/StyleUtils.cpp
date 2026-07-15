@@ -219,11 +219,24 @@ QVariantMap attributesFromOption(const QStyleOption *option)
     switch ((QStyleOption::OptionType)option->type) {
     case QStyleOption::SO_ToolButton:
         if (const auto optionButton = static_cast<const QStyleOptionToolButton *>(option)) {
-            if (optionButton->toolButtonStyle == Qt::ToolButtonTextUnderIcon) {
-                QVariantMap map;
+            QVariantMap map;
+            switch (optionButton->toolButtonStyle) {
+            case Qt::ToolButtonIconOnly:
+                map[QStringLiteral("display")] = QVariant(QStringLiteral("icon-only"));
+                break;
+            case Qt::ToolButtonTextOnly:
+                map[QStringLiteral("display")] = QVariant(QStringLiteral("text-only"));
+                break;
+            case Qt::ToolButtonTextBesideIcon:
+                map[QStringLiteral("display")] = QVariant(QStringLiteral("text-beside-icon"));
+                break;
+            case Qt::ToolButtonTextUnderIcon:
                 map[QStringLiteral("display")] = QVariant(QStringLiteral("text-under-icon"));
+                break;
+            default:
                 return map;
             }
+            return map;
         }
         break;
     case QStyleOption::SO_ViewItem:
@@ -502,9 +515,10 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
             break;
         case Union::Properties::Alignment::Center:
         case Union::Properties::Alignment::Fill:
-            // For single items, we can just utilize the exact center, since we do not need to move
+            // For single items and stackCenter/stackFill, we can just utilize the exact center, since we do not need to move
             // other items around
-            if (subElements.size() > 1) {
+            if (subElements.size() > 1 && verticalAlignment != Union::Properties::Alignment::StackCenter
+                && verticalAlignment != Union::Properties::Alignment::StackFill) {
                 if (!previousRect.isEmpty()) {
                     elementRect.moveLeft(previousRect.right());
                     elementRect.adjust(0, 0, -previousRect.width() + spacing / 2, 0);
@@ -538,26 +552,33 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
             elementRect.moveCenter(QPoint(elementRect.center().x(), mainRect.center().y()));
             break;
         case Union::Properties::Alignment::Start:
-
             if (!previousRect.isEmpty()) {
                 elementRect.moveTop(previousRect.bottom());
+                elementRect.adjust(0, previousRect.height() - spacing / 2, 0, 0);
             } else {
                 elementRect.moveCenter(QPoint(elementRect.center().x(), mainRect.top()));
             }
             availableSpace.moveTop(elementRect.bottom());
             break;
         case Union::Properties::Alignment::End:
-            elementRect.moveCenter(QPoint(elementRect.center().x(), mainRect.bottom()));
-            // TODO need to check previous item position
+            if (!previousRect.isEmpty()) {
+                elementRect.moveTop(previousRect.bottom());
+                elementRect.adjust(0, 0, 0, -previousRect.height() + spacing / 2);
+            } else {
+                elementRect.moveCenter(QPoint(elementRect.center().x(), mainRect.bottom()));
+            }
+            availableSpace.moveTop(elementRect.bottom());
             break;
         case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::StackFill:
             if (!previousRect.isEmpty()) {
                 elementRect.moveTop(previousRect.bottom());
+                elementRect.adjust(0, 0, 0, -previousRect.height() + spacing / 2);
             } else {
-                elementRect.moveCenter(QPoint(elementRect.center().x(), mainRect.center().y()));
+                elementRect.moveTop(mainRect.top());
             }
             availableSpace.moveTop(elementRect.bottom());
+            break;
         }
         previousRect = elementRect;
         map[subElement] = elementRect;
