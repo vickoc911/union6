@@ -378,15 +378,43 @@ QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::
     return rect;
 }
 
-Union::Properties::StylePropertyGroup *prepareProperties(Union::Element::Ptr &element)
+Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList childElementNames)
+{
+    Union::ElementList elements;
+    QStringList elementTypes;
+
+    if (widget) {
+        elementTypes = widget->property(property_union_member_list).toStringList();
+    }
+    if (!childElementNames.isEmpty()) {
+        elementTypes.append(childElementNames);
+    }
+
+    if (elementTypes.isEmpty()) {
+        qWarning() << "Could not draw widget" << widget << "with styleOption" << opt << " ! Missing elementType!";
+    }
+
+    for (const auto &elementType : elementTypes) {
+        auto unionElement = Union::Element::create();
+        unionElement->setType(elementType);
+        unionElement->setStates(statesFromOption(opt));
+        unionElement->setHints(hintsFromOption(opt));
+        unionElement->setColorSet(colorsetFromOption(opt));
+        unionElement->setAttributes(attributesFromOption(opt));
+        elements.append(unionElement);
+    }
+    return elements;
+}
+
+Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList &elements)
 {
     const auto style = Union::StyleRegistry::instance()->defaultStyle();
     const auto query = std::make_unique<Union::ElementQuery>(style);
 
-    query->setElements({element});
+    query->setElements(elements);
     query->execute();
-
     auto properties = query->properties();
+
     return properties;
 }
 
@@ -444,7 +472,7 @@ QStringList setupMemberList(QWidget *widget)
     return members;
 }
 
-QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, const QList<Union::Element::Ptr> &elementList, const QStringList &subElements)
+QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements)
 {
     QMap<QString, QRectF> map;
 
@@ -468,8 +496,8 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
     QRectF availableSpace = mainRect;
     QRectF previousRect;
     for (const auto &subElement : subElements) {
-        auto currentHierarchy = elementList;
-        // NOTE: Currently these are part of the main element, but eventually
+        auto currentHierarchy = elements;
+        // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
         if (subElement != QStringLiteral("Icon") && subElement != QStringLiteral("Text")) {
             auto unionElement = Union::Element::create();
@@ -480,10 +508,7 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
             unionElement->setAttributes(attributesFromOption(opt));
             currentHierarchy.append(unionElement);
         }
-
-        query->setElements(currentHierarchy);
-        query->execute();
-        auto properties = query->properties();
+        auto properties = queryProperties(elements);
         Union::Properties::Alignment horizontalAlignment;
         Union::Properties::Alignment verticalAlignment;
         QRectF elementRect = availableSpace;
@@ -496,6 +521,8 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
         } else {
+            elementRect.setWidth(properties->layout()->width().value_or(0));
+            elementRect.setHeight(properties->layout()->height().value_or(0));
             horizontalAlignment = properties->layout()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
         }
@@ -506,6 +533,7 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, 
         auto spacing = properties->layout()->spacing().value_or(0);
         switch (horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
+            break;
         case Union::Properties::Alignment::Start:
             if (!previousRect.isEmpty()) {
                 elementRect.moveLeft(previousRect.right());

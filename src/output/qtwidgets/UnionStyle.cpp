@@ -30,10 +30,11 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     switch (controlElement) {
     case QStyle::CE_PushButton: {
         const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
-        drawElement(buttonOption, painter, widget);
+        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
         drawControl(CE_PushButtonLabel, buttonOption, painter, widget);
     }
         return;
+    case QStyle::CE_CheckBoxLabel:
     case QStyle::CE_PushButtonLabel: {
         const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
         drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
@@ -49,9 +50,33 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawIconText(buttonOption, this, painter, widget, buttonOption->icon, text);
     }
         return;
+    case QStyle::CE_CheckBox: {
+        const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
+
+        auto bgElements = prepareElements(option, widget, {QStringLiteral("CheckBox")});
+        auto bgProps = queryProperties(bgElements);
+        auto rect = backgroundRectangle(option, bgProps).toRect();
+        drawBackground(painter, rect, bgProps);
+
+        auto indicatorElements = prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
+        auto indicatorProps = queryProperties(indicatorElements);
+        auto indicatorMap = layoutMap(buttonOption->rect, indicatorElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
+        drawElement(indicatorProps, painter, option, indicatorMap[QStringLiteral("Indicator")].toRect());
+
+        auto textRect = indicatorMap[QStringLiteral("Text")].toRect();
+        QColor textColor = bgProps->text()->color().value().toQColor();
+        painter->setPen(textColor);
+        drawItemText(painter,
+                     textRect,
+                     Qt::TextShowMnemonic | toQtAlignment(bgProps->text()->alignment()),
+                     buttonOption->palette,
+                     buttonOption->state & State_Enabled,
+                     buttonOption->text,
+                     textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+    }
+        return;
+
     case QStyle::CE_PushButtonBevel:
-    case QStyle::CE_CheckBox:
-    case QStyle::CE_CheckBoxLabel:
     case QStyle::CE_RadioButton:
     case QStyle::CE_RadioButtonLabel:
     case QStyle::CE_TabBarTab:
@@ -106,20 +131,15 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     switch (control) {
     case QStyle::CC_ToolButton: {
         const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
-        drawElement(buttonOption, painter, widget);
+        drawElement(queryProperties(prepareElements(option, widget)), painter, buttonOption);
         drawControl(CE_ToolButtonLabel, buttonOption, painter, widget);
     }
         return;
     case QStyle::CC_GroupBox: {
         const auto groupBoxOption = static_cast<const QStyleOptionGroupBox *>(option);
-
-        auto element = Union::Element::create();
-        element->setType(QStringLiteral("GroupBox"));
-        element->setStates(statesFromOption(option));
-        element->setColorSet(colorsetFromOption(option));
-
-        const auto properties = prepareProperties(element);
-        auto rect = backgroundRectangle(option, properties).toRect();
+        const auto elements = prepareElements(groupBoxOption, widget);
+        const auto properties = queryProperties(elements);
+        auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
         drawBackground(painter, rect, properties);
         if ((groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && !groupBoxOption->text.isEmpty()) {
             QRect textRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
@@ -154,11 +174,11 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 {
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
-        drawElement(option, painter, widget, QStringLiteral("Item"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Item")})), painter, option);
         return;
     case QStyle::PE_Widget:
         // Relates to PE_Frame
-        drawElement(option, painter, widget, QStringLiteral("Panel"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Panel")})), painter, option);
         return;
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
@@ -167,29 +187,29 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         if (widget->parentWidget()->inherits("QComboBox") || widget->parentWidget()->inherits("QAbstractSpinBox")) {
             return;
         }
-        drawElement(option, painter, widget);
+        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
         return;
     case QStyle::PE_PanelItemViewItem:
-        drawElement(option, painter, widget, QStringLiteral("ItemViewItem"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ItemViewItem")})), painter, option);
         return;
     case QStyle::PE_PanelItemViewRow:
-        drawElement(option, painter, widget, QStringLiteral("ItemViewRow"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ItemViewRow")})), painter, option);
         return;
     case QStyle::PE_PanelScrollAreaCorner:
-        drawElement(option, painter, widget, QStringLiteral("ScrollAreaCorner"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ScrollAreaCorner")})), painter, option);
         return;
     case QStyle::PE_PanelTipLabel:
-        drawElement(option, painter, widget, QStringLiteral("ToolTip"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ToolTip")})), painter, option);
         return;
     case QStyle::PE_FrameFocusRect:
-        drawElement(option, painter, widget, QStringLiteral("FocusFrame"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("FocusFrame")})), painter, option);
         return;
         // Indicators
     case QStyle::PE_IndicatorCheckBox:
-        drawElement(option, painter, widget, QStringLiteral("Indicator"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")})), painter, option);
         return;
     case QStyle::PE_IndicatorRadioButton:
-        drawElement(option, painter, widget, QStringLiteral("Indicator"));
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("RadioButton"), QStringLiteral("Indicator")})), painter, option);
         return;
     case QStyle::PE_IndicatorArrowDown:
     case QStyle::PE_IndicatorArrowLeft:
@@ -215,7 +235,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorTabTearRight:
         break;
     default:
-        drawElement(option, painter, widget);
+        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
         return;
     }
 

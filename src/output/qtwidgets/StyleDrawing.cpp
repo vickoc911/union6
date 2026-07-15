@@ -393,78 +393,25 @@ void drawCornerProperty(QPainter *painter,
     painter->restore();
 }
 
-void drawElement(const QStyleOption *opt, QPainter *painter, const QWidget *widget, const QString childElementName)
+void drawElement(Union::Properties::StylePropertyGroup *properties, QPainter *painter, const QStyleOption *opt, QRect rect)
 {
-    QList<Union::Element::Ptr> elements;
-    QStringList elementTypes;
-
-    if (widget) {
-        elementTypes = widget->property(property_union_member_list).toStringList();
+    auto drawArea = rect;
+    if (drawArea.isEmpty()) {
+        drawArea = backgroundRectangle(opt, properties).toRect();
     }
-    if (!childElementName.isEmpty()) {
-        elementTypes.append(childElementName);
-    }
-
-    if (elementTypes.isEmpty()) {
-        qWarning() << "Could not draw widget" << widget << "with styleOption" << opt << " ! Missing elementType!";
-        return;
-    }
-
-    for (const auto &elementType : elementTypes) {
-        auto unionElement = Union::Element::create();
-        unionElement->setType(elementType);
-        unionElement->setStates(statesFromOption(opt));
-        unionElement->setHints(hintsFromOption(opt));
-        unionElement->setColorSet(colorsetFromOption(opt));
-        unionElement->setAttributes(attributesFromOption(opt));
-        elements.append(unionElement);
-    }
-
-    const auto style = Union::StyleRegistry::instance()->defaultStyle();
-    const auto query = std::make_unique<Union::ElementQuery>(style);
-
-    query->setElements(elements);
-    query->execute();
-    auto properties = query->properties();
-
-    auto rect = backgroundRectangle(opt, properties).toRect();
-    drawBackground(painter, rect, properties);
+    drawBackground(painter, drawArea, properties);
 }
 
 void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *painter, const QWidget *widget, const QIcon &icon, const QString &text)
 {
-    QList<Union::Element::Ptr> elements;
+    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     QStringList elementTypes;
 
     bool hasIcon = !icon.isNull();
     bool hasText = !text.isEmpty();
 
-    if (widget) {
-        elementTypes = widget->property(property_union_member_list).toStringList();
-    }
-
-    if (elementTypes.isEmpty()) {
-        qWarning() << "Could not draw text" << widget << "with styleOption" << opt << " ! Missing elementType!";
-        return;
-    }
-
-    for (const auto &elementType : elementTypes) {
-        auto unionElement = Union::Element::create();
-        unionElement->setType(elementType);
-        unionElement->setStates(statesFromOption(opt));
-        unionElement->setHints(hintsFromOption(opt));
-        unionElement->setColorSet(colorsetFromOption(opt));
-        unionElement->setAttributes(attributesFromOption(opt));
-        elements.append(unionElement);
-    }
-
-    const auto style = Union::StyleRegistry::instance()->defaultStyle();
-    const auto query = std::make_unique<Union::ElementQuery>(style);
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
-
-    query->setElements(elements);
-    query->execute();
-    auto properties = query->properties();
+    auto properties = queryProperties(elements);
 
     QMargins paddings;
     if (properties->layout()->padding()) {
@@ -480,7 +427,7 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
     if (hasText) {
         subElements.append(QStringLiteral("Text"));
     }
-    auto map = layoutMap(rect, opt, elements, subElements);
+    auto map = layoutMap(rect, elements, opt, subElements);
 
     QRect textRect;
     if (hasText) {

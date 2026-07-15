@@ -28,8 +28,9 @@ Qt::TextFlag toQtWrapMode(Union::Properties::TextWrapMode wrapMode);
 
 QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::StylePropertyGroup *properties);
 
-Union::Properties::StylePropertyGroup *prepareProperties(Union::Element::Ptr &element);
+Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget = nullptr, QStringList childElementNames = {});
+Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList &elements);
 
 QStringList setupMemberList(QWidget *widget);
 
-QMap<QString, QRectF> layoutMap(const QRect &mainRect, const QStyleOption *opt, const QList<Union::Element::Ptr> &elementList, const QStringList &subElements);
+QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements);
