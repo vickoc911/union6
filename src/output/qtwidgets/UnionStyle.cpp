@@ -58,6 +58,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         auto rect = backgroundRectangle(option, bgProps).toRect();
         drawBackground(painter, rect, bgProps);
 
+        // TODO this probably could be cleaner
         auto indicatorElements = prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
         auto indicatorProps = queryProperties(indicatorElements);
         auto indicatorMap = layoutMap(buttonOption->rect, indicatorElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
