@@ -78,7 +78,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
             painter->setPen(textColor);
             drawItemText(painter,
                          textRect,
-                         Qt::TextShowMnemonic | Qt::AlignHCenter | groupBoxOption->textAlignment,
+                         Qt::TextShowMnemonic | groupBoxOption->textAlignment,
                          groupBoxOption->palette,
                          groupBoxOption->state & State_Enabled,
                          groupBoxOption->text,
