@@ -496,7 +496,7 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
 
         painter->save();
         painter->setPen(penColor);
-        qstyle->drawItemText(painter, textRect, textFlags | textElide | textAlignment, opt->palette, enabled, text);
+        qstyle->drawItemText(painter, textRect, Qt::TextShowMnemonic | textFlags | textElide | textAlignment, opt->palette, enabled, text);
         painter->restore();
     }
 
@@ -522,15 +522,15 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
         painter->restore();
     }
 
-    /* debug
-        painter->save();
-        painter->setBrush(Qt::NoBrush);
-        painter->setPen(Qt::blue);
-        painter->drawRect(rect);
-        painter->setPen(Qt::green);
-        painter->drawRect(iconRect);
-        painter->setPen(Qt::red);
-        painter->drawRect(textRect);
-        painter->restore();
+    /*
+            painter->save();
+            painter->setBrush(Qt::NoBrush);
+            painter->setPen(Qt::blue);
+            painter->drawRect(rect);
+            painter->setPen(Qt::green);
+            painter->drawRect(iconRect);
+            painter->setPen(Qt::red);
+            painter->drawRect(textRect);
+            painter->restore();
     */
 }
