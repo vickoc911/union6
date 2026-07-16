@@ -36,6 +36,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_CheckBoxLabel:
     case QStyle::CE_PushButtonLabel: {
+    case QStyle::CE_RadioButtonLabel:
         const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
         drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
     }
@@ -57,20 +58,23 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_CheckBox: {
         const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
 
+        // Draw background
         auto bgElements = prepareElements(option, widget, {QStringLiteral("CheckBox")});
         auto bgProps = queryProperties(bgElements);
         auto rect = backgroundRectangle(option, bgProps).toRect();
         drawBackground(painter, rect, bgProps);
 
-        // TODO this probably could be cleaner
+        // Get checkbox elements for mapping out the item layout
         auto checkboxElements = prepareElements(option, widget, {QStringLiteral("CheckBox")});
-
         auto indicatorMap = layoutMap(buttonOption->rect, checkboxElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
+
+        // Get the indicator and turn it into properties, draw it
         auto indicatorRect = indicatorMap[QStringLiteral("Indicator")].toRect();
         auto indicatorElements = prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
         auto indicatorProps = queryProperties(indicatorElements);
         drawElement(indicatorProps, painter, option, indicatorRect);
 
+        // Draw the text
         auto textRect = indicatorMap[QStringLiteral("Text")].toRect();
         QColor textColor = bgProps->text()->color().value().toQColor();
         painter->setPen(textColor);
@@ -84,9 +88,39 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
 
+    case QStyle::CE_RadioButton: {
+        const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
+
+        // Draw background
+        auto bgElements = prepareElements(option, widget, {QStringLiteral("RadioButton")});
+        auto bgProps = queryProperties(bgElements);
+        auto rect = backgroundRectangle(option, bgProps).toRect();
+        drawBackground(painter, rect, bgProps);
+
+        // Get radiobutton elements for mapping out the item layout
+        auto radiobuttonElements = prepareElements(option, widget, {QStringLiteral("RadioButton")});
+        auto indicatorMap = layoutMap(buttonOption->rect, radiobuttonElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
+
+        // Get the indicator and turn it into properties, draw it
+        auto indicatorRect = indicatorMap[QStringLiteral("Indicator")].toRect();
+        auto indicatorElements = prepareElements(option, widget, {QStringLiteral("RadioButton"), QStringLiteral("Indicator")});
+        auto indicatorProps = queryProperties(indicatorElements);
+        drawElement(indicatorProps, painter, option, indicatorRect);
+
+        // Draw the text
+        auto textRect = indicatorMap[QStringLiteral("Text")].toRect();
+        QColor textColor = bgProps->text()->color().value().toQColor();
+        painter->setPen(textColor);
+        drawItemText(painter,
+                     textRect,
+                     Qt::TextShowMnemonic | toQtAlignment(bgProps->text()->alignment()),
+                     buttonOption->palette,
+                     buttonOption->state & State_Enabled,
+                     buttonOption->text,
+                     textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+    }
+        return;
     case QStyle::CE_PushButtonBevel:
-    case QStyle::CE_RadioButton:
-    case QStyle::CE_RadioButtonLabel:
     case QStyle::CE_TabBarTab:
     case QStyle::CE_TabBarTabShape:
     case QStyle::CE_TabBarTabLabel:

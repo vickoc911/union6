@@ -512,6 +512,8 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
         Union::Properties::Alignment horizontalAlignment;
         Union::Properties::Alignment verticalAlignment;
         QRectF elementRect = availableSpace;
+        // TODO for now icon and text have their own layout, so use that
+        // check them by name
         if (subElement == QStringLiteral("Icon")) {
             elementRect.setWidth(properties->icon()->width().value_or(0));
             elementRect.setHeight(properties->icon()->height().value_or(0));
@@ -526,9 +528,6 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             horizontalAlignment = properties->layout()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
         }
-
-        // TODO for now icon and text have their own layout, so use that
-        // check them by name
 
         auto spacing = properties->layout()->spacing().value_or(0);
         switch (horizontalAlignment) {
@@ -571,6 +570,7 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             availableSpace.moveRight(elementRect.left());
             break;
         }
+
         switch (verticalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
