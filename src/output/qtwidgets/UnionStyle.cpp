@@ -28,21 +28,26 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     painter->setRenderHint(QPainter::Antialiasing, true);
 
     switch (controlElement) {
+    case QStyle::CE_PushButtonBevel: {
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
+        drawElement(queryProperties(prepareElements(buttonOption, widget)), painter, buttonOption);
+    }
+        return;
     case QStyle::CE_PushButton: {
-        const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
-        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
+        drawControl(CE_PushButtonBevel, buttonOption, painter, widget);
         drawControl(CE_PushButtonLabel, buttonOption, painter, widget);
     }
         return;
     case QStyle::CE_CheckBoxLabel:
     case QStyle::CE_PushButtonLabel: {
     case QStyle::CE_RadioButtonLabel:
-        const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
         drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
     }
         return;
     case QStyle::CE_ToolButtonLabel: {
-        const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
         auto text = buttonOption->text;
         auto icon = buttonOption->icon;
         // Skip text drawing for icon only buttons completely
@@ -56,7 +61,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_CheckBox: {
-        const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
 
         // Draw background
         auto bgElements = prepareElements(option, widget, {QStringLiteral("CheckBox")});
@@ -89,7 +94,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
 
     case QStyle::CE_RadioButton: {
-        const auto buttonOption = static_cast<const QStyleOptionButton *>(option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
 
         // Draw background
         auto bgElements = prepareElements(option, widget, {QStringLiteral("RadioButton")});
@@ -120,7 +125,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
                      textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
     }
         return;
-    case QStyle::CE_PushButtonBevel:
     case QStyle::CE_TabBarTab:
     case QStyle::CE_TabBarTabShape:
     case QStyle::CE_TabBarTabLabel:
@@ -172,13 +176,13 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 {
     switch (control) {
     case QStyle::CC_ToolButton: {
-        const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
         drawElement(queryProperties(prepareElements(option, widget)), painter, buttonOption);
         drawControl(CE_ToolButtonLabel, buttonOption, painter, widget);
     }
         return;
     case QStyle::CC_GroupBox: {
-        const auto groupBoxOption = static_cast<const QStyleOptionGroupBox *>(option);
+        const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox *>(option);
         const auto elements = prepareElements(groupBoxOption, widget);
         const auto properties = queryProperties(elements);
         auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
