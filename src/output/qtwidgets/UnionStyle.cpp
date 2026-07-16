@@ -43,11 +43,15 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ToolButtonLabel: {
         const auto buttonOption = static_cast<const QStyleOptionToolButton *>(option);
         auto text = buttonOption->text;
+        auto icon = buttonOption->icon;
         // Skip text drawing for icon only buttons completely
         if (buttonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {
             text = QString();
         }
-        drawIconText(buttonOption, this, painter, widget, buttonOption->icon, text);
+        if (buttonOption->toolButtonStyle == Qt::ToolButtonTextOnly) {
+            icon = QIcon();
+        }
+        drawIconText(buttonOption, this, painter, widget, icon, text);
     }
         return;
     case QStyle::CE_CheckBox: {
@@ -59,10 +63,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawBackground(painter, rect, bgProps);
 
         // TODO this probably could be cleaner
+        auto checkboxElements = prepareElements(option, widget, {QStringLiteral("CheckBox")});
+
+        auto indicatorMap = layoutMap(buttonOption->rect, checkboxElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
+        auto indicatorRect = indicatorMap[QStringLiteral("Indicator")].toRect();
         auto indicatorElements = prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
         auto indicatorProps = queryProperties(indicatorElements);
-        auto indicatorMap = layoutMap(buttonOption->rect, indicatorElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
-        drawElement(indicatorProps, painter, option, indicatorMap[QStringLiteral("Indicator")].toRect());
+        drawElement(indicatorProps, painter, option, indicatorRect);
 
         auto textRect = indicatorMap[QStringLiteral("Text")].toRect();
         QColor textColor = bgProps->text()->color().value().toQColor();
