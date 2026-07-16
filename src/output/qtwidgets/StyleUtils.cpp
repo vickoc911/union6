@@ -491,6 +491,8 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
     // This needs more testing. We may need to make this bit more constrained than qtquick side
     // if this gets too complicated.
 
+    // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
+    // widgets limitations.
     const auto style = Union::StyleRegistry::instance()->defaultStyle();
     const auto query = std::make_unique<Union::ElementQuery>(style);
     QRectF availableSpace = mainRect;
@@ -543,8 +545,11 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             }
             availableSpace.moveLeft(elementRect.right());
             break;
-        case Union::Properties::Alignment::Center:
         case Union::Properties::Alignment::Fill:
+            elementRect.moveLeft(availableSpace.left() - spacing);
+            elementRect.moveRight(availableSpace.right() + spacing);
+            break;
+        case Union::Properties::Alignment::Center:
             // For single items and stackCenter/stackFill, we can just utilize the exact center, since we do not need to move
             // other items around
             if (subElements.size() > 1 && verticalAlignment != Union::Properties::Alignment::StackCenter
@@ -570,7 +575,6 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             availableSpace.moveRight(elementRect.left());
             break;
         }
-
         switch (verticalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
@@ -583,6 +587,9 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             availableSpace.moveTop(elementRect.bottom());
             break;
         case Union::Properties::Alignment::Fill:
+            elementRect.moveTop(availableSpace.top());
+            elementRect.moveBottom(availableSpace.bottom());
+            break;
         case Union::Properties::Alignment::Center:
             elementRect.moveCenter(QPoint(elementRect.center().x(), availableSpace.center().y()));
             break;
@@ -595,8 +602,16 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             }
             availableSpace.moveTop(elementRect.bottom());
             break;
-        case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::StackFill:
+            if (!previousRect.isEmpty()) {
+                elementRect.moveTop(previousRect.bottom() + spacing);
+                elementRect.adjust(0, 0, 0, -previousRect.height());
+                elementRect.moveBottom(availableSpace.bottom());
+            } else {
+                elementRect.moveTop(availableSpace.top());
+                elementRect.moveBottom(availableSpace.bottom());
+            }
+        case Union::Properties::Alignment::StackCenter:
             if (!previousRect.isEmpty()) {
                 elementRect.moveTop(previousRect.bottom() + spacing);
                 elementRect.adjust(0, 0, 0, -previousRect.height());
@@ -606,6 +621,22 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             availableSpace.moveTop(elementRect.bottom());
             break;
         }
+
+        // QtWidgets does not allow drawing outside of the
+        // widget area, so constrain it.
+        if (elementRect.x() < 0) {
+            elementRect.setX(0);
+        }
+        if (elementRect.y() < 0) {
+            elementRect.setY(0);
+        }
+        if (elementRect.height() > mainRect.height()) {
+            elementRect.setHeight(mainRect.height());
+        }
+        if (elementRect.width() > mainRect.width()) {
+            elementRect.setWidth(mainRect.width());
+        }
+
         previousRect = elementRect;
         map[subElement] = elementRect;
     }
