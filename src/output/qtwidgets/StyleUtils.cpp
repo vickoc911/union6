@@ -356,25 +356,12 @@ Qt::TextFlag toQtWrapMode(Union::Properties::TextWrapMode wrapMode)
 QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::StylePropertyGroup *properties)
 {
     // Shrink the widget rect by the insets
-    // TODO: we may have to keep it as a QRectF here
-    QRect rect = option->rect;
+    QRectF rect = option->rect;
     if (const auto layout = properties->layout()) {
         if (layout->inset()) {
-            rect -= layout->inset()->toMargins().toMargins();
+            rect -= layout->inset()->toMargins();
         }
     }
-
-    // Make sure to take out the space left for the visual focus rect
-    // Button and ComboBox types have focus rect so we need to reserve room for them
-    if (option->type == QStyleOption::OptionType::SO_Button || option->type == QStyleOption::OptionType::SO_ComboBox) {
-        // TODO: get the size from the focusRect subelement
-        QMarginsF adjustments(2, 2, 2, 2);
-        rect.setLeft(rect.left() + adjustments.left());
-        rect.setRight(rect.right() - adjustments.right());
-        rect.setTop(rect.top() + adjustments.top());
-        rect.setBottom(rect.bottom() - adjustments.bottom());
-    }
-
     return rect;
 }
 
@@ -392,6 +379,7 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
 
     if (elementTypes.isEmpty()) {
         qWarning() << "Could not draw widget" << widget << "with styleOption" << opt << " ! Missing elementType!";
+        return elements;
     }
 
     for (const auto &elementType : elementTypes) {
@@ -472,14 +460,10 @@ QStringList setupMemberList(QWidget *widget)
     return members;
 }
 
-QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements)
+QMap<QString, QRectF> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements)
 {
     QMap<QString, QRectF> map;
 
-    if (mainRect.isEmpty()) {
-        qWarning() << "Could not layout on empty rectangle!";
-        return map;
-    }
     if (subElements.empty()) {
         qWarning() << "No sublements given, returning empty map!";
         return map;
@@ -493,9 +477,7 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
 
     // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
     // widgets limitations.
-    const auto style = Union::StyleRegistry::instance()->defaultStyle();
-    const auto query = std::make_unique<Union::ElementQuery>(style);
-    QRectF availableSpace = mainRect;
+    QRectF availableSpace = opt->rect;
     QRectF previousRect;
     for (const auto &subElement : subElements) {
         auto currentHierarchy = elements;
@@ -531,7 +513,7 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             verticalAlignment = properties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
         }
 
-        auto spacing = properties->layout()->spacing().value_or(0);
+        int spacing = properties->layout()->spacing().value_or(0);
         switch (horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::StackFill:
@@ -546,8 +528,15 @@ QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList 
             availableSpace.moveLeft(elementRect.right());
             break;
         case Union::Properties::Alignment::Fill:
-            elementRect.moveLeft(availableSpace.left() - spacing);
-            elementRect.moveRight(availableSpace.right() + spacing);
+            if (!previousRect.isEmpty()) {
+                elementRect.moveLeft(previousRect.right() + spacing);
+                elementRect.adjust(0, 0, -previousRect.width(), 0);
+                elementRect.moveRight(availableSpace.right());
+            } else {
+                elementRect.moveRight(availableSpace.right());
+                elementRect.moveLeft(availableSpace.left());
+            }
+            availableSpace.moveLeft(elementRect.right());
             break;
         case Union::Properties::Alignment::Center:
             // For single items and vertical stackCenter/stackFill,
