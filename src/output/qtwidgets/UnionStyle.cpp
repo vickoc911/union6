@@ -300,6 +300,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget) const
 {
     QSize size = QCommonStyle::sizeFromContents(ct, opt, contentsSize, widget);
+    QSize minimumSize(0, 0);
     auto elements = prepareElements(opt, widget);
     if (elements.isEmpty()) {
         return size;
@@ -311,12 +312,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
     if (properties->layout()) {
         auto width = properties->layout()->width().value_or(0);
         auto height = properties->layout()->height().value_or(0);
-        if (size.width() < width) {
-            size.setWidth(width);
-        }
-        if (size.height() < height) {
-            size.setHeight(height);
-        }
+        minimumSize = QSize(width, height);
     }
 
     switch (ct) {
@@ -325,10 +321,19 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         QStringList subElements = {};
         bool hasIcon = !buttonOption->icon.isNull();
         bool hasText = !buttonOption->text.isEmpty();
-        if (hasIcon && hasText && properties->layout()->spacing()) {
-            size.rwidth() += properties->layout()->spacing().value_or(0);
+        if (hasText) {
+            const int textFlags(Qt::TextShowMnemonic | Qt::AlignCenter);
+            size = opt->fontMetrics.size(textFlags, buttonOption->text);
         }
+        if (hasIcon && properties->icon()) {
+            QSize iconSize(properties->icon()->width().value_or(0), properties->icon()->height().value_or(0));
+            size.setHeight(qMax(size.height(), iconSize.height()));
+            size.rwidth() += iconSize.width();
 
+            if (hasText && properties->layout()->spacing()) {
+                size.rwidth() += properties->layout()->spacing().value_or(0);
+            }
+        }
     } break;
     case QStyle::CT_CheckBox:
     case QStyle::CT_RadioButton:
@@ -356,34 +361,33 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         break;
     }
 
+    if (size.width() < minimumSize.width()) {
+        size.setWidth(minimumSize.width());
+    }
+    if (size.height() < minimumSize.height()) {
+        size.setHeight(minimumSize.height());
+    }
     return size;
 }
 
 QRect UnionStyle::subElementRect(SubElement subElement, const QStyleOption *option, const QWidget *widget) const
 {
+    return QCommonStyle::subElementRect(subElement, option, widget);
     switch (subElement) {
     case QStyle::SE_PushButtonContents: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        QStringList subElements = {};
-        if (!buttonOption->icon.isNull()) {
-            subElements.append(QStringLiteral("Icon"));
+        QRectF contentRect = buttonOption->rect;
+        auto props = queryProperties(prepareElements(buttonOption, widget));
+        if (props->layout()->margins()) {
+            contentRect = contentRect.marginsAdded(props->layout()->margins()->toMargins());
         }
-        if (!buttonOption->text.isEmpty()) {
-            subElements.append(QStringLiteral("Text"));
+        if (props->layout()->padding()) {
+            contentRect = contentRect.marginsAdded(props->layout()->padding()->toMargins());
         }
-        auto bgElements = prepareElements(buttonOption, widget);
-        auto bgProps = queryProperties(bgElements);
-        auto map = layoutMap(bgElements, buttonOption, subElements);
-        QRectF unitedRect;
-        for (const auto &r : map) {
-            unitedRect = unitedRect.united(r.toRect());
+        if (props->layout()->inset()) {
+            contentRect = contentRect.marginsRemoved(props->layout()->inset()->toMargins());
         }
-        if (bgProps->layout()->padding()) {
-            auto margins = bgProps->layout()->padding()->toMargins();
-            unitedRect = unitedRect.marginsRemoved(margins);
-        }
-        return visualRect(buttonOption->direction, unitedRect.toRect(), unitedRect.toRect());
-
+        return visualRect(buttonOption->direction, buttonOption->rect, contentRect.toRect());
     } break;
     case QStyle::SE_PushButtonBevel:
     case QStyle::SE_PushButtonFocusRect:
