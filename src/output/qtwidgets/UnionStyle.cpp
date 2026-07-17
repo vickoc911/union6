@@ -17,7 +17,7 @@
 #include <QWidget>
 
 UnionStyle::UnionStyle()
-    : QProxyStyle(qEnvironmentVariable("UNION_WIDGETS_BASE_STYLE", QStringLiteral("breeze")))
+    : QCommonStyle()
 {
     Union::StyleRegistry::instance()->load();
 }
@@ -30,22 +30,26 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     switch (controlElement) {
     case QStyle::CE_PushButtonBevel: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        drawElement(queryProperties(prepareElements(buttonOption, widget)), painter, buttonOption);
+        auto opt = *buttonOption;
+        opt.rect = subElementRect(SE_PushButtonBevel, buttonOption, widget);
+        drawElement(queryProperties(prepareElements(buttonOption, widget)), painter, &opt);
+    }
+        return;
+    case QStyle::CE_PushButtonLabel: {
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
+        auto opt = *buttonOption;
+        opt.rect = subElementRect(SE_PushButtonContents, buttonOption, widget);
+        drawIconText(&opt, this, painter, widget, buttonOption->icon, buttonOption->text);
     }
         return;
     case QStyle::CE_PushButton: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        drawControl(CE_PushButtonBevel, buttonOption, painter, widget);
-        drawControl(CE_PushButtonLabel, buttonOption, painter, widget);
+        drawControl(CE_PushButtonBevel, option, painter, widget);
+        drawControl(CE_PushButtonLabel, option, painter, widget);
     }
         return;
     case QStyle::CE_CheckBoxLabel:
-    case QStyle::CE_PushButtonLabel: {
     case QStyle::CE_RadioButtonLabel:
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
-    }
-        return;
+        break;
     case QStyle::CE_ToolButtonLabel: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
         auto text = buttonOption->text;
@@ -71,13 +75,15 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 
         // Get checkbox elements for mapping out the item layout
         auto checkboxElements = prepareElements(option, widget, {QStringLiteral("CheckBox")});
-        auto indicatorMap = layoutMap(buttonOption->rect, checkboxElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
+        auto indicatorMap = layoutMap(checkboxElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
 
         // Get the indicator and turn it into properties, draw it
         auto indicatorRect = indicatorMap[QStringLiteral("Indicator")].toRect();
         auto indicatorElements = prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
         auto indicatorProps = queryProperties(indicatorElements);
-        drawElement(indicatorProps, painter, option, indicatorRect);
+        QStyleOptionButton indicatorOpt = *buttonOption;
+        indicatorOpt.rect = indicatorRect;
+        drawElement(indicatorProps, painter, &indicatorOpt);
 
         // Draw the text
         auto textRect = indicatorMap[QStringLiteral("Text")].toRect();
@@ -93,7 +99,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
 
-    case QStyle::CE_RadioButton: {
+    case QStyle::CE_RadioButton:
+    /*
+    {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
 
         // Draw background
@@ -125,6 +133,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
                      textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
     }
         return;
+        */
     case QStyle::CE_TabBarTab:
     case QStyle::CE_TabBarTabShape:
     case QStyle::CE_TabBarTabLabel:
@@ -168,7 +177,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         break;
     }
 
-    QProxyStyle::drawControl(controlElement, option, painter, widget);
+    QCommonStyle::drawControl(controlElement, option, painter, widget);
 }
 
 // Complex controls are bit annoying. We may need to manually handle some things to make sure they work correctly
@@ -213,7 +222,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         break;
     }
 
-    QProxyStyle::drawComplexControl(control, option, painter, widget);
+    QCommonStyle::drawComplexControl(control, option, painter, widget);
 }
 
 void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -285,33 +294,157 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     }
 
-    QProxyStyle::drawPrimitive(element, option, painter, widget);
+    QCommonStyle::drawPrimitive(element, option, painter, widget);
 }
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget) const
 {
-    if (ct == CT_PushButton) {
-        auto size = QProxyStyle::sizeFromContents(ct, opt, contentsSize, widget);
-
-        auto element = Union::Element::create();
-        element->setType(QStringLiteral("Button"));
-        element->setColorSet(Union::Element::ColorSet::Button);
-
-        const auto style = Union::StyleRegistry::instance()->defaultStyle();
-        const auto matches = style->matches({element});
-        const auto properties = matches.first()->properties();
-
-        if (const auto layout = properties->layout()) {
-            const QMargins padding = layout->padding()->toMargins().toMargins();
-            size = size.grownBy(padding / 2.0f);
-        }
-
-        // Make sure to allocate space for the visual focus rect
-        size = size.grownBy(QMargins(2, 2, 2, 2));
-
+    QSize size = QCommonStyle::sizeFromContents(ct, opt, contentsSize, widget);
+    auto elements = prepareElements(opt, widget);
+    if (elements.isEmpty()) {
         return size;
     }
-    return QProxyStyle::sizeFromContents(ct, opt, contentsSize, widget);
+    auto properties = queryProperties(elements);
+    if (!properties) {
+        return size;
+    }
+    if (properties->layout()) {
+        auto width = properties->layout()->width().value_or(0);
+        auto height = properties->layout()->height().value_or(0);
+        if (size.width() < width) {
+            size.setWidth(width);
+        }
+        if (size.height() < height) {
+            size.setHeight(height);
+        }
+    }
+
+    switch (ct) {
+    case QStyle::CT_PushButton: {
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt);
+        QStringList subElements = {};
+        bool hasIcon = !buttonOption->icon.isNull();
+        bool hasText = !buttonOption->text.isEmpty();
+        if (hasIcon && hasText && properties->layout()->spacing()) {
+            size.rwidth() += properties->layout()->spacing().value_or(0);
+        }
+
+    } break;
+    case QStyle::CT_CheckBox:
+    case QStyle::CT_RadioButton:
+    case QStyle::CT_ToolButton:
+    case QStyle::CT_ComboBox:
+    case QStyle::CT_Splitter:
+    case QStyle::CT_ProgressBar:
+    case QStyle::CT_MenuItem:
+    case QStyle::CT_MenuBarItem:
+    case QStyle::CT_MenuBar:
+    case QStyle::CT_Menu:
+    case QStyle::CT_TabBarTab:
+    case QStyle::CT_Slider:
+    case QStyle::CT_ScrollBar:
+    case QStyle::CT_LineEdit:
+    case QStyle::CT_SpinBox:
+    case QStyle::CT_SizeGrip:
+    case QStyle::CT_TabWidget:
+    case QStyle::CT_DialogButtons:
+    case QStyle::CT_HeaderSection:
+    case QStyle::CT_GroupBox:
+    case QStyle::CT_MdiControls:
+    case QStyle::CT_ItemViewItem:
+    case QStyle::CT_CustomBase:
+        break;
+    }
+
+    return size;
+}
+
+QRect UnionStyle::subElementRect(SubElement subElement, const QStyleOption *option, const QWidget *widget) const
+{
+    switch (subElement) {
+    case QStyle::SE_PushButtonContents: {
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
+        QStringList subElements = {};
+        if (!buttonOption->icon.isNull()) {
+            subElements.append(QStringLiteral("Icon"));
+        }
+        if (!buttonOption->text.isEmpty()) {
+            subElements.append(QStringLiteral("Text"));
+        }
+        auto bgElements = prepareElements(buttonOption, widget);
+        auto bgProps = queryProperties(bgElements);
+        auto map = layoutMap(bgElements, buttonOption, subElements);
+        QRectF unitedRect;
+        for (const auto &r : map) {
+            unitedRect = unitedRect.united(r.toRect());
+        }
+        if (bgProps->layout()->padding()) {
+            auto margins = bgProps->layout()->padding()->toMargins();
+            unitedRect = unitedRect.marginsRemoved(margins);
+        }
+        return visualRect(buttonOption->direction, unitedRect.toRect(), unitedRect.toRect());
+
+    } break;
+    case QStyle::SE_PushButtonBevel:
+    case QStyle::SE_PushButtonFocusRect:
+    case QStyle::SE_CheckBoxIndicator:
+    case QStyle::SE_CheckBoxContents:
+    case QStyle::SE_CheckBoxFocusRect:
+    case QStyle::SE_CheckBoxClickRect:
+    case QStyle::SE_RadioButtonIndicator:
+    case QStyle::SE_RadioButtonContents:
+    case QStyle::SE_RadioButtonFocusRect:
+    case QStyle::SE_RadioButtonClickRect:
+    case QStyle::SE_ComboBoxFocusRect:
+    case QStyle::SE_SliderFocusRect:
+    case QStyle::SE_ProgressBarGroove:
+    case QStyle::SE_ProgressBarContents:
+    case QStyle::SE_ProgressBarLabel:
+    case QStyle::SE_ToolBoxTabContents:
+    case QStyle::SE_HeaderLabel:
+    case QStyle::SE_HeaderArrow:
+    case QStyle::SE_TabWidgetTabBar:
+    case QStyle::SE_TabWidgetTabPane:
+    case QStyle::SE_TabWidgetTabContents:
+    case QStyle::SE_TabWidgetLeftCorner:
+    case QStyle::SE_TabWidgetRightCorner:
+    case QStyle::SE_ItemViewItemCheckIndicator:
+    case QStyle::SE_TabBarTearIndicator:
+    case QStyle::SE_TreeViewDisclosureItem:
+    case QStyle::SE_LineEditContents:
+    case QStyle::SE_FrameContents:
+    case QStyle::SE_DockWidgetCloseButton:
+    case QStyle::SE_DockWidgetFloatButton:
+    case QStyle::SE_DockWidgetTitleBarText:
+    case QStyle::SE_DockWidgetIcon:
+    case QStyle::SE_CheckBoxLayoutItem:
+    case QStyle::SE_ComboBoxLayoutItem:
+    case QStyle::SE_DateTimeEditLayoutItem:
+    case QStyle::SE_LabelLayoutItem:
+    case QStyle::SE_ProgressBarLayoutItem:
+    case QStyle::SE_PushButtonLayoutItem:
+    case QStyle::SE_RadioButtonLayoutItem:
+    case QStyle::SE_SliderLayoutItem:
+    case QStyle::SE_SpinBoxLayoutItem:
+    case QStyle::SE_ToolButtonLayoutItem:
+    case QStyle::SE_FrameLayoutItem:
+    case QStyle::SE_GroupBoxLayoutItem:
+    case QStyle::SE_TabWidgetLayoutItem:
+    case QStyle::SE_ItemViewItemDecoration:
+    case QStyle::SE_ItemViewItemText:
+    case QStyle::SE_ItemViewItemFocusRect:
+    case QStyle::SE_TabBarTabLeftButton:
+    case QStyle::SE_TabBarTabRightButton:
+    case QStyle::SE_TabBarTabText:
+    case QStyle::SE_ShapedFrameContents:
+    case QStyle::SE_ToolBarHandle:
+    case QStyle::SE_TabBarScrollLeftButton:
+    case QStyle::SE_TabBarScrollRightButton:
+    case QStyle::SE_TabBarTearIndicatorRight:
+    case QStyle::SE_CustomBase:
+        break;
+    }
+    return QCommonStyle::subElementRect(subElement, option, widget);
 }
 
 int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
@@ -322,6 +455,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case PM_ButtonShiftVertical:
         return 0;
     case QStyle::PM_ButtonMargin:
+        return 8;
     case QStyle::PM_ButtonDefaultIndicator:
     case QStyle::PM_MenuButtonIndicator:
     case QStyle::PM_DefaultFrameWidth:
@@ -415,16 +549,16 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_LineEditIconSize:
     case QStyle::PM_LineEditIconMargin:
     case QStyle::PM_CustomBase:
-        return QProxyStyle::pixelMetric(metric, option, widget);
+        return QCommonStyle::pixelMetric(metric, option, widget);
         break;
     default:
-        return QProxyStyle::pixelMetric(metric, option, widget);
+        return QCommonStyle::pixelMetric(metric, option, widget);
     };
 }
 
 void UnionStyle::polish(QApplication *application)
 {
-    QProxyStyle::polish(application);
+    QCommonStyle::polish(application);
 
     // Set global window color
     auto element = Union::Element::create();
@@ -450,5 +584,5 @@ void UnionStyle::polish(QWidget *widget)
 
     widget->setProperty(property_union_member_list, setupMemberList(widget));
 
-    QProxyStyle::polish(widget);
+    QCommonStyle::polish(widget);
 }

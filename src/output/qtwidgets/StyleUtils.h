@@ -33,4 +33,4 @@ Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList 
 
 QStringList setupMemberList(QWidget *widget);
 
-QMap<QString, QRectF> layoutMap(const QRect &mainRect, const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements);
+QMap<QString, QRectF> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements);
