@@ -415,7 +415,6 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
     }
 
     QStringList subElements;
-    // TODO: these need to be ordered correctly
     if (hasIcon) {
         subElements.append(QStringLiteral("Icon"));
     }
@@ -424,7 +423,7 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
     }
     auto map = layoutMap(elements, opt, subElements);
 
-    QRect textRect = map[QStringLiteral("Text")].toRect();
+    QRect textRect = map[QStringLiteral("Text")].rect.toRect();
     if (hasText) {
         auto textAlignment = toQtAlignment(properties->text()->alignment());
         auto textFlags = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
@@ -440,7 +439,7 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
         painter->restore();
     }
 
-    QRect iconRect = map[QStringLiteral("Icon")].toRect();
+    QRect iconRect = map[QStringLiteral("Icon")].rect.toRect();
     if (hasIcon) {
         auto iconAlignment = toQtAlignment(properties->icon()->alignment());
         auto iconColor = properties->icon()->color();
@@ -457,7 +456,6 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
         painter->restore();
     }
 
-    /*
             painter->save();
             painter->setBrush(Qt::NoBrush);
             painter->setPen(Qt::blue);
@@ -467,5 +465,4 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
             painter->setPen(Qt::red);
             painter->drawRect(textRect);
             painter->restore();
-            */
 }

@@ -460,9 +460,10 @@ QStringList setupMemberList(QWidget *widget)
     return members;
 }
 
-QMap<QString, QRectF> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements)
+QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements)
 {
-    QMap<QString, QRectF> map;
+    QMap<QString, LayoutItem> map;
+    QList<LayoutItem> items;
 
     if (subElements.empty()) {
         qWarning() << "No sublements given, returning empty map!";
@@ -473,13 +474,15 @@ QMap<QString, QRectF> layoutMap(const Union::ElementList &elements, const QStyle
     // Then place and resize those rectangles according to hierarchy
     // Use the original opt->rect as the main container
     // move any subelements in it according their given rules
-
-    // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
-    // widgets limitations.
     QRectF availableSpace = opt->rect;
-    QRectF previousRect;
+    // Get spacing for main item
+    auto properties = queryProperties(elements);
+    int spacing = 0;
+    if (subElements.count() > 1) {
+        spacing = properties->layout()->spacing().value_or(0);
+    }
+    auto currentHierarchy = elements;
     for (const auto &subElement : subElements) {
-        auto currentHierarchy = elements;
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
         if (subElement != QStringLiteral("Icon") && subElement != QStringLiteral("Text")) {
@@ -491,17 +494,19 @@ QMap<QString, QRectF> layoutMap(const Union::ElementList &elements, const QStyle
             unionElement->setAttributes(attributesFromOption(opt));
             currentHierarchy.append(unionElement);
         }
-        auto properties = queryProperties(currentHierarchy);
+        properties = queryProperties(currentHierarchy);
         Union::Properties::Alignment horizontalAlignment;
         Union::Properties::Alignment verticalAlignment;
+        int order = 0;
         QRectF elementRect = availableSpace;
-        // TODO for now icon and text have their own layout, so use that
-        // check them by name
+        // NOTE: For now icon and text are their own things, so check them separately.
+        // in future this should be unnecessary.
         if (subElement == QStringLiteral("Icon")) {
             elementRect.setWidth(properties->icon()->width().value_or(0));
             elementRect.setHeight(properties->icon()->height().value_or(0));
             horizontalAlignment = properties->icon()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->icon()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
+            order = properties->icon()->alignment()->order().value_or(0);
         } else if (subElement == QStringLiteral("Text")) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
@@ -510,123 +515,141 @@ QMap<QString, QRectF> layoutMap(const Union::ElementList &elements, const QStyle
             } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
                 elementRect = opt->fontMetrics.boundingRect(buttonOption->text);
             }
+            order = properties->text()->alignment()->order().value_or(0);
         } else {
             elementRect.setWidth(properties->layout()->width().value_or(0));
             elementRect.setHeight(properties->layout()->height().value_or(0));
             horizontalAlignment = properties->layout()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
+            order = properties->layout()->alignment()->order().value_or(0);
         }
+        LayoutItem item = LayoutItem();
+        item.elementName = subElement;
+        item.horizontalAlignment = horizontalAlignment;
+        item.verticalAlignment = verticalAlignment;
+        item.order = order;
+        item.rect = elementRect;
+        items.append(item);
+    }
 
-        int spacing = properties->layout()->spacing().value_or(0);
-        switch (horizontalAlignment) {
+    // Sort the list according to order
+    std::sort(items.begin(), items.end(), [](const LayoutItem &lhs, const LayoutItem &rhs) {
+        return lhs.order < rhs.order;
+    });
+
+    // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
+    // widgets limitations.
+    QRectF previousRect;
+    for (auto &item : items) {
+        switch (item.horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::StackFill:
         case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::Start:
             if (!previousRect.isEmpty()) {
-                elementRect.moveLeft(previousRect.right() + spacing);
-                // elementRect.adjust(0, 0, -previousRect.width(), 0);
+                item.rect.moveLeft(previousRect.right());
+                item.rect.adjust(spacing, 0, spacing, 0);
             } else {
-                elementRect.moveLeft(availableSpace.left());
+                item.rect.moveLeft(availableSpace.left());
             }
-            availableSpace.moveLeft(elementRect.right());
+            availableSpace.moveLeft(item.rect.right());
             break;
         case Union::Properties::Alignment::Fill:
             if (!previousRect.isEmpty()) {
-                elementRect.moveLeft(previousRect.right() + spacing);
-                // elementRect.adjust(0, 0, -previousRect.width(), 0);
-                elementRect.moveRight(availableSpace.right());
+                item.rect.moveLeft(previousRect.right());
+                item.rect.moveRight(availableSpace.right());
+                item.rect.adjust(spacing, 0, spacing, 0);
             } else {
-                elementRect.moveRight(availableSpace.right());
-                elementRect.moveLeft(availableSpace.left());
+                item.rect.moveRight(availableSpace.right());
+                item.rect.moveLeft(availableSpace.left());
             }
-            availableSpace.moveLeft(elementRect.right());
+            availableSpace.moveLeft(item.rect.right());
             break;
         case Union::Properties::Alignment::Center:
             // For single items and vertical stackCenter/stackFill,
             // we can just utilize the exact center,
             // since we do not need to move other items around
-            if (subElements.size() > 1 && verticalAlignment != Union::Properties::Alignment::StackCenter
-                && verticalAlignment != Union::Properties::Alignment::StackFill) {
+            if (items.size() > 1 && item.verticalAlignment != Union::Properties::Alignment::StackCenter
+                && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
                 if (!previousRect.isEmpty()) {
-                    elementRect.moveLeft(previousRect.right() + spacing);
-                    // elementRect.adjust(0, 0, -previousRect.width(), 0);
+                    item.rect.moveLeft(previousRect.right());
+                    item.rect.adjust(spacing, 0, spacing, 0);
                 } else {
-                    elementRect.moveLeft(availableSpace.left());
+                    item.rect.moveLeft(availableSpace.left());
                 }
-                availableSpace.moveLeft(elementRect.right());
+                availableSpace.moveLeft(item.rect.right());
             } else {
-                elementRect.moveCenter(QPoint(availableSpace.center().x(), elementRect.center().y()));
+                item.rect.moveCenter(QPoint(availableSpace.center().x(), item.rect.center().y()));
             }
             break;
         case Union::Properties::Alignment::End:
             if (!previousRect.isEmpty()) {
-                elementRect.moveRight(previousRect.left() - spacing);
-                // elementRect.adjust(previousRect.width(), 0, 0, 0);
+                item.rect.moveRight(previousRect.left());
+                item.rect.adjust(spacing, 0, spacing, 0);
             } else {
-                elementRect.moveRight(availableSpace.right());
+                item.rect.moveRight(availableSpace.right());
             }
-            availableSpace.moveRight(elementRect.left());
+            availableSpace.moveRight(item.rect.left());
             break;
         }
-        switch (verticalAlignment) {
+        switch (item.verticalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
             if (!previousRect.isEmpty()) {
-                elementRect.moveTop(previousRect.bottom() + spacing);
-                elementRect.adjust(0, previousRect.height(), 0, 0);
+                item.rect.moveTop(previousRect.bottom());
+                item.rect.adjust(0, spacing, 0, spacing);
             } else {
-                elementRect.moveCenter(QPoint(elementRect.center().x(), availableSpace.top()));
+                item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.top()));
             }
-            availableSpace.moveTop(elementRect.bottom());
+            availableSpace.moveTop(item.rect.bottom());
             break;
         case Union::Properties::Alignment::Fill:
-            elementRect.moveTop(availableSpace.top());
-            elementRect.moveBottom(availableSpace.bottom());
+            item.rect.moveTop(availableSpace.top());
+            item.rect.moveBottom(availableSpace.bottom());
             break;
         case Union::Properties::Alignment::Center:
-            elementRect.moveCenter(QPoint(elementRect.center().x(), availableSpace.center().y()));
+            item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.center().y()));
             break;
         case Union::Properties::Alignment::End:
             if (!previousRect.isEmpty()) {
-                elementRect.moveTop(previousRect.bottom() + spacing);
-                elementRect.adjust(0, 0, 0, -previousRect.height());
+                item.rect.moveTop(previousRect.bottom());
+                item.rect.adjust(0, spacing, 0, spacing);
             } else {
-                elementRect.moveCenter(QPoint(elementRect.center().x(), availableSpace.bottom()));
+                item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.bottom()));
             }
-            availableSpace.moveTop(elementRect.bottom());
+            availableSpace.moveTop(item.rect.bottom());
             break;
         case Union::Properties::Alignment::StackFill:
             if (!previousRect.isEmpty()) {
-                elementRect.moveTop(previousRect.bottom());
-                // elementRect.adjust(0, 0, 0, -previousRect.height());
-                elementRect.moveBottom(availableSpace.bottom());
+                item.rect.moveTop(previousRect.bottom());
+                item.rect.adjust(0, spacing, 0, spacing);
+                item.rect.moveBottom(availableSpace.bottom());
             } else {
-                elementRect.moveTop(availableSpace.top());
-                elementRect.moveBottom(availableSpace.bottom());
+                item.rect.moveTop(availableSpace.top());
+                item.rect.moveBottom(availableSpace.bottom());
             }
         case Union::Properties::Alignment::StackCenter:
             if (!previousRect.isEmpty()) {
-                elementRect.moveTop(previousRect.bottom());
-                // elementRect.adjust(0, 0, 0, -previousRect.height());
+                item.rect.moveTop(previousRect.bottom());
+                item.rect.adjust(0, spacing, 0, spacing);
             } else {
-                elementRect.moveTop(availableSpace.top());
+                item.rect.moveTop(availableSpace.top());
             }
-            availableSpace.moveTop(elementRect.bottom());
+            availableSpace.moveTop(item.rect.bottom());
             break;
         }
 
         // QtWidgets does not allow drawing outside of the
         // widget area, so constrain it.
-        if (elementRect.x() < 0) {
-            elementRect.setX(0);
+        if (item.rect.x() < 0) {
+            item.rect.setX(0);
         }
-        if (elementRect.y() < 0) {
-            elementRect.setY(0);
+        if (item.rect.y() < 0) {
+            item.rect.setY(0);
         }
 
-        previousRect = elementRect;
-        map[subElement] = elementRect;
+        previousRect = item.rect;
+        map[item.elementName] = item;
     }
     return map;
 }

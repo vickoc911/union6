@@ -78,7 +78,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         auto indicatorMap = layoutMap(checkboxElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
 
         // Get the indicator and turn it into properties, draw it
-        auto indicatorRect = indicatorMap[QStringLiteral("Indicator")].toRect();
+        auto indicatorRect = indicatorMap[QStringLiteral("Indicator")].rect.toRect();
         auto indicatorElements = prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
         auto indicatorProps = queryProperties(indicatorElements);
         QStyleOptionButton indicatorOpt = *buttonOption;
@@ -86,16 +86,21 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElement(indicatorProps, painter, &indicatorOpt);
 
         // Draw the text
-        auto textRect = indicatorMap[QStringLiteral("Text")].toRect();
+        auto textRect = indicatorMap[QStringLiteral("Text")].rect.toRect();
         QColor textColor = bgProps->text()->color().value().toQColor();
+        auto textAlignment = toQtAlignment(bgProps->text()->alignment());
+        auto textFlags = toQtWrapMode(bgProps->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
+        auto textElide = toQtElideMode(bgProps->text()->elide().value_or(Union::Properties::TextElide::Right));
+        painter->save();
         painter->setPen(textColor);
         drawItemText(painter,
                      textRect,
-                     Qt::TextShowMnemonic | toQtAlignment(bgProps->text()->alignment()),
+                     Qt::TextShowMnemonic | textFlags | textElide | textAlignment,
                      buttonOption->palette,
                      buttonOption->state & State_Enabled,
                      buttonOption->text,
                      textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+        painter->restore();
     }
         return;
 
@@ -316,6 +321,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
     }
 
     switch (ct) {
+    case QStyle::CT_CheckBox:
     case QStyle::CT_PushButton: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt);
         QStringList subElements = {};
@@ -335,7 +341,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
             }
         }
     } break;
-    case QStyle::CT_CheckBox:
     case QStyle::CT_RadioButton:
     case QStyle::CT_ToolButton:
     case QStyle::CT_ComboBox:
