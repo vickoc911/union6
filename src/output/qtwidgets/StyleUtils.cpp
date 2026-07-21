@@ -8,6 +8,7 @@
 #include <QStyleOption>
 #include <QStyleOptionFrame>
 #include <QTableView>
+#include <QTextOption>
 
 Union::Element::States statesFromOption(const QStyleOption *option)
 {
@@ -148,11 +149,24 @@ QStringList hintsFromOption(const QStyleOption *option)
             }
         }
     } break;
+    case QStyleOption::SO_Header: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
+            switch (opt->sortIndicator) {
+            case QStyleOptionHeader::None:
+                return hints;
+            case QStyleOptionHeader::SortUp:
+                hints.append(QStringLiteral("sort-ascending"));
+                break;
+            case QStyleOptionHeader::SortDown:
+                hints.append(QStringLiteral("sort-descending"));
+                break;
+            }
+        }
+    }
     case QStyleOption::SO_Tab:
     case QStyleOption::SO_MenuItem:
     case QStyleOption::SO_ProgressBar:
     case QStyleOption::SO_ToolBox:
-    case QStyleOption::SO_Header:
     case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_TabWidgetFrame:
     case QStyleOption::SO_TabBarBase:
@@ -311,13 +325,13 @@ Qt::Alignment toQtAlignment(Union::Properties::AlignmentPropertyGroup *alignment
 
     switch (unionHorizontal) {
     case Union::Properties::Alignment::Unspecified:
-    case Union::Properties::Alignment::Fill:
-    case Union::Properties::Alignment::StackCenter:
-    case Union::Properties::Alignment::StackFill:
     case Union::Properties::Alignment::Start:
         horizontalAlignment = Qt::AlignLeft;
         break;
+    case Union::Properties::Alignment::Fill:
     case Union::Properties::Alignment::Center:
+    case Union::Properties::Alignment::StackFill:
+    case Union::Properties::Alignment::StackCenter:
         horizontalAlignment = Qt::AlignHCenter;
         break;
     case Union::Properties::Alignment::End:
@@ -456,7 +470,8 @@ QStringList setupMemberList(const QWidget *widget)
                                                        {"QAbstractScrollArea", QStringLiteral("ScrollArea")},
                                                        {"QListView", QStringLiteral("ListView")},
                                                        {"QScrollBar", QStringLiteral("ScrollBar")},
-                                                       {"QTreeView", QStringLiteral("QTreeViewDelegate")}};
+                                                       {"QTreeView", QStringLiteral("QTreeViewDelegate")},
+                                                       {"QSplitter", QStringLiteral("Splitter")}};
 
     auto currentWidget = widget;
     while (currentWidget) {
@@ -478,7 +493,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     QList<LayoutItem> items;
 
     if (subElements.empty()) {
-        qWarning() << "No sublements given, returning empty map!";
+        qWarning() << "No sublements given, returning empty map!" << elements << opt->type;
         return map;
     }
 
@@ -494,6 +509,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         spacing = properties->layout()->spacing().value_or(0);
     }
     auto currentHierarchy = elements;
+    // this could be turned into its own method
     for (const auto &subElement : subElements) {
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
@@ -522,10 +538,13 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         } else if (subElement == QStringLiteral("Text")) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
+            auto textAlignment = toQtAlignment(properties->text()->alignment());
+            auto textFlags = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
+            // We need to make sure the text rectangle for all the elements that have text is correct
             if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt)) {
-                elementRect = opt->fontMetrics.boundingRect(buttonOption->text);
+                elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlags | textAlignment, buttonOption->text);
             } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
-                elementRect = opt->fontMetrics.boundingRect(buttonOption->text);
+                elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlags | textAlignment, buttonOption->text);
             }
             order = properties->text()->alignment()->order().value_or(0);
         } else {
@@ -549,11 +568,13 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         return lhs.order < rhs.order;
     });
 
+    // Apply padding
     QMarginsF padding;
-
     if (properties->layout() && properties->layout()->padding()) {
         padding = properties->layout()->padding()->toMargins();
     }
+
+    // Actual layouting starts here
     // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
     // widgets limitations.
     QRectF previousRect;
