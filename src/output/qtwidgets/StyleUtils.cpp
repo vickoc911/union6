@@ -149,11 +149,24 @@ QStringList hintsFromOption(const QStyleOption *option)
             }
         }
     } break;
+    case QStyleOption::SO_Header: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
+            switch (opt->sortIndicator) {
+            case QStyleOptionHeader::None:
+                return hints;
+            case QStyleOptionHeader::SortUp:
+                hints.append(QStringLiteral("sort-ascending"));
+                break;
+            case QStyleOptionHeader::SortDown:
+                hints.append(QStringLiteral("sort-descending"));
+                break;
+            }
+        }
+    }
     case QStyleOption::SO_Tab:
     case QStyleOption::SO_MenuItem:
     case QStyleOption::SO_ProgressBar:
     case QStyleOption::SO_ToolBox:
-    case QStyleOption::SO_Header:
     case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_TabWidgetFrame:
     case QStyleOption::SO_TabBarBase:
