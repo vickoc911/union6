@@ -278,6 +278,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget) const
 {
+    // TODO use subelement rects to build the thing if possible
     QSize size = QCommonStyle::sizeFromContents(ct, opt, contentsSize, widget);
     QSize minimumSize(contentsSize.width(), contentsSize.height());
     QIcon icon = QIcon();
@@ -437,62 +438,63 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto indicatorMap = layoutMap(checkboxElements, option, {QStringLiteral("Indicator"), QStringLiteral("Text")});
         return indicatorMap[QStringLiteral("Text")].rect.toRect();
     }
+    case QStyle::SE_DockWidgetCloseButton:
+    case QStyle::SE_DockWidgetFloatButton:
+    case QStyle::SE_DockWidgetIcon:
+    case QStyle::SE_DockWidgetTitleBarText:
+    case QStyle::SE_FrameContents:
+    case QStyle::SE_HeaderArrow:
+    case QStyle::SE_HeaderLabel:
+    case QStyle::SE_ItemViewItemCheckIndicator:
+    case QStyle::SE_ItemViewItemDecoration:
+    case QStyle::SE_ItemViewItemText:
+    case QStyle::SE_LineEditContents:
+    case QStyle::SE_ProgressBarContents:
+    case QStyle::SE_ProgressBarGroove:
+    case QStyle::SE_ProgressBarLabel:
+    case QStyle::SE_PushButtonBevel:
+    case QStyle::SE_PushButtonContents:
+    case QStyle::SE_ShapedFrameContents:
+    case QStyle::SE_TabBarScrollLeftButton:
+    case QStyle::SE_TabBarScrollRightButton:
+    case QStyle::SE_TabBarTabLeftButton:
+    case QStyle::SE_TabBarTabRightButton:
+    case QStyle::SE_TabBarTabText:
+    case QStyle::SE_TabBarTearIndicator:
+    case QStyle::SE_TabBarTearIndicatorRight:
+    case QStyle::SE_TabWidgetLeftCorner:
+    case QStyle::SE_TabWidgetRightCorner:
+    case QStyle::SE_TabWidgetTabBar:
+    case QStyle::SE_TabWidgetTabContents:
+    case QStyle::SE_TabWidgetTabPane:
+    case QStyle::SE_ToolBarHandle:
+    case QStyle::SE_ToolBoxTabContents:
+    case QStyle::SE_TreeViewDisclosureItem:
+        break;
+    // Follow defaults
+    case QStyle::SE_CustomBase:
     case QStyle::SE_CheckBoxClickRect:
     case QStyle::SE_CheckBoxFocusRect:
     case QStyle::SE_RadioButtonFocusRect:
     case QStyle::SE_RadioButtonClickRect:
-        return option->rect;
     case QStyle::SE_PushButtonFocusRect:
-    case QStyle::SE_PushButtonContents:
     case QStyle::SE_ComboBoxFocusRect:
     case QStyle::SE_SliderFocusRect:
-    case QStyle::SE_ProgressBarGroove:
-    case QStyle::SE_ProgressBarContents:
-    case QStyle::SE_ProgressBarLabel:
-    case QStyle::SE_ToolBoxTabContents:
-    case QStyle::SE_HeaderLabel:
-    case QStyle::SE_HeaderArrow:
-    case QStyle::SE_TabWidgetTabBar:
-    case QStyle::SE_TabWidgetTabPane:
-    case QStyle::SE_TabWidgetTabContents:
-    case QStyle::SE_TabWidgetLeftCorner:
-    case QStyle::SE_TabWidgetRightCorner:
-    case QStyle::SE_ItemViewItemCheckIndicator:
-    case QStyle::SE_TabBarTearIndicator:
-    case QStyle::SE_TreeViewDisclosureItem:
-    case QStyle::SE_LineEditContents:
-    case QStyle::SE_FrameContents:
-    case QStyle::SE_DockWidgetCloseButton:
-    case QStyle::SE_DockWidgetFloatButton:
-    case QStyle::SE_DockWidgetTitleBarText:
-    case QStyle::SE_DockWidgetIcon:
+    case QStyle::SE_ItemViewItemFocusRect:
     case QStyle::SE_CheckBoxLayoutItem:
     case QStyle::SE_ComboBoxLayoutItem:
     case QStyle::SE_DateTimeEditLayoutItem:
+    case QStyle::SE_FrameLayoutItem:
+    case QStyle::SE_GroupBoxLayoutItem:
     case QStyle::SE_LabelLayoutItem:
+    case QStyle::SE_SpinBoxLayoutItem:
+    case QStyle::SE_SliderLayoutItem:
     case QStyle::SE_ProgressBarLayoutItem:
     case QStyle::SE_PushButtonLayoutItem:
     case QStyle::SE_RadioButtonLayoutItem:
-    case QStyle::SE_SliderLayoutItem:
-    case QStyle::SE_SpinBoxLayoutItem:
-    case QStyle::SE_ToolButtonLayoutItem:
-    case QStyle::SE_FrameLayoutItem:
-    case QStyle::SE_GroupBoxLayoutItem:
     case QStyle::SE_TabWidgetLayoutItem:
-    case QStyle::SE_ItemViewItemDecoration:
-    case QStyle::SE_ItemViewItemText:
-    case QStyle::SE_ItemViewItemFocusRect:
-    case QStyle::SE_TabBarTabLeftButton:
-    case QStyle::SE_TabBarTabRightButton:
-    case QStyle::SE_TabBarTabText:
-    case QStyle::SE_ShapedFrameContents:
-    case QStyle::SE_ToolBarHandle:
-    case QStyle::SE_TabBarScrollLeftButton:
-    case QStyle::SE_TabBarScrollRightButton:
-    case QStyle::SE_TabBarTearIndicatorRight:
-    case QStyle::SE_PushButtonBevel:
-    case QStyle::SE_CustomBase:
-        break;
+    case QStyle::SE_ToolButtonLayoutItem:
+        return QCommonStyle::subElementRect(element, option, widget);
     }
 
     return QCommonStyle::subElementRect(element, option, widget);
