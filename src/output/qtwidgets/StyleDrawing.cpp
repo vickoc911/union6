@@ -425,7 +425,7 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
 
     QRect textRect = map[QStringLiteral("Text")].rect.toRect();
     if (hasText) {
-        // hide mnemonics if requested
+        // TODO: hide mnemonics if requested
         int flags = Qt::AlignVCenter;
         auto textAlignment = toQtAlignment(properties->text()->alignment());
         auto textFlags = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
@@ -462,7 +462,7 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
         painter->restore();
     }
 
-    qWarning() << iconRect << textRect;
+    /*
     painter->save();
     painter->setBrush(Qt::NoBrush);
     painter->setPen(Qt::blue);
@@ -472,4 +472,5 @@ void drawIconText(const QStyleOption *opt, const QStyle *qstyle, QPainter *paint
     painter->setPen(Qt::yellow);
     painter->drawRect(textRect);
     painter->restore();
+    */
 }

@@ -35,28 +35,16 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElement(queryProperties(prepareElements(buttonOption, widget)), painter, &opt);
     }
         return;
+    case QStyle::CE_RadioButtonLabel:
+    case QStyle::CE_CheckBoxLabel:
     case QStyle::CE_PushButtonLabel: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        auto opt = *buttonOption;
-        opt.rect = subElementRect(SE_PushButtonContents, buttonOption, widget);
-        drawIconText(&opt, this, painter, widget, buttonOption->icon, buttonOption->text);
+        drawIconText(buttonOption, this, painter, widget, buttonOption->icon, buttonOption->text);
     }
         return;
     case QStyle::CE_PushButton: {
         drawControl(CE_PushButtonBevel, option, painter, widget);
         drawControl(CE_PushButtonLabel, option, painter, widget);
-    }
-        return;
-    case QStyle::CE_CheckBoxLabel:
-    case QStyle::CE_RadioButtonLabel: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        auto opt = *buttonOption;
-        auto subelement = SE_CheckBoxContents;
-        if (controlElement == CE_RadioButtonLabel) {
-            subelement = SE_RadioButtonContents;
-        }
-        opt.rect = subElementRect(subelement, buttonOption, widget);
-        drawIconText(&opt, this, painter, widget, buttonOption->icon, buttonOption->text);
     }
         return;
     case QStyle::CE_ToolButtonLabel: {
@@ -76,47 +64,31 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_CheckBox: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
         QStyleOptionButton subopt = *buttonOption;
-
         // Draw background
         auto bgElements = prepareElements(&subopt, widget, {QStringLiteral("CheckBox")});
         auto bgProps = queryProperties(bgElements);
         auto rect = backgroundRectangle(option, bgProps).toRect();
         drawBackground(painter, rect, bgProps);
-
-        // Get checkbox elements for mapping out the item layout
+        // Draw indicator
         subopt.rect = subElementRect(SE_CheckBoxIndicator, buttonOption, widget);
         drawPrimitive(PE_IndicatorCheckBox, &subopt, painter, widget);
-        painter->save();
-        painter->setBrush(Qt::transparent);
-        painter->setPen(Qt::green);
-        painter->drawRect(subopt.rect);
-        painter->restore();
-
-        // Draw the text
+        // Draw text
         subopt.rect = subElementRect(SE_CheckBoxContents, buttonOption, widget);
         drawControl(CE_CheckBoxLabel, &subopt, painter, widget);
-        painter->save();
-        painter->setBrush(Qt::transparent);
-        painter->setPen(Qt::red);
-        painter->drawRect(subopt.rect);
-        painter->restore();
     }
         return;
     case QStyle::CE_RadioButton: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
         QStyleOptionButton subopt = *buttonOption;
-
         // Draw background
         auto bgElements = prepareElements(&subopt, widget, {QStringLiteral("RadioButton")});
         auto bgProps = queryProperties(bgElements);
         auto rect = backgroundRectangle(option, bgProps).toRect();
         drawBackground(painter, rect, bgProps);
-
-        // Get checkbox elements for mapping out the item layout
+        // Draw indicator
         subopt.rect = subElementRect(SE_RadioButtonIndicator, buttonOption, widget);
         drawPrimitive(PE_IndicatorRadioButton, &subopt, painter, widget);
-
-        // Draw the text
+        // Draw text
         subopt.rect = subElementRect(SE_RadioButtonContents, buttonOption, widget);
         drawControl(CE_RadioButtonLabel, &subopt, painter, widget);
     }
