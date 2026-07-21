@@ -358,27 +358,48 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         icon = tabOption->icon;
         text = tabOption->text;
     } break;
+    case QStyle::CT_MenuBar:
     case QStyle::CT_MenuItem:
     case QStyle::CT_MenuBarItem: {
-        const auto tabOption = qstyleoption_cast<const QStyleOptionMenuItem *>(opt);
-        icon = tabOption->icon;
-        text = tabOption->text;
+        const auto menuOption = qstyleoption_cast<const QStyleOptionMenuItem *>(opt);
+        icon = menuOption->icon;
+        text = menuOption->text;
     } break;
-    case QStyle::CT_Splitter:
-    case QStyle::CT_ProgressBar:
-    case QStyle::CT_MenuBar:
-    case QStyle::CT_Menu:
+    case QStyle::CT_GroupBox: {
+        const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox *>(opt);
+        text = groupBoxOption->text;
+    } break;
+    case QStyle::CT_ProgressBar: {
+        const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(opt);
+        text = progressBarOption->text;
+    } break;
+    case QStyle::CT_HeaderSection: {
+        const auto headerOption = qstyleoption_cast<const QStyleOptionHeader *>(opt);
+        icon = headerOption->icon;
+        text = headerOption->text;
+    } break;
+    case QStyle::CT_ItemViewItem: {
+        const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(opt);
+        icon = viewItemOption->icon;
+        text = viewItemOption->text;
+    } break;
+    // QStyleOptionSlider, no text/icon
     case QStyle::CT_Slider:
     case QStyle::CT_ScrollBar:
+    // QStyleOptionFrame, no text/icon
     case QStyle::CT_LineEdit:
+    // QStyleOptionSpinBox, no text/icon
     case QStyle::CT_SpinBox:
-    case QStyle::CT_SizeGrip:
+    // QStyleOptionTabWidgetFrame, no text/icon
     case QStyle::CT_TabWidget:
+    // Undocumented
     case QStyle::CT_DialogButtons:
-    case QStyle::CT_HeaderSection:
-    case QStyle::CT_GroupBox:
+    // QStyleOptionComplex, no text/icon
     case QStyle::CT_MdiControls:
-    case QStyle::CT_ItemViewItem:
+    // Uses QStyleOption so there is no text/icon information
+    case QStyle::CT_SizeGrip:
+    case QStyle::CT_Menu:
+    case QStyle::CT_Splitter:
     case QStyle::CT_CustomBase:
         break;
     }

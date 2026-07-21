@@ -456,7 +456,8 @@ QStringList setupMemberList(const QWidget *widget)
                                                        {"QAbstractScrollArea", QStringLiteral("ScrollArea")},
                                                        {"QListView", QStringLiteral("ListView")},
                                                        {"QScrollBar", QStringLiteral("ScrollBar")},
-                                                       {"QTreeView", QStringLiteral("QTreeViewDelegate")}};
+                                                       {"QTreeView", QStringLiteral("QTreeViewDelegate")},
+                                                       {"QSplitter", QStringLiteral("Splitter")}};
 
     auto currentWidget = widget;
     while (currentWidget) {
