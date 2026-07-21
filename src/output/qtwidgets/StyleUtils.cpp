@@ -509,6 +509,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         spacing = properties->layout()->spacing().value_or(0);
     }
     auto currentHierarchy = elements;
+    // this could be turned into its own method
     for (const auto &subElement : subElements) {
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
@@ -539,6 +540,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             auto textAlignment = toQtAlignment(properties->text()->alignment());
             auto textFlags = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
+            // We need to make sure the text rectangle for all the elements that have text is correct
             if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt)) {
                 elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlags | textAlignment, buttonOption->text);
             } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
@@ -566,11 +568,13 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         return lhs.order < rhs.order;
     });
 
+    // Apply padding
     QMarginsF padding;
-
     if (properties->layout() && properties->layout()->padding()) {
         padding = properties->layout()->padding()->toMargins();
     }
+
+    // Actual layouting starts here
     // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
     // widgets limitations.
     QRectF previousRect;

@@ -16,6 +16,13 @@
 #include <QStyleOption>
 #include <QWidget>
 
+/*
+ * How this works:
+ * We polish the items which should get the hierarchy information
+ * Create the needed areas/rectangles/sizes from the layoutmap
+ * Utilize those areas for drawing the elements in right places
+ */
+
 UnionStyle::UnionStyle()
     : QCommonStyle()
 {
