@@ -520,24 +520,22 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto map = layoutMap(elements, option, {QStringLiteral("CloseButton")});
         rect = map[QStringLiteral("CloseButton")].rect.toRect();
     } break;
-    case QStyle::SE_TabBarScrollLeftButton:
-    case QStyle::SE_TabBarScrollRightButton:
-    case QStyle::SE_TabBarTearIndicator:
-    case QStyle::SE_TabBarTearIndicatorRight:
-    case QStyle::SE_TabWidgetLeftCorner:
-    case QStyle::SE_TabWidgetRightCorner:
-    case QStyle::SE_TabWidgetTabBar:
-    case QStyle::SE_TabWidgetTabContents:
-    case QStyle::SE_TabWidgetTabPane:
-    case QStyle::SE_ToolBarHandle:
-    case QStyle::SE_ToolBoxTabContents:
+    // Follow defaults
     case QStyle::SE_DockWidgetCloseButton:
     case QStyle::SE_DockWidgetFloatButton:
     case QStyle::SE_DockWidgetIcon:
     case QStyle::SE_DockWidgetTitleBarText:
-        rect = QCommonStyle::subElementRect(element, option, widget);
-        break;
-    // Follow defaults
+    case QStyle::SE_ToolBarHandle:
+    case QStyle::SE_TabWidgetLeftCorner:
+    case QStyle::SE_TabWidgetRightCorner:
+    case QStyle::SE_TabWidgetTabBar:
+    case QStyle::SE_TabWidgetTabPane:
+    case QStyle::SE_TabWidgetTabContents:
+    case QStyle::SE_ToolBoxTabContents: // TODO: check if this needs changes
+    case QStyle::SE_TabBarTearIndicator:
+    case QStyle::SE_TabBarTearIndicatorRight:
+    case QStyle::SE_TabBarScrollRightButton:
+    case QStyle::SE_TabBarScrollLeftButton:
     case QStyle::SE_CustomBase:
     case QStyle::SE_CheckBoxClickRect:
     case QStyle::SE_CheckBoxFocusRect:
