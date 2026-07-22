@@ -538,10 +538,8 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         } else if (subElement == QStringLiteral("Text")) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
-            auto textAlignment = toQtAlignment(properties->text()->alignment());
-            auto textFlags = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
             const auto optiontext = textFromOption(opt);
-            elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlags | textAlignment, optiontext);
+            elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlagsFromProperties(properties), optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
             elementRect.setWidth(properties->layout()->width().value_or(0));
@@ -740,4 +738,18 @@ QString textFromOption(const QStyleOption *opt)
         break;
     }
     return QString();
+}
+
+int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties)
+{
+    int textFlags = Qt::AlignVCenter;
+    auto textAlignment = toQtAlignment(properties->text()->alignment());
+    auto textWrap = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
+    auto textElide = toQtElideMode(properties->text()->elide().value_or(Union::Properties::TextElide::Right));
+    auto textColor = properties->text()->color();
+    textFlags |= textAlignment;
+    textFlags |= textWrap;
+    textFlags |= textElide;
+    textFlags |= Qt::TextShowMnemonic;
+    return textFlags;
 }
