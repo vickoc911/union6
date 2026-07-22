@@ -197,8 +197,17 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         }
     }
         return;
+    case QStyle::CC_ComboBox: {
+        // TODO: this is wrong, used for debug for now
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionComboBox *>(option);
+        const auto elements = prepareElements(buttonOption, widget);
+        const auto properties = queryProperties(elements);
+        auto rect = backgroundRectangle(buttonOption, properties).toRect();
+        drawBackground(painter, rect, properties);
+        drawControl(CE_ComboBoxLabel, buttonOption, painter, widget);
+    }
+        return;
     case QStyle::CC_SpinBox:
-    case QStyle::CC_ComboBox:
     case QStyle::CC_ScrollBar:
     case QStyle::CC_Slider:
     case QStyle::CC_TitleBar:
@@ -347,11 +356,25 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }
         size = unifiedRect.size().grownBy(padding);
-
     } break;
     case QStyle::CT_ComboBox: {
+        const auto option = qstyleoption_cast<const QStyleOptionComboBox *>(opt);
+        auto elements = prepareElements(option, widget);
+        QStringList childelements = {QStringLiteral("Icon"), QStringLiteral("Text"), QStringLiteral("Indicator")};
+        auto map = layoutMap(elements, option, childelements);
+        QRect unifiedRect;
+        for (const auto &m : map) {
+            unifiedRect = unifiedRect.united(m.rect.toRect());
+        }
+        size = unifiedRect.size().grownBy(padding);
     } break;
     case QStyle::CT_TabBarTab: {
+        QRegion r;
+        auto lb = subElementRect(SE_TabBarTabLeftButton, opt, widget);
+        auto rb = subElementRect(SE_TabBarTabRightButton, opt, widget);
+        auto textRect = subElementRect(SE_TabBarTabText, opt, widget);
+        r.setRects({lb, textRect, rb});
+        size = r.boundingRect().size().grownBy(padding);
     } break;
     case QStyle::CT_MenuBar:
     case QStyle::CT_MenuItem:
@@ -480,11 +503,25 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto mapItem = (element == SE_HeaderLabel) ? QStringLiteral("Text") : QStringLiteral("Icon");
         rect = map[mapItem].rect.toRect();
     } break;
+    case QStyle::SE_TabBarTabText: {
+        auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
+        auto map = layoutMap(elements, option, {QStringLiteral("Text")});
+        rect = map[QStringLiteral("Text")].rect.toRect();
+    } break;
+    // Use this as the icon area
+    case QStyle::SE_TabBarTabLeftButton: {
+        auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
+        auto map = layoutMap(elements, option, {QStringLiteral("Icon")});
+        rect = map[QStringLiteral("Icon")].rect.toRect();
+    } break;
+    // Use this as the close button
+    case QStyle::SE_TabBarTabRightButton: {
+        auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
+        auto map = layoutMap(elements, option, {QStringLiteral("CloseButton")});
+        rect = map[QStringLiteral("CloseButton")].rect.toRect();
+    } break;
     case QStyle::SE_TabBarScrollLeftButton:
     case QStyle::SE_TabBarScrollRightButton:
-    case QStyle::SE_TabBarTabLeftButton:
-    case QStyle::SE_TabBarTabRightButton:
-    case QStyle::SE_TabBarTabText:
     case QStyle::SE_TabBarTearIndicator:
     case QStyle::SE_TabBarTearIndicatorRight:
     case QStyle::SE_TabWidgetLeftCorner:

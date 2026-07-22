@@ -493,7 +493,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     QList<LayoutItem> items;
 
     if (subElements.empty()) {
-        qWarning() << "No sublements given, returning empty map!";
+        qWarning() << "No sublements given, returning empty map!" << elements << opt->type;
         return map;
     }
 
