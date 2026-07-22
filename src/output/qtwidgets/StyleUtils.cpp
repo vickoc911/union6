@@ -325,13 +325,13 @@ Qt::Alignment toQtAlignment(Union::Properties::AlignmentPropertyGroup *alignment
 
     switch (unionHorizontal) {
     case Union::Properties::Alignment::Unspecified:
-    case Union::Properties::Alignment::Fill:
-    case Union::Properties::Alignment::StackCenter:
-    case Union::Properties::Alignment::StackFill:
     case Union::Properties::Alignment::Start:
         horizontalAlignment = Qt::AlignLeft;
         break;
+    case Union::Properties::Alignment::Fill:
     case Union::Properties::Alignment::Center:
+    case Union::Properties::Alignment::StackFill:
+    case Union::Properties::Alignment::StackCenter:
         horizontalAlignment = Qt::AlignHCenter;
         break;
     case Union::Properties::Alignment::End:
