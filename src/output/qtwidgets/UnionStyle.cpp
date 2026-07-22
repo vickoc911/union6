@@ -189,7 +189,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
             painter->setPen(textColor);
             drawItemText(painter,
                          textRect,
-                         Qt::TextShowMnemonic | groupBoxOption->textAlignment,
+                         textFlagsFromProperties(properties),
                          groupBoxOption->palette,
                          groupBoxOption->state & State_Enabled,
                          groupBoxOption->text,
