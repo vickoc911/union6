@@ -265,11 +265,28 @@ QVariantMap attributesFromOption(const QStyleOption *option)
             return map;
         }
         break;
+    case QStyleOption::SO_Tab:
+        if (const auto tabOption = static_cast<const QStyleOptionTab *>(option)) {
+            QVariantMap map;
+            const bool north = tabOption->shape == QTabBar::RoundedNorth || tabOption->shape == QTabBar::TriangularNorth;
+            const bool south = tabOption->shape == QTabBar::RoundedSouth || tabOption->shape == QTabBar::TriangularSouth;
+            const bool west = tabOption->shape == QTabBar::RoundedWest || tabOption->shape == QTabBar::TriangularWest;
+            const bool east = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::TriangularEast;
+
+            if (north) {
+                map[QStringLiteral("direction")] = QVariant(QStringLiteral("top"));
+            }
+            if (south) {
+                map[QStringLiteral("direction")] = QVariant(QStringLiteral("bottom"));
+            }
+            return map;
+        }
+        break;
+    case QStyleOption::SO_TabBarBase:
     case QStyleOption::SO_ViewItem:
     case QStyleOption::SO_Default:
     case QStyleOption::SO_FocusRect:
     case QStyleOption::SO_Button:
-    case QStyleOption::SO_Tab:
     case QStyleOption::SO_MenuItem:
     case QStyleOption::SO_Frame:
     case QStyleOption::SO_ProgressBar:
@@ -277,7 +294,6 @@ QVariantMap attributesFromOption(const QStyleOption *option)
     case QStyleOption::SO_Header:
     case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_TabWidgetFrame:
-    case QStyleOption::SO_TabBarBase:
     case QStyleOption::SO_RubberBand:
     case QStyleOption::SO_ToolBar:
     case QStyleOption::SO_GraphicsItem:
@@ -501,10 +517,17 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     // Then place and resize those rectangles according to hierarchy
     // Use the original opt->rect as the main container
     // move any subelements in it according their given rules
+
     QRectF availableSpace = opt->rect;
+
     // Get spacing for main item
     auto properties = queryProperties(elements);
     int spacing = 0;
+    QMargins padding;
+    if (properties->layout()->padding()) {
+        padding = properties->layout()->padding()->toMargins().toMargins();
+    }
+    availableSpace = availableSpace.marginsRemoved(padding);
     if (subElements.count() > 1) {
         spacing = properties->layout()->spacing().value_or(0);
     }
@@ -538,14 +561,8 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         } else if (subElement == QStringLiteral("Text")) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
-            auto textAlignment = toQtAlignment(properties->text()->alignment());
-            auto textFlags = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
-            // We need to make sure the text rectangle for all the elements that have text is correct
-            if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt)) {
-                elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlags | textAlignment, buttonOption->text);
-            } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
-                elementRect = opt->fontMetrics.boundingRect(elementRect.toRect(), textFlags | textAlignment, buttonOption->text);
-            }
+            const auto optiontext = textFromOption(opt);
+            elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlagsFromProperties(properties, true), optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
             elementRect.setWidth(properties->layout()->width().value_or(0));
@@ -568,112 +585,69 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         return lhs.order < rhs.order;
     });
 
-    // Apply padding
-    QMarginsF padding;
-    if (properties->layout() && properties->layout()->padding()) {
-        padding = properties->layout()->padding()->toMargins();
-    }
-
     // Actual layouting starts here
     // QtWidgets containment is always within Widget, since we can't draw outside of a widget due
     // widgets limitations.
-    QRectF previousRect;
+
+    // TODO: this does not handle moving end and start well if orders do not match
+    // Instead we should just use the order and horizontal/vertical to calculate the values here,
+    // so check for StackFill/StackCenter. Use Order value for the actual drawing order.
+    // The actual alignment value would be used for Qt::alignment when drawing
+
+    int counter = 1;
     for (auto &item : items) {
+        // Skip spacing for last/only item
+        if (counter >= items.count()) {
+            spacing = 0;
+        }
+
         switch (item.horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::StackFill:
         case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::Start:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveLeft(previousRect.right());
-                item.rect.adjust(spacing, 0, spacing, 0);
-            } else {
-                item.rect.moveLeft(availableSpace.left() + padding.left());
-            }
-            availableSpace.moveLeft(item.rect.right());
+            item.rect.moveLeft(availableSpace.left());
+            availableSpace.moveLeft(item.rect.right() + spacing);
             break;
         case Union::Properties::Alignment::Fill:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveLeft(previousRect.right());
-                item.rect.moveRight(availableSpace.right());
-                item.rect.adjust(spacing, 0, spacing, 0);
-            } else {
-                item.rect.moveRight(availableSpace.right() - padding.right());
-                item.rect.moveLeft(availableSpace.left() + padding.left());
-            }
-            availableSpace.moveLeft(item.rect.right());
-            break;
         case Union::Properties::Alignment::Center:
             // For single items and vertical stackCenter/stackFill,
             // we can just utilize the exact center,
             // since we do not need to move other items around
             if (items.size() > 1 && item.verticalAlignment != Union::Properties::Alignment::StackCenter
                 && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
-                if (!previousRect.isEmpty()) {
-                    item.rect.moveLeft(previousRect.right());
-                    item.rect.adjust(spacing, 0, spacing, 0);
-                } else {
-                    item.rect.moveLeft(availableSpace.left() + padding.left());
-                }
-                availableSpace.moveLeft(item.rect.right());
+                item.rect.moveLeft(availableSpace.left());
+                availableSpace.moveLeft(item.rect.right() + spacing);
             } else {
                 item.rect.moveCenter(QPoint(availableSpace.center().x(), item.rect.center().y()));
             }
             break;
         case Union::Properties::Alignment::End:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveRight(previousRect.left());
-                item.rect.adjust(spacing, 0, spacing, 0);
-            } else {
-                item.rect.moveRight(availableSpace.right() - padding.right());
-            }
-            availableSpace.moveRight(item.rect.left());
+            item.rect.moveRight(availableSpace.right());
+            availableSpace.moveRight(item.rect.left() - spacing);
             break;
         }
+
         switch (item.verticalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-            } else {
-                item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.top() + padding.top()));
-            }
-            availableSpace.moveTop(item.rect.bottom());
+            item.rect.moveTop(availableSpace.top());
+            availableSpace.moveTop(item.rect.bottom() + spacing);
             break;
         case Union::Properties::Alignment::Fill:
-            item.rect.moveTop(availableSpace.top() + padding.top());
-            item.rect.moveBottom(availableSpace.bottom() - padding.bottom());
-            break;
         case Union::Properties::Alignment::Center:
             item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.center().y()));
             break;
         case Union::Properties::Alignment::End:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-            } else {
-                item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.bottom() - padding.bottom()));
-            }
-            availableSpace.moveTop(item.rect.bottom());
+            item.rect.moveTop(availableSpace.bottom());
+            availableSpace.moveTop(item.rect.bottom() + spacing);
             break;
         case Union::Properties::Alignment::StackFill:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-                item.rect.moveBottom(availableSpace.bottom());
-            } else {
-                item.rect.moveTop(availableSpace.top() + padding.top());
-                item.rect.moveBottom(availableSpace.bottom() - padding.bottom());
-            }
+            item.rect.moveTop(availableSpace.top());
+            item.rect.moveBottom(availableSpace.bottom() - spacing);
         case Union::Properties::Alignment::StackCenter:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-            } else {
-                item.rect.moveTop(availableSpace.top() + padding.top());
-            }
-            availableSpace.moveTop(item.rect.bottom());
+            item.rect.moveTop(availableSpace.top());
+            availableSpace.moveTop(item.rect.bottom() + spacing);
             break;
         }
 
@@ -686,8 +660,82 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             item.rect.setY(0);
         }
 
-        previousRect = item.rect;
         map[item.elementName] = item;
+        counter++;
     }
+
     return map;
+}
+
+QString textFromOption(const QStyleOption *opt)
+{
+    switch ((QStyleOption::OptionType)opt->type) {
+    case QStyleOption::SO_Button:
+        if (const auto option = qstyleoption_cast<const QStyleOptionButton *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_ToolButton:
+        if (const auto option = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_DockWidget:
+        if (const auto option = qstyleoption_cast<const QStyleOptionDockWidget *>(opt)) {
+            return option->title;
+        }
+        break;
+    case QStyleOption::SO_Header:
+        if (const auto option = qstyleoption_cast<const QStyleOptionHeader *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_MenuItem:
+        if (const auto option = qstyleoption_cast<const QStyleOptionMenuItem *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_ProgressBar:
+        if (const auto option = qstyleoption_cast<const QStyleOptionProgressBar *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_Tab:
+        if (const auto option = qstyleoption_cast<const QStyleOptionTab *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_ToolBox:
+        if (const auto option = qstyleoption_cast<const QStyleOptionToolBox *>(opt)) {
+            return option->text;
+        }
+        break;
+    case QStyleOption::SO_ViewItem:
+        if (const auto option = qstyleoption_cast<const QStyleOptionViewItem *>(opt)) {
+            return option->text;
+        }
+        break;
+    default:
+        break;
+    }
+    return QString();
+}
+
+int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, bool skipAlign)
+{
+    int textFlags = Qt::AlignVCenter;
+    // Handle alignment case-by-case basis. Sometimes we want to just use default
+    // alignleft and center, especially if we have an icon to work with.
+    auto textAlign = QFlags(Qt::AlignAbsolute);
+    if (!skipAlign) {
+        textAlign = toQtAlignment(properties->text()->alignment());
+    }
+    auto textWrap = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
+    auto textElide = toQtElideMode(properties->text()->elide().value_or(Union::Properties::TextElide::Right));
+    auto textColor = properties->text()->color();
+    textFlags |= textAlign;
+    textFlags |= textWrap;
+    textFlags |= textElide;
+    textFlags |= Qt::TextShowMnemonic;
+    return textFlags;
 }
