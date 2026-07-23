@@ -265,11 +265,28 @@ QVariantMap attributesFromOption(const QStyleOption *option)
             return map;
         }
         break;
+    case QStyleOption::SO_Tab:
+        if (const auto tabOption = static_cast<const QStyleOptionTab *>(option)) {
+            QVariantMap map;
+            const bool north = tabOption->shape == QTabBar::RoundedNorth || tabOption->shape == QTabBar::TriangularNorth;
+            const bool south = tabOption->shape == QTabBar::RoundedSouth || tabOption->shape == QTabBar::TriangularSouth;
+            const bool west = tabOption->shape == QTabBar::RoundedWest || tabOption->shape == QTabBar::TriangularWest;
+            const bool east = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::TriangularEast;
+
+            if (north) {
+                map[QStringLiteral("direction")] = QVariant(QStringLiteral("top"));
+            }
+            if (south) {
+                map[QStringLiteral("direction")] = QVariant(QStringLiteral("bottom"));
+            }
+            return map;
+        }
+        break;
+    case QStyleOption::SO_TabBarBase:
     case QStyleOption::SO_ViewItem:
     case QStyleOption::SO_Default:
     case QStyleOption::SO_FocusRect:
     case QStyleOption::SO_Button:
-    case QStyleOption::SO_Tab:
     case QStyleOption::SO_MenuItem:
     case QStyleOption::SO_Frame:
     case QStyleOption::SO_ProgressBar:
@@ -277,7 +294,6 @@ QVariantMap attributesFromOption(const QStyleOption *option)
     case QStyleOption::SO_Header:
     case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_TabWidgetFrame:
-    case QStyleOption::SO_TabBarBase:
     case QStyleOption::SO_RubberBand:
     case QStyleOption::SO_ToolBar:
     case QStyleOption::SO_GraphicsItem:
