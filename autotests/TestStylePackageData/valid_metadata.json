@@ -1,0 +1,10 @@
+{
+    "input-type": "test",
+    "name": "Test Metadata",
+    "description": "Metadata to test the metadata loading",
+    "version": "1.0",
+    "license": "BSD-2-Clause",
+    "authors": [
+        "Test Author"
+    ]
+}
