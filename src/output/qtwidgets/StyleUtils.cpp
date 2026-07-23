@@ -124,7 +124,11 @@ QStringList hintsFromOption(const QStyleOption *option)
                 hints.append(QStringLiteral("rounded"));
             }
             switch (optionFrame->frameShape) {
-            case QFrame::NoFrame:
+            case QFrame::NoFrame: {
+                if (!hints.contains(QStringLiteral("flat"))) {
+                    hints.append(QStringLiteral("flat"));
+                }
+            }
             case QFrame::Box:
             case QFrame::Panel:
             case QFrame::WinPanel:
@@ -141,7 +145,7 @@ QStringList hintsFromOption(const QStyleOption *option)
             if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::None)) {
                 return hints;
             }
-            if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::HasMenu)) {
+            if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::Menu)) {
                 hints.append(QStringLiteral("with-menu"));
             }
             if (!optionButton->state.testFlag(QStyle::State_AutoRaise)) {
@@ -162,23 +166,52 @@ QStringList hintsFromOption(const QStyleOption *option)
                 break;
             }
         }
-    }
+    } break;
+    case QStyleOption::SO_MenuItem: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionMenuItemV2 *>(option)) {
+            if (opt->checked) {
+                hints.append(QStringLiteral("with-submenu"));
+            }
+        }
+    } break;
+    case QStyleOption::SO_GroupBox: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+            if (opt->features.testFlag(QStyleOptionFrame::Flat)) {
+                hints.append(QStringLiteral("flat"));
+            }
+            if (opt->features.testFlag(QStyleOptionFrame::Rounded)) {
+                hints.append(QStringLiteral("rounded"));
+            }
+        }
+    } break;
+    case QStyleOption::SO_ComboBox: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
+            if (!opt->frame) {
+                hints.append(QStringLiteral("flat"));
+            }
+            if (opt->editable) {
+                hints.append(QStringLiteral("editable"));
+            }
+        }
+    } break;
+    case QStyleOption::SO_SpinBox: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
+            // TODO: Use constrained look for now, revisit this when we have better layouting
+            hints.append(QStringLiteral("constrained"));
+        }
+    } break;
     case QStyleOption::SO_Tab:
-    case QStyleOption::SO_MenuItem:
-    case QStyleOption::SO_ProgressBar:
-    case QStyleOption::SO_ToolBox:
-    case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_TabWidgetFrame:
     case QStyleOption::SO_TabBarBase:
+    case QStyleOption::SO_ProgressBar:
+    case QStyleOption::SO_Slider:
+    case QStyleOption::SO_ToolBox:
+    case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_RubberBand:
     case QStyleOption::SO_ToolBar:
     case QStyleOption::SO_GraphicsItem:
     case QStyleOption::SO_Complex:
-    case QStyleOption::SO_Slider:
-    case QStyleOption::SO_SpinBox:
-    case QStyleOption::SO_ComboBox:
     case QStyleOption::SO_TitleBar:
-    case QStyleOption::SO_GroupBox:
     case QStyleOption::SO_SizeGrip:
     default:
         return QStringList();
@@ -268,16 +301,22 @@ QVariantMap attributesFromOption(const QStyleOption *option)
     case QStyleOption::SO_Tab:
         if (const auto tabOption = static_cast<const QStyleOptionTab *>(option)) {
             QVariantMap map;
-            const bool north = tabOption->shape == QTabBar::RoundedNorth || tabOption->shape == QTabBar::TriangularNorth;
-            const bool south = tabOption->shape == QTabBar::RoundedSouth || tabOption->shape == QTabBar::TriangularSouth;
-            const bool west = tabOption->shape == QTabBar::RoundedWest || tabOption->shape == QTabBar::TriangularWest;
-            const bool east = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::TriangularEast;
+            const bool top = tabOption->shape == QTabBar::RoundedNorth || tabOption->shape == QTabBar::TriangularNorth;
+            const bool bottom = tabOption->shape == QTabBar::RoundedSouth || tabOption->shape == QTabBar::TriangularSouth;
+            const bool left = tabOption->shape == QTabBar::RoundedWest || tabOption->shape == QTabBar::TriangularWest;
+            const bool right = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::TriangularEast;
 
-            if (north) {
+            if (top) {
                 map[QStringLiteral("direction")] = QVariant(QStringLiteral("top"));
             }
-            if (south) {
+            if (bottom) {
                 map[QStringLiteral("direction")] = QVariant(QStringLiteral("bottom"));
+            }
+            if (left) {
+                map[QStringLiteral("direction")] = QVariant(QStringLiteral("left"));
+            }
+            if (right) {
+                map[QStringLiteral("direction")] = QVariant(QStringLiteral("right"));
             }
             return map;
         }
@@ -601,13 +640,15 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             spacing = 0;
         }
 
+        auto itemWidth = item.rect.width() + spacing;
+        auto itemHeight = item.rect.height() + spacing;
         switch (item.horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::StackFill:
         case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::Start:
             item.rect.moveLeft(availableSpace.left());
-            availableSpace.moveLeft(item.rect.right() + spacing);
+            availableSpace.adjust(itemWidth, 0, 0, 0);
             break;
         case Union::Properties::Alignment::Fill:
         case Union::Properties::Alignment::Center:
@@ -617,14 +658,14 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             if (items.size() > 1 && item.verticalAlignment != Union::Properties::Alignment::StackCenter
                 && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
                 item.rect.moveLeft(availableSpace.left());
-                availableSpace.moveLeft(item.rect.right() + spacing);
+                availableSpace.adjust(itemWidth, 0, 0, 0);
             } else {
                 item.rect.moveCenter(QPoint(availableSpace.center().x(), item.rect.center().y()));
             }
             break;
         case Union::Properties::Alignment::End:
             item.rect.moveRight(availableSpace.right());
-            availableSpace.moveRight(item.rect.left() - spacing);
+            availableSpace.adjust(0, 0, -itemWidth, 0);
             break;
         }
 
@@ -632,7 +673,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
             item.rect.moveTop(availableSpace.top());
-            availableSpace.moveTop(item.rect.bottom() + spacing);
+            availableSpace.adjust(0, itemHeight, 0, 0);
             break;
         case Union::Properties::Alignment::Fill:
         case Union::Properties::Alignment::Center:
@@ -640,24 +681,15 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             break;
         case Union::Properties::Alignment::End:
             item.rect.moveTop(availableSpace.bottom());
-            availableSpace.moveTop(item.rect.bottom() + spacing);
+            availableSpace.adjust(0, 0, 0, -itemHeight);
             break;
         case Union::Properties::Alignment::StackFill:
             item.rect.moveTop(availableSpace.top());
-            item.rect.moveBottom(availableSpace.bottom() - spacing);
+            availableSpace.adjust(0, 0, 0, -itemHeight);
         case Union::Properties::Alignment::StackCenter:
             item.rect.moveTop(availableSpace.top());
-            availableSpace.moveTop(item.rect.bottom() + spacing);
+            availableSpace.adjust(0, itemHeight, 0, 0);
             break;
-        }
-
-        // QtWidgets does not allow drawing outside of the
-        // widget area, so constrain it.
-        if (item.rect.x() < 0) {
-            item.rect.setX(0);
-        }
-        if (item.rect.y() < 0) {
-            item.rect.setY(0);
         }
 
         map[item.elementName] = item;
@@ -734,8 +766,17 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
     auto textElide = toQtElideMode(properties->text()->elide().value_or(Union::Properties::TextElide::Right));
     auto textColor = properties->text()->color();
     textFlags |= textAlign;
-    textFlags |= textWrap;
+    // Do not add wrap flags if we get DontClip
+    // This could be done better
+    if (textWrap == Qt::TextDontClip) {
+        textFlags |= textWrap;
+    }
     textFlags |= textElide;
     textFlags |= Qt::TextShowMnemonic;
     return textFlags;
+}
+
+QRect centerRect(const QRect &rect, int width, int height)
+{
+    return QRect(rect.left() + (rect.width() - width) / 2, rect.top() + (rect.height() - height) / 2, width, height);
 }
