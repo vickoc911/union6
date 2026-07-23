@@ -226,7 +226,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
             painter->setPen(textColor);
             drawItemText(painter,
                          textRect,
-                         textFlagsFromProperties(properties),
+                         textFlagsFromProperties(properties, true),
                          groupBoxOption->palette,
                          groupBoxOption->state & State_Enabled,
                          groupBoxOption->text,
@@ -367,12 +367,8 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         size = r.boundingRect().size().grownBy(padding);
     } break;
     case QStyle::CT_PushButton: {
-        QRegion r;
         auto contentsRect = subElementRect(SE_PushButtonContents, opt, widget);
-        auto bgRect = subElementRect(SE_PushButtonBevel, opt, widget);
-        auto focus = subElementRect(SE_PushButtonFocusRect, opt, widget);
-        r.setRects({contentsRect, bgRect, focus});
-        size = r.boundingRect().size().grownBy(padding);
+        size = contentsRect.size().grownBy(padding);
     } break;
     case QStyle::CT_ToolButton: {
         const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt);
@@ -537,7 +533,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_CheckBoxContents: {
         const auto opt = qstyleoption_cast<const QStyleOptionButton *>(option);
         auto elements = prepareElements(option, widget);
-        QStringList childelements = {QStringLiteral("Indicator")};
+        QStringList childelements = {};
+        if (element != SE_PushButtonContents) {
+            childelements.append(QStringLiteral("Indicator"));
+        }
         if (!opt->icon.isNull()) {
             childelements.append(QStringLiteral("Icon"));
         }
@@ -550,6 +549,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto map = layoutMap(elements, option, childelements);
         QRect unifiedRect;
         for (const auto &m : map) {
+            // Contents will skip the indicator
             if (m.elementName != QStringLiteral("Indicator")) {
                 unifiedRect = unifiedRect.united(m.rect.toRect());
             }
@@ -584,6 +584,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto map = layoutMap(elements, option, {QStringLiteral("Icon"), QStringLiteral("Text")});
         QRect unifiedRect;
         for (const auto &m : map) {
+            // Skip the indicator area
             if (m.elementName != QStringLiteral("Indicator")) {
                 unifiedRect = unifiedRect.united(m.rect.toRect());
             }
@@ -929,7 +930,7 @@ void UnionStyle::drawText(const QRect &rect, const QStyleOption *opt, QPainter *
 
     painter->save();
     painter->setPen(penColor);
-    drawItemText(painter, rect, textFlagsFromProperties(properties), opt->palette, enabled, text);
+    drawItemText(painter, rect, textFlagsFromProperties(properties, true), opt->palette, enabled, text);
     painter->restore();
 }
 
@@ -939,7 +940,6 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
     auto properties = queryProperties(elements);
 
-    auto iconAlignment = Qt::AlignCenter; // toQtAlignment(properties->icon()->alignment());
     auto iconColor = properties->icon()->color();
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
@@ -951,7 +951,7 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
 
     painter->save();
     painter->setPen(penColor);
-    drawItemPixmap(painter, rect, iconAlignment, pixmap);
+    drawItemPixmap(painter, rect, Qt::AlignCenter, pixmap);
     painter->restore();
 }
 
@@ -984,16 +984,4 @@ void UnionStyle::layoutAndDrawIconText(const QStyleOption *opt, QPainter *painte
     if (hasIcon) {
         drawIcon(iconRect, opt, painter, icon, widget);
     }
-
-    /*
-             painter->save();
-             painter->setBrush(Qt::NoBrush);
-             painter->setPen(Qt::blue);
-             painter->drawRect(opt->rect);
-             painter->setPen(Qt::magenta);
-             painter->drawRect(iconRect);
-             painter->setPen(Qt::yellow);
-             painter->drawRect(textRect);
-             painter->restore();
-    */
 }

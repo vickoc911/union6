@@ -562,7 +562,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             const auto optiontext = textFromOption(opt);
-            elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlagsFromProperties(properties), optiontext);
+            elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlagsFromProperties(properties, true), optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
             elementRect.setWidth(properties->layout()->width().value_or(0));
@@ -594,25 +594,20 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     // so check for StackFill/StackCenter. Use Order value for the actual drawing order.
     // The actual alignment value would be used for Qt::alignment when drawing
 
-    QRectF previousRect;
     int counter = 1;
     for (auto &item : items) {
         // Skip spacing for last/only item
         if (counter >= items.count()) {
             spacing = 0;
         }
+
         switch (item.horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::StackFill:
         case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::Start:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveLeft(previousRect.right());
-                item.rect.adjust(spacing, 0, spacing, 0);
-            } else {
-                item.rect.moveLeft(availableSpace.left());
-            }
-            availableSpace.moveLeft(item.rect.right());
+            item.rect.moveLeft(availableSpace.left());
+            availableSpace.moveLeft(item.rect.right() + spacing);
             break;
         case Union::Properties::Alignment::Fill:
         case Union::Properties::Alignment::Center:
@@ -621,71 +616,41 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             // since we do not need to move other items around
             if (items.size() > 1 && item.verticalAlignment != Union::Properties::Alignment::StackCenter
                 && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
-                if (!previousRect.isEmpty()) {
-                    item.rect.moveLeft(previousRect.right());
-                    item.rect.adjust(spacing, 0, spacing, 0);
-                } else {
-                    item.rect.moveLeft(availableSpace.left());
-                }
-                availableSpace.moveLeft(item.rect.right());
+                item.rect.moveLeft(availableSpace.left());
+                availableSpace.moveLeft(item.rect.right() + spacing);
             } else {
                 item.rect.moveCenter(QPoint(availableSpace.center().x(), item.rect.center().y()));
             }
             break;
         case Union::Properties::Alignment::End:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveLeft(previousRect.right());
-                item.rect.adjust(spacing, 0, spacing, 0);
-            } else {
-                item.rect.moveRight(availableSpace.right());
-            }
-            availableSpace.moveRight(item.rect.left());
+            item.rect.moveRight(availableSpace.right());
+            availableSpace.moveRight(item.rect.left() - spacing);
             break;
         }
+
         switch (item.verticalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-            } else {
-                item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.top()));
-            }
-            availableSpace.moveTop(item.rect.bottom());
+            item.rect.moveTop(availableSpace.top());
+            availableSpace.moveTop(item.rect.bottom() + spacing);
             break;
         case Union::Properties::Alignment::Fill:
-            item.rect.moveTop(availableSpace.top());
-            item.rect.moveBottom(availableSpace.bottom());
+            item.rect.moveTop(availableSpace.top() - spacing);
+            item.rect.moveBottom(availableSpace.bottom() + spacing);
             break;
         case Union::Properties::Alignment::Center:
             item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.center().y()));
             break;
         case Union::Properties::Alignment::End:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-            } else {
-                item.rect.moveCenter(QPoint(item.rect.center().x(), availableSpace.bottom()));
-            }
-            availableSpace.moveTop(item.rect.bottom());
+            item.rect.moveTop(availableSpace.bottom());
+            availableSpace.moveTop(item.rect.bottom() + spacing);
             break;
         case Union::Properties::Alignment::StackFill:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-                item.rect.moveBottom(availableSpace.bottom());
-            } else {
-                item.rect.moveTop(availableSpace.top());
-                item.rect.moveBottom(availableSpace.bottom());
-            }
+            item.rect.moveTop(availableSpace.top());
+            item.rect.moveBottom(availableSpace.bottom() - spacing);
         case Union::Properties::Alignment::StackCenter:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveTop(previousRect.bottom());
-                item.rect.adjust(0, spacing, 0, spacing);
-            } else {
-                item.rect.moveTop(availableSpace.top());
-            }
-            availableSpace.moveTop(item.rect.bottom());
+            item.rect.moveTop(availableSpace.top());
+            availableSpace.moveTop(item.rect.bottom() + spacing);
             break;
         }
 
@@ -698,9 +663,8 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             item.rect.setY(0);
         }
 
-        previousRect = item.rect;
         map[item.elementName] = item;
-        spacing++;
+        counter++;
     }
 
     return map;
@@ -760,13 +724,19 @@ QString textFromOption(const QStyleOption *opt)
     return QString();
 }
 
-int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties)
+int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, bool skipAlign)
 {
-    int textFlags = Qt::AlignLeft | Qt::AlignVCenter;
-    // The text alignment is handled by Qt
+    int textFlags = Qt::AlignVCenter;
+    // Handle alignment case-by-case basis. Sometimes we want to just use default
+    // alignleft and center, especially if we have an icon to work with.
+    auto textAlign = QFlags(Qt::AlignAbsolute);
+    if (!skipAlign) {
+        textAlign = toQtAlignment(properties->text()->alignment());
+    }
     auto textWrap = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
     auto textElide = toQtElideMode(properties->text()->elide().value_or(Union::Properties::TextElide::Right));
     auto textColor = properties->text()->color();
+    textFlags |= textAlign;
     textFlags |= textWrap;
     textFlags |= textElide;
     textFlags |= Qt::TextShowMnemonic;
