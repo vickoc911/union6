@@ -26,16 +26,20 @@ public:
 
     QSize sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget) const override;
     QRect subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget = nullptr) const override;
+    QRect subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *w = nullptr) const override;
+
     int pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const override;
+    int styleHint(StyleHint hint, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *returnData) const override;
 
     void polish(QApplication *application) override;
     void polish(QWidget *) override;
 
     void drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget = nullptr) const;
     void drawText(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QString &text, const QWidget *widget = nullptr) const;
-    void layoutAndDrawIconText(const QStyleOption *opt,
-                               QPainter *painter,
-                               const QWidget *widget = nullptr,
-                               const QIcon &icon = QIcon(),
-                               const QString &text = QString()) const;
+    void layoutAndDrawIconTextIndicator(const QStyleOption *opt,
+                                        QPainter *painter,
+                                        const QWidget *widget = nullptr,
+                                        const QIcon &icon = QIcon(),
+                                        const QString &text = QString(),
+                                        const QIcon &indicator = QIcon()) const;
 };
