@@ -294,8 +294,7 @@ tabbutton {
     color: var(--tab-text-color);
 
     icon-alignment: content start center 0;
-    text-alignment-horizontal: center;
-    icon-alignment-horizontal: center;
+    text-alignment: content center center 1;
 
     &[direction="top"] {
         border-bottom-left-radius: 0px;
@@ -348,7 +347,6 @@ tabbutton {
 
     /* close button for widgets */
     & > closebutton {
-        layout-alignment: content end center 0;
         width: var(--icon-size-small);
         height: var(--icon-size-small);
         icon-name: "tab-close";

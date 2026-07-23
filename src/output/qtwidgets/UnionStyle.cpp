@@ -113,19 +113,18 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
         auto opt = *tabOption;
         opt.rect = subElementRect(SE_TabWidgetTabPane, tabOption, widget);
-        drawElement(queryProperties(prepareElements(tabOption, widget)), painter, tabOption);
+        drawElement(queryProperties(prepareElements(tabOption, widget, {QStringLiteral("TabButton")})), painter, tabOption);
     }
         return;
     case QStyle::CE_TabBarTabLabel: {
         const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-        auto opt = *tabOption;
-        opt.rect = subElementRect(SE_TabBarTabText, tabOption, widget);
-        layoutAndDrawIconText(&opt, painter, widget, tabOption->icon, tabOption->text);
+        layoutAndDrawIconText(tabOption, painter, widget, tabOption->icon, tabOption->text);
     }
         return;
     case QStyle::CE_TabBarTab: {
-        drawControl(CE_TabBarTabShape, option, painter, widget);
-        drawControl(CE_TabBarTabLabel, option, painter, widget);
+        const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
+        drawControl(CE_TabBarTabShape, tabOption, painter, widget);
+        drawControl(CE_TabBarTabLabel, tabOption, painter, widget);
     }
         return;
     case QStyle::CE_ItemViewItem: {
@@ -582,22 +581,18 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     } break;
     case QStyle::SE_TabBarTabText: {
         auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
-        auto map = layoutMap(elements, option, {QStringLiteral("Text")});
-        rect = map[QStringLiteral("Text")].rect.toRect();
-    } break;
-    // Use this as the icon area
-    case QStyle::SE_TabBarTabLeftButton: {
-        auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
-        auto map = layoutMap(elements, option, {QStringLiteral("Icon")});
-        rect = map[QStringLiteral("Icon")].rect.toRect();
-    } break;
-    // Use this as the close button
-    case QStyle::SE_TabBarTabRightButton: {
-        auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
-        auto map = layoutMap(elements, option, {QStringLiteral("CloseButton")});
-        rect = map[QStringLiteral("CloseButton")].rect.toRect();
+        auto map = layoutMap(elements, option, {QStringLiteral("Icon"), QStringLiteral("Text")});
+        QRect unifiedRect;
+        for (const auto &m : map) {
+            if (m.elementName != QStringLiteral("Indicator")) {
+                unifiedRect = unifiedRect.united(m.rect.toRect());
+            }
+        }
+        rect = unifiedRect;
     } break;
     // Follow defaults
+    case QStyle::SE_TabBarTabLeftButton:
+    case QStyle::SE_TabBarTabRightButton:
     case QStyle::SE_DockWidgetCloseButton:
     case QStyle::SE_DockWidgetFloatButton:
     case QStyle::SE_DockWidgetIcon:
@@ -944,7 +939,7 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
     auto properties = queryProperties(elements);
 
-    auto iconAlignment = toQtAlignment(properties->icon()->alignment());
+    auto iconAlignment = Qt::AlignCenter; // toQtAlignment(properties->icon()->alignment());
     auto iconColor = properties->icon()->color();
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();

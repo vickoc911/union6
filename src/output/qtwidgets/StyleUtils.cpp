@@ -599,16 +599,6 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             availableSpace.moveLeft(item.rect.right());
             break;
         case Union::Properties::Alignment::Fill:
-            if (!previousRect.isEmpty()) {
-                item.rect.moveLeft(previousRect.right());
-                item.rect.moveRight(availableSpace.right());
-                item.rect.adjust(spacing, 0, spacing, 0);
-            } else {
-                item.rect.moveRight(availableSpace.right());
-                item.rect.moveLeft(availableSpace.left());
-            }
-            availableSpace.moveLeft(item.rect.right());
-            break;
         case Union::Properties::Alignment::Center:
             // For single items and vertical stackCenter/stackFill,
             // we can just utilize the exact center,
@@ -628,7 +618,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             break;
         case Union::Properties::Alignment::End:
             if (!previousRect.isEmpty()) {
-                item.rect.moveRight(previousRect.left());
+                item.rect.moveLeft(previousRect.right());
                 item.rect.adjust(spacing, 0, spacing, 0);
             } else {
                 item.rect.moveRight(availableSpace.right());
@@ -756,12 +746,11 @@ QString textFromOption(const QStyleOption *opt)
 
 int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties)
 {
-    int textFlags = Qt::AlignVCenter;
-    auto textAlignment = toQtAlignment(properties->text()->alignment());
+    int textFlags = Qt::AlignLeft | Qt::AlignVCenter;
+    // The text alignment is handled by Qt
     auto textWrap = toQtWrapMode(properties->text()->wrapMode().value_or(Union::Properties::TextWrapMode::NoWrap));
     auto textElide = toQtElideMode(properties->text()->elide().value_or(Union::Properties::TextElide::Right));
     auto textColor = properties->text()->color();
-    textFlags |= textAlignment;
     textFlags |= textWrap;
     textFlags |= textElide;
     textFlags |= Qt::TextShowMnemonic;
