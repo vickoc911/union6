@@ -63,6 +63,7 @@ menuitem
     from.
     */
     &:hovered,
+    &:selected,
     &.with-submenu:highlighted
     {
         background-color: var(--focus-color);
