@@ -168,10 +168,36 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
     }
         return;
+    case QStyle::CE_ProgressBarGroove: {
+        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
+    }
+        return;
+    case QStyle::CE_ProgressBarContents: {
+        const auto opt = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
+        // drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Track")})), painter, option);
+
+        // TODO: get the rectangle size between minimum and maximum.
+        // right divided by value?
+        auto minPosition = opt->rect.left();
+        auto maxPosition = opt->rect.right();
+        auto groove = subElementRect(SE_ProgressBarContents, opt, widget);
+
+        painter->setPen(Qt::green);
+        painter->drawRect(groove);
+        painter->setPen(Qt::red);
+        painter->drawRect(opt->rect);
+    }
+        return;
+    case QStyle::CE_ProgressBarLabel: {
+        const auto opt = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
+        layoutAndDrawIconText(opt, painter, widget, QIcon(), opt->text);
+    }
+        return;
     case QStyle::CE_ProgressBar:
-    case QStyle::CE_ProgressBarGroove:
-    case QStyle::CE_ProgressBarContents:
-    case QStyle::CE_ProgressBarLabel:
+        drawControl(CE_ProgressBarGroove, option, painter, widget);
+        drawControl(CE_ProgressBarContents, option, painter, widget);
+        drawControl(CE_ProgressBarLabel, option, painter, widget);
+        return;
     case QStyle::CE_MenuScroller:
     case QStyle::CE_MenuVMargin:
     case QStyle::CE_MenuHMargin:
@@ -564,18 +590,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             rect = map[QStringLiteral("CheckBox")].rect.toRect();
         }
     } break;
-    case QStyle::SE_ProgressBarLabel: {
-        const auto opt = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
-        auto elements = prepareElements(option, widget);
-        QStringList childelements = {QStringLiteral("Indicator")};
-        if (!opt->text.isEmpty()) {
-            childelements.append(QStringLiteral("Text"));
-        } else {
-            return QRect();
-        }
-        auto map = layoutMap(elements, option, childelements);
-        rect = map[QStringLiteral("Text")].rect.toRect();
-    } break;
+
     case QStyle::SE_PushButtonContents:
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_CheckBoxContents: {
@@ -604,15 +619,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         rect = unifiedRect;
     } break;
-    case QStyle::SE_ProgressBarGroove: {
-        auto elements = prepareElements(option, widget);
-        auto map = layoutMap(elements, option, {QStringLiteral("Track")});
-        rect = map[QStringLiteral("Track")].rect.toRect();
-    } break;
+
     case QStyle::SE_PushButtonBevel:
     case QStyle::SE_ShapedFrameContents:
     case QStyle::SE_LineEditContents:
-    case QStyle::SE_ProgressBarContents:
     case QStyle::SE_FrameContents: {
         auto frameElements = prepareElements(option, widget);
         auto props = queryProperties(frameElements);
@@ -637,6 +647,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         rect = unifiedRect;
     } break;
     // Follow defaults
+    case QStyle::SE_ProgressBarContents:
+    case QStyle::SE_ProgressBarLabel:
+    case QStyle::SE_ProgressBarGroove:
+        return option->rect;
     case QStyle::SE_TabWidgetTabContents:
     case QStyle::SE_ToolBoxTabContents:
     case QStyle::SE_TabBarTabLeftButton:
