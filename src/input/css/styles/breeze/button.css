@@ -392,3 +392,9 @@ delaybutton.changed {
     background-color: var(--changed-background);
     border: 1px solid var(--changed-foreground);
 }
+
+
+tabscrollbutton {
+    width: var(--button-default-size);
+    height: var(--button-default-size);
+}

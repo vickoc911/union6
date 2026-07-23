@@ -109,6 +109,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         layoutAndDrawIconText(option, painter, widget, menuItem->icon, menuItem->text);
     }
         return;
+    case QStyle::CE_ToolBoxTabShape:
     case QStyle::CE_TabBarTabShape: {
         const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
         auto opt = *tabOption;
@@ -116,11 +117,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElement(queryProperties(prepareElements(tabOption, widget, {QStringLiteral("TabButton")})), painter, tabOption);
     }
         return;
+    case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel: {
         const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
         layoutAndDrawIconText(tabOption, painter, widget, tabOption->icon, tabOption->text);
     }
         return;
+    case QStyle::CE_ToolBoxTab:
     case QStyle::CE_TabBarTab: {
         const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
         drawControl(CE_TabBarTabShape, tabOption, painter, widget);
@@ -176,7 +179,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_Header:
     case QStyle::CE_HeaderSection:
     case QStyle::CE_HeaderLabel:
-    case QStyle::CE_ToolBoxTab:
     case QStyle::CE_SizeGrip:
     case QStyle::CE_Splitter:
     case QStyle::CE_RubberBand:
@@ -191,8 +193,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_FocusFrame:
     case QStyle::CE_ComboBoxLabel:
     case QStyle::CE_ToolBar:
-    case QStyle::CE_ToolBoxTabShape:
-    case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_HeaderEmptyArea:
     case QStyle::CE_ColumnViewGrip:
     case QStyle::CE_ShapedFrame:
@@ -579,6 +579,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto mapItem = (element == SE_HeaderLabel) ? QStringLiteral("Text") : QStringLiteral("Icon");
         rect = map[mapItem].rect.toRect();
     } break;
+    case QStyle::SE_ToolBoxTabContents:
     case QStyle::SE_TabBarTabText: {
         auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
         auto map = layoutMap(elements, option, {QStringLiteral("Icon"), QStringLiteral("Text")});
@@ -604,7 +605,6 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_TabWidgetTabBar:
     case QStyle::SE_TabWidgetTabPane:
     case QStyle::SE_TabWidgetTabContents:
-    case QStyle::SE_ToolBoxTabContents: // TODO: check if this needs changes
     case QStyle::SE_TabBarTearIndicator:
     case QStyle::SE_TabBarTearIndicatorRight:
     case QStyle::SE_TabBarScrollRightButton:
@@ -804,8 +804,18 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return properties->layout()->spacing().value_or(defaultMetric);
         }
     } break;
+    case QStyle::PM_TabBarScrollButtonWidth: {
+        auto elements = prepareElements(option, widget, {QStringLiteral("TabScrollButton")});
+        if (elements.isEmpty()) {
+            return defaultMetric;
+        }
+        auto properties = queryProperties(elements);
+        if (!properties) {
+            return defaultMetric;
+        }
+        return properties->layout()->width().value_or(defaultMetric);
+    } break;
     case QStyle::PM_TitleBarButtonSize:
-    case QStyle::PM_TabBarScrollButtonWidth:
     case QStyle::PM_MenuPanelWidth:
     case QStyle::PM_SplitterWidth:
     case QStyle::PM_ProgressBarChunkWidth: {
