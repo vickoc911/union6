@@ -97,11 +97,44 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         // Skip text drawing for icon only buttons completely
         if (buttonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {
             text = QString();
-        }
-        if (buttonOption->toolButtonStyle == Qt::ToolButtonTextOnly) {
+        } else if (buttonOption->toolButtonStyle == Qt::ToolButtonTextOnly) {
             icon = QIcon();
         }
-        layoutAndDrawIconText(buttonOption, painter, widget, icon, text);
+        if (icon.isNull() && buttonOption->features.testFlag(QStyleOptionToolButton::Arrow)) {
+            QList<Union::Element::Ptr> elements = prepareElements(buttonOption, widget);
+            bool hasText = !text.isEmpty();
+            QStringList subElements = {QStringLiteral("Icon")};
+            if (hasText) {
+                subElements.append(QStringLiteral("Text"));
+            }
+            auto map = layoutMap(elements, buttonOption, subElements);
+            if (hasText) {
+                QRect textRect = map[QStringLiteral("Text")].rect.toRect();
+                drawText(textRect, buttonOption, painter, text, widget);
+            }
+            QRect iconRect = map[QStringLiteral("Icon")].rect.toRect();
+            auto subopt = *buttonOption;
+            subopt.rect = iconRect;
+
+            switch (buttonOption->arrowType) {
+            case Qt::LeftArrow:
+                drawPrimitive(PE_IndicatorArrowLeft, &subopt, painter, widget);
+                break;
+            case Qt::RightArrow:
+                drawPrimitive(PE_IndicatorArrowRight, &subopt, painter, widget);
+                break;
+            case Qt::UpArrow:
+                drawPrimitive(PE_IndicatorArrowUp, &subopt, painter, widget);
+                break;
+            case Qt::DownArrow:
+                drawPrimitive(PE_IndicatorArrowDown, &subopt, painter, widget);
+                break;
+            default:
+                break;
+            }
+        } else {
+            layoutAndDrawIconText(buttonOption, painter, widget, icon, text);
+        }
     }
         return;
     case QStyle::CE_CheckBox: {
@@ -168,6 +201,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_ItemViewItem: {
         const auto vi = qstyleoption_cast<const QStyleOptionViewItem *>(option);
+        // Dont allow drawing outside of the area
+        painter->save();
+        painter->setClipRect(option->rect);
         QStyleOptionViewItem subopt = *vi;
         // Draw background
         auto elements = prepareElements(&subopt, widget, {QStringLiteral("ItemViewItem")});
@@ -199,6 +235,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             subopt.rect = subElementRect(SE_ItemViewItemDecoration, vi, widget);
             layoutAndDrawIconText(&subopt, painter, widget, vi->icon, QString());
         }
+        painter->restore();
     }
         return;
     case QStyle::CE_ProgressBarGroove: {
@@ -304,6 +341,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 // Complex controls are bit annoying. We may need to manually handle some things to make sure they work correctly
 void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
+    // Make lines not look completely terrible on fractional scales
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
     switch (control) {
     case QStyle::CC_ToolButton: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
@@ -357,6 +397,9 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 
 void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    // Make lines not look completely terrible on fractional scales
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
         drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Item")})), painter, option);
@@ -1097,7 +1140,7 @@ int UnionStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWid
     case SH_Menu_SupportsSections:
         return true;
     case SH_Widget_Animation_Duration:
-        return 1;
+        return 150;
     case SH_DialogButtonBox_ButtonsHaveIcons:
         return true;
     case SH_GroupBox_TextLabelVerticalAlignment:
@@ -1261,13 +1304,13 @@ void UnionStyle::layoutAndDrawIconText(const QStyleOption *opt, QPainter *painte
     }
     auto map = layoutMap(elements, opt, subElements);
 
-    QRect textRect = map[QStringLiteral("Text")].rect.toRect();
     if (hasText) {
+        QRect textRect = map[QStringLiteral("Text")].rect.toRect();
         drawText(textRect, opt, painter, text, widget);
     }
 
-    QRect iconRect = map[QStringLiteral("Icon")].rect.toRect();
     if (hasIcon) {
+        QRect iconRect = map[QStringLiteral("Icon")].rect.toRect();
         drawIcon(iconRect, opt, painter, icon, widget);
     }
 }
