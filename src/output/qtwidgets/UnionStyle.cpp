@@ -65,6 +65,8 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
+    // Dont allow drawing outside of the area
+    painter->setClipRect(option->rect);
 
     switch (controlElement) {
     case QStyle::CE_PushButtonBevel: {
@@ -337,6 +339,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 // Complex controls are bit annoying. We may need to manually handle some things to make sure they work correctly
 void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
+    // Make lines not look completely terrible on fractional scales
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    // Dont allow drawing outside of the area
+    painter->setClipRect(option->rect);
     switch (control) {
     case QStyle::CC_ToolButton: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
@@ -390,6 +396,10 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 
 void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
+    // Make lines not look completely terrible on fractional scales
+    painter->setRenderHint(QPainter::Antialiasing, true);
+    // Dont allow drawing outside of the area
+    painter->setClipRect(option->rect);
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
         drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Item")})), painter, option);
