@@ -111,7 +111,7 @@ toolbutton.raised
 
     &.with-menu > indicator {
         visibility: visible;
-        layout-alignment: content end center 0;
+        layout-alignment: content end center 1;
         width: var(--icon-size-small);
         height: var(--icon-size-small);
         icon-name: "arrow-down";
