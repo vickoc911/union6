@@ -384,7 +384,9 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         const auto elements = prepareElements(groupBoxOption, widget);
         const auto properties = queryProperties(elements);
         auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
-        drawBackground(painter, rect, properties);
+        if (!groupBoxOption->features.testFlag(QStyleOptionFrame::Flat)) {
+            drawBackground(painter, rect, properties);
+        }
         if ((groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && !groupBoxOption->text.isEmpty()) {
             QRect textRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
             QColor textColor = properties->text()->color().value().toQColor();
@@ -392,11 +394,20 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
             painter->setPen(textColor);
             drawItemText(painter,
                          textRect,
-                         textFlagsFromProperties(properties, true),
+                         textFlagsFromProperties(properties, false),
                          groupBoxOption->palette,
                          groupBoxOption->state & State_Enabled,
                          groupBoxOption->text,
                          textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
+        }
+
+        if (auto groupBox = qobject_cast<const QGroupBox *>(widget)) {
+            if (groupBox->isCheckable()) {
+                QStyleOptionButton checkbox;
+                checkbox.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
+                checkbox.state = groupBoxOption->state;
+                drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
+            }
         }
     }
         return;
@@ -408,6 +419,15 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         const auto props = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
         if (props->icon()) {
             auto icon = QIcon::fromTheme(props->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
+            // Take the button padding into account when drawing this
+            if (props->layout() && props->layout()->padding()) {
+                auto pad = props->layout()->padding()->toMargins().toMargins();
+                indicatorRect.adjust(props->layout()->spacing().value_or(0), pad.top(), -pad.right(), -pad.bottom());
+                auto center = indicatorRect.center();
+                indicatorRect.setWidth(props->icon()->width().value_or(0));
+                indicatorRect.setHeight(props->icon()->height().value_or(0));
+                indicatorRect.moveCenter(center);
+            }
             drawIcon(indicatorRect, option, painter, icon, widget);
         }
     }
@@ -620,6 +640,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         QRect unifiedRect;
         for (const auto &m : map) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
+        }
+        // Follow the contents width
+        if (unifiedRect.width() < contentsSize.width()) {
+            unifiedRect.setWidth(contentsSize.width());
         }
         size = unifiedRect.size().grownBy(padding);
     } break;
@@ -924,6 +948,34 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
         case SC_ComboBoxEditField: {
         }
 
+        default:
+            break;
+        }
+    }
+    if (cc == CC_GroupBox) {
+        switch (sc) {
+        case SC_GroupBoxLabel: {
+            auto elements = prepareElements(opt, widget);
+            auto map = layoutMap(elements, opt, {QStringLiteral("GroupBox"), QStringLiteral("Text")});
+            auto rect = map[QStringLiteral("Text")].rect.toRect();
+            return visualRect(opt->direction, opt->rect, rect);
+        }
+        case SC_GroupBoxContents: {
+            auto elements = prepareElements(opt, widget);
+            auto map = layoutMap(elements, opt, {QStringLiteral("GroupBox"), QStringLiteral("Text")});
+            auto rect = map[QStringLiteral("GroupBox")].rect.toRect();
+            return visualRect(opt->direction, opt->rect, rect);
+        }
+        case SC_GroupBoxCheckBox: {
+            auto elements = prepareElements(opt, widget);
+            auto map = layoutMap(elements, opt, {QStringLiteral("GroupBox"), QStringLiteral("Icon")});
+            auto rect = map[QStringLiteral("Icon")].rect.toRect();
+            return visualRect(opt->direction, opt->rect, rect);
+        }
+        case SC_GroupBoxFrame: {
+            const auto boxOption(qstyleoption_cast<const QStyleOptionGroupBox *>(opt));
+            return boxOption->features.testFlag(QStyleOptionFrame::Flat) ? QRect() : opt->rect;
+        }
         default:
             break;
         }
