@@ -169,11 +169,10 @@ groupbox {
     border-radius: var(--corner-radius);
     background-color: var(--window-background-alternate-color);
     color: var(--window-text-color);
-    text-alignment: content fill center 0;
-
-    & > header {
-        color: var(--window-text-color);
-    }
+    icon-alignment: content start start 0;
+    text-alignment: content center stack-fill 0;
+    layout-alignment: content start stack-fill 1;
+    width: 200px;
 }
 
 focusframe,
