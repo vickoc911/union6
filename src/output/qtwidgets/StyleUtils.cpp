@@ -665,11 +665,11 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
 
         // QtWidgets does not allow drawing outside of the
         // widget area, so constrain it.
-        if (item.rect.x() < opt->rect.x()) {
-            item.rect.setX(opt->rect.x());
+        if (availableSpace.x() < 0) {
+            availableSpace.setX(0);
         }
-        if (item.rect.y() < opt->rect.y()) {
-            item.rect.setY(opt->rect.y());
+        if (availableSpace.y() < 0) {
+            availableSpace.setY(0);
         }
 
         map[item.elementName] = item;
