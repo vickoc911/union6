@@ -141,7 +141,7 @@ QStringList hintsFromOption(const QStyleOption *option)
             if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::None)) {
                 return hints;
             }
-            if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::HasMenu)) {
+            if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::Menu)) {
                 hints.append(QStringLiteral("with-menu"));
             }
             if (!optionButton->state.testFlag(QStyle::State_AutoRaise)) {

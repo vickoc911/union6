@@ -358,6 +358,15 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
             const auto props = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
             if (props->icon()) {
                 auto icon = QIcon::fromTheme(props->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
+                // Take the button padding into account when drawing this
+                if (properties->layout() && properties->layout()->padding()) {
+                    auto pad = properties->layout()->padding()->toMargins().toMargins();
+                    indicatorRect.adjust(properties->layout()->spacing().value_or(0), pad.top(), -pad.right(), -pad.bottom());
+                    auto center = indicatorRect.center();
+                    indicatorRect.setWidth(props->icon()->width().value_or(0));
+                    indicatorRect.setHeight(props->icon()->height().value_or(0));
+                    indicatorRect.moveCenter(center);
+                }
                 drawIcon(indicatorRect, option, painter, icon, widget);
             }
         }
@@ -570,7 +579,8 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
             menubuttonrect = subControlRect(CC_ToolButton, toolButtonOption, SC_ToolButtonMenu, widget);
         }
 
-        if (!toolButtonOption->icon.isNull() && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly) {
+        if ((!toolButtonOption->icon.isNull() && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly)
+            || toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow)) {
             childelements.append(QStringLiteral("Icon"));
         }
         if (!toolButtonOption->text.isEmpty() && toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly) {
