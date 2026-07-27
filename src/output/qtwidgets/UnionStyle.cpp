@@ -77,12 +77,19 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_RadioButtonLabel:
     case QStyle::CE_CheckBoxLabel: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        layoutAndDrawIconText(buttonOption, painter, widget, buttonOption->icon, buttonOption->text);
+        layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text);
     }
         return;
     case QStyle::CE_PushButtonLabel: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        layoutAndDrawIconText(buttonOption, painter, widget, buttonOption->icon, buttonOption->text);
+        QIcon indicator;
+        if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+            auto indicatorProps = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
+            if (indicatorProps->icon()) {
+                indicator = QIcon::fromTheme(indicatorProps->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
+            }
+        }
+        layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text, indicator);
     }
         return;
     case QStyle::CE_PushButton: {
@@ -133,7 +140,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
                 break;
             }
         } else {
-            layoutAndDrawIconText(buttonOption, painter, widget, icon, text);
+            layoutAndDrawIconTextIndicator(buttonOption, painter, widget, icon, text);
         }
     }
         return;
@@ -172,7 +179,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_MenuItem: {
         const auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
         drawElement(queryProperties(prepareElements(menuItem, widget, {QStringLiteral("MenuItem")})), painter, menuItem);
-        layoutAndDrawIconText(menuItem, painter, widget, menuItem->icon, menuItem->text);
+        layoutAndDrawIconTextIndicator(menuItem, painter, widget, menuItem->icon, menuItem->text);
     }
         return;
     case QStyle::CE_ToolBoxTabShape:
@@ -189,7 +196,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
         auto subopt = *tabOption;
         subopt.rect = subElementRect(SE_TabBarTabText, tabOption, widget);
-        layoutAndDrawIconText(&subopt, painter, widget, tabOption->icon, tabOption->text);
+        layoutAndDrawIconTextIndicator(&subopt, painter, widget, tabOption->icon, tabOption->text);
     }
         return;
     case QStyle::CE_ToolBoxTab:
@@ -213,7 +220,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         // Draw text
         if (subopt.features.testFlag(QStyleOptionViewItem::HasDisplay)) {
             subopt.rect = subElementRect(SE_ItemViewItemText, &subopt, widget);
-            layoutAndDrawIconText(&subopt, painter, widget, QIcon(), vi->text);
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), vi->text);
         }
         // Draw indicator
         if (subopt.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
@@ -233,7 +240,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
         } else if (subopt.features.testFlag(QStyleOptionViewItem::HasDecoration)) {
             subopt.rect = subElementRect(SE_ItemViewItemDecoration, vi, widget);
-            layoutAndDrawIconText(&subopt, painter, widget, vi->icon, QString());
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, vi->icon, QString());
         }
         painter->restore();
     }
@@ -294,7 +301,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             auto subopt = *opt;
             auto rect = subElementRect(SE_ProgressBarLabel, opt, widget);
             subopt.rect = rect;
-            layoutAndDrawIconText(&subopt, painter, widget, QIcon(), opt->text);
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), opt->text);
         }
     }
         return;
@@ -568,7 +575,14 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
     } break;
     case QStyle::CT_PushButton: {
         auto contentsRect = subElementRect(SE_PushButtonContents, opt, widget);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt);
         size = contentsRect.size().grownBy(padding);
+        if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+            auto indicatorProps = queryProperties(prepareElements(opt, widget, {QStringLiteral("Indicator")}));
+            if (indicatorProps->layout()) {
+                size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, opt, widget);
+            }
+        }
     } break;
     case QStyle::CT_ToolButton: {
         const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt);
@@ -1370,12 +1384,18 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
     painter->restore();
 }
 
-void UnionStyle::layoutAndDrawIconText(const QStyleOption *opt, QPainter *painter, const QWidget *widget, const QIcon &icon, const QString &text) const
+void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
+                                                QPainter *painter,
+                                                const QWidget *widget,
+                                                const QIcon &icon,
+                                                const QString &text,
+                                                const QIcon &indicator) const
 {
     QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
 
     bool hasIcon = !icon.isNull();
     bool hasText = !text.isEmpty();
+    bool hasIndicator = !indicator.isNull();
 
     QStringList subElements;
     if (hasIcon) {
@@ -1383,6 +1403,9 @@ void UnionStyle::layoutAndDrawIconText(const QStyleOption *opt, QPainter *painte
     }
     if (hasText) {
         subElements.append(QStringLiteral("Text"));
+    }
+    if (hasIndicator) {
+        subElements.append(QStringLiteral("Indicator"));
     }
     // Nothing to draw, just return
     if (subElements.isEmpty()) {
@@ -1398,5 +1421,10 @@ void UnionStyle::layoutAndDrawIconText(const QStyleOption *opt, QPainter *painte
     if (hasIcon) {
         QRect iconRect = map[QStringLiteral("Icon")].rect.toRect();
         drawIcon(iconRect, opt, painter, icon, widget);
+    }
+
+    if (hasIndicator) {
+        QRect indicatorRect = map[QStringLiteral("Indicator")].rect.toRect();
+        drawIcon(indicatorRect, opt, painter, indicator, widget);
     }
 }
