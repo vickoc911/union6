@@ -613,13 +613,15 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             spacing = 0;
         }
 
+        auto itemWidth = item.rect.width() + spacing;
+        auto itemHeight = item.rect.height() + spacing;
         switch (item.horizontalAlignment) {
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::StackFill:
         case Union::Properties::Alignment::StackCenter:
         case Union::Properties::Alignment::Start:
             item.rect.moveLeft(availableSpace.left());
-            availableSpace.moveLeft(item.rect.right() + spacing);
+            availableSpace.adjust(itemWidth, 0, 0, 0);
             break;
         case Union::Properties::Alignment::Fill:
         case Union::Properties::Alignment::Center:
@@ -629,14 +631,14 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             if (items.size() > 1 && item.verticalAlignment != Union::Properties::Alignment::StackCenter
                 && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
                 item.rect.moveLeft(availableSpace.left());
-                availableSpace.moveLeft(item.rect.right() + spacing);
+                availableSpace.adjust(itemWidth, 0, 0, 0);
             } else {
                 item.rect.moveCenter(QPoint(availableSpace.center().x(), item.rect.center().y()));
             }
             break;
         case Union::Properties::Alignment::End:
             item.rect.moveRight(availableSpace.right());
-            availableSpace.moveRight(item.rect.left() - spacing);
+            availableSpace.adjust(0, 0, -itemWidth, 0);
             break;
         }
 
@@ -644,7 +646,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
             item.rect.moveTop(availableSpace.top());
-            availableSpace.moveTop(item.rect.bottom() + spacing);
+            availableSpace.adjust(0, itemHeight, 0, 0);
             break;
         case Union::Properties::Alignment::Fill:
         case Union::Properties::Alignment::Center:
@@ -652,24 +654,15 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             break;
         case Union::Properties::Alignment::End:
             item.rect.moveTop(availableSpace.bottom());
-            availableSpace.moveTop(item.rect.bottom() + spacing);
+            availableSpace.adjust(0, 0, 0, -itemHeight);
             break;
         case Union::Properties::Alignment::StackFill:
             item.rect.moveTop(availableSpace.top());
-            item.rect.moveBottom(availableSpace.bottom() - spacing);
+            availableSpace.adjust(0, 0, 0, -itemHeight);
         case Union::Properties::Alignment::StackCenter:
             item.rect.moveTop(availableSpace.top());
-            availableSpace.moveTop(item.rect.bottom() + spacing);
+            availableSpace.adjust(0, itemHeight, 0, 0);
             break;
-        }
-
-        // QtWidgets does not allow drawing outside of the
-        // widget area, so constrain it.
-        if (item.rect.x() < opt->rect.x()) {
-            item.rect.setX(opt->rect.x());
-        }
-        if (item.rect.y() < opt->rect.y()) {
-            item.rect.setY(opt->rect.y());
         }
 
         map[item.elementName] = item;
