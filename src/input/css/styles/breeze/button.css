@@ -109,13 +109,25 @@ toolbutton.raised
         icon-alignment-vertical: stack-center;
     }
 
-    &.with-menu > indicator {
-        visibility: visible;
-        layout-alignment: content end center 0;
-        width: var(--icon-size-small);
-        height: var(--icon-size-small);
-        icon-name: "arrow-down";
-        icon-color: var(--button-active-text-color)
+    &.with-menu{
+        &[display="text-only"] {
+            text-alignment-horizontal: start;
+        }
+        &[display="icon-only"] {
+            icon-alignment-horizontal: start;
+        }
+        &[display="text-under-icon"] {
+            icon-alignment-horizontal: center;
+            text-alignment-horizontal: center;
+        }
+        & > indicator {
+            visibility: visible;
+            layout-alignment: content end center 0;
+            width: var(--icon-size-small);
+            height: var(--icon-size-small);
+            icon-name: "arrow-down";
+            icon-color: var(--button-active-text-color)
+        }
     }
 }
 
