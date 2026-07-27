@@ -116,13 +116,17 @@ toolbutton.raised
         &[display="icon-only"] {
             icon-alignment-horizontal: start;
         }
+        &[display="text-beside-icon"] {
+            icon-alignment-horizontal: start;
+            text-alignment-horizontal: center;
+        }
         &[display="text-under-icon"] {
             icon-alignment-horizontal: center;
             text-alignment-horizontal: center;
         }
         & > indicator {
             visibility: visible;
-            layout-alignment: content end center 0;
+            layout-alignment: content end center 1;
             width: var(--icon-size-small);
             height: var(--icon-size-small);
             icon-name: "arrow-down";
