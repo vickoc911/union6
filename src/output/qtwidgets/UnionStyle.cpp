@@ -310,6 +310,16 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_ProgressBarContents, option, painter, widget);
         drawControl(CE_ProgressBarLabel, option, painter, widget);
         return;
+    case QStyle::CE_ScrollBarSlider: {
+        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Handle")})), painter, option);
+    }
+        return;
+    case QStyle::CE_ScrollBarAddLine:
+    case QStyle::CE_ScrollBarSubLine:
+    case QStyle::CE_ScrollBarAddPage:
+    case QStyle::CE_ScrollBarSubPage:
+    case QStyle::CE_ScrollBarFirst:
+    case QStyle::CE_ScrollBarLast:
     case QStyle::CE_MenuEmptyArea:
         return; // This is what breeze does as well
     case QStyle::CE_MenuBarItem:
@@ -325,13 +335,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_Splitter:
     case QStyle::CE_RubberBand:
     case QStyle::CE_DockWidgetTitle:
-    case QStyle::CE_ScrollBarAddLine:
-    case QStyle::CE_ScrollBarSubLine:
-    case QStyle::CE_ScrollBarAddPage:
-    case QStyle::CE_ScrollBarSubPage:
-    case QStyle::CE_ScrollBarSlider:
-    case QStyle::CE_ScrollBarFirst:
-    case QStyle::CE_ScrollBarLast:
     case QStyle::CE_FocusFrame:
     case QStyle::CE_ComboBoxLabel:
     case QStyle::CE_ToolBar:
@@ -448,7 +451,20 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         }
     }
         return;
-    case QStyle::CC_ScrollBar:
+    case QStyle::CC_ScrollBar: {
+        // Draw background, then let QCommonStyle handle rest;
+        auto scrollbarProps = queryProperties(prepareElements(option, widget));
+        // If scrollbar has no background color, QStyle gets confused and doesnt draw anything,
+        // causing visual glitches. In those cases, use the ApplicationWindow background color.
+        if (scrollbarProps->background() && scrollbarProps->background()->color().has_value()) {
+            drawElement(scrollbarProps, painter, option);
+        } else {
+            drawBackground(painter, option->rect, queryProperties(prepareElements(option, widget, {QStringLiteral("ApplicationWindow")})));
+        }
+        drawBackground(painter, option->rect, scrollbarProps);
+        QCommonStyle::drawComplexControl(control, option, painter, widget);
+    }
+        return;
     case QStyle::CC_Slider:
     case QStyle::CC_TitleBar:
     case QStyle::CC_Dial:
@@ -457,7 +473,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         break;
     }
 
-    return QCommonStyle::drawComplexControl(control, option, painter, widget);
+    QCommonStyle::drawComplexControl(control, option, painter, widget);
 }
 
 void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -742,6 +758,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
     case QStyle::CT_Slider:
     // QStyleOptionSlider, no text/icon
     case QStyle::CT_ScrollBar:
+
     // QStyleOptionFrame, no text/icon
     case QStyle::CT_LineEdit:
     // QStyleOptionSpinBox, no text/icon
@@ -1006,6 +1023,24 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
             break;
         }
     }
+
+    if (cc == CC_ScrollBar) {
+        if (sc == SC_ScrollBarSlider) {
+            auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(opt);
+            auto rect = QCommonStyle::subControlRect(cc, opt, sc, widget);
+            auto props = queryProperties(prepareElements(opt, widget, {QStringLiteral("Slider")}));
+            if (props->layout()) {
+                if (sliderOpt->orientation == Qt::Horizontal) {
+                    int thickness = props->layout()->height().value_or(0);
+                    return visualRect(opt->direction, opt->rect, rect.adjusted(0, thickness, 0, -thickness));
+                } else {
+                    int thickness = props->layout()->width().value_or(0);
+                    return visualRect(opt->direction, opt->rect, rect.adjusted(thickness, 0, -thickness, 0));
+                }
+            }
+        }
+    }
+
     /* Use what qcommonstyle provides for now
         if (cc == CC_SpinBox){
             switch (sc) {
@@ -1121,10 +1156,14 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return defaultMetric;
         }
         if (scrollbaroption && properties->layout()) {
+            QSize size(properties->layout()->width().value_or(defaultMetric), properties->layout()->height().value_or(defaultMetric));
+            if (properties->layout()->padding()) {
+                size = size.shrunkBy(properties->layout()->padding()->toMargins().toMargins());
+            }
             if (scrollbaroption->orientation == Qt::Horizontal) {
-                return properties->layout()->height().value_or(defaultMetric);
+                return size.height();
             } else {
-                return properties->layout()->width().value_or(defaultMetric);
+                return size.width();
             }
         }
     } break;
