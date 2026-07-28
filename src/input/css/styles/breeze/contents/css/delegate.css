@@ -148,14 +148,14 @@ switchdelegate[display="text-under-icon"] > indicator {
 itemviewrow,
 itemviewitem {
     inset: 0px;
-    padding: 0px;
-    layout-alignment: content start center 0;
     icon-alignment: content start center 0;
     text-alignment: content start center 1;
     icon-size: var(--small-element-size);
+    spacing: var(--small-spacing);
 
     & > checkbox {
-        padding: 2px;
+        layout-alignment: content start center 0;
+        padding: 0px;
         margin: 0px;
         inset: 0px;
         width: var(--small-element-size);

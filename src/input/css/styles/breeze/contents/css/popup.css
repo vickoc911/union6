@@ -103,6 +103,7 @@ menuitem
 
     & > shortcuttext {
         spacing: 40px;
+        text-alignment: content end center 1;
         color: mix(var(--window-background-color), var(--window-text-color), 0.5);
         &:disabled {
             color: mix(var(--window-background-color), var(--window-disabled-text-color), 0.5);
