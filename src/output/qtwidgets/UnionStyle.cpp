@@ -641,6 +641,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         for (const auto &m : map) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }
+        // Follow the contents width
+        if (unifiedRect.width() < contentsSize.width()) {
+            unifiedRect.setWidth(contentsSize.width());
+        }
         size = unifiedRect.size().grownBy(padding);
     } break;
     case QStyle::CT_TabBarTab: {
