@@ -200,17 +200,25 @@ QStringList hintsFromOption(const QStyleOption *option)
             hints.append(QStringLiteral("constrained"));
         }
     } break;
+    case QStyleOption::SO_Complex:
+    case QStyleOption::SO_Slider: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
+            if (opt->orientation == Qt::Horizontal) {
+                hints.append(QStringLiteral("horizontal"));
+            } else {
+                hints.append(QStringLiteral("vertical"));
+            }
+        }
+    } break;
     case QStyleOption::SO_Tab:
     case QStyleOption::SO_TabWidgetFrame:
     case QStyleOption::SO_TabBarBase:
     case QStyleOption::SO_ProgressBar:
-    case QStyleOption::SO_Slider:
     case QStyleOption::SO_ToolBox:
     case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_RubberBand:
     case QStyleOption::SO_ToolBar:
     case QStyleOption::SO_GraphicsItem:
-    case QStyleOption::SO_Complex:
     case QStyleOption::SO_TitleBar:
     case QStyleOption::SO_SizeGrip:
     default:
