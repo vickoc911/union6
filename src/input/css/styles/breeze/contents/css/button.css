@@ -104,11 +104,6 @@ toolbutton.raised
         box-shadow: none;
     }
 
-    &[display="text-under-icon"] {
-        text-alignment-vertical: stack-center;
-        icon-alignment-vertical: stack-center;
-    }
-
     &.with-menu > indicator {
         visibility: visible;
         layout-alignment: content end center 1;
@@ -116,6 +111,15 @@ toolbutton.raised
         height: var(--icon-size-small);
         icon-name: "arrow-down";
         icon-color: var(--button-active-text-color)
+    }
+
+    &[display="text-under-icon"] {
+        text-alignment-vertical: stack-center;
+        icon-alignment-vertical: stack-center;
+
+        &.with-menu > indicator {
+            layout-alignment: content center stack-center 1;
+        }
     }
 }
 
@@ -209,6 +213,7 @@ combobox
     text-alignment: content fill center 0;
     icon-alignment: content start center 0;
     box-shadow: var(--button-shadow);
+    text-wrap-mode: wrap;
 
     & > indicator {
         layout-alignment: content end center 0;
@@ -225,6 +230,7 @@ combobox
         background-color: var(--view-background-color);
         border: 1px solid var(--view-border-color);
         box-shadow: none;
+        text-wrap-mode: no-wrap;
 
         &:hovered {
             border-color: var(--button-active-border-highlight-color);
@@ -328,7 +334,8 @@ tabbutton {
         box-shadow: none;
     }
 
-    &:checked
+    &:checked,
+    &:highlighted /* Widgets uses highlighted */
     {
         background-color: var(--tab-open-background-color);
         color: var(--tab-open-text-color);
