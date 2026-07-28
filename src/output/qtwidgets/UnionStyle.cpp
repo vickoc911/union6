@@ -384,9 +384,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         const auto elements = prepareElements(groupBoxOption, widget);
         const auto properties = queryProperties(elements);
         auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
-        if (!groupBoxOption->features.testFlag(QStyleOptionFrame::Flat)) {
-            drawBackground(painter, rect, properties);
-        }
+        drawBackground(painter, rect, properties);
         if ((groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && !groupBoxOption->text.isEmpty()) {
             QRect textRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
             QColor textColor = properties->text()->color().value().toQColor();
@@ -432,7 +430,24 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         }
     }
         return;
-    case QStyle::CC_SpinBox:
+    case QStyle::CC_SpinBox: {
+        const auto spinBoxOpt = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
+        auto elements = prepareElements(spinBoxOpt, widget);
+        drawElement(queryProperties(elements), painter, spinBoxOpt);
+        // For spinbox we need to manually create the indicator buttons
+        if (spinBoxOpt->buttonSymbols != QAbstractSpinBox::NoButtons) {
+            bool arrows = (spinBoxOpt->buttonSymbols == QAbstractSpinBox::UpDownArrows);
+            // Increase
+            auto up = *spinBoxOpt;
+            up.rect = subControlRect(CC_SpinBox, spinBoxOpt, SC_SpinBoxUp, widget);
+            drawPrimitive(arrows ? PE_IndicatorSpinUp : PE_IndicatorSpinPlus, &up, painter, widget);
+            // Decrease
+            auto down = *spinBoxOpt;
+            down.rect = subControlRect(CC_SpinBox, spinBoxOpt, SC_SpinBoxDown, widget);
+            drawPrimitive(arrows ? PE_IndicatorSpinDown : PE_IndicatorSpinMinus, &down, painter, widget);
+        }
+    }
+        return;
     case QStyle::CC_ScrollBar:
     case QStyle::CC_Slider:
     case QStyle::CC_TitleBar:
@@ -529,6 +544,30 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
+    case QStyle::PE_IndicatorSpinPlus:
+    case QStyle::PE_IndicatorSpinMinus:
+    case QStyle::PE_IndicatorSpinUp:
+    case QStyle::PE_IndicatorSpinDown: {
+        auto up = (element == PE_IndicatorSpinUp);
+        auto spinboxElements = prepareElements(option, widget);
+        auto element = Union::Element::create();
+        element->setType(QStringLiteral("Indicator"));
+        element->setStates(statesFromOption(option));
+        auto hints = hintsFromOption(option);
+        // Use the constrained look for now
+        hints.append(up ? QStringLiteral("Increase") : QStringLiteral("Decrease"));
+        element->setHints(hints);
+        element->setColorSet(colorsetFromOption(option));
+        element->setAttributes(attributesFromOption(option));
+        spinboxElements.append(element);
+        auto props = queryProperties(spinboxElements);
+        drawBackground(painter, option->rect, props);
+        if (props->icon()) {
+            auto icon = QIcon::fromTheme(props->icon()->name().value_or(up ? QStringLiteral("arrow-up-symbolic") : QStringLiteral("arrow-down-symbolic")));
+            drawIcon(option->rect, option, painter, icon, widget);
+        }
+    }
+        return;
     case QStyle::PE_IndicatorBranch:
     case QStyle::PE_IndicatorButtonDropDown:
     case QStyle::PE_IndicatorItemViewItemCheck:
@@ -536,10 +575,6 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorHeaderArrow:
     case QStyle::PE_IndicatorMenuCheckMark:
     case QStyle::PE_IndicatorProgressChunk:
-    case QStyle::PE_IndicatorSpinDown:
-    case QStyle::PE_IndicatorSpinMinus:
-    case QStyle::PE_IndicatorSpinPlus:
-    case QStyle::PE_IndicatorSpinUp:
     case QStyle::PE_IndicatorToolBarHandle:
     case QStyle::PE_IndicatorToolBarSeparator:
     case QStyle::PE_IndicatorTabTear:
@@ -924,18 +959,10 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
         if (!comboBoxOption) {
             return QCommonStyle::subControlRect(CC_ComboBox, opt, sc, widget);
         }
-
-        const bool editable(comboBoxOption->editable);
-        const bool flat(editable && !comboBoxOption->frame);
-
-        // copy rect
-        auto rect(opt->rect);
-
         switch (sc) {
         case SC_ComboBoxFrame:
-            return flat ? rect : QRect();
         case SC_ComboBoxListBoxPopup:
-            return rect;
+            return opt->rect;
 
         case SC_ComboBoxArrow: {
             auto elements = prepareElements(opt, widget);
@@ -973,13 +1000,24 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
             return visualRect(opt->direction, opt->rect, rect);
         }
         case SC_GroupBoxFrame: {
-            const auto boxOption(qstyleoption_cast<const QStyleOptionGroupBox *>(opt));
-            return boxOption->features.testFlag(QStyleOptionFrame::Flat) ? QRect() : opt->rect;
+            return opt->rect;
         }
         default:
             break;
         }
     }
+    /* Use what qcommonstyle provides for now
+        if (cc == CC_SpinBox){
+            switch (sc) {
+                case            SC_SpinBoxUp:
+                case            SC_SpinBoxDown :
+                case            SC_SpinBoxFrame:
+                case            SC_SpinBoxEditField:
+                default:
+                    break;
+            }
+        }
+    */
     return QCommonStyle::subControlRect(cc, opt, sc, widget);
 }
 
