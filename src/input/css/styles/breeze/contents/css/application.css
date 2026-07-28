@@ -165,8 +165,6 @@ framewindow
 
 groupbox {
     padding: var(--small-spacing);
-    border: 1px solid var(--window-border-color);
-    border-radius: var(--corner-radius);
     background-color: var(--window-background-alternate-color);
     color: var(--window-text-color);
     icon-alignment: content start start 0;
@@ -188,4 +186,13 @@ panel,
 scrollareacorner {
     background-color: var(--window-background-color);
     color: var(--window-text-color);
+}
+
+panel,
+groupbox,
+frame {
+    &.flat {
+        background-color: transparent;
+        border: none;
+    }
 }
