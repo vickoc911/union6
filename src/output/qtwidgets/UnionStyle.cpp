@@ -465,7 +465,114 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         QCommonStyle::drawComplexControl(control, option, painter, widget);
     }
         return;
-    case QStyle::CC_Slider:
+    case QStyle::CC_Slider: {
+        const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
+        // Background
+        auto grooveRect = subControlRect(CC_Slider, sliderOption, SC_SliderGroove, widget);
+        drawBackground(painter, grooveRect, queryProperties(prepareElements(sliderOption, widget)));
+
+        const qreal p = sliderOption->sliderValue;
+        const qreal min = sliderOption->minimum;
+        const qreal max = sliderOption->maximum;
+        const qreal percentage = (p - min) / (max - min);
+
+        auto progress = grooveRect;
+
+        const bool horizontal = sliderOption->state.testFlag(QStyle::State_Horizontal);
+        const bool inverted(sliderOption->upsideDown);
+        bool reverse = horizontal && option->direction == Qt::RightToLeft;
+        if (inverted) {
+            reverse = !reverse;
+        }
+
+        if (horizontal) {
+            const qreal progressWidth = percentage * grooveRect.width();
+            if (reverse) {
+                progress.setLeft(grooveRect.right() - progressWidth);
+            } else {
+                progress.setWidth(progressWidth);
+            }
+        } else {
+            const qreal progressHeight = percentage * grooveRect.height();
+            if (reverse) {
+                progress.setTop(grooveRect.bottom() - progressHeight);
+            } else {
+                progress.setHeight(progressHeight);
+            }
+        }
+
+        drawBackground(painter, progress, queryProperties(prepareElements(sliderOption, widget, {QStringLiteral("Fill")})));
+
+        // Tickmark drawing is copied from breeze
+        // TODO: theyre still bit off, not exactly at the center of the handle
+        if (sliderOption->subControls.testFlag(SC_SliderTickmarks)) {
+            auto tickmarkElements = prepareElements(sliderOption, widget, {QStringLiteral("Tickmark")});
+            auto props = queryProperties(tickmarkElements);
+            if (!props->layout()) {
+                return;
+            }
+            auto rect = option->rect;
+            const int tickPosition(sliderOption->tickPosition);
+            const int available(pixelMetric(PM_SliderSpaceAvailable, option, widget));
+            int interval = sliderOption->tickInterval;
+
+            if (interval < 1) {
+                interval = sliderOption->pageStep;
+            }
+            if (interval >= 1) {
+                const int fudge(pixelMetric(PM_SliderLength, option, widget) / 2);
+                int current(sliderOption->minimum);
+
+                int tickwidth = props->layout()->width().value_or(2);
+                int tickheight = props->layout()->height().value_or(8);
+
+                // store tick lines
+                QList<QLine> tickLines;
+                if (horizontal) {
+                    if (tickPosition & QSlider::TicksAbove) {
+                        tickLines.append(QLine(rect.left(), grooveRect.top() - tickwidth, rect.left(), grooveRect.top() - tickwidth - tickheight));
+                    }
+                    if (tickPosition & QSlider::TicksBelow) {
+                        tickLines.append(QLine(rect.left(), grooveRect.bottom() + tickwidth, rect.left(), grooveRect.bottom() + tickwidth + tickheight));
+                    }
+
+                } else {
+                    if (tickPosition & QSlider::TicksAbove) {
+                        tickLines.append(QLine(grooveRect.left() - tickwidth, rect.top(), grooveRect.left() - tickwidth - tickheight, rect.top()));
+                    }
+                    if (tickPosition & QSlider::TicksBelow) {
+                        tickLines.append(QLine(grooveRect.right() + tickwidth, rect.top(), grooveRect.right() + tickwidth + tickheight, rect.top()));
+                    }
+                }
+
+                // colors
+                const auto reverse(option->direction == Qt::RightToLeft);
+                while (current <= sliderOption->maximum) {
+                    // adjust color
+                    tickmarkElements.last()->setHint(QStringLiteral("active"), current <= sliderOption->sliderPosition);
+                    auto props = queryProperties(tickmarkElements);
+                    const auto color = props->background()->color()->toQColor();
+                    painter->setPen(color);
+
+                    // calculate positions and draw lines
+                    const int position(sliderPositionFromValue(sliderOption->minimum, sliderOption->maximum, current, available, inverted) + fudge);
+                    for (const QLine &tickLine : std::as_const(tickLines)) {
+                        if (horizontal) {
+                            painter->drawLine(tickLine.translated(reverse ? (rect.width() - position) : position, 0));
+                        } else {
+                            painter->drawLine(tickLine.translated(0, position));
+                        }
+                    }
+                    // go to next position
+                    current += interval;
+                }
+            }
+        }
+
+        auto handle = subControlRect(CC_Slider, sliderOption, SC_SliderHandle, widget);
+        drawBackground(painter, handle, queryProperties(prepareElements(sliderOption, widget, {QStringLiteral("Handle")})));
+    }
+        return;
     case QStyle::CC_TitleBar:
     case QStyle::CC_Dial:
     case QStyle::CC_MdiControls:
@@ -755,7 +862,17 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         // unimplemented
         break;
     }
-    case QStyle::CT_Slider:
+    case QStyle::CT_Slider: {
+        auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(opt);
+        if (sliderOpt) {
+            QRegion r;
+            auto grooveRect = subControlRect(CC_Slider, sliderOpt, SC_SliderGroove, widget);
+            auto tickRect = subControlRect(CC_Slider, sliderOpt, SC_SliderTickmarks, widget);
+            auto handleRect = subControlRect(CC_Slider, sliderOpt, SC_SliderHandle, widget);
+            r.setRects({grooveRect, tickRect, handleRect});
+            size = r.boundingRect().size().grownBy(padding);
+        }
+    } break;
     // QStyleOptionSlider, no text/icon
     case QStyle::CT_ScrollBar:
 
@@ -1038,6 +1155,70 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
                     return visualRect(opt->direction, opt->rect, rect.adjusted(thickness, 0, -thickness, 0));
                 }
             }
+        }
+    }
+
+    if (cc == CC_Slider) {
+        // cast option and check
+        const auto sliderOption(qstyleoption_cast<const QStyleOptionSlider *>(opt));
+        if (!sliderOption) {
+            return QCommonStyle::subControlRect(cc, opt, sc, widget);
+        }
+
+        // direction
+        const bool horizontal(sliderOption->orientation == Qt::Horizontal);
+
+        // somewhat a copy-pasta of QCommonStyle::subControlRect, except we want
+        // to account for our specific tick marks, and perform centering.
+        auto rect(sliderOption->rect);
+
+        switch (sc) {
+        case SC_SliderHandle: {
+            auto props = queryProperties(prepareElements(opt, widget, {QStringLiteral("Handle")}));
+            int handleHeight = 1;
+            int handleWidth = 1;
+            if (props->layout()) {
+                handleHeight = props->layout()->height().value_or(6);
+                handleWidth = props->layout()->width().value_or(6);
+            }
+
+            QRect ret(centerRect(rect, handleWidth, handleHeight));
+            const int sliderPos = sliderPositionFromValue(sliderOption->minimum,
+                                                          sliderOption->maximum,
+                                                          sliderOption->sliderPosition,
+                                                          (horizontal ? rect.width() : rect.height()) - handleHeight,
+                                                          sliderOption->upsideDown);
+            if (horizontal) {
+                ret.moveLeft(rect.x() + sliderPos);
+            } else {
+                ret.moveTop(rect.y() + sliderPos);
+            }
+            ret = visualRect(opt->direction, rect, ret);
+            return ret;
+        }
+
+        case SC_SliderGroove: {
+            auto props = queryProperties(prepareElements(opt, widget));
+            int grooveHeight = 1;
+            int grooveWidth = 1;
+            if (props->layout()) {
+                grooveHeight = props->layout()->height().value_or(6);
+                grooveWidth = props->layout()->width().value_or(6);
+            }
+            auto frameWidth = pixelMetric(PM_DefaultFrameWidth, opt, widget);
+            auto grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
+
+            // centering
+            if (horizontal) {
+                grooveRect = centerRect(rect, grooveRect.width(), grooveHeight);
+            } else {
+                grooveRect = centerRect(rect, grooveWidth, grooveRect.height());
+            }
+            return grooveRect;
+        }
+
+        default:
+            return QCommonStyle::subControlRect(cc, opt, sc, widget);
         }
     }
 
