@@ -124,7 +124,11 @@ QStringList hintsFromOption(const QStyleOption *option)
                 hints.append(QStringLiteral("rounded"));
             }
             switch (optionFrame->frameShape) {
-            case QFrame::NoFrame:
+            case QFrame::NoFrame: {
+                if (!hints.contains(QStringLiteral("flat"))) {
+                    hints.append(QStringLiteral("flat"));
+                }
+            }
             case QFrame::Box:
             case QFrame::Panel:
             case QFrame::WinPanel:
@@ -170,21 +174,44 @@ QStringList hintsFromOption(const QStyleOption *option)
             }
         }
     } break;
+    case QStyleOption::SO_GroupBox: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+            if (opt->features.testFlag(QStyleOptionFrame::Flat)) {
+                hints.append(QStringLiteral("flat"));
+            }
+            if (opt->features.testFlag(QStyleOptionFrame::Rounded)) {
+                hints.append(QStringLiteral("rounded"));
+            }
+        }
+    } break;
+    case QStyleOption::SO_ComboBox: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
+            if (!opt->frame) {
+                hints.append(QStringLiteral("flat"));
+            }
+            if (opt->editable) {
+                hints.append(QStringLiteral("editable"));
+            }
+        }
+    } break;
+    case QStyleOption::SO_SpinBox: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
+            // TODO: Use constrained look for now, revisit this when we have better layouting
+            hints.append(QStringLiteral("constrained"));
+        }
+    } break;
     case QStyleOption::SO_Tab:
-    case QStyleOption::SO_ProgressBar:
-    case QStyleOption::SO_ToolBox:
-    case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_TabWidgetFrame:
     case QStyleOption::SO_TabBarBase:
+    case QStyleOption::SO_ProgressBar:
+    case QStyleOption::SO_Slider:
+    case QStyleOption::SO_ToolBox:
+    case QStyleOption::SO_DockWidget:
     case QStyleOption::SO_RubberBand:
     case QStyleOption::SO_ToolBar:
     case QStyleOption::SO_GraphicsItem:
     case QStyleOption::SO_Complex:
-    case QStyleOption::SO_Slider:
-    case QStyleOption::SO_SpinBox:
-    case QStyleOption::SO_ComboBox:
     case QStyleOption::SO_TitleBar:
-    case QStyleOption::SO_GroupBox:
     case QStyleOption::SO_SizeGrip:
     default:
         return QStringList();
