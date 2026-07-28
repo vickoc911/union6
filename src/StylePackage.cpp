@@ -23,6 +23,7 @@ struct StyleMetaData {
     QString license;
     QUrl url;
     QStringList authors;
+    bool hidden = false;
 };
 
 class UNION_NO_EXPORT StylePackage::Private
@@ -162,6 +163,17 @@ QStringList StylePackage::authors() const
     return {};
 }
 
+bool StylePackage::isHidden() const
+{
+    loadMetadata();
+
+    if (d->metaData) {
+        return d->metaData->hidden;
+    }
+
+    return false;
+}
+
 bool StylePackage::isValid() const
 {
     if (d->error != Error::None) {
@@ -262,6 +274,7 @@ void StylePackage::loadMetadata() const
     metaData.version = json.value(u"version").toString();
     metaData.license = json.value(u"license").toString();
     metaData.url = QUrl{json.value(u"url").toString()};
+    metaData.hidden = json.value(u"hidden").toBool();
 
     const auto authors = json.value(u"authors").toArray();
     std::ranges::transform(authors, std::back_inserter(metaData.authors), [](const QJsonValue &value) {
