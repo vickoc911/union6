@@ -61,4 +61,5 @@ void drawCornerProperty(QPainter *painter,
                         const Union::Properties::BorderPropertyGroup *border,
                         const Union::Properties::CornerPropertyGroup *corner);
 
+// TODO: this could probably be removed
 void drawElement(Union::Properties::StylePropertyGroup *properties, QPainter *painter, const QStyleOption *opt);
