@@ -630,9 +630,16 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         items.append(item);
     }
 
-    // Sort the list according to order
+    // Sort the list according to order. Set any filled items as last
     std::sort(items.begin(), items.end(), [](const LayoutItem &lhs, const LayoutItem &rhs) {
-        return lhs.order < rhs.order;
+        if (rhs.horizontalAlignment == Union::Properties::Alignment::Fill) {
+            if (lhs.horizontalAlignment == Union::Properties::Alignment::Fill) {
+                return lhs.order < rhs.order;
+            }
+            return false;
+        } else {
+            return lhs.order < rhs.order;
+        }
     });
 
     // Actual layouting starts here
@@ -662,6 +669,10 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             availableSpace.adjust(itemWidth, 0, 0, 0);
             break;
         case Union::Properties::Alignment::Fill:
+            item.rect.setLeft(availableSpace.left() + spacing);
+            item.rect.setRight(availableSpace.right() - spacing);
+            availableSpace.adjust(itemWidth, 0, -itemWidth, 0);
+            break;
         case Union::Properties::Alignment::Center:
             // For single items and vertical stackCenter/stackFill,
             // we can just utilize the exact center,
@@ -712,6 +723,10 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
 
 QString textFromOption(const QStyleOption *opt)
 {
+    if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(opt)) {
+        return comboBoxOption->currentText;
+    }
+
     switch ((QStyleOption::OptionType)opt->type) {
     case QStyleOption::SO_Button:
         if (const auto option = qstyleoption_cast<const QStyleOptionButton *>(opt)) {
