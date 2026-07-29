@@ -68,28 +68,31 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 
     switch (controlElement) {
     case QStyle::CE_PushButtonBevel: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        auto opt = *buttonOption;
-        opt.rect = subElementRect(SE_PushButtonBevel, buttonOption, widget);
-        drawElement(queryProperties(prepareElements(buttonOption, widget)), painter, &opt);
+        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+            auto opt = *buttonOption;
+            opt.rect = subElementRect(SE_PushButtonBevel, buttonOption, widget);
+            drawElementBackground(painter, &opt, widget);
+        }
     }
         return;
     case QStyle::CE_RadioButtonLabel:
     case QStyle::CE_CheckBoxLabel: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text);
+        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+            layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text);
+        }
     }
         return;
     case QStyle::CE_PushButtonLabel: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        QIcon indicator;
-        if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            auto indicatorProps = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
-            if (indicatorProps->icon()) {
-                indicator = QIcon::fromTheme(indicatorProps->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
+        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+            QIcon indicator;
+            if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+                auto indicatorProps = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
+                if (indicatorProps->icon()) {
+                    indicator = QIcon::fromTheme(indicatorProps->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
+                }
             }
+            layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text, indicator);
         }
-        layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text, indicator);
     }
         return;
     case QStyle::CE_PushButton: {
@@ -99,6 +102,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_ToolButtonLabel: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
+        if (!buttonOption) {
+            return;
+        }
         auto text = buttonOption->text;
         auto icon = buttonOption->icon;
         // Skip text drawing for icon only buttons completely
@@ -145,73 +151,82 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_CheckBox: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        QStyleOptionButton subopt = *buttonOption;
-        // Draw background
-        auto bgElements = prepareElements(&subopt, widget);
-        auto bgProps = queryProperties(bgElements);
-        auto rect = backgroundRectangle(option, bgProps).toRect();
-        drawBackground(painter, rect, bgProps);
-        // Draw indicator
-        subopt.rect = subElementRect(SE_CheckBoxIndicator, buttonOption, widget);
-        drawPrimitive(PE_IndicatorCheckBox, &subopt, painter, widget);
-        // Draw text
-        subopt.rect = subElementRect(SE_CheckBoxContents, buttonOption, widget);
-        drawControl(CE_CheckBoxLabel, &subopt, painter, widget);
+        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+            QStyleOptionButton subopt = *buttonOption;
+            // Draw background
+            auto bgElements = prepareElements(&subopt, widget);
+            auto bgProps = queryProperties(bgElements);
+            auto rect = backgroundRectangle(option, bgProps).toRect();
+            drawBackground(painter, rect, bgProps);
+            // Draw indicator
+            subopt.rect = subElementRect(SE_CheckBoxIndicator, buttonOption, widget);
+            drawPrimitive(PE_IndicatorCheckBox, &subopt, painter, widget);
+            // Draw text
+            subopt.rect = subElementRect(SE_CheckBoxContents, buttonOption, widget);
+            drawControl(CE_CheckBoxLabel, &subopt, painter, widget);
+        }
     }
         return;
     case QStyle::CE_RadioButton: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        QStyleOptionButton subopt = *buttonOption;
-        // Draw background
-        auto bgElements = prepareElements(&subopt, widget);
-        auto bgProps = queryProperties(bgElements);
-        auto rect = backgroundRectangle(option, bgProps).toRect();
-        drawBackground(painter, rect, bgProps);
-        // Draw indicator
-        subopt.rect = subElementRect(SE_RadioButtonIndicator, buttonOption, widget);
-        drawPrimitive(PE_IndicatorRadioButton, &subopt, painter, widget);
-        // Draw text
-        subopt.rect = subElementRect(SE_RadioButtonContents, buttonOption, widget);
-        drawControl(CE_RadioButtonLabel, &subopt, painter, widget);
+        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+            QStyleOptionButton subopt = *buttonOption;
+            // Draw background
+            auto bgElements = prepareElements(&subopt, widget);
+            auto bgProps = queryProperties(bgElements);
+            auto rect = backgroundRectangle(option, bgProps).toRect();
+            drawBackground(painter, rect, bgProps);
+            // Draw indicator
+            subopt.rect = subElementRect(SE_RadioButtonIndicator, buttonOption, widget);
+            drawPrimitive(PE_IndicatorRadioButton, &subopt, painter, widget);
+            // Draw text
+            subopt.rect = subElementRect(SE_RadioButtonContents, buttonOption, widget);
+            drawControl(CE_RadioButtonLabel, &subopt, painter, widget);
+        }
     }
         return;
     case QStyle::CE_MenuItem: {
-        const auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-        drawElement(queryProperties(prepareElements(menuItem, widget, {QStringLiteral("MenuItem")})), painter, menuItem);
-        layoutAndDrawIconTextIndicator(menuItem, painter, widget, menuItem->icon, menuItem->text);
+        if (const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
+            drawElementBackground(painter, menuItemOption, widget, {QStringLiteral("MenuItem")});
+            layoutAndDrawIconTextIndicator(menuItemOption, painter, widget, menuItemOption->icon, menuItemOption->text);
+        }
     }
         return;
     case QStyle::CE_ToolBoxTabShape:
     case QStyle::CE_TabBarTabShape: {
-        const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-        auto bgElements = prepareElements(tabOption, widget, {QStringLiteral("TabButton")});
-        auto bgProps = queryProperties(bgElements);
-        auto rect = backgroundRectangle(option, bgProps).toRect();
-        drawBackground(painter, rect, bgProps);
+        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
+            auto bgElements = prepareElements(tabOption, widget, {QStringLiteral("TabButton")});
+            auto bgProps = queryProperties(bgElements);
+            auto rect = backgroundRectangle(option, bgProps).toRect();
+            drawBackground(painter, rect, bgProps);
+        }
     }
         return;
     case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel: {
-        const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-        auto subopt = *tabOption;
-        subopt.rect = subElementRect(SE_TabBarTabText, tabOption, widget);
-        layoutAndDrawIconTextIndicator(&subopt, painter, widget, tabOption->icon, tabOption->text);
+        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
+            auto subopt = *tabOption;
+            subopt.rect = subElementRect(SE_TabBarTabText, tabOption, widget);
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, tabOption->icon, tabOption->text);
+        }
     }
         return;
     case QStyle::CE_ToolBoxTab:
     case QStyle::CE_TabBarTab: {
-        const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option);
-        drawControl(CE_TabBarTabShape, tabOption, painter, widget);
-        drawControl(CE_TabBarTabLabel, tabOption, painter, widget);
+        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
+            drawControl(CE_TabBarTabShape, tabOption, painter, widget);
+            drawControl(CE_TabBarTabLabel, tabOption, painter, widget);
+        }
     }
         return;
     case QStyle::CE_ItemViewItem: {
-        const auto vi = qstyleoption_cast<const QStyleOptionViewItem *>(option);
+        const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option);
+        if (!viewItemOption) {
+            return;
+        }
         // Dont allow drawing outside of the area
         painter->save();
         painter->setClipRect(option->rect);
-        QStyleOptionViewItem subopt = *vi;
+        QStyleOptionViewItem subopt = *viewItemOption;
         // Draw background
         auto elements = prepareElements(&subopt, widget, {QStringLiteral("ItemViewItem")});
         auto props = queryProperties(elements);
@@ -220,7 +235,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         // Draw text
         if (subopt.features.testFlag(QStyleOptionViewItem::HasDisplay)) {
             subopt.rect = subElementRect(SE_ItemViewItemText, &subopt, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), vi->text);
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), viewItemOption->text);
         }
         // Draw indicator
         if (subopt.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
@@ -236,40 +251,44 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
                 checkbox.state = State_On;
                 break;
             }
-            checkbox.rect = subElementRect(SE_ItemViewItemCheckIndicator, vi, widget);
+            checkbox.rect = subElementRect(SE_ItemViewItemCheckIndicator, viewItemOption, widget);
             drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
         } else if (subopt.features.testFlag(QStyleOptionViewItem::HasDecoration)) {
-            subopt.rect = subElementRect(SE_ItemViewItemDecoration, vi, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, vi->icon, QString());
+            subopt.rect = subElementRect(SE_ItemViewItemDecoration, viewItemOption, widget);
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, viewItemOption->icon, QString());
         }
         painter->restore();
     }
         return;
     case QStyle::CE_ProgressBarGroove: {
-        const auto opt = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
-        auto subopt = *opt;
-        auto groove = subElementRect(SE_ProgressBarGroove, opt, widget);
-        subopt.rect = groove;
-        drawElement(queryProperties(prepareElements(&subopt, widget)), painter, &subopt);
+        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
+            auto subopt = *progressBarOption;
+            auto groove = subElementRect(SE_ProgressBarGroove, progressBarOption, widget);
+            subopt.rect = groove;
+            drawElementBackground(painter, &subopt, widget);
+        }
     }
         return;
     case QStyle::CE_ProgressBarContents: {
-        const auto opt = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
-        auto subopt = *opt;
+        const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
+        if (!progressBarOption) {
+            return;
+        }
+        auto subopt = *progressBarOption;
 
-        const qreal p = opt->progress;
+        const qreal p = progressBarOption->progress;
         if (p <= 0) {
             return;
         }
-        const qreal min = opt->minimum;
-        const qreal max = opt->maximum;
+        const qreal min = progressBarOption->minimum;
+        const qreal max = progressBarOption->maximum;
         const qreal percentage = (p - min) / (max - min);
 
-        auto groove = subElementRect(SE_ProgressBarGroove, opt, widget);
-        auto progress = subElementRect(SE_ProgressBarContents, opt, widget);
+        auto groove = subElementRect(SE_ProgressBarGroove, progressBarOption, widget);
+        auto progress = subElementRect(SE_ProgressBarContents, progressBarOption, widget);
 
-        const bool horizontal = opt->state.testFlag(QStyle::State_Horizontal);
-        const bool inverted(opt->invertedAppearance);
+        const bool horizontal = progressBarOption->state.testFlag(QStyle::State_Horizontal);
+        const bool inverted(progressBarOption->invertedAppearance);
         bool reverse = horizontal && option->direction == Qt::RightToLeft;
         if (inverted) {
             reverse = !reverse;
@@ -292,16 +311,17 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
         subopt.rect = progress;
 
-        drawElement(queryProperties(prepareElements(&subopt, widget, {QStringLiteral("Track")})), painter, &subopt);
+        drawElementBackground(painter, &subopt, widget, {QStringLiteral("Track")});
     }
         return;
     case QStyle::CE_ProgressBarLabel: {
-        const auto opt = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
-        if (opt->textVisible) {
-            auto subopt = *opt;
-            auto rect = subElementRect(SE_ProgressBarLabel, opt, widget);
-            subopt.rect = rect;
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), opt->text);
+        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
+            if (progressBarOption->textVisible) {
+                auto subopt = *progressBarOption;
+                auto rect = subElementRect(SE_ProgressBarLabel, progressBarOption, widget);
+                subopt.rect = rect;
+                layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), progressBarOption->text);
+            }
         }
     }
         return;
@@ -310,9 +330,11 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_ProgressBarContents, option, painter, widget);
         drawControl(CE_ProgressBarLabel, option, painter, widget);
         return;
-    case QStyle::CE_ScrollBarSlider: {
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Handle")})), painter, option);
-    }
+    case QStyle::CE_ScrollBarSlider:
+        drawElementBackground(painter, option, widget, {QStringLiteral("Handle")});
+        return;
+    case QStyle::CE_ShapedFrame:
+        drawElementBackground(painter, option, widget, {QStringLiteral("Frame")});
         return;
     case QStyle::CE_ScrollBarAddLine:
     case QStyle::CE_ScrollBarSubLine:
@@ -322,6 +344,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ScrollBarLast:
     case QStyle::CE_MenuEmptyArea:
         return; // This is what breeze does as well
+    case QStyle::CE_FocusFrame:
     case QStyle::CE_MenuBarItem:
     case QStyle::CE_MenuBarEmptyArea:
     case QStyle::CE_MenuVMargin:
@@ -335,12 +358,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_Splitter:
     case QStyle::CE_RubberBand:
     case QStyle::CE_DockWidgetTitle:
-    case QStyle::CE_FocusFrame:
     case QStyle::CE_ComboBoxLabel:
     case QStyle::CE_ToolBar:
     case QStyle::CE_HeaderEmptyArea:
     case QStyle::CE_ColumnViewGrip:
-    case QStyle::CE_ShapedFrame:
     case QStyle::CE_CustomBase:
         break;
     }
@@ -357,6 +378,9 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     switch (control) {
     case QStyle::CC_ToolButton: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
+        if (!buttonOption) {
+            return;
+        }
         const auto elements = prepareElements(buttonOption, widget);
         const auto properties = queryProperties(elements);
         auto rect = subControlRect(CC_ToolButton, option, SC_ToolButton, widget);
@@ -384,6 +408,9 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         return;
     case QStyle::CC_GroupBox: {
         const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox *>(option);
+        if (!groupBoxOption) {
+            return;
+        }
         const auto elements = prepareElements(groupBoxOption, widget);
         const auto properties = queryProperties(elements);
         auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
@@ -413,11 +440,14 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     }
         return;
     case QStyle::CC_ComboBox: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionComboBox *>(option);
-        drawElement(queryProperties(prepareElements(buttonOption, widget)), painter, buttonOption);
-        drawControl(CE_ComboBoxLabel, buttonOption, painter, widget);
-        auto indicatorRect = subControlRect(CC_ComboBox, buttonOption, SC_ComboBoxArrow, widget);
-        const auto props = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
+        const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option);
+        if (!comboBoxOption) {
+            return;
+        }
+        drawElementBackground(painter, comboBoxOption, widget);
+        drawControl(CE_ComboBoxLabel, comboBoxOption, painter, widget);
+        auto indicatorRect = subControlRect(CC_ComboBox, comboBoxOption, SC_ComboBoxArrow, widget);
+        const auto props = queryProperties(prepareElements(comboBoxOption, widget, {QStringLiteral("Indicator")}));
         if (props->icon()) {
             auto icon = QIcon::fromTheme(props->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
             // Take the button padding into account when drawing this
@@ -435,8 +465,11 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         return;
     case QStyle::CC_SpinBox: {
         const auto spinBoxOpt = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
+        if (!spinBoxOpt) {
+            return;
+        }
         auto elements = prepareElements(spinBoxOpt, widget);
-        drawElement(queryProperties(elements), painter, spinBoxOpt);
+        drawElementBackground(painter, spinBoxOpt, widget);
         // For spinbox we need to manually create the indicator buttons
         if (spinBoxOpt->buttonSymbols != QAbstractSpinBox::NoButtons) {
             bool arrows = (spinBoxOpt->buttonSymbols == QAbstractSpinBox::UpDownArrows);
@@ -457,7 +490,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         // If scrollbar has no background color, QStyle gets confused and doesnt draw anything,
         // causing visual glitches. In those cases, use the ApplicationWindow background color.
         if (scrollbarProps->background() && scrollbarProps->background()->color().has_value()) {
-            drawElement(scrollbarProps, painter, option);
+            drawBackground(painter, option->rect, scrollbarProps);
         } else {
             drawBackground(painter, option->rect, queryProperties(prepareElements(option, widget, {QStringLiteral("ApplicationWindow")})));
         }
@@ -467,6 +500,9 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         return;
     case QStyle::CC_Slider: {
         const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
+        if (!sliderOption) {
+            return;
+        }
         // Background
         auto grooveRect = subControlRect(CC_Slider, sliderOption, SC_SliderGroove, widget);
         drawBackground(painter, grooveRect, queryProperties(prepareElements(sliderOption, widget)));
@@ -590,11 +626,11 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Item")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("Item")});
         return;
     case QStyle::PE_Widget:
         // Relates to PE_Frame
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("Panel")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("Panel")});
         return;
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
@@ -603,29 +639,29 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         if (widget->parentWidget()->inherits("QComboBox") || widget->parentWidget()->inherits("QAbstractSpinBox")) {
             return;
         }
-        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
+        drawElementBackground(painter, option, widget);
         return;
     case QStyle::PE_PanelItemViewItem:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ItemViewItem")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("ItemViewItem")});
         return;
     case QStyle::PE_PanelItemViewRow:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ItemViewRow")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("ItemViewRow")});
         return;
     case QStyle::PE_PanelScrollAreaCorner:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ScrollAreaCorner")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("ScrollAreaCorner")});
         return;
     case QStyle::PE_PanelTipLabel:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("ToolTip")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("ToolTip")});
         return;
     case QStyle::PE_FrameFocusRect:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("FocusFrame")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("FocusFrame")});
         return;
         // Indicators
     case QStyle::PE_IndicatorCheckBox:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("CheckBox"), QStringLiteral("Indicator")});
         return;
     case QStyle::PE_IndicatorRadioButton:
-        drawElement(queryProperties(prepareElements(option, widget, {QStringLiteral("RadioButton"), QStringLiteral("Indicator")})), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("RadioButton"), QStringLiteral("Indicator")});
         return;
     case QStyle::PE_IndicatorArrowLeft: {
         auto props = queryProperties(prepareElements(option, widget, {QStringLiteral("IndicatorArrowLeft")}));
@@ -707,19 +743,19 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorTabTearRight:
         break;
     default:
-        drawElement(queryProperties(prepareElements(option, widget)), painter, option);
+        drawElementBackground(painter, option, widget, {QStringLiteral("Item")});
         return;
     }
 
     QCommonStyle::drawPrimitive(element, option, painter, widget);
 }
 
-QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *opt, const QSize &contentsSize, const QWidget *widget) const
+QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
     // TODO use subelement rects to build the thing if possible
-    QSize size = QCommonStyle::sizeFromContents(ct, opt, contentsSize, widget);
+    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
     QSize minimumSize(contentsSize.width(), contentsSize.height());
-    auto elements = prepareElements(opt, widget);
+    auto elements = prepareElements(option, widget);
     if (elements.isEmpty()) {
         return size;
     }
@@ -736,34 +772,34 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
             padding = properties->layout()->padding()->toMargins().toMargins();
         }
     }
-    switch (ct) {
+    switch (contentsType) {
     case QStyle::CT_CheckBox: {
         QRegion r;
-        auto indicatorRect = subElementRect(SE_CheckBoxIndicator, opt, widget);
-        auto textRect = subElementRect(SE_CheckBoxContents, opt, widget);
+        auto indicatorRect = subElementRect(SE_CheckBoxIndicator, option, widget);
+        auto textRect = subElementRect(SE_CheckBoxContents, option, widget);
         r.setRects({indicatorRect, textRect});
         size = r.boundingRect().size().grownBy(padding);
     } break;
     case QStyle::CT_RadioButton: {
         QRegion r;
-        auto indicatorRect = subElementRect(SE_RadioButtonIndicator, opt, widget);
-        auto textRect = subElementRect(SE_RadioButtonContents, opt, widget);
+        auto indicatorRect = subElementRect(SE_RadioButtonIndicator, option, widget);
+        auto textRect = subElementRect(SE_RadioButtonContents, option, widget);
         r.setRects({indicatorRect, textRect});
         size = r.boundingRect().size().grownBy(padding);
     } break;
     case QStyle::CT_PushButton: {
-        auto contentsRect = subElementRect(SE_PushButtonContents, opt, widget);
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(opt);
+        auto contentsRect = subElementRect(SE_PushButtonContents, option, widget);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
         size = contentsRect.size().grownBy(padding);
         if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            auto indicatorProps = queryProperties(prepareElements(opt, widget, {QStringLiteral("Indicator")}));
+            auto indicatorProps = queryProperties(prepareElements(option, widget, {QStringLiteral("Indicator")}));
             if (indicatorProps->layout()) {
-                size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, opt, widget);
+                size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, option, widget);
             }
         }
     } break;
     case QStyle::CT_ToolButton: {
-        const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt);
+        const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
         auto elements = prepareElements(toolButtonOption, widget);
         QStringList childelements = {};
         QRect menubuttonrect;
@@ -791,7 +827,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
 
     } break;
     case QStyle::CT_ComboBox: {
-        const auto option = qstyleoption_cast<const QStyleOptionComboBox *>(opt);
         auto elements = prepareElements(option, widget);
         QStringList childelements = {QStringLiteral("Icon"), QStringLiteral("Text"), QStringLiteral("Indicator")};
         auto map = layoutMap(elements, option, childelements);
@@ -806,9 +841,9 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         size = unifiedRect.size().grownBy(padding);
     } break;
     case QStyle::CT_TabBarTab: {
-        auto elements = prepareElements(opt, widget, {QStringLiteral("TabButton")});
+        auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
         auto props = queryProperties(elements);
-        auto textRect = subElementRect(SE_TabBarTabText, opt, widget);
+        auto textRect = subElementRect(SE_TabBarTabText, option, widget);
         if (props->layout()) {
             if (props->layout()->width()) {
                 textRect.setWidth(props->layout()->width().value_or(contentsSize.width()));
@@ -823,37 +858,37 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         return textRect.size().grownBy(padding);
     } break;
     case QStyle::CT_MenuBar: {
-        const auto option = qstyleoption_cast<const QStyleOptionMenuItem *>(opt);
         size = backgroundRectangle(option, properties).size().toSize();
     } break;
     case QStyle::CT_MenuBarItem: {
-        const auto menuopt = qstyleoption_cast<const QStyleOptionMenuItem *>(opt);
-        auto elements = prepareElements(menuopt, widget, {QStringLiteral("MenuBarItem")});
+        const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
+        if (!menuItemOption) {
+            return size;
+        }
+        auto elements = prepareElements(menuItemOption, widget, {QStringLiteral("MenuBarItem")});
         QStringList childelements = {};
-        if (!menuopt->icon.isNull()) {
+        if (!menuItemOption->icon.isNull()) {
             childelements.append(QStringLiteral("Icon"));
         }
-        if (!menuopt->text.isEmpty()) {
+        if (!menuItemOption->text.isEmpty()) {
             childelements.append(QStringLiteral("Text"));
         }
         if (childelements.isEmpty()) {
             return size;
         }
-        auto map = layoutMap(elements, menuopt, childelements);
+        auto map = layoutMap(elements, menuItemOption, childelements);
         QRect unifiedRect;
         for (const auto &m : map) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }
         size = unifiedRect.size().grownBy(padding);
     } break;
-    case QStyle::CT_MenuItem:
-    case QStyle::CT_GroupBox: {
-    } break;
+
     case QStyle::CT_ProgressBar: {
         QRegion r;
-        auto grooveRect = subElementRect(SE_ProgressBarGroove, opt, widget);
-        auto contentRect = subElementRect(SE_ProgressBarContents, opt, widget);
-        auto textRect = subElementRect(SE_ProgressBarLabel, opt, widget);
+        auto grooveRect = subElementRect(SE_ProgressBarGroove, option, widget);
+        auto contentRect = subElementRect(SE_ProgressBarContents, option, widget);
+        auto textRect = subElementRect(SE_ProgressBarLabel, option, widget);
         r.setRects({grooveRect, contentRect, textRect});
         size = r.boundingRect().size().grownBy(padding);
     } break;
@@ -863,7 +898,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
         break;
     }
     case QStyle::CT_Slider: {
-        auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(opt);
+        auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(option);
         if (sliderOpt) {
             QRegion r;
             auto grooveRect = subControlRect(CC_Slider, sliderOpt, SC_SliderGroove, widget);
@@ -873,9 +908,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType ct, const QStyleOption *
             size = r.boundingRect().size().grownBy(padding);
         }
     } break;
+    case QStyle::CT_MenuItem:
+    case QStyle::CT_GroupBox:
     // QStyleOptionSlider, no text/icon
     case QStyle::CT_ScrollBar:
-
     // QStyleOptionFrame, no text/icon
     case QStyle::CT_LineEdit:
     // QStyleOptionSpinBox, no text/icon
@@ -917,16 +953,16 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ItemViewItemText:
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator: {
-        const auto vi = qstyleoption_cast<const QStyleOptionViewItem *>(option);
+        const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option);
         QStringList childelements = {};
-        if (vi) {
-            if (vi->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
+        if (viewItemOption) {
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
                 childelements.append(QStringLiteral("Text"));
             }
-            if (vi->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
                 childelements.append(QStringLiteral("Icon"));
             }
-            if (vi->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
                 childelements.append(QStringLiteral("CheckBox"));
             }
         }
@@ -951,16 +987,16 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_PushButtonContents:
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_CheckBoxContents: {
-        const auto opt = qstyleoption_cast<const QStyleOptionButton *>(option);
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
         auto elements = prepareElements(option, widget);
         QStringList childelements = {};
         if (element != SE_PushButtonContents) {
             childelements.append(QStringLiteral("Indicator"));
         }
-        if (!opt->icon.isNull()) {
+        if (!buttonOption->icon.isNull()) {
             childelements.append(QStringLiteral("Icon"));
         }
-        if (!opt->text.isEmpty()) {
+        if (!buttonOption->text.isEmpty()) {
             childelements.append(QStringLiteral("Text"));
         }
         if (childelements.isEmpty()) {
@@ -1006,8 +1042,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ProgressBarLabel:
     case QStyle::SE_ProgressBarContents:
     case QStyle::SE_ProgressBarGroove: {
-        const auto opt(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
-        if (!opt) {
+        const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
+        if (!progressBarOption) {
             return QRect();
         }
         auto props = queryProperties(prepareElements(option, widget));
@@ -1018,7 +1054,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             height = props->layout()->height().value_or(height);
         }
         rect = option->rect;
-        if (opt->state.testFlag(QStyle::State_Horizontal)) {
+        if (progressBarOption->state.testFlag(QStyle::State_Horizontal)) {
             rect = centerRect(rect, width, height);
         } else {
             rect = centerRect(rect, height, width);
@@ -1070,40 +1106,39 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     return visualRect(option->direction, option->rect, rect);
 }
 
-QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *opt, SubControl sc, const QWidget *widget) const
+QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
-    if (cc == CC_ToolButton) {
-        const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt);
-        auto elements = prepareElements(toolButtonOption, widget);
+    if (complexControl == CC_ToolButton) {
+        auto elements = prepareElements(option, widget);
 
-        if (sc == SC_ToolButton) {
+        if (subControl == SC_ToolButton) {
             const auto properties = queryProperties(elements);
-            return visualRect(opt->direction, opt->rect, backgroundRectangle(toolButtonOption, properties).toRect());
+            return visualRect(option->direction, option->rect, backgroundRectangle(option, properties).toRect());
         }
         // TODO: we need to handle this manually. Just move it on the right side of the button for now.
-        if (sc == SC_ToolButtonMenu) {
+        if (subControl == SC_ToolButtonMenu) {
             // Apply padding etc?
-            return QCommonStyle::subControlRect(cc, opt, sc, widget);
+            return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
         }
     }
 
-    if (cc == CC_ComboBox) {
+    if (complexControl == CC_ComboBox) {
         // cast option and check
-        const auto comboBoxOption(qstyleoption_cast<const QStyleOptionComboBox *>(opt));
+        const auto comboBoxOption(qstyleoption_cast<const QStyleOptionComboBox *>(option));
         if (!comboBoxOption) {
-            return QCommonStyle::subControlRect(CC_ComboBox, opt, sc, widget);
+            return QCommonStyle::subControlRect(CC_ComboBox, option, subControl, widget);
         }
-        switch (sc) {
+        switch (subControl) {
         case SC_ComboBoxFrame:
         case SC_ComboBoxListBoxPopup:
-            return opt->rect;
+            return option->rect;
 
         case SC_ComboBoxArrow: {
-            auto elements = prepareElements(opt, widget);
-            auto map = layoutMap(elements, opt, {QStringLiteral("Indicator")});
+            auto elements = prepareElements(option, widget);
+            auto map = layoutMap(elements, option, {QStringLiteral("Indicator")});
             auto rect = map[QStringLiteral("Indicator")].rect;
 
-            return visualRect(opt->direction, opt->rect, rect.toRect());
+            return visualRect(option->direction, option->rect, rect.toRect());
         }
 
         case SC_ComboBoxEditField: {
@@ -1113,68 +1148,67 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
             break;
         }
     }
-    if (cc == CC_GroupBox) {
-        switch (sc) {
+    if (complexControl == CC_GroupBox) {
+        switch (subControl) {
         case SC_GroupBoxLabel: {
-            auto elements = prepareElements(opt, widget);
-            auto map = layoutMap(elements, opt, {QStringLiteral("GroupBox"), QStringLiteral("Text")});
+            auto elements = prepareElements(option, widget);
+            auto map = layoutMap(elements, option, {QStringLiteral("GroupBox"), QStringLiteral("Text")});
             auto rect = map[QStringLiteral("Text")].rect.toRect();
-            return visualRect(opt->direction, opt->rect, rect);
+            return visualRect(option->direction, option->rect, rect);
         }
         case SC_GroupBoxContents: {
-            auto elements = prepareElements(opt, widget);
-            auto map = layoutMap(elements, opt, {QStringLiteral("GroupBox"), QStringLiteral("Text")});
+            auto elements = prepareElements(option, widget);
+            auto map = layoutMap(elements, option, {QStringLiteral("GroupBox"), QStringLiteral("Text")});
             auto rect = map[QStringLiteral("GroupBox")].rect.toRect();
-            return visualRect(opt->direction, opt->rect, rect);
+            return visualRect(option->direction, option->rect, rect);
         }
         case SC_GroupBoxCheckBox: {
-            auto elements = prepareElements(opt, widget);
-            auto map = layoutMap(elements, opt, {QStringLiteral("GroupBox"), QStringLiteral("Icon")});
+            auto elements = prepareElements(option, widget);
+            auto map = layoutMap(elements, option, {QStringLiteral("GroupBox"), QStringLiteral("Icon")});
             auto rect = map[QStringLiteral("Icon")].rect.toRect();
-            return visualRect(opt->direction, opt->rect, rect);
+            return visualRect(option->direction, option->rect, rect);
         }
         case SC_GroupBoxFrame: {
-            return opt->rect;
+            return option->rect;
         }
         default:
             break;
         }
     }
 
-    if (cc == CC_ScrollBar) {
-        if (sc == SC_ScrollBarSlider) {
-            auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(opt);
-            auto rect = QCommonStyle::subControlRect(cc, opt, sc, widget);
-            auto props = queryProperties(prepareElements(opt, widget, {QStringLiteral("Slider")}));
+    if (complexControl == CC_ScrollBar) {
+        if (subControl == SC_ScrollBarSlider) {
+            auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
+            if (!sliderOption) {
+                return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
+            }
+            auto rect = QCommonStyle::subControlRect(complexControl, option, subControl, widget);
+            auto props = queryProperties(prepareElements(option, widget, {QStringLiteral("Slider")}));
             if (props->layout()) {
-                if (sliderOpt->orientation == Qt::Horizontal) {
+                if (sliderOption->orientation == Qt::Horizontal) {
                     int thickness = props->layout()->height().value_or(0);
-                    return visualRect(opt->direction, opt->rect, rect.adjusted(0, thickness, 0, -thickness));
+                    return visualRect(option->direction, option->rect, rect.adjusted(0, thickness, 0, -thickness));
                 } else {
                     int thickness = props->layout()->width().value_or(0);
-                    return visualRect(opt->direction, opt->rect, rect.adjusted(thickness, 0, -thickness, 0));
+                    return visualRect(option->direction, option->rect, rect.adjusted(thickness, 0, -thickness, 0));
                 }
             }
         }
     }
 
-    if (cc == CC_Slider) {
+    if (complexControl == CC_Slider) {
         // cast option and check
-        const auto sliderOption(qstyleoption_cast<const QStyleOptionSlider *>(opt));
+        const auto sliderOption(qstyleoption_cast<const QStyleOptionSlider *>(option));
         if (!sliderOption) {
-            return QCommonStyle::subControlRect(cc, opt, sc, widget);
+            return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
         }
-
-        // direction
+        // Copied from Breeze
         const bool horizontal(sliderOption->orientation == Qt::Horizontal);
-
-        // somewhat a copy-pasta of QCommonStyle::subControlRect, except we want
-        // to account for our specific tick marks, and perform centering.
         auto rect(sliderOption->rect);
 
-        switch (sc) {
+        switch (subControl) {
         case SC_SliderHandle: {
-            auto props = queryProperties(prepareElements(opt, widget, {QStringLiteral("Handle")}));
+            auto props = queryProperties(prepareElements(option, widget, {QStringLiteral("Handle")}));
             int handleHeight = 1;
             int handleWidth = 1;
             if (props->layout()) {
@@ -1182,30 +1216,30 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
                 handleWidth = props->layout()->width().value_or(6);
             }
 
-            QRect ret(centerRect(rect, handleWidth, handleHeight));
+            QRect handleRect(centerRect(rect, handleWidth, handleHeight));
             const int sliderPos = sliderPositionFromValue(sliderOption->minimum,
                                                           sliderOption->maximum,
                                                           sliderOption->sliderPosition,
-                                                          (horizontal ? rect.width() : rect.height()) - handleHeight,
+                                                          (horizontal ? (rect.width() - handleWidth) : (rect.height() - handleHeight)),
                                                           sliderOption->upsideDown);
             if (horizontal) {
-                ret.moveLeft(rect.x() + sliderPos);
+                handleRect.moveLeft(rect.x() + sliderPos);
             } else {
-                ret.moveTop(rect.y() + sliderPos);
+                handleRect.moveTop(rect.y() + sliderPos);
             }
-            ret = visualRect(opt->direction, rect, ret);
-            return ret;
+            handleRect = visualRect(option->direction, rect, handleRect);
+            return handleRect;
         }
 
         case SC_SliderGroove: {
-            auto props = queryProperties(prepareElements(opt, widget));
+            auto props = queryProperties(prepareElements(option, widget));
             int grooveHeight = 1;
             int grooveWidth = 1;
             if (props->layout()) {
                 grooveHeight = props->layout()->height().value_or(6);
                 grooveWidth = props->layout()->width().value_or(6);
             }
-            auto frameWidth = pixelMetric(PM_DefaultFrameWidth, opt, widget);
+            auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
             auto grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
 
             // centering
@@ -1214,11 +1248,11 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
             } else {
                 grooveRect = centerRect(rect, grooveWidth, grooveRect.height());
             }
-            return grooveRect;
+            return visualRect(option->direction, rect, grooveRect);
         }
 
         default:
-            return QCommonStyle::subControlRect(cc, opt, sc, widget);
+            return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
         }
     }
 
@@ -1234,7 +1268,7 @@ QRect UnionStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex *o
             }
         }
     */
-    return QCommonStyle::subControlRect(cc, opt, sc, widget);
+    return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
 }
 
 int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
@@ -1350,7 +1384,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     } break;
     case QStyle::PM_ToolBarHandleExtent:
     case QStyle::PM_ToolBarExtensionExtent: {
-        auto toolbaroption = qstyleoption_cast<const QStyleOptionToolBar *>(option);
+        auto toolBarOption = qstyleoption_cast<const QStyleOptionToolBar *>(option);
         QStringList childelements;
         if (metric == PM_ToolBarHandleExtent) {
             childelements.append(QStringLiteral("Handle"));
@@ -1366,8 +1400,8 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         if (!properties) {
             return defaultMetric;
         }
-        if (toolbaroption && properties->layout()) {
-            if (toolbaroption->state & QStyle::State_Horizontal) {
+        if (toolBarOption && properties->layout()) {
+            if (toolBarOption->state & QStyle::State_Horizontal) {
                 return properties->layout()->width().value_or(defaultMetric);
             } else {
                 return properties->layout()->height().value_or(defaultMetric);
