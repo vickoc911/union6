@@ -445,6 +445,9 @@ Qt::TextFlag toQtWrapMode(Union::Properties::TextWrapMode wrapMode)
 QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::StylePropertyGroup *properties)
 {
     // Shrink the widget rect by the insets
+    if (!option) {
+        return QRectF();
+    }
     QRectF rect = option->rect;
     if (const auto layout = properties->layout()) {
         if (layout->inset()) {
