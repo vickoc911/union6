@@ -608,10 +608,20 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             horizontalAlignment = properties->icon()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->icon()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             order = properties->icon()->alignment()->order().value_or(0);
-        } else if (subElement == QStringLiteral("Text")) {
+        } else if (subElement == QStringLiteral("Text") || subElement == QStringLiteral("ShortcutText")) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
-            const auto optiontext = textFromOption(opt);
+            auto optiontext = textFromOption(opt);
+            const int tabPosition(optiontext.indexOf(QLatin1Char('\t')));
+            if (tabPosition >= 0) {
+                QString accelerator(optiontext.mid(tabPosition + 1));
+                if (subElement == QStringLiteral("ShortcutText")) {
+                    optiontext = optiontext.mid(tabPosition + 1);
+                } else {
+                    optiontext = optiontext.left(tabPosition);
+                }
+            }
+            // if we are a menuitem and have a shortcut, we need to split the text with /t and place them according their alignments
             elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlagsFromProperties(properties, true), optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
