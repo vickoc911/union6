@@ -225,6 +225,7 @@ combobox
         background-color: var(--view-background-color);
         border: 1px solid var(--view-border-color);
         box-shadow: none;
+        text-wrap-mode: no-wrap;
 
         &:hovered {
             border-color: var(--button-active-border-highlight-color);

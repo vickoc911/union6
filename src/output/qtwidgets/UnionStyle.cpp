@@ -75,6 +75,16 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
     }
         return;
+    case QStyle::CE_ComboBoxLabel: {
+        if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
+            if (!comboBoxOption->editable) {
+                auto subopt = *comboBoxOption;
+                subopt.rect = subControlRect(CC_ComboBox, comboBoxOption, SC_ComboBoxEditField, widget);
+                layoutAndDrawIconTextIndicator(&subopt, painter, widget, comboBoxOption->currentIcon, comboBoxOption->currentText);
+            }
+        }
+    }
+        return;
     case QStyle::CE_RadioButtonLabel:
     case QStyle::CE_CheckBoxLabel: {
         if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
@@ -956,10 +966,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option);
         QStringList childelements = {};
         if (viewItemOption) {
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay) && !viewItemOption->text.isEmpty()) {
                 childelements.append(QStringLiteral("Text"));
             }
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration) && !viewItemOption->icon.isNull()) {
                 childelements.append(QStringLiteral("Icon"));
             }
             if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
@@ -1137,11 +1147,17 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             auto elements = prepareElements(option, widget);
             auto map = layoutMap(elements, option, {QStringLiteral("Indicator")});
             auto rect = map[QStringLiteral("Indicator")].rect;
-
+            const int spacing(pixelMetric(PM_LayoutVerticalSpacing, option, widget));
+            rect = rect.adjusted(-spacing, 0, spacing, 0);
             return visualRect(option->direction, option->rect, rect.toRect());
         }
 
         case SC_ComboBoxEditField: {
+            QRect labelRect;
+            auto rect = option->rect;
+            auto indicatorRect = subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget);
+            labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
+            return visualRect(option->direction, option->rect, labelRect);
         }
 
         default:
