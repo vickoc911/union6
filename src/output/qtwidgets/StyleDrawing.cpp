@@ -393,7 +393,8 @@ void drawCornerProperty(QPainter *painter,
     painter->restore();
 }
 
-void drawElement(Union::Properties::StylePropertyGroup *properties, QPainter *painter, const QStyleOption *opt)
+void drawElementBackground(QPainter *painter, const QStyleOption *option, const QWidget *widget, const QStringList &subElements)
 {
-    drawBackground(painter, opt->rect, properties);
+    const auto properties = queryProperties(prepareElements(option, widget, subElements));
+    drawBackground(painter, option->rect, properties);
 }
