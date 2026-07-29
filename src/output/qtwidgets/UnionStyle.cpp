@@ -196,8 +196,29 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_MenuItem: {
         if (const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
-            drawElementBackground(painter, menuItemOption, widget, {QStringLiteral("MenuItem")});
-            layoutAndDrawIconTextIndicator(menuItemOption, painter, widget, menuItemOption->icon, menuItemOption->text);
+            if (menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
+                drawElementBackground(painter, menuItemOption, widget, {QStringLiteral("MenuSeparator")});
+                // TODO we need to allow text drawing on separators?
+                // if (!menuItemOption->text.isEmpty()){
+                //    auto textrect = menuItemOption->rect;
+                //    textrect.setHeight(menuItemOption->fontMetrics.height());
+                //    drawText(textrect, menuItemOption, painter, menuItemOption->text, widget);
+                //}
+            } else {
+                drawElementBackground(painter, menuItemOption, widget, {QStringLiteral("MenuItem")});
+                QIcon indicatorArrow;
+                layoutAndDrawIconTextIndicator(menuItemOption, painter, widget, menuItemOption->icon, menuItemOption->text);
+                if (menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu) {
+                    auto elements = prepareElements(menuItemOption, widget, {QStringLiteral("MenuItem")});
+                    auto props = queryProperties(elements);
+                    if (props->layout() && props->icon()) {
+                        auto map = layoutMap(elements, menuItemOption, {QStringLiteral("Arrow")});
+                        auto rect = map[QStringLiteral("Arrow")].rect;
+                        QIcon icon = QIcon::fromTheme(props->icon()->name().value_or(QStringLiteral("arrow-right-symbolic")));
+                        drawIcon(rect.toRect(), menuItemOption, painter, icon, widget);
+                    }
+                }
+            }
         }
     }
         return;
@@ -368,7 +389,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_Splitter:
     case QStyle::CE_RubberBand:
     case QStyle::CE_DockWidgetTitle:
-    case QStyle::CE_ComboBoxLabel:
     case QStyle::CE_ToolBar:
     case QStyle::CE_HeaderEmptyArea:
     case QStyle::CE_ColumnViewGrip:
@@ -870,30 +890,45 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_MenuBar: {
         size = backgroundRectangle(option, properties).size().toSize();
     } break;
-    case QStyle::CT_MenuBarItem: {
-        const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-        if (!menuItemOption) {
+    case QStyle::CT_MenuItem: {
+        const auto *menuItemOpt = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
+        if (!menuItemOpt) {
             return size;
         }
-        auto elements = prepareElements(menuItemOption, widget, {QStringLiteral("MenuBarItem")});
-        QStringList childelements = {};
-        if (!menuItemOption->icon.isNull()) {
-            childelements.append(QStringLiteral("Icon"));
+        // Handle separator separately (pun not intended)
+        if (menuItemOpt->menuItemType == QStyleOptionMenuItem::Separator) {
+            auto separatorProps = queryProperties(prepareElements(menuItemOpt, widget, {QStringLiteral("MenuSeparator")}));
+            if (separatorProps->layout()) {
+                int width = separatorProps->layout()->width().value_or(1);
+                int height = separatorProps->layout()->height().value_or(1);
+                QSize separatorSize(width, height);
+                if (separatorProps->layout()->padding()) {
+                    separatorSize = separatorSize.grownBy(separatorProps->layout()->padding()->toMargins().toMargins());
+                }
+                return separatorSize;
+            }
+        } else {
+            auto menuProps = queryProperties(prepareElements(menuItemOpt, widget, {QStringLiteral("MenuItem")}));
+            if (menuProps->layout()) {
+                int width = menuProps->layout()->width().value_or(1);
+                int height = menuProps->layout()->height().value_or(1);
+                if (size.width() > width) {
+                    width = size.width();
+                }
+                if (size.height() > height) {
+                    height = size.height();
+                }
+                QSize itemSize(width, height);
+                if (menuProps->layout()->padding()) {
+                    itemSize = itemSize.grownBy(menuProps->layout()->padding()->toMargins().toMargins());
+                }
+                size = itemSize;
+            }
         }
-        if (!menuItemOption->text.isEmpty()) {
-            childelements.append(QStringLiteral("Text"));
-        }
-        if (childelements.isEmpty()) {
-            return size;
-        }
-        auto map = layoutMap(elements, menuItemOption, childelements);
-        QRect unifiedRect;
-        for (const auto &m : map) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
-        }
-        size = unifiedRect.size().grownBy(padding);
     } break;
-
+    case QStyle::CT_MenuBarItem: {
+        break;
+    }
     case QStyle::CT_ProgressBar: {
         QRegion r;
         auto grooveRect = subElementRect(SE_ProgressBarGroove, option, widget);
@@ -902,9 +937,9 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         r.setRects({grooveRect, contentRect, textRect});
         size = r.boundingRect().size().grownBy(padding);
     } break;
-    case QStyle::CT_HeaderSection:
     case QStyle::CT_ItemViewItem: {
-        // unimplemented
+        auto grooveRect = subElementRect(SE_ItemViewItemText, option, widget);
+        size = grooveRect.size().grownBy(padding);
         break;
     }
     case QStyle::CT_Slider: {
@@ -918,7 +953,9 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             size = r.boundingRect().size().grownBy(padding);
         }
     } break;
-    case QStyle::CT_MenuItem:
+    case QStyle::CT_HeaderSection:
+        // unimplemented
+    case QStyle::CT_Menu:
     case QStyle::CT_GroupBox:
     // QStyleOptionSlider, no text/icon
     case QStyle::CT_ScrollBar:
@@ -934,7 +971,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_MdiControls:
     // Uses QStyleOption so there is no text/icon information
     case QStyle::CT_SizeGrip:
-    case QStyle::CT_Menu:
     case QStyle::CT_Splitter:
     case QStyle::CT_CustomBase:
         break;
@@ -1753,8 +1789,10 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
 {
     QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
 
+    QString itemText = text;
+    QString shortcutText;
     bool hasIcon = !icon.isNull();
-    bool hasText = !text.isEmpty();
+    bool hasText = !itemText.isEmpty();
     bool hasIndicator = !indicator.isNull();
 
     QStringList subElements;
@@ -1763,9 +1801,12 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
     }
     if (hasText) {
         subElements.append(QStringLiteral("Text"));
-    }
-    if (hasIndicator) {
-        subElements.append(QStringLiteral("Indicator"));
+        const int tabPosition(itemText.indexOf(QLatin1Char('\t')));
+        if (tabPosition >= 0) {
+            subElements.append(QStringLiteral("ShortcutText"));
+            shortcutText = itemText.mid(tabPosition + 1);
+            itemText = itemText.left(tabPosition);
+        }
     }
     // Nothing to draw, just return
     if (subElements.isEmpty()) {
@@ -1775,7 +1816,7 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
 
     if (hasText) {
         QRect textRect = map[QStringLiteral("Text")].rect.toRect();
-        drawText(textRect, opt, painter, text, widget);
+        drawText(textRect, opt, painter, itemText, widget);
     }
 
     if (hasIcon) {
@@ -1786,5 +1827,10 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
     if (hasIndicator) {
         QRect indicatorRect = map[QStringLiteral("Indicator")].rect.toRect();
         drawIcon(indicatorRect, opt, painter, indicator, widget);
+    }
+
+    if (!shortcutText.isEmpty()) {
+        QRect textRect = map[QStringLiteral("ShortcutText")].rect.toRect();
+        drawText(textRect, opt, painter, shortcutText, widget);
     }
 }
