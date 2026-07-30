@@ -310,44 +310,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         if (!progressBarOption) {
             return;
         }
-        auto subopt = *progressBarOption;
-
-        const qreal p = progressBarOption->progress;
-        if (p <= 0) {
-            return;
-        }
-        const qreal min = progressBarOption->minimum;
-        const qreal max = progressBarOption->maximum;
-        const qreal percentage = (p - min) / (max - min);
-
-        auto groove = subElementRect(SE_ProgressBarGroove, progressBarOption, widget);
+        auto elements = prepareElements(progressBarOption, widget, {QStringLiteral("ProgressBar"), QStringLiteral("Track")});
+        auto props = queryProperties(elements);
         auto progress = subElementRect(SE_ProgressBarContents, progressBarOption, widget);
-
-        const bool horizontal = progressBarOption->state.testFlag(QStyle::State_Horizontal);
-        const bool inverted(progressBarOption->invertedAppearance);
-        bool reverse = horizontal && option->direction == Qt::RightToLeft;
-        if (inverted) {
-            reverse = !reverse;
-        }
-
-        if (horizontal) {
-            const qreal progressWidth = percentage * groove.width();
-            if (reverse) {
-                progress.setLeft(groove.right() - progressWidth);
-            } else {
-                progress.setWidth(progressWidth);
-            }
-        } else {
-            const qreal progressHeight = percentage * groove.height();
-            if (reverse) {
-                progress.setHeight(progressHeight);
-            } else {
-                progress.setTop(groove.bottom() - progressHeight);
-            }
-        }
-        subopt.rect = progress;
-
-        drawElementBackground(painter, &subopt, widget, {QStringLiteral("Track")});
+        drawBackground(painter, progress, props);
     }
         return;
     case QStyle::CE_ProgressBarLabel: {
@@ -1089,9 +1055,57 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         rect = unifiedRect;
     } break;
-    case QStyle::SE_ProgressBarLabel:
-    case QStyle::SE_ProgressBarContents:
+    case QStyle::SE_ProgressBarLabel: {
+        // Copied and repurposed from Breeze
+        const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
+        if (!progressBarOption) {
+            return QRect();
+        }
+        const bool textVisible(progressBarOption->textVisible);
+        const bool busy(progressBarOption->minimum == 0 && progressBarOption->maximum == 0);
+        if (!textVisible || busy) {
+            return QRect();
+        }
+
+        auto props = queryProperties(prepareElements(option, widget));
+        auto textFlags = textFlagsFromProperties(props, false);
+        int textWidth =
+            qMax(option->fontMetrics.size(textFlags, progressBarOption->text).width(), option->fontMetrics.size(textFlags, QStringLiteral("100%")).width());
+        auto rect = centerRect(option->rect, textWidth, option->rect.height());
+        rect.setLeft(rect.right() - textWidth + 1);
+        rect = visualRect(option->direction, option->rect, rect);
+        return rect;
+    } break;
+    case QStyle::SE_ProgressBarContents: {
+        // Copied from Breeze
+        const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
+        if (!progressBarOption) {
+            return QRect();
+        }
+        const auto rect(subElementRect(SE_ProgressBarGroove, progressBarOption, widget));
+        const bool busy(progressBarOption->minimum == 0 && progressBarOption->maximum == 0);
+        if (busy) {
+            return rect;
+        }
+        const bool horizontal(progressBarOption->state.testFlag(QStyle::State_Horizontal));
+        bool reverse = (horizontal && (option->direction == Qt::RightToLeft)) || !horizontal;
+        if (progressBarOption->invertedAppearance) {
+            reverse = !reverse;
+        }
+        const int progress(progressBarOption->progress - progressBarOption->minimum);
+        const int steps(qMax(progressBarOption->maximum - progressBarOption->minimum, 1));
+        const qreal position = qreal(progress) / qreal(steps);
+        const int indicatorSize(position * (horizontal ? rect.width() : rect.height()));
+        QRect indicatorRect;
+        if (horizontal) {
+            indicatorRect = QRect(rect.left() + (reverse ? rect.width() - indicatorSize : 0), rect.y(), indicatorSize, rect.height());
+        } else {
+            indicatorRect = QRect(rect.x(), reverse ? (rect.bottom() - indicatorSize + 1) : rect.top(), rect.width(), indicatorSize);
+        }
+        return indicatorRect;
+    } break;
     case QStyle::SE_ProgressBarGroove: {
+        // Copied and repurposed from Breeze
         const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
         if (!progressBarOption) {
             return QRect();
@@ -1099,18 +1113,19 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto props = queryProperties(prepareElements(option, widget));
         qreal width = 0;
         qreal height = 0;
-        QMargins inset;
         if (props->layout()) {
             width = props->layout()->width().value_or(width);
             height = props->layout()->height().value_or(height);
-            inset = props->layout()->inset()->toMargins().toMargins();
         }
-        rect = option->rect.marginsRemoved(inset);
+        rect = option->rect;
+        rect.setHeight(height);
+        rect.setWidth(width);
         if (progressBarOption->state.testFlag(QStyle::State_Horizontal)) {
-            rect = centerRect(rect, width, height);
+            rect = centerRect(option->rect, width, height);
         } else {
-            rect = centerRect(rect, height, width);
+            rect = centerRect(option->rect, height, width);
         }
+        return visualRect(option->direction, option->rect, rect);
     } break;
     // Follow defaults
     case QStyle::SE_TabWidgetTabContents:
