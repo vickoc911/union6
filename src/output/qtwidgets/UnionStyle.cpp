@@ -205,12 +205,17 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
                 //    drawText(textrect, menuItemOption, painter, menuItemOption->text, widget);
                 //}
             } else {
+                const auto elements = prepareElements(menuItemOption, widget, {QStringLiteral("MenuItem")});
+                auto props = queryProperties(elements);
                 drawElementBackground(painter, menuItemOption, widget, {QStringLiteral("MenuItem")});
-                QIcon indicatorArrow;
-                layoutAndDrawIconTextIndicator(menuItemOption, painter, widget, menuItemOption->icon, menuItemOption->text);
+                layoutAndDrawIconTextIndicator(menuItemOption,
+                                               painter,
+                                               widget,
+                                               menuItemOption->icon,
+                                               menuItemOption->text,
+                                               QIcon(),
+                                               {QStringLiteral("MenuItem")});
                 if (menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu) {
-                    auto elements = prepareElements(menuItemOption, widget, {QStringLiteral("MenuItem")});
-                    auto props = queryProperties(elements);
                     if (props->layout() && props->icon()) {
                         auto map = layoutMap(elements, menuItemOption, {QStringLiteral("Arrow")});
                         auto rect = map[QStringLiteral("Arrow")].rect;
@@ -266,7 +271,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         // Draw text
         if (subopt.features.testFlag(QStyleOptionViewItem::HasDisplay)) {
             subopt.rect = subElementRect(SE_ItemViewItemText, &subopt, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), viewItemOption->text);
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), viewItemOption->text, QIcon(), {QStringLiteral("ItemViewItem")});
         }
         // Draw indicator
         if (subopt.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
@@ -286,7 +291,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
         } else if (subopt.features.testFlag(QStyleOptionViewItem::HasDecoration)) {
             subopt.rect = subElementRect(SE_ItemViewItemDecoration, viewItemOption, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, viewItemOption->icon, QString());
+            layoutAndDrawIconTextIndicator(&subopt, painter, widget, viewItemOption->icon, QString(), QIcon(), {QStringLiteral("ItemViewItem")});
         }
         painter->restore();
     }
@@ -1095,11 +1100,13 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         auto props = queryProperties(prepareElements(option, widget));
         qreal width = 0;
         qreal height = 0;
+        QMargins inset;
         if (props->layout()) {
             width = props->layout()->width().value_or(width);
             height = props->layout()->height().value_or(height);
+            inset = props->layout()->inset()->toMargins().toMargins();
         }
-        rect = option->rect;
+        rect = option->rect.marginsRemoved(inset);
         if (progressBarOption->state.testFlag(QStyle::State_Horizontal)) {
             rect = centerRect(rect, width, height);
         } else {
@@ -1737,20 +1744,30 @@ void UnionStyle::polish(QWidget *widget)
     QCommonStyle::polish(widget);
 }
 
-void UnionStyle::drawText(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QString &text, const QWidget *widget) const
+void UnionStyle::drawText(const QRect &rect,
+                          const QStyleOption *opt,
+                          QPainter *painter,
+                          const QString &text,
+                          const QWidget *widget,
+                          const QColor &overrideColor) const
 {
     if (text.isEmpty()) {
         return;
     }
 
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
+    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     auto properties = queryProperties(elements);
-    // TODO: hide mnemonics if requested
-    auto textColor = properties->text()->color();
-    QColor penColor = opt->palette.text().color();
-    if (textColor) {
-        penColor = textColor->toQColor();
+    QColor penColor;
+    if (overrideColor.isValid()) {
+        penColor = overrideColor;
+    } else {
+        // TODO: hide mnemonics if requested
+        auto textColor = properties->text()->color();
+        penColor = opt->palette.text().color();
+        if (textColor) {
+            penColor = textColor->toQColor();
+        }
     }
 
     painter->save();
@@ -1759,18 +1776,22 @@ void UnionStyle::drawText(const QRect &rect, const QStyleOption *opt, QPainter *
     painter->restore();
 }
 
-void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget) const
+void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget, const QColor &overrideColor)
+    const
 {
     QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
     auto properties = queryProperties(elements);
 
-    auto iconColor = properties->icon()->color();
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
     const QPixmap pixmap = icon.pixmap(rect.size(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+
     QColor penColor = opt->palette.text().color(); // Use text color as fallback
-    if (iconColor) {
+    if (overrideColor.isValid()) {
+        penColor = overrideColor;
+    } else if (properties->icon() && properties->icon()->color().has_value()) {
+        auto iconColor = properties->icon()->color();
         penColor = iconColor->toQColor();
     }
 
@@ -1785,9 +1806,10 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
                                                 const QWidget *widget,
                                                 const QIcon &icon,
                                                 const QString &text,
-                                                const QIcon &indicator) const
+                                                const QIcon &indicator,
+                                                const QStringList &children) const
 {
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
+    QList<Union::Element::Ptr> elements = prepareElements(opt, widget, children);
 
     QString itemText = text;
     QString shortcutText;
@@ -1829,8 +1851,17 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
         drawIcon(indicatorRect, opt, painter, indicator, widget);
     }
 
+    // ShortcutText is just like a regular text element but handled with different name
+    // and has different coloration, so override the default colors
     if (!shortcutText.isEmpty()) {
         QRect textRect = map[QStringLiteral("ShortcutText")].rect.toRect();
-        drawText(textRect, opt, painter, shortcutText, widget);
+        auto shortcutHierarchy = children;
+        shortcutHierarchy.append(QStringLiteral("ShortcutText"));
+        const auto properties = queryProperties(prepareElements(opt, widget, shortcutHierarchy));
+        QColor overrideColor;
+        if (properties->text() && properties->text()->color().has_value()) {
+            overrideColor = properties->text()->color()->toQColor();
+        }
+        drawText(textRect, opt, painter, shortcutText, widget, overrideColor);
     }
 }
