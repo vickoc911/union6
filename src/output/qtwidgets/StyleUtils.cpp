@@ -680,9 +680,9 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             break;
         // TODO: this is bit unreliable, need to figure out better solution
         case Union::Properties::Alignment::Fill:
-            item.rect.setLeft(availableSpace.left() + spacing);
-            item.rect.setRight(availableSpace.right() - spacing);
-            availableSpace.adjust(itemWidth, 0, -itemWidth, 0);
+            item.rect.moveLeft(availableSpace.left());
+            item.rect.setRight(availableSpace.left() + itemWidth);
+            availableSpace.adjust(itemWidth, 0, 0, 0);
             break;
         case Union::Properties::Alignment::Center:
             // For single items and vertical stackCenter/stackFill,
