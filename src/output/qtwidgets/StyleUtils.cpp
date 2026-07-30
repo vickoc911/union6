@@ -642,14 +642,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
 
     // Sort the list according to order. Set any filled items as last
     std::sort(items.begin(), items.end(), [](const LayoutItem &lhs, const LayoutItem &rhs) {
-        if (rhs.horizontalAlignment == Union::Properties::Alignment::Fill) {
-            if (lhs.horizontalAlignment == Union::Properties::Alignment::Fill) {
-                return lhs.order < rhs.order;
-            }
-            return false;
-        } else {
-            return lhs.order < rhs.order;
-        }
+        return lhs.order < rhs.order;
     });
 
     // Actual layouting starts here
