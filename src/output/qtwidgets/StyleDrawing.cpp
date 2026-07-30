@@ -67,6 +67,10 @@ void drawBackground(QPainter *painter, const QRect &rect, const Union::Propertie
     // Draw background
     if (const auto background = style->background()) {
         QPainterPath path;
+        // Remove any insets we may have, we do not want to draw them
+        if (style->layout() && style->layout()->inset()) {
+            innerRect = innerRect.marginsRemoved(style->layout()->inset()->toMargins());
+        }
 
         // Draw less complex rectangles if complex ones are not needed
         if (allCornerRadiiEqual && !constrainedRadii.topLeft) {
