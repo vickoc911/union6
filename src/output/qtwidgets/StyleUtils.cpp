@@ -451,7 +451,7 @@ QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::
     QRectF rect = option->rect;
     if (const auto layout = properties->layout()) {
         if (layout->inset()) {
-            rect -= layout->inset()->toMargins();
+            rect = rect.marginsRemoved(layout->inset()->toMargins());
         }
     }
     return rect;

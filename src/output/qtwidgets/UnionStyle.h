@@ -35,12 +35,23 @@ public:
     void polish(QApplication *application) override;
     void polish(QWidget *) override;
 
-    void drawIcon(const QRect &rect, const QStyleOption *option, QPainter *painter, const QIcon &icon, const QWidget *widget = nullptr) const;
-    void drawText(const QRect &rect, const QStyleOption *option, QPainter *painter, const QString &text, const QWidget *widget = nullptr) const;
+    void drawIcon(const QRect &rect,
+                  const QStyleOption *option,
+                  QPainter *painter,
+                  const QIcon &icon,
+                  const QWidget *widget = nullptr,
+                  const QColor &overrideColor = QColor()) const;
+    void drawText(const QRect &rect,
+                  const QStyleOption *option,
+                  QPainter *painter,
+                  const QString &text,
+                  const QWidget *widget = nullptr,
+                  const QColor &overrideColor = QColor()) const;
     void layoutAndDrawIconTextIndicator(const QStyleOption *option,
                                         QPainter *painter,
                                         const QWidget *widget = nullptr,
                                         const QIcon &icon = QIcon(),
                                         const QString &text = QString(),
-                                        const QIcon &indicator = QIcon()) const;
+                                        const QIcon &indicator = QIcon(),
+                                        const QStringList &children = {}) const;
 };
