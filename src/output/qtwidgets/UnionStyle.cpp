@@ -806,6 +806,9 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         if (properties->layout()->padding()) {
             padding = properties->layout()->padding()->toMargins().toMargins();
         }
+        if (properties->layout()->inset()) {
+            padding += properties->layout()->inset()->toMargins().toMargins();
+        }
     }
     switch (contentsType) {
     case QStyle::CT_CheckBox: {
@@ -907,10 +910,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
                 int width = separatorProps->layout()->width().value_or(1);
                 int height = separatorProps->layout()->height().value_or(1);
                 QSize separatorSize(width, height);
-                if (separatorProps->layout()->padding()) {
-                    separatorSize = separatorSize.grownBy(separatorProps->layout()->padding()->toMargins().toMargins());
-                }
-                return separatorSize;
+                return separatorSize.grownBy(padding);
             }
         } else {
             auto menuProps = queryProperties(prepareElements(menuItemOpt, widget, {QStringLiteral("MenuItem")}));
@@ -924,10 +924,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
                     height = size.height();
                 }
                 QSize itemSize(width, height);
-                if (menuProps->layout()->padding()) {
-                    itemSize = itemSize.grownBy(menuProps->layout()->padding()->toMargins().toMargins());
-                }
-                size = itemSize;
+                return itemSize.grownBy(padding);
             }
         }
     } break;
@@ -941,10 +938,11 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         auto textRect = subElementRect(SE_ProgressBarLabel, option, widget);
         r.setRects({grooveRect, contentRect, textRect});
         size = r.boundingRect().size().grownBy(padding);
+        return size;
     } break;
     case QStyle::CT_ItemViewItem: {
-        auto grooveRect = subElementRect(SE_ItemViewItemText, option, widget);
-        size = grooveRect.size().grownBy(padding);
+        auto textRect = subElementRect(SE_ItemViewItemText, option, widget);
+        size = textRect.size().grownBy(padding);
         break;
     }
     case QStyle::CT_Slider: {
@@ -956,6 +954,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             auto handleRect = subControlRect(CC_Slider, sliderOpt, SC_SliderHandle, widget);
             r.setRects({grooveRect, tickRect, handleRect});
             size = r.boundingRect().size().grownBy(padding);
+            return size;
         }
     } break;
     case QStyle::CT_HeaderSection:
