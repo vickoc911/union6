@@ -451,7 +451,7 @@ QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::
     QRectF rect = option->rect;
     if (const auto layout = properties->layout()) {
         if (layout->inset()) {
-            rect -= layout->inset()->toMargins();
+            rect = rect.marginsRemoved(layout->inset()->toMargins());
         }
     }
     return rect;
@@ -678,6 +678,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             item.rect.moveLeft(availableSpace.left());
             availableSpace.adjust(itemWidth, 0, 0, 0);
             break;
+        // TODO: this is bit unreliable, need to figure out better solution
         case Union::Properties::Alignment::Fill:
             item.rect.setLeft(availableSpace.left() + spacing);
             item.rect.setRight(availableSpace.right() - spacing);
