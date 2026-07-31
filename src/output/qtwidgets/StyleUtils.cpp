@@ -606,8 +606,14 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         // NOTE: For now icon and text are their own things, so check them separately.
         // in future this should be unnecessary.
         if (subElement == QStringLiteral("Icon")) {
-            elementRect.setWidth(properties->icon()->width().value_or(0));
-            elementRect.setHeight(properties->icon()->height().value_or(0));
+            // Toolbutton can override the icon size
+            if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
+                elementRect.setWidth(toolButtonOption->iconSize.width());
+                elementRect.setHeight(toolButtonOption->iconSize.height());
+            } else {
+                elementRect.setWidth(properties->icon()->width().value_or(0));
+                elementRect.setHeight(properties->icon()->height().value_or(0));
+            }
             horizontalAlignment = properties->icon()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->icon()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             order = properties->icon()->alignment()->order().value_or(0);
