@@ -1773,7 +1773,15 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
 
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-    const QPixmap pixmap = icon.pixmap(rect.size(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+    auto iconSize = rect.size();
+    // Toolbutton can override the regular icon size
+    if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
+        // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
+        if (toolButtonOption->icon.name() == icon.name()) {
+            iconSize = toolButtonOption->iconSize;
+        }
+    }
+    const QPixmap pixmap = icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
     QColor penColor = opt->palette.text().color(); // Use text color as fallback
     if (overrideColor.isValid()) {
