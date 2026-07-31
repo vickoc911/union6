@@ -334,7 +334,8 @@ tabbutton {
         box-shadow: none;
     }
 
-    &:checked
+    &:checked,
+    &:highlighted /* Widgets uses highlighted */
     {
         background-color: var(--tab-open-background-color);
         color: var(--tab-open-text-color);
