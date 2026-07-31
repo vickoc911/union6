@@ -12,6 +12,7 @@
 #include <QStyleOptionFrame>
 #include <QTableView>
 #include <QTextOption>
+using namespace Qt::StringLiterals;
 
 Union::Element::States statesFromOption(const QStyleOption *option)
 {
@@ -60,7 +61,7 @@ QStringList hintsFromOption(const QStyleOption *option)
     case QStyleOption::SO_FocusRect: {
         if (const auto optionFocusRect = static_cast<const QStyleOptionFocusRect *>(option)) {
             if (optionFocusRect->state.testFlag(QStyle::State_FocusAtBorder)) {
-                hints.append(QStringLiteral("focus-at-border"));
+                hints.append(u"focus-at-border"_s);
             }
         }
     } break;
@@ -70,22 +71,22 @@ QStringList hintsFromOption(const QStyleOption *option)
                 return hints;
             }
             if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::Flat)) {
-                hints.append(QStringLiteral("flat"));
+                hints.append(u"flat"_s);
             }
             if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::HasMenu)) {
-                hints.append(QStringLiteral("with-menu"));
+                hints.append(u"with-menu"_s);
             }
             if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::DefaultButton)) {
-                hints.append(QStringLiteral("default-button"));
+                hints.append(u"default-button"_s);
             }
             if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::AutoDefaultButton)) {
-                hints.append(QStringLiteral("auto-default-button"));
+                hints.append(u"auto-default-button"_s);
             }
             if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::CommandLinkButton)) {
-                hints.append(QStringLiteral("command-link-button"));
+                hints.append(u"command-link-button"_s);
             }
             if (!optionButton->state.testFlag(QStyle::State_AutoRaise)) {
-                hints.append(QStringLiteral("raised"));
+                hints.append(u"raised"_s);
             }
         }
     } break;
@@ -101,19 +102,19 @@ QStringList hintsFromOption(const QStyleOption *option)
 
             switch (viewItemPosition) {
             case QStyleOptionViewItem::Invalid:
-                hints.append(QStringLiteral("position-invalid"));
+                hints.append(u"position-invalid"_s);
                 break;
             case QStyleOptionViewItem::Beginning:
-                hints.append(QStringLiteral("position-beginning"));
+                hints.append(u"position-beginning"_s);
                 break;
             case QStyleOptionViewItem::Middle:
-                hints.append(QStringLiteral("position-middle"));
+                hints.append(u"position-middle"_s);
                 break;
             case QStyleOptionViewItem::End:
-                hints.append(QStringLiteral("position-end"));
+                hints.append(u"position-end"_s);
                 break;
             case QStyleOptionViewItem::OnlyOne:
-                hints.append(QStringLiteral("position-onlyone"));
+                hints.append(u"position-onlyone"_s);
                 break;
             }
         }
@@ -121,15 +122,15 @@ QStringList hintsFromOption(const QStyleOption *option)
     case QStyleOption::SO_Frame: {
         if (const auto optionFrame = static_cast<const QStyleOptionFrame *>(option)) {
             if (optionFrame->features.testFlag(QStyleOptionFrame::Flat)) {
-                hints.append(QStringLiteral("flat"));
+                hints.append(u"flat"_s);
             }
             if (optionFrame->features.testFlag(QStyleOptionFrame::Rounded)) {
-                hints.append(QStringLiteral("rounded"));
+                hints.append(u"rounded"_s);
             }
             switch (optionFrame->frameShape) {
             case QFrame::NoFrame: {
-                if (!hints.contains(QStringLiteral("flat"))) {
-                    hints.append(QStringLiteral("flat"));
+                if (!hints.contains(u"flat"_s)) {
+                    hints.append(u"flat"_s);
                 }
             }
             case QFrame::Box:
@@ -149,10 +150,10 @@ QStringList hintsFromOption(const QStyleOption *option)
                 return hints;
             }
             if (optionButton->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::Menu)) {
-                hints.append(QStringLiteral("with-menu"));
+                hints.append(u"with-menu"_s);
             }
             if (!optionButton->state.testFlag(QStyle::State_AutoRaise)) {
-                hints.append(QStringLiteral("raised"));
+                hints.append(u"raised"_s);
             }
         }
     } break;
@@ -162,10 +163,10 @@ QStringList hintsFromOption(const QStyleOption *option)
             case QStyleOptionHeader::None:
                 return hints;
             case QStyleOptionHeader::SortUp:
-                hints.append(QStringLiteral("sort-ascending"));
+                hints.append(u"sort-ascending"_s);
                 break;
             case QStyleOptionHeader::SortDown:
-                hints.append(QStringLiteral("sort-descending"));
+                hints.append(u"sort-descending"_s);
                 break;
             }
         }
@@ -173,43 +174,43 @@ QStringList hintsFromOption(const QStyleOption *option)
     case QStyleOption::SO_MenuItem: {
         if (const auto opt = qstyleoption_cast<const QStyleOptionMenuItemV2 *>(option)) {
             if (opt->checked) {
-                hints.append(QStringLiteral("with-submenu"));
+                hints.append(u"with-submenu"_s);
             }
         }
     } break;
     case QStyleOption::SO_GroupBox: {
         if (const auto opt = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
             if (opt->features.testFlag(QStyleOptionFrame::Flat)) {
-                hints.append(QStringLiteral("flat"));
+                hints.append(u"flat"_s);
             }
             if (opt->features.testFlag(QStyleOptionFrame::Rounded)) {
-                hints.append(QStringLiteral("rounded"));
+                hints.append(u"rounded"_s);
             }
         }
     } break;
     case QStyleOption::SO_ComboBox: {
         if (const auto opt = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
             if (!opt->frame) {
-                hints.append(QStringLiteral("flat"));
+                hints.append(u"flat"_s);
             }
             if (opt->editable) {
-                hints.append(QStringLiteral("editable"));
+                hints.append(u"editable"_s);
             }
         }
     } break;
     case QStyleOption::SO_SpinBox: {
         if (const auto opt = qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
             // TODO: Use constrained look for now, revisit this when we have better layouting
-            hints.append(QStringLiteral("constrained"));
+            hints.append(u"constrained"_s);
         }
     } break;
     case QStyleOption::SO_Complex:
     case QStyleOption::SO_Slider: {
         if (const auto opt = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
             if (opt->orientation == Qt::Horizontal) {
-                hints.append(QStringLiteral("horizontal"));
+                hints.append(u"horizontal"_s);
             } else {
-                hints.append(QStringLiteral("vertical"));
+                hints.append(u"vertical"_s);
             }
         }
     } break;
@@ -292,16 +293,16 @@ QVariantMap attributesFromOption(const QStyleOption *option)
             QVariantMap map;
             switch (optionButton->toolButtonStyle) {
             case Qt::ToolButtonIconOnly:
-                map[QStringLiteral("display")] = QVariant(QStringLiteral("icon-only"));
+                map[u"display"_s] = QVariant(u"icon-only"_s);
                 break;
             case Qt::ToolButtonTextOnly:
-                map[QStringLiteral("display")] = QVariant(QStringLiteral("text-only"));
+                map[u"display"_s] = QVariant(u"text-only"_s);
                 break;
             case Qt::ToolButtonTextBesideIcon:
-                map[QStringLiteral("display")] = QVariant(QStringLiteral("text-beside-icon"));
+                map[u"display"_s] = QVariant(u"text-beside-icon"_s);
                 break;
             case Qt::ToolButtonTextUnderIcon:
-                map[QStringLiteral("display")] = QVariant(QStringLiteral("text-under-icon"));
+                map[u"display"_s] = QVariant(u"text-under-icon"_s);
                 break;
             default:
                 return map;
@@ -318,16 +319,16 @@ QVariantMap attributesFromOption(const QStyleOption *option)
             const bool right = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::TriangularEast;
 
             if (top) {
-                map[QStringLiteral("direction")] = QVariant(QStringLiteral("top"));
+                map[u"direction"_s] = QVariant(u"top"_s);
             }
             if (bottom) {
-                map[QStringLiteral("direction")] = QVariant(QStringLiteral("bottom"));
+                map[u"direction"_s] = QVariant(u"bottom"_s);
             }
             if (left) {
-                map[QStringLiteral("direction")] = QVariant(QStringLiteral("left"));
+                map[u"direction"_s] = QVariant(u"left"_s);
             }
             if (right) {
-                map[QStringLiteral("direction")] = QVariant(QStringLiteral("right"));
+                map[u"direction"_s] = QVariant(u"right"_s);
             }
             return map;
         }
@@ -507,40 +508,40 @@ QStringList setupMemberList(const QWidget *widget)
     QStringList members;
     // We will have to check what items the widget inherits from,
     // as far as I know there is no better way to do this.
-    const QMap<const char *, QString> parentClasses = {{"QCheckBox", QStringLiteral("CheckBox")},
-                                                       {"QRadioButton", QStringLiteral("RadioButton")},
-                                                       {"QPushButton", QStringLiteral("Button")},
-                                                       {"QToolButton", QStringLiteral("ToolButton")},
-                                                       {"QDial", QStringLiteral("Dial")},
-                                                       {"QScrollBar", QStringLiteral("ScrollBar")},
-                                                       {"QSlider", QStringLiteral("Slider")},
-                                                       {"QAbstractSpinBox", QStringLiteral("SpinBox")},
-                                                       {"QComboBox", QStringLiteral("ComboBox")},
-                                                       {"QDialog", QStringLiteral("Dialog")},
-                                                       {"QDialogButtonBox", QStringLiteral("DialogButtonBox")},
-                                                       {"QDockWidget", QStringLiteral("Dock")},
-                                                       {"QFocusFrame", QStringLiteral("FocusFrame")},
-                                                       {"QFrame", QStringLiteral("Frame")},
-                                                       {"QGroupBox", QStringLiteral("GroupBox")},
-                                                       {"QKeySequenceEit", QStringLiteral("KeySequenceEdit")},
-                                                       {"QLineEdit", QStringLiteral("TextField")},
-                                                       {"QMainWindow", QStringLiteral("ApplicationWindow")},
-                                                       {"QMdiSubWinow", QStringLiteral("MdiSubWindow")},
-                                                       {"QMenu", QStringLiteral("Menu")},
-                                                       {"QMenuBar", QStringLiteral("MenuBar")},
-                                                       {"QProgressBar", QStringLiteral("ProgressBar")},
-                                                       {"QRubberBand", QStringLiteral("RubberBand")},
-                                                       {"QSizeGrip", QStringLiteral("SizeGrip")},
-                                                       {"QSplitterHandle", QStringLiteral("SplitterHandle")},
-                                                       {"QStatusBar", QStringLiteral("StatusBar")},
-                                                       {"QTabBar", QStringLiteral("TabBar")},
-                                                       {"QTabWidget", QStringLiteral("TabWidget")},
-                                                       {"QToolBar", QStringLiteral("ToolBar")},
-                                                       {"QAbstractScrollArea", QStringLiteral("ScrollArea")},
-                                                       {"QListView", QStringLiteral("ListView")},
-                                                       {"QScrollBar", QStringLiteral("ScrollBar")},
-                                                       {"QTreeView", QStringLiteral("QTreeViewDelegate")},
-                                                       {"QSplitter", QStringLiteral("Splitter")}};
+    const QMap<const char *, QString> parentClasses = {{"QCheckBox", u"CheckBox"_s},
+                                                       {"QRadioButton", u"RadioButton"_s},
+                                                       {"QPushButton", u"Button"_s},
+                                                       {"QToolButton", u"ToolButton"_s},
+                                                       {"QDial", u"Dial"_s},
+                                                       {"QScrollBar", u"ScrollBar"_s},
+                                                       {"QSlider", u"Slider"_s},
+                                                       {"QAbstractSpinBox", u"SpinBox"_s},
+                                                       {"QComboBox", u"ComboBox"_s},
+                                                       {"QDialog", u"Dialog"_s},
+                                                       {"QDialogButtonBox", u"DialogButtonBox"_s},
+                                                       {"QDockWidget", u"Dock"_s},
+                                                       {"QFocusFrame", u"FocusFrame"_s},
+                                                       {"QFrame", u"Frame"_s},
+                                                       {"QGroupBox", u"GroupBox"_s},
+                                                       {"QKeySequenceEit", u"KeySequenceEdit"_s},
+                                                       {"QLineEdit", u"TextField"_s},
+                                                       {"QMainWindow", u"ApplicationWindow"_s},
+                                                       {"QMdiSubWinow", u"MdiSubWindow"_s},
+                                                       {"QMenu", u"Menu"_s},
+                                                       {"QMenuBar", u"MenuBar"_s},
+                                                       {"QProgressBar", u"ProgressBar"_s},
+                                                       {"QRubberBand", u"RubberBand"_s},
+                                                       {"QSizeGrip", u"SizeGrip"_s},
+                                                       {"QSplitterHandle", u"SplitterHandle"_s},
+                                                       {"QStatusBar", u"StatusBar"_s},
+                                                       {"QTabBar", u"TabBar"_s},
+                                                       {"QTabWidget", u"TabWidget"_s},
+                                                       {"QToolBar", u"ToolBar"_s},
+                                                       {"QAbstractScrollArea", u"ScrollArea"_s},
+                                                       {"QListView", u"ListView"_s},
+                                                       {"QScrollBar", u"ScrollBar"_s},
+                                                       {"QTreeView", u"QTreeViewDelegate"_s},
+                                                       {"QSplitter", u"Splitter"_s}};
 
     auto currentWidget = widget;
     while (currentWidget) {
@@ -589,7 +590,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     for (const auto &subElement : subElements) {
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
-        if (subElement != QStringLiteral("Icon") && subElement != QStringLiteral("Text")) {
+        if (subElement != u"Icon"_s && subElement != u"Text"_s) {
             auto unionElement = Union::Element::create();
             unionElement->setType(subElement);
             unionElement->setStates(statesFromOption(opt));
@@ -605,7 +606,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         QRectF elementRect = availableSpace;
         // NOTE: For now icon and text are their own things, so check them separately.
         // in future this should be unnecessary.
-        if (subElement == QStringLiteral("Icon")) {
+        if (subElement == u"Icon"_s) {
             // Toolbutton can override the icon size
             if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
                 elementRect.setWidth(toolButtonOption->iconSize.width());
@@ -617,14 +618,14 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             horizontalAlignment = properties->icon()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->icon()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             order = properties->icon()->alignment()->order().value_or(0);
-        } else if (subElement == QStringLiteral("Text") || subElement == QStringLiteral("ShortcutText")) {
+        } else if (subElement == u"Text"_s || subElement == u"ShortcutText"_s) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             auto optiontext = textFromOption(opt);
             const int tabPosition(optiontext.indexOf(QLatin1Char('\t')));
             if (tabPosition >= 0) {
                 QString accelerator(optiontext.mid(tabPosition + 1));
-                if (subElement == QStringLiteral("ShortcutText")) {
+                if (subElement == u"ShortcutText"_s) {
                     optiontext = optiontext.mid(tabPosition + 1);
                 } else {
                     optiontext = optiontext.left(tabPosition);
@@ -826,33 +827,33 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
     if (const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option)) {
         if (viewItemOption) {
             if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay) && !viewItemOption->text.isEmpty()) {
-                childelements.append(QStringLiteral("Text"));
+                childelements.append(u"Text"_s);
             }
             if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration) && !viewItemOption->icon.isNull()) {
-                childelements.append(QStringLiteral("Icon"));
+                childelements.append(u"Icon"_s);
             }
             if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-                childelements.append(QStringLiteral("CheckBox"));
+                childelements.append(u"CheckBox"_s);
             }
         }
     } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
         if (qobject_cast<const QPushButton *>(widget)) {
             if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-                childelements.append(QStringLiteral("Indicator"));
+                childelements.append(u"Indicator"_s);
             }
             if (!buttonOption->icon.isNull()) {
-                childelements.append(QStringLiteral("Icon"));
+                childelements.append(u"Icon"_s);
             }
             if (!buttonOption->text.isEmpty()) {
-                childelements.append(QStringLiteral("Text"));
+                childelements.append(u"Text"_s);
             }
         } else if (qobject_cast<const QCheckBox *>(widget) || qobject_cast<const QRadioButton *>(widget)) {
-            childelements.append(QStringLiteral("Indicator"));
+            childelements.append(u"Indicator"_s);
             if (!buttonOption->icon.isNull()) {
-                childelements.append(QStringLiteral("Icon"));
+                childelements.append(u"Icon"_s);
             }
             if (!buttonOption->text.isEmpty()) {
-                childelements.append(QStringLiteral("Text"));
+                childelements.append(u"Text"_s);
             }
         }
     } else if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
@@ -861,13 +862,13 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
         bool hasIcon = !toolButtonOption->icon.isNull();
         bool hasText = !toolButtonOption->text.isEmpty();
         if (hasIcon) {
-            childelements.append(QStringLiteral("Icon"));
+            childelements.append(u"Icon"_s);
         }
         if (hasText) {
-            childelements.append(QStringLiteral("Text"));
+            childelements.append(u"Text"_s);
         }
         if (hasIndicator) {
-            childelements.append(QStringLiteral("Indicator"));
+            childelements.append(u"Indicator"_s);
         }
     }
 
