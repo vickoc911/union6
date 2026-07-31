@@ -950,22 +950,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator: {
         const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option);
-        QStringList childelements = {};
-        if (viewItemOption) {
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay) && !viewItemOption->text.isEmpty()) {
-                childelements.append(QStringLiteral("Text"));
-            }
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration) && !viewItemOption->icon.isNull()) {
-                childelements.append(QStringLiteral("Icon"));
-            }
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-                childelements.append(QStringLiteral("CheckBox"));
-            }
-        }
-        if (childelements.empty()) {
+        QStringList childelements = buildSubElementList(viewItemOption, widget);
+        if (childelements.isEmpty()) {
             return QRect();
         }
-
         auto elements = prepareElements(option, widget, {QStringLiteral("ItemViewItem")});
         auto map = layoutMap(elements, option, childelements);
 
@@ -979,51 +967,26 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             rect = map[QStringLiteral("CheckBox")].rect.toRect();
         }
     } break;
-
-    case QStyle::SE_PushButtonContents: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        auto elements = prepareElements(option, widget);
-        QStringList childelements = {};
-        if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            childelements.append(QStringLiteral("Indicator"));
-        }
-        if (!buttonOption->icon.isNull()) {
-            childelements.append(QStringLiteral("Icon"));
-        }
-        if (!buttonOption->text.isEmpty()) {
-            childelements.append(QStringLiteral("Text"));
-        }
-        if (childelements.isEmpty()) {
-            return QRect();
-        }
-        auto map = layoutMap(elements, option, childelements);
-        QRect unifiedRect;
-        for (const auto &m : map) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
-        }
-        rect = unifiedRect;
-    } break;
+    case QStyle::SE_PushButtonContents:
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_CheckBoxContents: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        auto elements = prepareElements(option, widget);
-        QStringList childelements = {};
-        childelements.append(QStringLiteral("Indicator"));
-        if (!buttonOption->icon.isNull()) {
-            childelements.append(QStringLiteral("Icon"));
-        }
-        if (!buttonOption->text.isEmpty()) {
-            childelements.append(QStringLiteral("Text"));
-        }
+        auto elements = prepareElements(buttonOption, widget);
+        QStringList childelements = buildSubElementList(buttonOption, widget);
         if (childelements.isEmpty()) {
             return QRect();
         }
         auto map = layoutMap(elements, option, childelements);
         QRect unifiedRect;
+
         for (const auto &m : map) {
             // Contents will skip the indicator
-            if (m.elementName != QStringLiteral("Indicator")) {
+            if (element == SE_PushButtonContents) {
                 unifiedRect = unifiedRect.united(m.rect.toRect());
+            } else {
+                if (m.elementName != QStringLiteral("Indicator")) {
+                    unifiedRect = unifiedRect.united(m.rect.toRect());
+                }
             }
         }
         rect = unifiedRect;
@@ -1190,22 +1153,11 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
                 if (!hasIndicator) {
                     return QRect();
                 }
-                auto elements = prepareElements(toolButtonOption, widget);
-                bool hasIcon = !toolButtonOption->icon.isNull();
-                bool hasText = !toolButtonOption->text.isEmpty();
-
-                QStringList subElements;
-                if (hasIcon) {
-                    subElements.append(QStringLiteral("Icon"));
+                auto subElements = buildSubElementList(toolButtonOption, widget);
+                if (subElements.isEmpty()) {
+                    return QRect();
                 }
-                if (hasText) {
-                    subElements.append(QStringLiteral("Text"));
-                }
-                if (hasIndicator) {
-                    subElements.append(QStringLiteral("Indicator"));
-                }
-                auto map = layoutMap(elements, toolButtonOption, subElements);
-
+                auto map = layoutMap(prepareElements(toolButtonOption, widget), toolButtonOption, subElements);
                 return visualRect(toolButtonOption->direction, toolButtonOption->rect, map[QStringLiteral("Indicator")].rect.toRect());
             }
         }
