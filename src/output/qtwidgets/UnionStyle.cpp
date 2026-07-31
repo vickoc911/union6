@@ -388,21 +388,13 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         drawBackground(painter, rect, properties);
 
         drawControl(CE_ToolButtonLabel, buttonOption, painter, widget);
-        if (buttonOption->features.testFlag(QStyleOptionToolButton::Menu)) {
+        if (buttonOption->features.testFlag(QStyleOptionToolButton::Menu) || buttonOption->features.testFlag(QStyleOptionToolButton::HasMenu)) {
             auto indicatorRect = subControlRect(CC_ToolButton, option, SC_ToolButtonMenu, widget);
             const auto props = queryProperties(prepareElements(buttonOption, widget, {QStringLiteral("Indicator")}));
             if (props->icon()) {
                 auto icon = QIcon::fromTheme(props->icon()->name().value_or(QStringLiteral("arrow-down-symbolic")));
-                // Take the button padding into account when drawing this
-                if (properties->layout() && properties->layout()->padding()) {
-                    auto pad = properties->layout()->padding()->toMargins().toMargins();
-                    indicatorRect.adjust(properties->layout()->spacing().value_or(0), pad.top(), -pad.right(), -pad.bottom());
-                    auto center = indicatorRect.center();
-                    indicatorRect.setWidth(props->icon()->width().value_or(0));
-                    indicatorRect.setHeight(props->icon()->height().value_or(0));
-                    indicatorRect.moveCenter(center);
-                }
                 drawIcon(indicatorRect, option, painter, icon, widget);
+                painter->setPen(Qt::cyan);
             }
         }
     }
@@ -805,30 +797,17 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_ToolButton: {
         const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
         auto elements = prepareElements(toolButtonOption, widget);
-        QStringList childelements = {};
-        QRect menubuttonrect;
-        if (toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu)) {
-            menubuttonrect = subControlRect(CC_ToolButton, toolButtonOption, SC_ToolButtonMenu, widget);
+        QRect backgroundRect = subControlRect(CC_ToolButton, toolButtonOption, SC_ToolButton, widget);
+        QRect menubuttonrect = subControlRect(CC_ToolButton, toolButtonOption, SC_ToolButtonMenu, widget);
+        QRegion r;
+        r.setRects({backgroundRect, menubuttonrect});
+        size = r.boundingRect().size().grownBy(padding);
+        if (!menubuttonrect.isEmpty()) {
+            auto indicatorProps = queryProperties(prepareElements(option, widget, {QStringLiteral("Indicator")}));
+            if (indicatorProps->layout() && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
+                size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, option, widget);
+            }
         }
-
-        if ((!toolButtonOption->icon.isNull() && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly)
-            || toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow)) {
-            childelements.append(QStringLiteral("Icon"));
-        }
-        if (!toolButtonOption->text.isEmpty() && toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly) {
-            childelements.append(QStringLiteral("Text"));
-        }
-        if (childelements.isEmpty()) {
-            return size;
-        }
-        auto map = layoutMap(elements, toolButtonOption, childelements);
-        QRect unifiedRect;
-        for (const auto &m : map) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
-        }
-        unifiedRect.setWidth(unifiedRect.width() + menubuttonrect.width());
-        size = unifiedRect.size().grownBy(padding);
-
     } break;
     case QStyle::CT_ComboBox: {
         auto elements = prepareElements(option, widget);
@@ -1197,16 +1176,38 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
     if (complexControl == CC_ToolButton) {
-        auto elements = prepareElements(option, widget);
+        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
+            // Background
+            if (subControl == SC_ToolButton) {
+                auto elements = prepareElements(toolButtonOption, widget);
+                const auto properties = queryProperties(elements);
+                return visualRect(toolButtonOption->direction, toolButtonOption->rect, backgroundRectangle(toolButtonOption, properties).toRect());
+            }
+            // Menu button background
+            if (subControl == SC_ToolButtonMenu) {
+                bool hasIndicator =
+                    toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
+                if (!hasIndicator) {
+                    return QRect();
+                }
+                auto elements = prepareElements(toolButtonOption, widget);
+                bool hasIcon = !toolButtonOption->icon.isNull();
+                bool hasText = !toolButtonOption->text.isEmpty();
 
-        if (subControl == SC_ToolButton) {
-            const auto properties = queryProperties(elements);
-            return visualRect(option->direction, option->rect, backgroundRectangle(option, properties).toRect());
-        }
-        // TODO: we need to handle this manually. Just move it on the right side of the button for now.
-        if (subControl == SC_ToolButtonMenu) {
-            // Apply padding etc?
-            return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
+                QStringList subElements;
+                if (hasIcon) {
+                    subElements.append(QStringLiteral("Icon"));
+                }
+                if (hasText) {
+                    subElements.append(QStringLiteral("Text"));
+                }
+                if (hasIndicator) {
+                    subElements.append(QStringLiteral("Indicator"));
+                }
+                auto map = layoutMap(elements, toolButtonOption, subElements);
+
+                return visualRect(toolButtonOption->direction, toolButtonOption->rect, map[QStringLiteral("Indicator")].rect.toRect());
+            }
         }
     }
 

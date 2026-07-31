@@ -457,7 +457,7 @@ QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::
     return rect;
 }
 
-Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList childElementNames)
+Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy)
 {
     Union::ElementList elements;
     QStringList elementTypes;
@@ -468,8 +468,8 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
             elementTypes = setupMemberList(widget);
         }
     }
-    if (!childElementNames.isEmpty()) {
-        elementTypes.append(childElementNames);
+    if (!targetHierarchy.isEmpty()) {
+        elementTypes.append(targetHierarchy);
     }
 
     for (const auto &elementType : elementTypes) {
