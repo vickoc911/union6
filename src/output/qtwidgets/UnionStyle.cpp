@@ -273,15 +273,16 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             QStyleOptionButton checkbox;
             switch (subopt.checkState) {
             case Qt::Unchecked:
-                checkbox.state = State_Off;
+                checkbox.state.setFlag(State_Off);
                 break;
             case Qt::PartiallyChecked:
-                checkbox.state = State_NoChange;
+                checkbox.state.setFlag(State_NoChange);
                 break;
             case Qt::Checked:
-                checkbox.state = State_On;
+                checkbox.state.setFlag(State_On);
                 break;
             }
+            checkbox.state.setFlag(State_Enabled, viewItemOption->state.testFlag(State_Enabled));
             checkbox.rect = subElementRect(SE_ItemViewItemCheckIndicator, viewItemOption, widget);
             drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
         } else if (subopt.features.testFlag(QStyleOptionViewItem::HasDecoration)) {
