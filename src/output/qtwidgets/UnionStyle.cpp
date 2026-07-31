@@ -334,6 +334,49 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ShapedFrame:
         drawElementBackground(painter, option, widget, {u"Frame"_s});
         return;
+    case QStyle::CE_FocusFrame:
+        drawElementBackground(painter, option, widget, {u"FocusFrame"_s});
+        return;
+    case QStyle::CE_ToolBar:
+        drawElementBackground(painter, option, widget);
+        return;
+    case QStyle::CE_MenuBarItem:
+        drawElementBackground(painter, option, widget, {u"MenuBarItem"_s});
+        return;
+    case QStyle::CE_HeaderLabel:
+        if (const auto header = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
+            auto props = queryProperties(prepareElements(header, widget, {u"HeaderViewDelegate"_s}));
+            QIcon sortIndicator;
+            switch (header->sortIndicator) {
+            case QStyleOptionHeader::None:
+                break;
+            case QStyleOptionHeader::SortUp:
+                if (props->icon()) {
+                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-up-symbolic"_s));
+                }
+                break;
+            case QStyleOptionHeader::SortDown:
+                if (props->icon()) {
+                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
+                }
+                break;
+            }
+            layoutAndDrawIconTextIndicator(header, painter, widget, sortIndicator, header->text, QIcon(), {u"HeaderViewDelegate"_s});
+        }
+        return;
+    case QStyle::CE_HeaderSection: {
+        drawElementBackground(painter, option, widget, {u"HeaderViewDelegate"_s});
+    }
+        return;
+    case QStyle::CE_Header:
+        drawControl(CE_HeaderSection, option, painter, widget);
+        drawControl(CE_HeaderLabel, option, painter, widget);
+        return;
+    case QStyle::CE_SizeGrip:
+    case QStyle::CE_Splitter:
+    case QStyle::CE_RubberBand:
+    case QStyle::CE_DockWidgetTitle:
+    case QStyle::CE_ColumnViewGrip:
     case QStyle::CE_ScrollBarAddLine:
     case QStyle::CE_ScrollBarSubLine:
     case QStyle::CE_ScrollBarAddPage:
@@ -341,24 +384,12 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ScrollBarFirst:
     case QStyle::CE_ScrollBarLast:
     case QStyle::CE_MenuEmptyArea:
-        return; // This is what breeze does as well
-    case QStyle::CE_FocusFrame:
-    case QStyle::CE_MenuBarItem:
+    case QStyle::CE_HeaderEmptyArea:
     case QStyle::CE_MenuBarEmptyArea:
     case QStyle::CE_MenuVMargin:
     case QStyle::CE_MenuHMargin:
     case QStyle::CE_MenuTearoff:
     case QStyle::CE_MenuScroller:
-    case QStyle::CE_Header:
-    case QStyle::CE_HeaderSection:
-    case QStyle::CE_HeaderLabel:
-    case QStyle::CE_SizeGrip:
-    case QStyle::CE_Splitter:
-    case QStyle::CE_RubberBand:
-    case QStyle::CE_DockWidgetTitle:
-    case QStyle::CE_ToolBar:
-    case QStyle::CE_HeaderEmptyArea:
-    case QStyle::CE_ColumnViewGrip:
     case QStyle::CE_CustomBase:
         break;
     }
@@ -1611,9 +1642,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_MessageBoxIconSize:
     case QStyle::PM_TitleBarButtonIconSize:
     case QStyle::PM_LineEditIconSize: {
-        if (properties->icon()) {
-            return properties->icon()->width().value_or(defaultMetric);
-        }
+        return QCommonStyle::pixelMetric(metric, option, widget);
     } break;
 
     // Use defaults
