@@ -104,11 +104,6 @@ toolbutton.raised
         box-shadow: none;
     }
 
-    &[display="text-under-icon"] {
-        text-alignment-vertical: stack-center;
-        icon-alignment-vertical: stack-center;
-    }
-
     &.with-menu > indicator {
         visibility: visible;
         layout-alignment: content end center 1;
@@ -116,6 +111,15 @@ toolbutton.raised
         height: var(--icon-size-small);
         icon-name: "arrow-down";
         icon-color: var(--button-active-text-color)
+    }
+
+    &[display="text-under-icon"] {
+        text-alignment-vertical: stack-center;
+        icon-alignment-vertical: stack-center;
+
+        &.with-menu > indicator {
+            layout-alignment: content center stack-center 1;
+        }
     }
 }
 
