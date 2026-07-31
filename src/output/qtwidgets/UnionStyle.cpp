@@ -483,7 +483,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         } else {
             drawBackground(painter, option->rect, queryProperties(prepareElements(option, widget, {u"ApplicationWindow"_s})));
         }
-        drawBackground(painter, option->rect, scrollbarProps);
+        auto rect = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
+        drawBackground(painter, rect, scrollbarProps);
         QCommonStyle::drawComplexControl(control, option, painter, widget);
     }
         return;
@@ -606,6 +607,40 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     }
 
     QCommonStyle::drawComplexControl(control, option, painter, widget);
+}
+
+QStyle::SubControl
+UnionStyle::hitTestComplexControl(ComplexControl control, const QStyleOptionComplex *option, const QPoint &point, const QWidget *widget) const
+{
+    switch (control) {
+    // Make scrollbar behave like in QtQuick
+    case CC_ScrollBar: {
+        auto grooveRect = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
+        if (grooveRect.contains(point)) {
+            const auto sliderRect = subControlRect(CC_ScrollBar, option, SC_ScrollBarSlider, widget);
+            const auto precedes = [](const QStyleOptionComplex *option, QPoint point, QRect rect) {
+                if (option->state & QStyle::State_Horizontal) {
+                    if (option->direction == Qt::LeftToRight) {
+                        return point.x() < rect.right();
+                    } else {
+                        return point.x() > rect.x();
+                    }
+                } else {
+                    return point.y() < rect.y();
+                }
+            };
+            if (sliderRect.contains(point)) {
+                return SC_ScrollBarSlider;
+            } else if (precedes(option, point, sliderRect)) {
+                return SC_ScrollBarSubPage;
+            } else {
+                return SC_ScrollBarAddPage;
+            }
+        }
+    }
+    default:
+        return QCommonStyle::hitTestComplexControl(control, option, point, widget);
+    }
 }
 
 void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
@@ -1219,22 +1254,55 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
     }
 
     if (complexControl == CC_ScrollBar) {
+        // Copied from Breeze
         if (subControl == SC_ScrollBarSlider) {
             auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
             if (!sliderOption) {
                 return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
             }
-            auto rect = QCommonStyle::subControlRect(complexControl, option, subControl, widget);
+            const bool horizontal = (sliderOption->state.testFlag(State_Horizontal));
+            auto groove = visualRect(option->direction, option->rect, subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget));
+            if (sliderOption->minimum == sliderOption->maximum) {
+                return groove;
+            }
+            int space(horizontal ? groove.width() : groove.height());
+            int thickness = 0;
+            QMargins padding;
             auto props = queryProperties(prepareElements(option, widget, {u"Slider"_s}));
             if (props->layout()) {
+                auto scrollProps = queryProperties(prepareElements(option, widget));
+                if (scrollProps->layout() && scrollProps->layout()->padding()) {
+                    padding = scrollProps->layout()->padding()->toMargins().toMargins();
+                }
                 if (sliderOption->orientation == Qt::Horizontal) {
-                    int thickness = props->layout()->height().value_or(0);
-                    return visualRect(option->direction, option->rect, rect.adjusted(0, thickness, 0, -thickness));
+                    thickness = props->layout()->height().value_or(0);
                 } else {
-                    int thickness = props->layout()->width().value_or(0);
-                    return visualRect(option->direction, option->rect, rect.adjusted(thickness, 0, -thickness, 0));
+                    thickness = props->layout()->width().value_or(0);
                 }
             }
+
+            int sliderSize = space * qreal(sliderOption->pageStep) / (sliderOption->maximum - sliderOption->minimum + sliderOption->pageStep);
+            sliderSize = qMax(sliderSize, thickness);
+            sliderSize = qMin(sliderSize, space);
+            space -= sliderSize;
+            if (space <= 0) {
+                return groove;
+            }
+            int pos = qRound(qreal(sliderOption->sliderPosition - sliderOption->minimum) / (sliderOption->maximum - sliderOption->minimum) * space);
+            if (sliderOption->upsideDown) {
+                pos = space - pos;
+            }
+            if (horizontal) {
+                auto rect = QRect(groove.left() + pos, groove.top(), sliderSize, groove.height());
+                return visualRect(option->direction, option->rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
+            } else {
+                auto rect = QRect(groove.left(), groove.top() + pos, groove.width(), sliderSize);
+                return visualRect(option->direction, option->rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
+            }
+        } else if (subControl == SC_ScrollBarGroove) {
+            return visualRect(option->direction, option->rect, option->rect);
+        } else {
+            return QRect();
         }
     }
 
@@ -1310,6 +1378,10 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             }
         }
     */
+
+    if (complexControl == CC_TitleBar) { }
+    if (complexControl == CC_Dial) { }
+    if (complexControl == CC_MdiControls) { }
     return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
 }
 
@@ -1663,6 +1735,8 @@ int UnionStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWid
         return true;
     case SH_DockWidget_ButtonsHaveFrame:
         return false;
+    case SH_ScrollBar_LeftClickAbsolutePosition:
+        return true;
     default:
         return QCommonStyle::styleHint(hint, option, widget, returnData);
     }
