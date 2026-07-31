@@ -18,7 +18,7 @@
 
 static Union::LruImageCache imageCache;
 
-void drawBackground(QPainter *painter, const QRect &rect, const Union::Properties::StylePropertyGroup *style)
+void drawBackground(QPainter *painter, const QRectF &rect, const Union::Properties::StylePropertyGroup *style)
 {
     QRectF innerRect = rect;
     // Borders
@@ -181,7 +181,7 @@ void drawBackground(QPainter *painter, const QRect &rect, const Union::Propertie
     }
 }
 
-QPainterPath unevenRadiiRectPath(const auto &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
+QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
 {
     QPainterPath path;
 
@@ -222,7 +222,7 @@ QPainterPath unevenRadiiRectPath(const auto &rect, const Union::Properties::Corn
     return path;
 }
 
-Union::Properties::CornersPropertyGroup::CornerRadii constrainRadii(const QRect &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
+Union::Properties::CornersPropertyGroup::CornerRadii constrainRadii(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
 {
     auto topLeft = std::min({rect.width() / 2.0, rect.height() / 2.0, cornerRadii.topLeft});
     auto topRight = std::min({rect.width() / 2.0, rect.height() / 2.0, cornerRadii.topRight});
@@ -238,7 +238,7 @@ Union::Properties::CornersPropertyGroup::CornerRadii constrainRadii(const QRect 
 }
 
 void drawLineProperty(QPainter *painter,
-                      const QRect &rect,
+                      const QRectF &rect,
                       SubNodeIndex subNodeIndex,
                       const QMarginsF &borderSizes,
                       const Union::Properties::LinePropertyGroup *line,
@@ -297,7 +297,7 @@ void drawLineProperty(QPainter *painter,
 
 // TODO: Fix tiny gaps caused by antialiasing between corners and borders
 void drawCornerProperty(QPainter *painter,
-                        const QRect &rect,
+                        const QRectF &rect,
                         SubNodeIndex subNodeIndex,
                         const Union::Properties::BorderPropertyGroup *border,
                         const Union::Properties::CornerPropertyGroup *corner)
