@@ -827,6 +827,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
                 size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, option, widget);
             }
         }
+        return size;
     } break;
     case QStyle::CT_ToolButton: {
         const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
@@ -923,8 +924,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_ItemViewItem: {
         auto textRect = subElementRect(SE_ItemViewItemText, option, widget);
         size = textRect.size().grownBy(padding);
-        break;
-    }
+    } break;
     case QStyle::CT_Slider: {
         auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(option);
         if (sliderOpt) {
@@ -1619,9 +1619,11 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     // Use defaults
     case QStyle::PM_TabBar_ScrollButtonOverlap:
         return 0;
-    case QStyle::PM_MaximumDragDistance:
+    case QStyle::PM_ScrollView_ScrollBarOverlap:
+        return 0;
     case QStyle::PM_SliderTickmarkOffset:
     case QStyle::PM_SliderSpaceAvailable:
+    case QStyle::PM_MaximumDragDistance:
     case QStyle::PM_MenuTearoffHeight:
     case QStyle::PM_DockWidgetSeparatorExtent:
     case QStyle::PM_TabBarTabOverlap:
@@ -1637,7 +1639,6 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_DockWidgetTitleBarButtonMargin:
     case QStyle::PM_SizeGripSize:
     case QStyle::PM_TextCursorWidth:
-    case QStyle::PM_ScrollView_ScrollBarOverlap:
     case QStyle::PM_SubMenuOverlap:
     case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
     case QStyle::PM_HeaderDefaultSectionSizeVertical:
