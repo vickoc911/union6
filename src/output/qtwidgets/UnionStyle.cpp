@@ -843,6 +843,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             unifiedRect.setWidth(contentsSize.width());
         }
         size = unifiedRect.size().grownBy(padding);
+        size.rwidth() += pixelMetric(PM_LayoutLeftMargin, option, widget);
     } break;
     case QStyle::CT_TabBarTab: {
         auto elements = prepareElements(option, widget, {QStringLiteral("TabButton")});
@@ -1000,15 +1001,35 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
     } break;
 
-    case QStyle::SE_PushButtonContents:
+    case QStyle::SE_PushButtonContents: {
+        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
+        auto elements = prepareElements(option, widget);
+        QStringList childelements = {};
+        if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+            childelements.append(QStringLiteral("Indicator"));
+        }
+        if (!buttonOption->icon.isNull()) {
+            childelements.append(QStringLiteral("Icon"));
+        }
+        if (!buttonOption->text.isEmpty()) {
+            childelements.append(QStringLiteral("Text"));
+        }
+        if (childelements.isEmpty()) {
+            return QRect();
+        }
+        auto map = layoutMap(elements, option, childelements);
+        QRect unifiedRect;
+        for (const auto &m : map) {
+            unifiedRect = unifiedRect.united(m.rect.toRect());
+        }
+        rect = unifiedRect;
+    } break;
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_CheckBoxContents: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
         auto elements = prepareElements(option, widget);
         QStringList childelements = {};
-        if (element != SE_PushButtonContents) {
-            childelements.append(QStringLiteral("Indicator"));
-        }
+        childelements.append(QStringLiteral("Indicator"));
         if (!buttonOption->icon.isNull()) {
             childelements.append(QStringLiteral("Icon"));
         }
@@ -1843,6 +1864,9 @@ void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
             shortcutText = itemText.mid(tabPosition + 1);
             itemText = itemText.left(tabPosition);
         }
+    }
+    if (hasIndicator) {
+        subElements.append(QStringLiteral("Indicator"));
     }
     // Nothing to draw, just return
     if (subElements.isEmpty()) {
