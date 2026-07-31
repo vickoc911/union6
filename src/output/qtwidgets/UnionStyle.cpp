@@ -652,6 +652,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_FrameStatusBarItem:
         drawElementBackground(painter, option, widget, {u"Item"_s});
         return;
+    case QStyle::PE_FrameMenu:
+        drawElementBackground(painter, option, widget, {u"Menu"_s});
+        return;
     case QStyle::PE_Widget:
         // Relates to PE_Frame
         drawElementBackground(painter, option, widget, {u"Panel"_s});
@@ -1404,8 +1407,9 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case PM_ButtonShiftHorizontal:
     case PM_ButtonShiftVertical:
         return 0;
-    // Due to how QWidgets works, we just return the average margin size now
-    // since there is no support for returning margin per edge
+    // Due to how QWidgets works, we just return the average padding size now
+    // since there is no support for returning padding per edge
+    // In QStyle "Margin" means "Padding" apparently.
     case QStyle::PM_ToolBarItemMargin:
     case QStyle::PM_MenuBarVMargin:
     case QStyle::PM_MenuBarHMargin:
@@ -1416,8 +1420,8 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_HeaderMargin:
     case QStyle::PM_LineEditIconMargin:
     case QStyle::PM_ButtonMargin: {
-        if (properties->layout() && properties->layout()->margins()) {
-            auto margins = properties->layout()->margins()->toMargins();
+        if (properties->layout() && properties->layout()->padding()) {
+            auto margins = properties->layout()->padding()->toMargins();
             auto avg = (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
             return avg;
         }
@@ -1526,8 +1530,8 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_LayoutTopMargin:
     case QStyle::PM_LayoutRightMargin:
     case QStyle::PM_LayoutBottomMargin: {
-        if (properties->layout() && properties->layout()->margins()) {
-            auto margins = properties->layout()->margins()->toMargins();
+        if (properties->layout() && properties->layout()->padding()) {
+            auto margins = properties->layout()->padding()->toMargins();
             if (metric == PM_LayoutLeftMargin) {
                 return margins.left();
             }
