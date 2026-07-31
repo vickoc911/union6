@@ -78,4 +78,13 @@ QString textFromOption(const QStyleOption *opt);
  */
 int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, bool skipAlign);
 
+/*!
+ * \brief Centers a rectangle depending on width and height. Copied from Breeze.
+ */
 QRect centerRect(const QRect &rect, int width, int height);
+
+/*!
+ * \brief Helper function to build a list of subelements (icon, text, indicator) depending on
+ * which items are being drawn
+ */
+QStringList buildSubElementList(const QStyleOption *option, const QWidget *widget);

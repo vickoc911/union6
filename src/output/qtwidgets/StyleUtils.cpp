@@ -5,6 +5,9 @@
 #include <ElementQuery.h>
 #include <StyleRegistry.h>
 
+#include <QCheckBox>
+#include <QPushButton>
+#include <QRadioButton>
 #include <QStyleOption>
 #include <QStyleOptionFrame>
 #include <QTableView>
@@ -809,4 +812,58 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
 QRect centerRect(const QRect &rect, int width, int height)
 {
     return QRect(rect.left() + (rect.width() - width) / 2, rect.top() + (rect.height() - height) / 2, width, height);
+}
+
+QStringList buildSubElementList(const QStyleOption *option, const QWidget *widget)
+{
+    QStringList childelements = {};
+    if (const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option)) {
+        if (viewItemOption) {
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay) && !viewItemOption->text.isEmpty()) {
+                childelements.append(QStringLiteral("Text"));
+            }
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration) && !viewItemOption->icon.isNull()) {
+                childelements.append(QStringLiteral("Icon"));
+            }
+            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
+                childelements.append(QStringLiteral("CheckBox"));
+            }
+        }
+    } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+        if (qobject_cast<const QPushButton *>(widget)) {
+            if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+                childelements.append(QStringLiteral("Indicator"));
+            }
+            if (!buttonOption->icon.isNull()) {
+                childelements.append(QStringLiteral("Icon"));
+            }
+            if (!buttonOption->text.isEmpty()) {
+                childelements.append(QStringLiteral("Text"));
+            }
+        } else if (qobject_cast<const QCheckBox *>(widget) || qobject_cast<const QRadioButton *>(widget)) {
+            childelements.append(QStringLiteral("Indicator"));
+            if (!buttonOption->icon.isNull()) {
+                childelements.append(QStringLiteral("Icon"));
+            }
+            if (!buttonOption->text.isEmpty()) {
+                childelements.append(QStringLiteral("Text"));
+            }
+        }
+    } else if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
+        bool hasIndicator =
+            toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
+        bool hasIcon = !toolButtonOption->icon.isNull();
+        bool hasText = !toolButtonOption->text.isEmpty();
+        if (hasIcon) {
+            childelements.append(QStringLiteral("Icon"));
+        }
+        if (hasText) {
+            childelements.append(QStringLiteral("Text"));
+        }
+        if (hasIndicator) {
+            childelements.append(QStringLiteral("Indicator"));
+        }
+    }
+
+    return childelements;
 }
