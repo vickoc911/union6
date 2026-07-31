@@ -40,10 +40,10 @@ Qt::TextFlag toQtWrapMode(Union::Properties::TextWrapMode wrapMode);
 QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::StylePropertyGroup *properties);
 
 /*!
- * \brief Prepares elements for a widget. If there is a specific ChildElement you want to access, such as
- * indicator, you can add those in the childElementNames.
+ * \brief Prepares elements for a widget. Sometimes we cannot decipher the specific item from widget alone, such as itemviews.
+ * In those cases you may need to manually choose a target hierarchy, such as {"ItemViewItem"}
  */
-Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget = nullptr, QStringList childElementNames = {});
+Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget = nullptr, QStringList targetHierarchy = {});
 
 /*!
  * \brief Queries the properties from list of elements. The properties match to the last element in the list,
