@@ -539,7 +539,6 @@ QStringList setupMemberList(const QWidget *widget)
                                                        {"QToolBar", u"ToolBar"_s},
                                                        {"QAbstractScrollArea", u"ScrollArea"_s},
                                                        {"QListView", u"ListView"_s},
-                                                       {"QScrollBar", u"ScrollBar"_s},
                                                        {"QTreeView", u"QTreeViewDelegate"_s},
                                                        {"QSplitter", u"Splitter"_s}};
 
