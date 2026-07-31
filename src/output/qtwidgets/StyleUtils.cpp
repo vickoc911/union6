@@ -687,11 +687,11 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             availableSpace.adjust(itemWidth, 0, 0, 0);
             break;
         case Union::Properties::Alignment::Center:
-            // For single items and vertical stackCenter/stackFill,
+            // For vertical stackCenter/stackFill,
             // we can just utilize the exact center,
             // since we do not need to move other items around
-            if (items.size() > 1 && item.verticalAlignment != Union::Properties::Alignment::StackCenter
-                && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
+            if (item.verticalAlignment != Union::Properties::Alignment::StackCenter && item.verticalAlignment != Union::Properties::Alignment::StackFill) {
+                // TODO: this is same as Start for now
                 item.rect.moveLeft(availableSpace.left());
                 availableSpace.adjust(itemWidth, 0, 0, 0);
             } else {
