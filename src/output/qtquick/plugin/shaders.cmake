@@ -30,6 +30,7 @@ macro(add_shaders ARG_NAME)
     install(TARGETS ${_targets} EXPORT KirigamiTargets ${KF_INSTALL_TARGETS_DEFAULT_ARGS})
 endmacro()
 
+add_shaders("icon" INPUT icon)
 add_shaders("rectangleshadow" INPUT rectangleshadow)
 
 macro(name_to_define ARG_NAME ARG_OUTPUT)

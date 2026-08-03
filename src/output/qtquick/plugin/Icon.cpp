@@ -10,6 +10,8 @@
 #include <StyleRegistry.h>
 
 #include "QuickStyle.h"
+#include "scenegraph/ShaderNode.h"
+#include "scenegraph/UniformDataStream.h"
 
 #include "qtquick_logging.h"
 
@@ -168,24 +170,25 @@ QSGNode *Icon::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *)
     }
 
     if (!node) {
-        node = window()->createImageNode();
+        auto shaderNode = new ShaderNode{};
+        shaderNode->setShader(u"icon"_s);
+        shaderNode->setUniformBufferSize(sizeof(float) * 21);
+        shaderNode->setUvChannels(1);
+        node = shaderNode;
     }
 
-    auto imageNode = static_cast<QSGImageNode *>(node);
+    auto shaderNode = static_cast<ShaderNode *>(node);
 
     auto bounds = boundingRect();
+    shaderNode->setRect(QRectF{std::round(bounds.x() + (bounds.width() - m_iconSize.width()) / 2.0),
+                               std::round(bounds.y() + (bounds.height() - m_iconSize.height()) / 2.0),
+                               qreal(m_iconSize.width()),
+                               qreal(m_iconSize.height())});
 
-    imageNode->setRect(QRectF{std::round(bounds.x() + (bounds.width() - m_iconSize.width()) / 2.0),
-                              std::round(bounds.y() + (bounds.height() - m_iconSize.height()) / 2.0),
-                              qreal(m_iconSize.width()),
-                              qreal(m_iconSize.height())});
-    imageNode->setOwnsTexture(true);
-
-    if (smooth()) {
-        imageNode->setFiltering(QSGTexture::Linear);
-    } else {
-        imageNode->setFiltering(QSGTexture::Nearest);
-    }
+    UniformDataStream stream(shaderNode->uniformData());
+    stream << UniformDataStream::Placeholder::ModelViewProjectionMatrix // matrix
+           << UniformDataStream::Placeholder::Viewport // viewport
+           << UniformDataStream::Placeholder::Opacity; // opacity
 
     auto renderWindow = QQuickRenderControl::renderWindowFor(window());
     if (!renderWindow) {
@@ -194,14 +197,22 @@ QSGNode *Icon::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *)
 
     auto dpr = renderWindow->devicePixelRatio();
 
-    if (m_iconChanged || !imageNode->texture() || !qFuzzyCompare(m_iconDpr, dpr)) {
+    if (m_iconChanged || !qFuzzyCompare(m_iconDpr, dpr)) {
         const auto mode = isEnabled() ? QIcon::Mode::Normal : QIcon::Mode::Disabled;
         auto image = m_icon.pixmap(m_iconSize, dpr, mode).toImage();
-        imageNode->setTexture(window()->createTextureFromImage(image, QQuickWindow::TextureCanUseAtlas));
+        if (smooth()) {
+            shaderNode->setTexture(0, 1, image, window(), ShaderNode::TextureCanUseAtlas);
+        } else {
+            shaderNode->setTexture(0, 1, image, window(), ShaderNode::TextureCanUseAtlas | ShaderNode::TextureNearestInterpolation);
+        }
         m_iconChanged = false;
+        m_iconDpr = dpr;
     }
 
-    return node;
+    shaderNode->update();
+    shaderNode->markDirty(QSGNode::DirtyMaterial);
+
+    return shaderNode;
 }
 
 bool Icon::eventFilter(QObject *watched, QEvent *event)
