@@ -666,6 +666,13 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     // so check for StackFill/StackCenter. Use Order value for the actual drawing order.
     // The actual alignment value would be used for Qt::alignment when drawing
 
+    // 1. Get sizes for each container in this order (start, end, center, stack)
+    // 2. Split containers to separate rectangles if there is more than 1 element in it
+    // 3. Place items to their matching container rectangles in the end
+    // So build some sort of array for the containers only at first, make sure they're sized properly,
+    // centering and stacking last so we get the center area "for free"
+    // If item does not fit, thats fine, need to rework the contentSize to get maxWidth + maxHeight QSize
+
     int counter = 1;
     for (auto &item : items) {
         // Skip spacing for last/only item
