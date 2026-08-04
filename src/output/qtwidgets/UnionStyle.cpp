@@ -823,8 +823,9 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     }
     QMargins padding;
     if (properties->layout()) {
-        auto width = properties->layout()->width().value_or(contentsSize.width());
-        auto height = properties->layout()->height().value_or(contentsSize.height());
+        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
+        auto width = properties->layout()->width().value_or(1) + frameWidth;
+        auto height = properties->layout()->height().value_or(1) + frameWidth;
         minimumSize = QSize(width, height);
         if (properties->layout()->padding()) {
             padding = properties->layout()->padding()->toMargins().toMargins();
@@ -834,47 +835,63 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         }
     }
     switch (contentsType) {
-    case QStyle::CT_CheckBox: {
-        QRegion r;
-        auto indicatorRect = subElementRect(SE_CheckBoxIndicator, option, widget);
-        auto textRect = subElementRect(SE_CheckBoxContents, option, widget);
-        r.setRects({indicatorRect, textRect});
-        size = r.boundingRect().size().grownBy(padding);
-    } break;
-    case QStyle::CT_RadioButton: {
-        QRegion r;
-        auto indicatorRect = subElementRect(SE_RadioButtonIndicator, option, widget);
-        auto textRect = subElementRect(SE_RadioButtonContents, option, widget);
-        r.setRects({indicatorRect, textRect});
-        size = r.boundingRect().size().grownBy(padding);
-    } break;
-    case QStyle::CT_PushButton: {
-        auto contentsRect = subElementRect(SE_PushButtonContents, option, widget);
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
-        size = contentsRect.size().grownBy(padding);
-        if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+    case QStyle::CT_PushButton:
+        if (const auto *buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+            size = contentsSize.grownBy(padding);
+            // TODO: currently only works on indicators at start/end
+            if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+                size.rwidth() += pixelMetric(PM_LayoutHorizontalSpacing, buttonOption, widget);
+            }
+        }
+        break;
+    case QStyle::CT_ToolButton: {
+        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
+            size = size.grownBy(padding);
             auto indicatorProps = queryProperties(prepareElements(option, widget, {u"Indicator"_s}));
             if (indicatorProps->layout()) {
-                size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, option, widget);
-            }
-        }
-        return size;
-    } break;
-    case QStyle::CT_ToolButton: {
-        const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-        auto elements = prepareElements(toolButtonOption, widget);
-        QRect backgroundRect = subControlRect(CC_ToolButton, toolButtonOption, SC_ToolButton, widget);
-        QRect menubuttonrect = subControlRect(CC_ToolButton, toolButtonOption, SC_ToolButtonMenu, widget);
-        QRegion r;
-        r.setRects({backgroundRect, menubuttonrect});
-        size = r.boundingRect().size().grownBy(padding);
-        if (!menubuttonrect.isEmpty()) {
-            auto indicatorProps = queryProperties(prepareElements(option, widget, {u"Indicator"_s}));
-            if (indicatorProps->layout() && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
-                size.rwidth() += indicatorProps->layout()->width().value_or(0) + pixelMetric(PM_LayoutLeftMargin, option, widget);
+                if (toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
+                    size.rwidth() += indicatorProps->layout()->width().value_or(0);
+                } else {
+                    size.rheight() += indicatorProps->layout()->height().value_or(0);
+                }
             }
         }
     } break;
+    case QStyle::CT_MenuItem: {
+        const auto *menuItemOpt = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
+        if (!menuItemOpt) {
+            return size;
+        }
+        // Handle separator separately (pun not intended)
+        if (menuItemOpt->menuItemType == QStyleOptionMenuItem::Separator) {
+            auto separatorProps = queryProperties(prepareElements(menuItemOpt, widget, {u"MenuSeparator"_s}));
+            if (separatorProps->layout()) {
+                int width = separatorProps->layout()->width().value_or(1);
+                int height = separatorProps->layout()->height().value_or(1);
+                QSize separatorSize(width, height);
+                return separatorSize.grownBy(padding);
+            }
+        } else {
+            auto menuProps = queryProperties(prepareElements(menuItemOpt, widget, {u"MenuItem"_s}));
+            if (menuProps->layout()) {
+                int width = menuProps->layout()->width().value_or(1);
+                int height = menuProps->layout()->height().value_or(1);
+                if (size.width() > width) {
+                    width = size.width();
+                }
+                if (size.height() > height) {
+                    height = size.height();
+                }
+                QSize itemSize(width, height);
+                return itemSize.grownBy(padding);
+            }
+        }
+    } break;
+    case QStyle::CT_ItemViewItem: {
+        auto textRect = subElementRect(SE_ItemViewItemText, option, widget);
+        size = textRect.size().grownBy(padding);
+    } break;
+    // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {
         auto elements = prepareElements(option, widget);
         QStringList childelements = {u"Icon"_s, u"Text"_s, u"Indicator"_s};
@@ -907,55 +924,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         }
         return textRect.size().grownBy(padding);
     } break;
-    case QStyle::CT_MenuBar: {
-        size = backgroundRectangle(option, properties).size().toSize();
-    } break;
-    case QStyle::CT_MenuItem: {
-        const auto *menuItemOpt = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-        if (!menuItemOpt) {
-            return size;
-        }
-        // Handle separator separately (pun not intended)
-        if (menuItemOpt->menuItemType == QStyleOptionMenuItem::Separator) {
-            auto separatorProps = queryProperties(prepareElements(menuItemOpt, widget, {u"MenuSeparator"_s}));
-            if (separatorProps->layout()) {
-                int width = separatorProps->layout()->width().value_or(1);
-                int height = separatorProps->layout()->height().value_or(1);
-                QSize separatorSize(width, height);
-                return separatorSize.grownBy(padding);
-            }
-        } else {
-            auto menuProps = queryProperties(prepareElements(menuItemOpt, widget, {u"MenuItem"_s}));
-            if (menuProps->layout()) {
-                int width = menuProps->layout()->width().value_or(1);
-                int height = menuProps->layout()->height().value_or(1);
-                if (size.width() > width) {
-                    width = size.width();
-                }
-                if (size.height() > height) {
-                    height = size.height();
-                }
-                QSize itemSize(width, height);
-                return itemSize.grownBy(padding);
-            }
-        }
-    } break;
-    case QStyle::CT_MenuBarItem: {
-        break;
-    }
-    case QStyle::CT_ProgressBar: {
-        QRegion r;
-        auto grooveRect = subElementRect(SE_ProgressBarGroove, option, widget);
-        auto contentRect = subElementRect(SE_ProgressBarContents, option, widget);
-        auto textRect = subElementRect(SE_ProgressBarLabel, option, widget);
-        r.setRects({grooveRect, contentRect, textRect});
-        size = r.boundingRect().size().grownBy(padding);
-        return size;
-    } break;
-    case QStyle::CT_ItemViewItem: {
-        auto textRect = subElementRect(SE_ItemViewItemText, option, widget);
-        size = textRect.size().grownBy(padding);
-    } break;
     case QStyle::CT_Slider: {
         auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(option);
         if (sliderOpt) {
@@ -968,25 +936,22 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return size;
         }
     } break;
-    case QStyle::CT_HeaderSection:
-        // unimplemented
-    case QStyle::CT_Menu:
-    case QStyle::CT_GroupBox:
-    // QStyleOptionSlider, no text/icon
-    case QStyle::CT_ScrollBar:
-    // QStyleOptionFrame, no text/icon
+    case QStyle::CT_MenuBar:
     case QStyle::CT_LineEdit:
-    // QStyleOptionSpinBox, no text/icon
-    case QStyle::CT_SpinBox:
-    // QStyleOptionTabWidgetFrame, no text/icon
-    case QStyle::CT_TabWidget:
-    // Undocumented
-    case QStyle::CT_DialogButtons:
-    // QStyleOptionComplex, no text/icon
-    case QStyle::CT_MdiControls:
-    // Uses QStyleOption so there is no text/icon information
-    case QStyle::CT_SizeGrip:
+    case QStyle::CT_GroupBox:
+    case QStyle::CT_CheckBox:
+    case QStyle::CT_RadioButton:
     case QStyle::CT_Splitter:
+    case QStyle::CT_ProgressBar:
+    case QStyle::CT_MenuBarItem:
+    case QStyle::CT_Menu:
+    case QStyle::CT_ScrollBar:
+    case QStyle::CT_SpinBox:
+    case QStyle::CT_SizeGrip:
+    case QStyle::CT_TabWidget:
+    case QStyle::CT_DialogButtons:
+    case QStyle::CT_HeaderSection:
+    case QStyle::CT_MdiControls:
     case QStyle::CT_CustomBase:
         break;
     }
@@ -1057,7 +1022,11 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         rect = unifiedRect;
     } break;
 
-    case QStyle::SE_PushButtonBevel:
+    case QStyle::SE_PushButtonBevel: {
+        auto buttonElements = prepareElements(option, widget);
+        auto props = queryProperties(buttonElements);
+        rect = backgroundRectangle(option, props).toRect();
+    } break;
     case QStyle::SE_ShapedFrameContents:
     case QStyle::SE_LineEditContents:
     case QStyle::SE_FrameContents: {
@@ -1289,13 +1258,17 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
 
     if (complexControl == CC_ScrollBar) {
         // Copied from Breeze
+        auto rect = option->rect;
+        if (widget) {
+            rect = widget->visibleRegion().boundingRect();
+        }
         if (subControl == SC_ScrollBarSlider) {
             auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
             if (!sliderOption) {
                 return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
             }
             const bool horizontal = (sliderOption->state.testFlag(State_Horizontal));
-            auto groove = visualRect(option->direction, option->rect, subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget));
+            auto groove = visualRect(option->direction, rect, subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget));
             if (sliderOption->minimum == sliderOption->maximum) {
                 return groove;
             }
@@ -1316,7 +1289,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             }
 
             int sliderSize = space * qreal(sliderOption->pageStep) / (sliderOption->maximum - sliderOption->minimum + sliderOption->pageStep);
-            sliderSize = qMax(sliderSize, thickness);
+            sliderSize = qMax(sliderSize, qMax(thickness, pixelMetric(PM_ScrollBarSliderMin, option, widget)));
             sliderSize = qMin(sliderSize, space);
             space -= sliderSize;
             if (space <= 0) {
@@ -1328,13 +1301,13 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             }
             if (horizontal) {
                 auto rect = QRect(groove.left() + pos, groove.top(), sliderSize, groove.height());
-                return visualRect(option->direction, option->rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
+                return visualRect(option->direction, rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
             } else {
                 auto rect = QRect(groove.left(), groove.top() + pos, groove.width(), sliderSize);
-                return visualRect(option->direction, option->rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
+                return visualRect(option->direction, rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
             }
         } else if (subControl == SC_ScrollBarGroove) {
-            return visualRect(option->direction, option->rect, option->rect);
+            return visualRect(option->direction, option->rect, rect);
         } else {
             return QRect();
         }
@@ -1349,6 +1322,10 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
         // Copied from Breeze
         const bool horizontal(sliderOption->orientation == Qt::Horizontal);
         auto rect(sliderOption->rect);
+        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
+        if (widget) {
+            rect = widget->visibleRegion().boundingRect();
+        }
 
         switch (subControl) {
         case SC_SliderHandle: {
@@ -1383,7 +1360,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
                 grooveHeight = props->layout()->height().value_or(6);
                 grooveWidth = props->layout()->width().value_or(6);
             }
-            auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
+
             auto grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
 
             // centering
@@ -1498,7 +1475,9 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return properties->layout()->width().value_or(defaultMetric);
         }
     } break;
-    case QStyle::PM_ScrollBarSliderMin:
+    case QStyle::PM_ScrollBarSliderMin: {
+        return 40;
+    } break;
     case QStyle::PM_SliderThickness:
     case QStyle::PM_SliderLength:
     case QStyle::PM_ScrollBarExtent: {
