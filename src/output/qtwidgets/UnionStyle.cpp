@@ -372,17 +372,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_HeaderSection, option, painter, widget);
         drawControl(CE_HeaderLabel, option, painter, widget);
         return;
-    case QStyle::CE_SizeGrip:
     case QStyle::CE_Splitter:
+        drawElementBackground(painter, option, widget, {u"Splitter"_s});
+        return;
+    case QStyle::CE_SizeGrip:
     case QStyle::CE_RubberBand:
     case QStyle::CE_DockWidgetTitle:
     case QStyle::CE_ColumnViewGrip:
-    case QStyle::CE_ScrollBarAddLine:
-    case QStyle::CE_ScrollBarSubLine:
-    case QStyle::CE_ScrollBarAddPage:
-    case QStyle::CE_ScrollBarSubPage:
-    case QStyle::CE_ScrollBarFirst:
-    case QStyle::CE_ScrollBarLast:
     case QStyle::CE_MenuEmptyArea:
     case QStyle::CE_HeaderEmptyArea:
     case QStyle::CE_MenuBarEmptyArea:
@@ -390,6 +386,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_MenuHMargin:
     case QStyle::CE_MenuTearoff:
     case QStyle::CE_MenuScroller:
+    // Scrollbar buttons are ignored for now since they do not exist in qtquick
+    case QStyle::CE_ScrollBarAddLine:
+    case QStyle::CE_ScrollBarSubLine:
+    case QStyle::CE_ScrollBarAddPage:
+    case QStyle::CE_ScrollBarSubPage:
+    case QStyle::CE_ScrollBarFirst:
+    case QStyle::CE_ScrollBarLast:
     case QStyle::CE_CustomBase:
         break;
     }
@@ -887,10 +890,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             }
         }
     } break;
-    case QStyle::CT_ItemViewItem: {
-        auto textRect = subElementRect(SE_ItemViewItemText, option, widget);
-        size = textRect.size().grownBy(padding);
-    } break;
     // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {
         auto elements = prepareElements(option, widget);
@@ -936,19 +935,22 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return size;
         }
     } break;
+    case QStyle::CT_ItemViewItem:
+        size = size.grownBy(padding);
+        break;
+    case QStyle::CT_TabWidget:
+    case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
     case QStyle::CT_LineEdit:
     case QStyle::CT_GroupBox:
     case QStyle::CT_CheckBox:
     case QStyle::CT_RadioButton:
-    case QStyle::CT_Splitter:
     case QStyle::CT_ProgressBar:
     case QStyle::CT_MenuBarItem:
     case QStyle::CT_Menu:
     case QStyle::CT_ScrollBar:
     case QStyle::CT_SpinBox:
     case QStyle::CT_SizeGrip:
-    case QStyle::CT_TabWidget:
     case QStyle::CT_DialogButtons:
     case QStyle::CT_HeaderSection:
     case QStyle::CT_MdiControls:
@@ -1612,15 +1614,18 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
     } break;
 
-    case QStyle::PM_ProgressBarChunkWidth:
-    case QStyle::PM_ToolBarIconSize:
+    case QStyle::PM_MessageBoxIconSize:
+        return 48;
     case QStyle::PM_ListViewIconSize:
-    case QStyle::PM_IconViewIconSize:
+        return 24;
     case QStyle::PM_SmallIconSize:
+    case QStyle::PM_ButtonIconSize:
+        return 16;
+    case QStyle::PM_IconViewIconSize:
+    case QStyle::PM_ToolBarIconSize:
+    case QStyle::PM_ProgressBarChunkWidth:
     case QStyle::PM_LargeIconSize:
     case QStyle::PM_TabBarIconSize:
-    case QStyle::PM_ButtonIconSize:
-    case QStyle::PM_MessageBoxIconSize:
     case QStyle::PM_TitleBarButtonIconSize:
     case QStyle::PM_LineEditIconSize:
     case QStyle::PM_SliderTickmarkOffset:
