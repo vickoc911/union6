@@ -1606,8 +1606,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     } break;
     case QStyle::PM_TitleBarButtonSize:
     case QStyle::PM_MenuPanelWidth:
-    case QStyle::PM_SplitterWidth:
-    case QStyle::PM_ProgressBarChunkWidth: {
+    case QStyle::PM_SplitterWidth: {
         if (properties->layout()) {
             return properties->layout()->width().value_or(defaultMetric);
         }
@@ -1634,6 +1633,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
     } break;
 
+    case QStyle::PM_ProgressBarChunkWidth:
     case QStyle::PM_ToolBarIconSize:
     case QStyle::PM_ListViewIconSize:
     case QStyle::PM_IconViewIconSize:
