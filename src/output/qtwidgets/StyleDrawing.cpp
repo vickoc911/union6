@@ -18,9 +18,21 @@
 
 static Union::LruImageCache imageCache;
 
-void drawBackground(QPainter *painter, const QRectF &rect, const Union::Properties::StylePropertyGroup *style)
+void drawBackground(QPainter *painter, const QRectF &mainRect, const Union::Properties::StylePropertyGroup *style)
 {
+    QRectF rect = mainRect;
+    // Remove any insets we may have, we do not want to draw them
+    if (style->layout() && style->layout()->inset()) {
+        auto height = rect.height();
+        auto width = rect.width();
+        // Ensure we do not go out of bounds
+        rect = rect.marginsRemoved(style->layout()->inset()->toMargins());
+        if (rect.height() <= 0 || rect.width() <= 0) {
+            rect = centerRect(rect.toRect(), width, height).toRectF();
+        }
+    }
     QRectF innerRect = rect;
+
     // Borders
     QMarginsF borderSizes = {0, 0, 0, 0};
     bool allBordersEqual = false;
@@ -67,17 +79,6 @@ void drawBackground(QPainter *painter, const QRectF &rect, const Union::Properti
     // Draw background
     if (const auto background = style->background()) {
         QPainterPath path;
-        // Remove any insets we may have, we do not want to draw them
-        if (style->layout() && style->layout()->inset()) {
-            auto height = innerRect.height();
-            auto width = innerRect.width();
-            // Ensure we do not go out of bounds
-            innerRect = innerRect.marginsRemoved(style->layout()->inset()->toMargins());
-            if (innerRect.height() <= 0 || innerRect.width() <= 0) {
-                innerRect = centerRect(innerRect.toRect(), width, height).toRectF();
-            }
-        }
-
         // Draw less complex rectangles if complex ones are not needed
         if (allCornerRadiiEqual && !constrainedRadii.topLeft) {
             path.addRect(innerRect);
