@@ -40,17 +40,6 @@ itemviewitem
         background-color: var(--view-background-alternate-color);
     }
 
-    &.inside-table,
-    &.inside-list
-    {
-        inset: 0px;
-        border-radius: 0px;
-        &.hover-enabled {
-            inset: var(--small-spacing);
-            border-radius: var(--corner-radius);
-        }
-    }
-
     &:hovered
     {
         border: 1px solid var(--highlight-color);
@@ -94,6 +83,23 @@ itemviewitem
     }
 }
 
+itemdelegate,
+checkdelegate,
+radiodelegate,
+switchdelegate,
+swipedelegate {
+    &.inside-table,
+    &.inside-list
+    {
+        inset: 0px;
+        border-radius: 0px;
+        &.hover-enabled {
+            inset: var(--small-spacing);
+            border-radius: var(--corner-radius);
+        }
+    }
+}
+
 /* For delegates with known indicators, place the indicator at the top left and
  * reduce the effective indicator size to 0. This ensures the indicator will be
  * placed inside the content item. */
@@ -115,7 +121,7 @@ switchdelegate[display="text-under-icon"] > indicator {
 
 itemviewrow,
 itemviewitem {
-    inset: 0px;
+    inset: 1px;
     icon-alignment: content start center 0;
     text-alignment: content start center 1;
     icon-size: var(--small-element-size);
@@ -131,24 +137,41 @@ itemviewitem {
     }
 
     &.position-invalid {
+        inset: 0px;
         border-radius: 0px;
     }
 
     &.position-beginning {
+        inset-right: 0px;
         border-right: none;
         border-top-right-radius: 0px;
         border-bottom-right-radius: 0px;
     }
 
     &.position-middle {
+        inset-left: 0px;
+        inset-right: 0px;
         border-right: none;
         border-left: none;
         border-radius: 0px;
     }
 
     &.position-end {
+        inset-left: 0px;
         border-left: none;
         border-top-left-radius: 0px;
         border-bottom-left-radius: 0px;
+    }
+
+    &.inside-table
+    {
+        inset: 0px;
+        &.position-invalid,
+        &.position-beginning,
+        &.position-middle,
+        &.position-end {
+            border: none;
+            border-radius: 0px;
+        }
     }
 }
