@@ -1435,8 +1435,10 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     // Don't shift button text when sunken
     case QStyle::PM_TabBarTabShiftHorizontal:
     case QStyle::PM_TabBarTabShiftVertical:
-    case PM_ButtonShiftHorizontal:
-    case PM_ButtonShiftVertical:
+    case QStyle::PM_ButtonShiftHorizontal:
+    case QStyle::PM_ButtonShiftVertical:
+    case QStyle::PM_TabBar_ScrollButtonOverlap:
+    case QStyle::PM_ScrollView_ScrollBarOverlap:
         return 0;
     // Due to how QWidgets works, we just return the average padding size now
     // since there is no support for returning padding per edge
@@ -1641,15 +1643,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_ButtonIconSize:
     case QStyle::PM_MessageBoxIconSize:
     case QStyle::PM_TitleBarButtonIconSize:
-    case QStyle::PM_LineEditIconSize: {
-        return QCommonStyle::pixelMetric(metric, option, widget);
-    } break;
-
-    // Use defaults
-    case QStyle::PM_TabBar_ScrollButtonOverlap:
-        return 0;
-    case QStyle::PM_ScrollView_ScrollBarOverlap:
-        return 0;
+    case QStyle::PM_LineEditIconSize:
     case QStyle::PM_SliderTickmarkOffset:
     case QStyle::PM_SliderSpaceAvailable:
     case QStyle::PM_MaximumDragDistance:
