@@ -6,12 +6,15 @@
 #include <StyleRegistry.h>
 
 #include <QCheckBox>
+#include <QListView>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QStyleOption>
 #include <QStyleOptionFrame>
 #include <QTableView>
 #include <QTextOption>
+#include <QTreeView>
+
 using namespace Qt::StringLiterals;
 
 Union::Element::States statesFromOption(const QStyleOption *option)
@@ -94,11 +97,21 @@ QStringList hintsFromOption(const QStyleOption *option)
         if (const auto optionViewItem = static_cast<const QStyleOptionViewItem *>(option)) {
             auto viewItemPosition = optionViewItem->viewItemPosition;
             const auto table = qobject_cast<const QTableView *>(optionViewItem->widget);
-
+            const auto tree = qobject_cast<const QTreeView *>(optionViewItem->widget);
+            const auto list = qobject_cast<const QListView *>(optionViewItem->widget);
             // For tables and such, we just want to select one item.
             if (table) {
-                viewItemPosition = QStyleOptionViewItem::Invalid;
+                hints.append(u"inside-table"_s);
             }
+            if (tree) {
+                hints.append(u"inside-tree"_s);
+            }
+            if (list) {
+                hints.append(u"inside-list"_s);
+            }
+
+            // These always have hover effect, i think
+            hints.append(u"hover-enabled"_s);
 
             switch (viewItemPosition) {
             case QStyleOptionViewItem::Invalid:
