@@ -386,22 +386,34 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElementBackground(painter, option, widget, {u"RubberBand"_s});
         return;
     case QStyle::CE_SizeGrip:
-    case QStyle::CE_DockWidgetTitle:
-    case QStyle::CE_ColumnViewGrip:
+        drawElementBackground(painter, option, widget, {u"SizeGrip"_s});
+        return;
+    case QStyle::CE_DockWidgetTitle: {
+        if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
+            auto textRect = subElementRect(SE_DockWidgetTitleBarText, option, widget);
+            drawText(textRect, dockOption, painter, dockOption->title, widget);
+        }
+    }
+        return;
+    // Ignored
     case QStyle::CE_MenuEmptyArea:
-    case QStyle::CE_HeaderEmptyArea:
-    case QStyle::CE_MenuBarEmptyArea:
     case QStyle::CE_MenuVMargin:
     case QStyle::CE_MenuHMargin:
-    case QStyle::CE_MenuTearoff:
-    case QStyle::CE_MenuScroller:
-    // Scrollbar buttons are ignored for now since they do not exist in qtquick
+        return;
+    // Scrollbar buttons are also ignored for now since they do not exist in qtquick
     case QStyle::CE_ScrollBarAddLine:
     case QStyle::CE_ScrollBarSubLine:
     case QStyle::CE_ScrollBarAddPage:
     case QStyle::CE_ScrollBarSubPage:
     case QStyle::CE_ScrollBarFirst:
     case QStyle::CE_ScrollBarLast:
+        return;
+    // Rely on QCommonStyle
+    case QStyle::CE_MenuScroller:
+    case QStyle::CE_MenuTearoff:
+    case QStyle::CE_HeaderEmptyArea:
+    case QStyle::CE_MenuBarEmptyArea:
+    case QStyle::CE_ColumnViewGrip: // Undocumented??
     case QStyle::CE_CustomBase:
         break;
     }
@@ -484,15 +496,6 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         const auto props = queryProperties(prepareElements(comboBoxOption, widget, {u"Indicator"_s}));
         if (props->icon()) {
             auto icon = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
-            // Take the button padding into account when drawing this
-            if (props->layout() && props->layout()->padding()) {
-                auto pad = props->layout()->padding()->toMargins().toMargins();
-                indicatorRect.adjust(props->layout()->spacing().value_or(0), pad.top(), -pad.right(), -pad.bottom());
-                auto center = indicatorRect.center();
-                indicatorRect.setWidth(props->icon()->width().value_or(0));
-                indicatorRect.setHeight(props->icon()->height().value_or(0));
-                indicatorRect.moveCenter(center);
-            }
             drawIcon(indicatorRect, option, painter, icon, widget);
         }
     }
@@ -644,7 +647,46 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         drawBackground(painter, handle, queryProperties(prepareElements(sliderOption, widget, {u"Handle"_s})));
     }
         return;
-    case QStyle::CC_TitleBar:
+    case QStyle::CC_TitleBar: {
+        const auto titleBarOption = qstyleoption_cast<const QStyleOptionTitleBar *>(option);
+        if (!titleBarOption) {
+            return;
+        }
+        drawElementBackground(painter, titleBarOption, widget, {u"TitleBar"_s});
+        auto map = layoutMap(prepareElements(titleBarOption, widget, {u"TitleBar"_s}), titleBarOption, buildSubElementList(titleBarOption, widget));
+        if (!titleBarOption->text.isEmpty()
+            && (titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
+            drawText(map[u"Text"_s].rect.toRect(), titleBarOption, painter, titleBarOption->text, widget);
+        }
+        if (!titleBarOption->icon.isNull()) {
+            drawIcon(map[u"Icon"_s].rect.toRect(), titleBarOption, painter, titleBarOption->icon, widget);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
+            const auto icon = queryIcon(titleBarOption, widget, u"help-contextual-symbolic"_s, {u"TitleBar"_s, u"HelpButton"_s});
+            drawIcon(map[u"HelpButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
+            const auto icon = queryIcon(titleBarOption, widget, u"window-minimize-symbolic"_s, {u"TitleBar"_s, u"MinimizeButton"_s});
+            drawIcon(map[u"MinimizeButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
+            const auto icon = queryIcon(titleBarOption, widget, u"window-maximize-symbolic"_s, {u"TitleBar"_s, u"MaximizeButton"_s});
+            drawIcon(map[u"MaximizeButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
+            const auto icon = queryIcon(titleBarOption, widget, u"window-close-symbolic"_s, {u"TitleBar"_s, u"CloseButton"_s});
+            drawIcon(map[u"CloseButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
+            const auto icon = queryIcon(titleBarOption, widget, u"application-menu-symbolic"_s, {u"TitleBar"_s, u"SystemMenu"_s});
+            drawIcon(map[u"SystemMenu"_s].rect.toRect(), titleBarOption, painter, icon, widget);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
+            const auto icon = queryIcon(titleBarOption, widget, u"window-shade-symbolic"_s, {u"TitleBar"_s, u"ShadeButton"_s});
+            drawIcon(map[u"ShadeButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
+        }
+    }
+        return;
     case QStyle::CC_Dial:
     case QStyle::CC_MdiControls:
     case QStyle::CC_CustomBase:
@@ -736,42 +778,22 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawElementBackground(painter, option, widget, {u"RadioButton"_s, u"Indicator"_s});
         return;
     case QStyle::PE_IndicatorArrowLeft: {
-        auto props = queryProperties(prepareElements(option, widget, {u"IndicatorArrowLeft"_s}));
-        auto name = u"arrow-left-symbolic"_s;
-        if (props->icon()) {
-            name = props->icon()->name().value_or(name);
-        }
-        auto icon = QIcon::fromTheme(name);
+        const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {u"IndicatorArrowLeft"_s});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
     case QStyle::PE_IndicatorArrowUp: {
-        auto props = queryProperties(prepareElements(option, widget, {u"IndicatorArrowUp"_s}));
-        auto name = u"arrow-up-symbolic"_s;
-        if (props->icon()) {
-            name = props->icon()->name().value_or(name);
-        }
-        auto icon = QIcon::fromTheme(name);
+        const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {u"IndicatorArrowUp"_s});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
     case QStyle::PE_IndicatorArrowRight: {
-        auto props = queryProperties(prepareElements(option, widget, {u"IndicatorArrowRight"_s}));
-        auto name = u"arrow-right-symbolic"_s;
-        if (props->icon()) {
-            name = props->icon()->name().value_or(name);
-        }
-        auto icon = QIcon::fromTheme(name);
+        const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {u"IndicatorArrowRight"_s});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
     case QStyle::PE_IndicatorArrowDown: {
-        auto props = queryProperties(prepareElements(option, widget, {u"IndicatorArrowDown"_s}));
-        auto name = u"arrow-down-symbolic"_s;
-        if (props->icon()) {
-            name = props->icon()->name().value_or(name);
-        }
-        auto icon = QIcon::fromTheme(name);
+        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {u"IndicatorArrowDown"_s});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
@@ -1164,15 +1186,38 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         return visualRect(option->direction, option->rect, rect);
     } break;
+    case QStyle::SE_DockWidgetTitleBarText:
+    case QStyle::SE_DockWidgetCloseButton:
+    case QStyle::SE_DockWidgetFloatButton:
+    case QStyle::SE_DockWidgetIcon: {
+        if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
+            QStringList childelements = buildSubElementList(dockOption, widget);
+            if (childelements.isEmpty()) {
+                return QRect();
+            }
+            auto elements = prepareElements(option, widget, {u"DockWidget"_s});
+            auto map = layoutMap(elements, option, childelements);
+
+            if (element == SE_DockWidgetTitleBarText) {
+                rect = map[u"Text"_s].rect.toRect();
+            }
+            if (element == SE_DockWidgetFloatButton) {
+                rect = map[u"FloatButton"_s].rect.toRect();
+            }
+            if (element == SE_DockWidgetCloseButton) {
+                rect = map[u"CloseButton"_s].rect.toRect();
+            }
+            // The styleoption has no icon, yet there is whole thing for an icon? Wtf.
+            if (element == SE_DockWidgetIcon) {
+                rect = map[u"Icon"_s].rect.toRect();
+            }
+        }
+    } break;
     // Follow defaults
     case QStyle::SE_TabWidgetTabContents:
     case QStyle::SE_ToolBoxTabContents:
     case QStyle::SE_TabBarTabLeftButton:
     case QStyle::SE_TabBarTabRightButton:
-    case QStyle::SE_DockWidgetCloseButton:
-    case QStyle::SE_DockWidgetFloatButton:
-    case QStyle::SE_DockWidgetIcon:
-    case QStyle::SE_DockWidgetTitleBarText:
     case QStyle::SE_ToolBarHandle:
     case QStyle::SE_TabWidgetLeftCorner:
     case QStyle::SE_TabWidgetRightCorner:
@@ -1431,7 +1476,35 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
         }
     */
 
-    if (complexControl == CC_TitleBar) { }
+    if (complexControl == CC_TitleBar) {
+        if (const auto titleBar = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
+            auto elements = prepareElements(option, widget, {u"TitleBar"_s});
+            auto subElements = buildSubElementList(titleBar, widget);
+            auto map = layoutMap(elements, option, subElements);
+            switch (subControl) {
+            case SC_TitleBarSysMenu:
+                return map[u"SystemMenu"_s].rect.toRect();
+            case SC_TitleBarMinButton:
+                return map[u"MinimizeButton"_s].rect.toRect();
+            case SC_TitleBarMaxButton:
+                return map[u"MaximizeButton"_s].rect.toRect();
+            case SC_TitleBarCloseButton:
+                return map[u"CloseButton"_s].rect.toRect();
+            case SC_TitleBarNormalButton:
+                return map[u"NormalButton"_s].rect.toRect();
+            case SC_TitleBarShadeButton:
+            case SC_TitleBarUnshadeButton:
+                return map[u"ShadeButton"_s].rect.toRect();
+            case SC_TitleBarContextHelpButton:
+                return map[u"HelpButton"_s].rect.toRect();
+            case SC_TitleBarLabel:
+                return map[u"Text"_s].rect.toRect();
+                break;
+            default:
+                break;
+            }
+        }
+    }
     if (complexControl == CC_Dial) { }
     if (complexControl == CC_MdiControls) { }
     return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
