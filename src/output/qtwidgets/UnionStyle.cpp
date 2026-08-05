@@ -382,8 +382,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_Splitter:
         drawElementBackground(painter, option, widget, {u"Splitter"_s});
         return;
-    case QStyle::CE_SizeGrip:
     case QStyle::CE_RubberBand:
+        drawElementBackground(painter, option, widget, {u"RubberBand"_s});
+        return;
+    case QStyle::CE_SizeGrip:
     case QStyle::CE_DockWidgetTitle:
     case QStyle::CE_ColumnViewGrip:
     case QStyle::CE_MenuEmptyArea:
