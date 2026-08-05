@@ -665,7 +665,11 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     // Sort the list according to order. Set any filled items as last
     std::sort(items.begin(), items.end(), [](const LayoutItem &lhs, const LayoutItem &rhs) {
         if (lhs.horizontalAlignment == rhs.horizontalAlignment || lhs.verticalAlignment == rhs.verticalAlignment) {
-            return lhs.order < rhs.order;
+            if (lhs.horizontalAlignment == Union::Properties::Alignment::End || lhs.verticalAlignment == Union::Properties::Alignment::End) {
+                return lhs.order > rhs.order;
+            } else {
+                return lhs.order < rhs.order;
+            }
         }
         return false;
     });
@@ -919,7 +923,54 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
         if (hasIndicator) {
             childelements.append(u"Indicator"_s);
         }
+    } else if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
+        if (dockOption->closable) {
+            childelements.append(u"CloseButton"_s);
+        }
+        if (dockOption->floatable) {
+            childelements.append(u"FloatButton"_s);
+        }
+        if (!dockOption->title.isEmpty()) {
+            childelements.append(u"Text"_s);
+        }
+        // Would check for icon too but the styleoption has no icon field!
+    } else if (const auto titleBarOption = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
+        if (!titleBarOption->text.isEmpty()
+            && (titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
+            childelements.append(u"Text"_s);
+        }
+        if (!titleBarOption->icon.isNull()) {
+            childelements.append(u"Icon"_s);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
+            childelements.append(u"HelpButton"_s);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
+            childelements.append(u"MinimizeButton"_s);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
+            childelements.append(u"MaximizeButton"_s);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
+            childelements.append(u"CloseButton"_s);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
+            childelements.append(u"SystemMenu"_s);
+        }
+        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
+            childelements.append(u"ShadeButton"_s);
+        }
     }
 
     return childelements;
+}
+
+QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString &defaultIconName, const QStringList &targetHierarchy)
+{
+    auto props = queryProperties(prepareElements(option, widget, targetHierarchy));
+    auto name = defaultIconName;
+    if (props->icon()) {
+        name = props->icon()->name().value_or(name);
+    }
+    return QIcon::fromTheme(name);
 }
