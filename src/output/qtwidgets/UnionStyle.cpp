@@ -1636,12 +1636,9 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     } break;
 
     case QStyle::PM_MessageBoxIconSize:
-        return 48;
     case QStyle::PM_ListViewIconSize:
-        return 24;
     case QStyle::PM_SmallIconSize:
     case QStyle::PM_ButtonIconSize:
-        return 16;
     case QStyle::PM_IconViewIconSize:
     case QStyle::PM_ToolBarIconSize:
     case QStyle::PM_ProgressBarChunkWidth:
