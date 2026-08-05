@@ -694,6 +694,9 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             qWarning() << "StackFill/StackCenter is not supported for horizontal alignment!";
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
+            item.rect.moveLeft(horizontalSpace.left());
+            horizontalSpace.setLeft(item.rect.left() + itemWidth);
+            break;
         case Union::Properties::Alignment::Center:
             // Center is bit confusing. It is meant to center the drawing inside the rectangle,
             // so we do that for stackcenter/stackfill items.
@@ -702,8 +705,13 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
                 item.rect = centerRect(horizontalSpace.toRect(), item.rect.width(), item.rect.height());
             } else {
                 // When layouting normally we need to move it to next to the other item anyway.
-                item.rect.moveLeft(horizontalSpace.left());
-                horizontalSpace.setLeft(item.rect.left() + itemWidth);
+                if (items.count() > 1) {
+                    item.rect.moveLeft(horizontalSpace.left());
+                    horizontalSpace.setLeft(item.rect.left() + itemWidth);
+                } else {
+                    // For single items, we can just center it completely
+                    item.rect.moveCenter(availableSpace.center());
+                }
             }
             break;
         case Union::Properties::Alignment::End:
