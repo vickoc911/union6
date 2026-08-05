@@ -227,6 +227,18 @@ QStringList hintsFromOption(const QStyleOption *option)
             }
         }
     } break;
+    case QStyleOption::SO_TitleBar: {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
+            bool minimized = opt->titleBarState & Qt::WindowMinimized;
+            bool maximized = opt->titleBarState & Qt::WindowMaximized;
+            if (maximized) {
+                hints.append(u"maximized"_s);
+            }
+            if (minimized) {
+                hints.append(u"minimized"_s);
+            }
+        }
+    } break;
     case QStyleOption::SO_Tab:
     case QStyleOption::SO_TabWidgetFrame:
     case QStyleOption::SO_TabBarBase:
@@ -236,7 +248,6 @@ QStringList hintsFromOption(const QStyleOption *option)
     case QStyleOption::SO_RubberBand:
     case QStyleOption::SO_ToolBar:
     case QStyleOption::SO_GraphicsItem:
-    case QStyleOption::SO_TitleBar:
     case QStyleOption::SO_SizeGrip:
     default:
         return QStringList();
