@@ -687,7 +687,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         }
     }
         return;
-    case QStyle::CC_Dial:
+    // Rely on QCommonStyle
+    case QStyle::CC_Dial: // TODO: need to make the dial from scratch to get this to work :(
     case QStyle::CC_MdiControls:
     case QStyle::CC_CustomBase:
         break;
@@ -1505,8 +1506,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             }
         }
     }
-    if (complexControl == CC_Dial) { }
-    if (complexControl == CC_MdiControls) { }
+    // Leave Dial and MDIControls to QCommonStyle for now
     return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
 }
 
