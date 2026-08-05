@@ -235,9 +235,16 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel: {
         if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
-            auto subopt = *tabOption;
-            subopt.rect = subElementRect(SE_TabBarTabText, tabOption, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, tabOption->icon, tabOption->text);
+            // TODO: Rely on qcommonstyle for vertical tabs for now
+            bool verticalTabs = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::RoundedWest
+                || tabOption->shape == QTabBar::TriangularEast || tabOption->shape == QTabBar::TriangularWest;
+            if (verticalTabs) {
+                QCommonStyle::drawControl(controlElement, tabOption, painter, widget);
+            } else {
+                auto subopt = *tabOption;
+                subopt.rect = subElementRect(SE_TabBarTabText, tabOption, widget);
+                layoutAndDrawIconTextIndicator(&subopt, painter, widget, tabOption->icon, tabOption->text);
+            }
         }
     }
         return;
@@ -1046,13 +1053,22 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         rect = map[mapItem].rect.toRect();
     } break;
     case QStyle::SE_TabBarTabText: {
-        auto elements = prepareElements(option, widget, {u"TabButton"_s});
-        auto map = layoutMap(elements, option, {u"Icon"_s, u"Text"_s});
-        QRect unifiedRect;
-        for (const auto &m : map) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
+        if (const QStyleOptionTab *tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
+            bool verticalTabs = tabOption->shape == QTabBar::RoundedEast || tabOption->shape == QTabBar::RoundedWest
+                || tabOption->shape == QTabBar::TriangularEast || tabOption->shape == QTabBar::TriangularWest;
+            if (verticalTabs) {
+                // TODO: Rely on qcommonstyle for vertical tabs for now
+                return QCommonStyle::subElementRect(SE_TabBarTabText, tabOption, widget);
+            }
+
+            auto elements = prepareElements(option, widget, {u"TabButton"_s});
+            auto map = layoutMap(elements, option, {u"Icon"_s, u"Text"_s});
+            QRect unifiedRect;
+            for (const auto &m : map) {
+                unifiedRect = unifiedRect.united(m.rect.toRect());
+            }
+            rect = unifiedRect;
         }
-        rect = unifiedRect;
     } break;
     case QStyle::SE_ProgressBarLabel: {
         // Copied and repurposed from Breeze
