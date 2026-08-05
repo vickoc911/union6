@@ -155,7 +155,7 @@ frame,
 splitter,
 groupbox,
 framemenu,
-framedockwidget,
+dockwidget,
 framewindow
 {
     padding: var(--large-spacing);
@@ -182,9 +182,33 @@ groupbox {
 focusframe,
 dockwidget {
     border-radius: var(--corner-radius);
-
     &:visual-focus {
         border: 1px solid var(--highlight-color);
+    }
+}
+
+dockwidget {
+    width: var(--small-element-size);
+    height: var(--small-element-size);
+    color: var(--header-text-color);
+    background-color: var(--header-background-color);
+    icon-alignment: content center center 0;
+    text-alignment: content center center 1;
+
+    floatbutton,
+    closebutton {
+        width: var(--small-element-size);
+        height: var(--small-element-size);
+    }
+
+    floatbutton {
+        layout-alignment: content start center 0;
+        icon-name: "window-restore";
+    }
+
+    closebutton {
+        layout-alignment: content end center 0;
+        icon-name: "window-close-symbolic";
     }
 }
 
@@ -207,4 +231,53 @@ rubberband {
     background-color: var(--highlight-hover-color);
     border: 1px solid var(--highlight-color);
     border-radius: var(--corner-radius);
+}
+
+titlebar {
+    width: var(--small-element-size);
+    height: var(--small-element-size);
+    color: var(--header-text-color);
+    background-color: var(--header-background-color);
+    icon-alignment: content center fill 0;
+    text-alignment: content center fill 1;
+
+    systemmenu,
+    minimizebutton,
+    maximizebutton,
+    closebutton,
+    normalbutton,
+    shadebutton,
+    helpbutton {
+        width: var(--small-element-size);
+        height: var(--small-element-size);
+    }
+
+    systemmenu {
+        layout-alignment: content start fill 0;
+        icon-name: "application-menu-symbolic";
+    }
+    minimizebutton {
+        layout-alignment: content end fill 0;
+        icon-name: "window-minimize-symbolic";
+    }
+    maximizebutton {
+        layout-alignment: content end fill 1;
+        icon-name: "window-maximize-symbolic";
+    }
+    closebutton {
+        layout-alignment: content end fill 2;
+        icon-name: "window-close-symbolic";
+    }
+    shadebutton {
+        layout-alignment: content start fill 2;
+        icon-name: "window-shade-symbolic";
+    }
+    helpbutton {
+        layout-alignment: content start fill -1;
+        icon-name: "help-contextual-symbolic";
+    }
+
+    normalbutton {
+        layout-alignment: content start fill 1;
+    }
 }
