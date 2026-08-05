@@ -273,4 +273,17 @@ titlebar {
     normalbutton {
         layout-alignment: content start fill 1;
     }
+
+    &.maximized {
+        maximizebutton {
+            icon-name: "window-restore-symbolic";
+        }
+    }
+
+    &.minimized {
+        minimizebutton {
+            icon-name: "empty";
+        }
+    }
+
 }
