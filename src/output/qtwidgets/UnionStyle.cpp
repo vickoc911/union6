@@ -797,6 +797,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
     }
         return;
+    case QStyle::PE_FrameLineEdit:
+        drawElementBackground(painter, option, widget, {u"TextField"_s});
+        break;
     case QStyle::PE_IndicatorBranch:
     case QStyle::PE_IndicatorButtonDropDown:
     case QStyle::PE_IndicatorItemViewItemCheck:
