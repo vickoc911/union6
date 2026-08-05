@@ -88,3 +88,9 @@ QRect centerRect(const QRect &rect, int width, int height);
  * which items are being drawn
  */
 QStringList buildSubElementList(const QStyleOption *option, const QWidget *widget);
+
+/*!
+ * \brief Helper function for getting correct icon from properties.
+ */
+
+QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString &defaultIconName, const QStringList &targetHierarchy = {});
