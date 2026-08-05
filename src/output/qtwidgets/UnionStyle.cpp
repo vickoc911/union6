@@ -444,7 +444,9 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         const auto elements = prepareElements(groupBoxOption, widget);
         const auto properties = queryProperties(elements);
         auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
-        drawBackground(painter, rect, properties);
+        if (groupBoxOption->subControls.testFlag(QStyle::SC_GroupBoxFrame)) {
+            drawBackground(painter, rect, properties);
+        }
         if ((groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && !groupBoxOption->text.isEmpty()) {
             QRect textRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
             QColor textColor = properties->text()->color().value().toQColor();
