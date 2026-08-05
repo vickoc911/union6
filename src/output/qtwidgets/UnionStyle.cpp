@@ -800,6 +800,24 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_FrameLineEdit:
         drawElementBackground(painter, option, widget, {u"TextField"_s});
         break;
+    case QStyle::PE_Frame:
+    case QStyle::PE_FrameDefaultButton:
+    case QStyle::PE_FrameDockWidget:
+    case QStyle::PE_FrameGroupBox:
+    case QStyle::PE_FrameTabWidget:
+    case QStyle::PE_FrameWindow:
+    case QStyle::PE_FrameButtonBevel:
+    case QStyle::PE_FrameButtonTool:
+    case QStyle::PE_FrameTabBarBase:
+    case QStyle::PE_PanelButtonCommand:
+    case QStyle::PE_PanelButtonBevel:
+    case QStyle::PE_PanelButtonTool:
+    case QStyle::PE_PanelMenuBar:
+    case QStyle::PE_PanelToolBar:
+    case QStyle::PE_PanelStatusBar:
+    case QStyle::PE_PanelMenu:
+        drawElementBackground(painter, option, widget);
+        break;
     case QStyle::PE_IndicatorBranch:
     case QStyle::PE_IndicatorButtonDropDown:
     case QStyle::PE_IndicatorItemViewItemCheck:
@@ -814,10 +832,8 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorItemViewItemDrop:
     case QStyle::PE_IndicatorTabClose:
     case QStyle::PE_IndicatorTabTearRight:
+    case QStyle::PE_CustomBase:
         break;
-    default:
-        drawElementBackground(painter, option, widget);
-        return;
     }
 
     QCommonStyle::drawPrimitive(element, option, painter, widget);
