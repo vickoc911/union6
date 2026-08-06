@@ -6,6 +6,8 @@
 /* Holds data for basic primitives such as arrow indicators. These are only the names for them,
 and they're mapped to PE_IndicatorArrowLeft etc. */
 
+/* Primitive Elements */
+
 indicatorarrowup {
     icon-name: "arrow-up-symbolic";
 }
@@ -29,4 +31,63 @@ indicatorbranch {
             icon-name: "arrow-down-symbolic";
         }
     }
+}
+
+indicatorbuttondropdown {
+    icon-name: "arrow-down-symbolic";
+}
+
+indicatorprogresschunk {
+    width: var(--small-element-size);
+    height: var(--small-element-size);
+    background-color: var(--highlight-color);
+    border-radius: var(--corner-radius);
+}
+
+indicatortoolbarseparator {
+    width: 1px;
+    height: var(--small-element-size);
+    background-color: var(--window-border-color);
+}
+
+indicatortoolbarhandle {
+    width: 4px;
+    height: var(--small-element-size);
+    border-left: 1px solid var(--window-border-color);
+    border-right: 1px solid var(--window-border-color);
+    border-top: none;
+    border-bottom: none;
+}
+
+/* Pixel Metrics. Anything named "size" only uses Width property */
+
+smalliconsize,
+tabbariconsize,
+lineediticonsize {
+    width: var(--icon-size-small);
+}
+listviewiconsize,
+buttoniconsize,
+toolbariconsize,
+headermarksize {
+    width: var(--icon-size-smallmedium);
+}
+iconviewiconsize {
+    width: var(--icon-size-medium);
+}
+largeiconsize,
+messageboxiconsize {
+    width: var(--icon-size-large);
+}
+
+sizegripsize,
+progressbarchunkwidth {
+    width: var(--large-element-size);
+}
+textcursorwidth {
+    width: 1px;
+}
+headerdefaultsectionsize {
+    width: 150px;
+    height: var(--large-element-size);
 }

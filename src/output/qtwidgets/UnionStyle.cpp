@@ -824,7 +824,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_FrameLineEdit:
         drawElementBackground(painter, option, widget, {u"TextField"_s});
-        break;
+        return;
     case QStyle::PE_Frame:
     case QStyle::PE_FrameDefaultButton:
     case QStyle::PE_FrameDockWidget:
@@ -842,7 +842,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_PanelStatusBar:
     case QStyle::PE_PanelMenu:
         drawElementBackground(painter, option, widget);
-        break;
+        return;
     case QStyle::PE_IndicatorBranch: {
         auto defaultIconName = QString();
         if (option->state.testFlag(State_Children)) {
@@ -854,24 +854,72 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             }
         }
         const auto icon = queryIcon(option, widget, defaultIconName, {u"IndicatorBranch"_s});
-        auto size = qMin(option->rect.height(), pixelMetric(PM_IndicatorHeight, option, widget));
-        auto rect = centerRect(option->rect, size, size);
+        auto size = querySize(option, widget, {u"TreeViewDelegate"_s, u"Indicator"_s});
+        auto rect = centerRect(option->rect, size.width(), size.height());
         drawIcon(rect, option, painter, icon, widget);
     }
         return;
-    case QStyle::PE_IndicatorButtonDropDown:
-    case QStyle::PE_IndicatorItemViewItemCheck:
-    case QStyle::PE_IndicatorDockWidgetResizeHandle:
-    case QStyle::PE_IndicatorHeaderArrow:
+    case QStyle::PE_IndicatorButtonDropDown: {
+        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {u"IndicatorButtonDropDown"_s});
+        drawIcon(option->rect, option, painter, icon, widget);
+    }
+        return;
     case QStyle::PE_IndicatorMenuCheckMark:
+    case QStyle::PE_IndicatorItemViewItemCheck:
+        drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
+        return;
+    case QStyle::PE_IndicatorHeaderArrow: {
+        if (const auto header = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
+            auto props = queryProperties(prepareElements(header, widget, {u"HeaderViewDelegate"_s}));
+            QIcon sortIndicator;
+            switch (header->sortIndicator) {
+            case QStyleOptionHeader::None:
+                break;
+            case QStyleOptionHeader::SortUp:
+                if (props->icon()) {
+                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-up-symbolic"_s));
+                }
+                break;
+            case QStyleOptionHeader::SortDown:
+                if (props->icon()) {
+                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
+                }
+                break;
+            }
+            drawIcon(header->rect, option, painter, sortIndicator, widget);
+        } else {
+            // Fallback
+            if (option->state.testFlags(State_UpArrow)) {
+                drawPrimitive(PE_IndicatorArrowUp, option, painter, widget);
+            } else if (option->state.testFlags(State_DownArrow)) {
+                drawPrimitive(PE_IndicatorArrowDown, option, painter, widget);
+            }
+        }
+    }
+        return;
     case QStyle::PE_IndicatorProgressChunk:
+        drawElementBackground(painter, option, widget, {u"IndicatorProgressChunk"_s});
+        return;
     case QStyle::PE_IndicatorToolBarHandle:
+        drawElementBackground(painter, option, widget, {u"IndicatorToolBarHandle"_s});
+        return;
     case QStyle::PE_IndicatorToolBarSeparator:
-    case QStyle::PE_IndicatorTabTear:
+        drawElementBackground(painter, option, widget, {u"IndicatorToolBarSeparator"_s});
+        return;
     case QStyle::PE_IndicatorColumnViewArrow:
-    case QStyle::PE_IndicatorItemViewItemDrop:
-    case QStyle::PE_IndicatorTabClose:
+        drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
+        return;
+    case QStyle::PE_IndicatorTabClose: {
+        drawElementBackground(painter, option, widget, {u"TabButton"_s, u"CloseButton"_s});
+        const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {u"IndicatorTabClose"_s});
+        drawIcon(option->rect, option, painter, icon, widget);
+    }
+        return;
+    // Handle with QCommonStyle for now
+    case QStyle::PE_IndicatorTabTear:
     case QStyle::PE_IndicatorTabTearRight:
+    case QStyle::PE_IndicatorItemViewItemDrop:
+    case QStyle::PE_IndicatorDockWidgetResizeHandle:
     case QStyle::PE_CustomBase:
         break;
     }
@@ -975,21 +1023,8 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         size.rwidth() += pixelMetric(PM_LayoutLeftMargin, option, widget);
     } break;
     case QStyle::CT_TabBarTab: {
-        auto elements = prepareElements(option, widget, {u"TabButton"_s});
-        auto props = queryProperties(elements);
         auto textRect = subElementRect(SE_TabBarTabText, option, widget);
-        if (props->layout()) {
-            if (props->layout()->width()) {
-                textRect.setWidth(props->layout()->width().value_or(contentsSize.width()));
-            }
-            if (props->layout()->height()) {
-                textRect.setHeight(props->layout()->height().value_or(contentsSize.height()));
-            }
-            if (props->layout()->padding()) {
-                padding = props->layout()->padding()->toMargins().toMargins();
-            }
-        }
-        return textRect.size().grownBy(padding);
+        size = contentsSize.expandedTo(textRect.size()).grownBy(padding);
     } break;
     case QStyle::CT_Slider: {
         auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(option);
@@ -1123,7 +1158,13 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             }
 
             auto elements = prepareElements(option, widget, {u"TabButton"_s});
-            auto map = layoutMap(elements, option, {u"Icon"_s, u"Text"_s});
+            QStringList subElements = {u"Icon"_s, u"Text"_s};
+            if (const auto tabbarwidget = qobject_cast<const QTabBar *>(widget)) {
+                if (tabbarwidget->tabsClosable()) {
+                    subElements.append(u"CloseButton"_s);
+                }
+            }
+            auto map = layoutMap(elements, option, subElements);
             QRect unifiedRect;
             for (const auto &m : map) {
                 unifiedRect = unifiedRect.united(m.rect.toRect());
@@ -1371,9 +1412,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             }
             const bool horizontal = (sliderOption->state.testFlag(State_Horizontal));
             auto groove = visualRect(option->direction, rect, subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget));
-            if (sliderOption->minimum == sliderOption->maximum) {
-                return groove;
-            }
+
             int space(horizontal ? groove.width() : groove.height());
             int thickness = 0;
             QMargins padding;
@@ -1387,6 +1426,17 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
                     thickness = props->layout()->height().value_or(0);
                 } else {
                     thickness = props->layout()->width().value_or(0);
+                }
+            }
+
+            // Return early with just padding changes
+            if (sliderOption->minimum == sliderOption->maximum) {
+                if (horizontal) {
+                    auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
+                    return visualRect(option->direction, rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
+                } else {
+                    auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
+                    return visualRect(option->direction, rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
                 }
             }
 
@@ -1701,79 +1751,52 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return properties->layout()->spacing().value_or(defaultMetric);
         }
     } break;
-    case QStyle::PM_TabBarScrollButtonWidth: {
-        auto elements = prepareElements(option, widget, {u"TabScrollButton"_s});
-        if (elements.isEmpty()) {
-            return defaultMetric;
-        }
-        auto properties = queryProperties(elements);
-        if (!properties) {
-            return defaultMetric;
-        }
-        return properties->layout()->width().value_or(defaultMetric);
-    } break;
-    case QStyle::PM_TitleBarButtonSize:
+    case QStyle::PM_TabBarScrollButtonWidth:
+        return querySize(option, widget, {u"TabScrollButton"_s}).width();
     case QStyle::PM_MenuPanelWidth:
-    case QStyle::PM_SplitterWidth: {
-        if (properties->layout()) {
-            return properties->layout()->width().value_or(defaultMetric);
-        }
-    } break;
-    case QStyle::PM_SpinBoxSliderHeight:
+    case QStyle::PM_SplitterWidth:
+        return querySize(option, widget).width();
     case QStyle::PM_TitleBarHeight:
-    case QStyle::PM_MenuScrollerHeight:
-    case QStyle::PM_TabBarBaseHeight: {
-        if (properties->layout()) {
-            return properties->layout()->height().value_or(defaultMetric);
-        }
-    } break;
-    case QStyle::PM_TreeViewIndentation: {
-        auto elements = prepareElements(option, widget, {u"Indentation"_s});
-        if (elements.isEmpty()) {
-            return defaultMetric;
-        }
-        auto properties = queryProperties(elements);
-        if (!properties) {
-            return defaultMetric;
-        }
-        if (properties->layout()) {
-            return properties->layout()->width().value_or(defaultMetric);
-        }
-    } break;
-
-    case QStyle::PM_MessageBoxIconSize:
-    case QStyle::PM_ListViewIconSize:
-    case QStyle::PM_SmallIconSize:
-    case QStyle::PM_ButtonIconSize:
-    case QStyle::PM_IconViewIconSize:
-    case QStyle::PM_ToolBarIconSize:
-    case QStyle::PM_ProgressBarChunkWidth:
-    case QStyle::PM_LargeIconSize:
-    case QStyle::PM_TabBarIconSize:
+        return querySize(option, widget, {u"TitleBar"_s}).height();
+    case QStyle::PM_TitleBarButtonSize:
     case QStyle::PM_TitleBarButtonIconSize:
+        return querySize(option, widget, {u"TitleBar"_s, u"NormalButton"_s}).width();
+    case QStyle::PM_SpinBoxSliderHeight:
+    case QStyle::PM_MenuScrollerHeight:
+    case QStyle::PM_TabBarBaseHeight:
+        return querySize(option, widget).height();
+    case QStyle::PM_TreeViewIndentation:
+        return querySize(option, widget, {u"TreeViewDelegate"_s, u"Indentation"_s}).width();
+    case QStyle::PM_SmallIconSize:
+        return querySize(option, widget, {u"SmallIconSize"_s}).width();
+    case QStyle::PM_TabBarIconSize:
+        return querySize(option, widget, {u"TabBarIconSize"_s}).width();
     case QStyle::PM_LineEditIconSize:
-    case QStyle::PM_SliderTickmarkOffset:
-    case QStyle::PM_SliderSpaceAvailable:
-    case QStyle::PM_MaximumDragDistance:
-    case QStyle::PM_MenuTearoffHeight:
-    case QStyle::PM_DockWidgetSeparatorExtent:
-    case QStyle::PM_TabBarTabOverlap:
-    case QStyle::PM_DockWidgetHandleExtent:
-    case QStyle::PM_TabBarBaseOverlap:
-    case QStyle::PM_DialogButtonsSeparator:
-    case QStyle::PM_DialogButtonsButtonWidth:
-    case QStyle::PM_DialogButtonsButtonHeight:
-    case QStyle::PM_MdiSubWindowMinimizedWidth:
+        return querySize(option, widget, {u"LineEditIconSize"_s}).width();
+    case QStyle::PM_ListViewIconSize:
+        return querySize(option, widget, {u"ListViewIconSize"_s}).width();
+    case QStyle::PM_ButtonIconSize:
+        return querySize(option, widget, {u"ButtonIconSize"_s}).width();
+    case QStyle::PM_ToolBarIconSize:
+        return querySize(option, widget, {u"ToolBarIconSize"_s}).width();
     case QStyle::PM_HeaderMarkSize:
-    case QStyle::PM_HeaderGripMargin:
-    case QStyle::PM_DockWidgetTitleMargin:
-    case QStyle::PM_DockWidgetTitleBarButtonMargin:
+        return querySize(option, widget, {u"HeaderMarkSize"_s}).width();
+    case QStyle::PM_IconViewIconSize:
+        return querySize(option, widget, {u"IconViewIconSize"_s}).width();
+    case QStyle::PM_LargeIconSize:
+        return querySize(option, widget, {u"LargeIconSize"_s}).width();
+    case QStyle::PM_MessageBoxIconSize:
+        return querySize(option, widget, {u"MessageBoxIconSize"_s}).width();
     case QStyle::PM_SizeGripSize:
+        return querySize(option, widget, {u"SizeGripSize"_s}).width();
     case QStyle::PM_TextCursorWidth:
-    case QStyle::PM_SubMenuOverlap:
+        return querySize(option, widget, {u"TextCursorWidth"_s}).width();
     case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
+        return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).width();
     case QStyle::PM_HeaderDefaultSectionSizeVertical:
-    case QStyle::PM_CustomBase:
+        return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).height();
+    case QStyle::PM_ProgressBarChunkWidth:
+        return querySize(option, widget, {u"ProgressBarChunkWidth"_s}).width();
     default:
         break;
     };

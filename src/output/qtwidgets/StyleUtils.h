@@ -94,3 +94,8 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
  */
 
 QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString &defaultIconName, const QStringList &targetHierarchy = {});
+
+/*!
+ * \brief Helper function to query the size of the element from properties.
+ */
+QSize querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy = {});
