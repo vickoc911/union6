@@ -1419,9 +1419,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
             }
             const bool horizontal = (sliderOption->state.testFlag(State_Horizontal));
             auto groove = visualRect(option->direction, rect, subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget));
-            if (sliderOption->minimum == sliderOption->maximum) {
-                return groove;
-            }
+
             int space(horizontal ? groove.width() : groove.height());
             int thickness = 0;
             QMargins padding;
@@ -1435,6 +1433,17 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
                     thickness = props->layout()->height().value_or(0);
                 } else {
                     thickness = props->layout()->width().value_or(0);
+                }
+            }
+
+            // Return early with just padding changes
+            if (sliderOption->minimum == sliderOption->maximum) {
+                if (horizontal) {
+                    auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
+                    return visualRect(option->direction, rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
+                } else {
+                    auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
+                    return visualRect(option->direction, rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
                 }
             }
 
