@@ -488,7 +488,7 @@ QRectF backgroundRectangle(const QStyleOption *option, const Union::Properties::
 Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy)
 {
     Union::ElementList elements;
-    QStringList elementTypes;
+    QStringList elementTypes = {};
 
     if (widget) {
         elementTypes = widget->property(property_union_member_list).toStringList();
@@ -496,9 +496,8 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
             elementTypes = setupMemberList(widget);
         }
     }
-    if (!targetHierarchy.isEmpty()) {
-        elementTypes.append(targetHierarchy);
-    }
+
+    elementTypes.append(targetHierarchy);
 
     for (const auto &elementType : elementTypes) {
         auto unionElement = Union::Element::create();
@@ -514,14 +513,12 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
 
 Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList &elements)
 {
+    Q_ASSERT(!elements.isEmpty());
     const auto style = Union::StyleRegistry::instance()->defaultStyle();
     const auto query = std::make_unique<Union::ElementQuery>(style);
-
     query->setElements(elements);
     query->execute();
-    auto properties = query->properties();
-
-    return properties;
+    return query->properties();
 }
 
 QStringList setupMemberList(const QWidget *widget)
@@ -978,9 +975,10 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
 
 QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString &defaultIconName, const QStringList &targetHierarchy)
 {
-    auto props = queryProperties(prepareElements(option, widget, targetHierarchy));
     auto name = defaultIconName;
-    if (props->icon()) {
+    auto elements = prepareElements(option, widget, targetHierarchy);
+    auto props = queryProperties(elements);
+    if (props && props->icon()) {
         name = props->icon()->name().value_or(name);
     }
     return QIcon::fromTheme(name);
