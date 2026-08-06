@@ -854,8 +854,8 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             }
         }
         const auto icon = queryIcon(option, widget, defaultIconName, {u"IndicatorBranch"_s});
-        auto size = qMin(option->rect.height(), pixelMetric(PM_IndicatorHeight, option, widget));
-        auto rect = centerRect(option->rect, size, size);
+        auto size = querySize(option, widget, {u"TreeViewDelegate"_s, u"Indicator"_s});
+        auto rect = centerRect(option->rect, size.width(), size.height());
         drawIcon(rect, option, painter, icon, widget);
     }
         return;
