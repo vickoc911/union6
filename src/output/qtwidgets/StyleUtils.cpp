@@ -70,9 +70,6 @@ QStringList hintsFromOption(const QStyleOption *option)
     } break;
     case QStyleOption::SO_Button: {
         if (const auto optionButton = static_cast<const QStyleOptionButton *>(option)) {
-            if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::None)) {
-                return hints;
-            }
             if (optionButton->features.testFlag(QStyleOptionButton::ButtonFeature::Flat)) {
                 hints.append(u"flat"_s);
             }
@@ -90,6 +87,9 @@ QStringList hintsFromOption(const QStyleOption *option)
             }
             if (!optionButton->state.testFlag(QStyle::State_AutoRaise)) {
                 hints.append(u"raised"_s);
+            }
+            if (optionButton->state.testFlag(QStyle::State_NoChange)) {
+                hints.append(u"no-change"_s);
             }
         }
     } break;
