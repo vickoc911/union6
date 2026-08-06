@@ -824,7 +824,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_FrameLineEdit:
         drawElementBackground(painter, option, widget, {u"TextField"_s});
-        break;
+        return;
     case QStyle::PE_Frame:
     case QStyle::PE_FrameDefaultButton:
     case QStyle::PE_FrameDockWidget:
@@ -842,7 +842,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_PanelStatusBar:
     case QStyle::PE_PanelMenu:
         drawElementBackground(painter, option, widget);
-        break;
+        return;
     case QStyle::PE_IndicatorBranch: {
         auto defaultIconName = QString();
         if (option->state.testFlag(State_Children)) {
@@ -859,19 +859,67 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawIcon(rect, option, painter, icon, widget);
     }
         return;
-    case QStyle::PE_IndicatorButtonDropDown:
-    case QStyle::PE_IndicatorItemViewItemCheck:
-    case QStyle::PE_IndicatorDockWidgetResizeHandle:
-    case QStyle::PE_IndicatorHeaderArrow:
+    case QStyle::PE_IndicatorButtonDropDown: {
+        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {u"IndicatorButtonDropDown"_s});
+        drawIcon(option->rect, option, painter, icon, widget);
+    }
+        return;
     case QStyle::PE_IndicatorMenuCheckMark:
+    case QStyle::PE_IndicatorItemViewItemCheck:
+        drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
+        return;
+    case QStyle::PE_IndicatorHeaderArrow: {
+        if (const auto header = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
+            auto props = queryProperties(prepareElements(header, widget, {u"HeaderViewDelegate"_s}));
+            QIcon sortIndicator;
+            switch (header->sortIndicator) {
+            case QStyleOptionHeader::None:
+                break;
+            case QStyleOptionHeader::SortUp:
+                if (props->icon()) {
+                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-up-symbolic"_s));
+                }
+                break;
+            case QStyleOptionHeader::SortDown:
+                if (props->icon()) {
+                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
+                }
+                break;
+            }
+            drawIcon(header->rect, option, painter, sortIndicator, widget);
+        } else {
+            // Fallback
+            if (option->state.testFlags(State_UpArrow)) {
+                drawPrimitive(PE_IndicatorArrowUp, option, painter, widget);
+            } else if (option->state.testFlags(State_DownArrow)) {
+                drawPrimitive(PE_IndicatorArrowDown, option, painter, widget);
+            }
+        }
+    }
+        return;
     case QStyle::PE_IndicatorProgressChunk:
+        drawElementBackground(painter, option, widget, {u"IndicatorProgressChunk"_s});
+        return;
     case QStyle::PE_IndicatorToolBarHandle:
+        drawElementBackground(painter, option, widget, {u"IndicatorToolBarHandle"_s});
+        return;
     case QStyle::PE_IndicatorToolBarSeparator:
-    case QStyle::PE_IndicatorTabTear:
+        drawElementBackground(painter, option, widget, {u"IndicatorToolBarSeparator"_s});
+        return;
     case QStyle::PE_IndicatorColumnViewArrow:
-    case QStyle::PE_IndicatorItemViewItemDrop:
-    case QStyle::PE_IndicatorTabClose:
+        drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
+        return;
+    case QStyle::PE_IndicatorTabClose: {
+        drawElementBackground(painter, option, widget, {u"IndicatorTabClose"_s});
+        const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {u"IndicatorTabClose"_s});
+        drawIcon(option->rect, option, painter, icon, widget);
+    }
+        return;
+    // Handle with QCommonStyle for now
+    case QStyle::PE_IndicatorTabTear:
     case QStyle::PE_IndicatorTabTearRight:
+    case QStyle::PE_IndicatorItemViewItemDrop:
+    case QStyle::PE_IndicatorDockWidgetResizeHandle:
     case QStyle::PE_CustomBase:
         break;
     }
