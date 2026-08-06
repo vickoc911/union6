@@ -910,7 +910,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
         return;
     case QStyle::PE_IndicatorTabClose: {
-        drawElementBackground(painter, option, widget, {u"IndicatorTabClose"_s});
+        drawElementBackground(painter, option, widget, {u"TabButton"_s, u"CloseButton"_s});
         const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {u"IndicatorTabClose"_s});
         drawIcon(option->rect, option, painter, icon, widget);
     }
@@ -1023,21 +1023,8 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         size.rwidth() += pixelMetric(PM_LayoutLeftMargin, option, widget);
     } break;
     case QStyle::CT_TabBarTab: {
-        auto elements = prepareElements(option, widget, {u"TabButton"_s});
-        auto props = queryProperties(elements);
         auto textRect = subElementRect(SE_TabBarTabText, option, widget);
-        if (props->layout()) {
-            if (props->layout()->width()) {
-                textRect.setWidth(props->layout()->width().value_or(contentsSize.width()));
-            }
-            if (props->layout()->height()) {
-                textRect.setHeight(props->layout()->height().value_or(contentsSize.height()));
-            }
-            if (props->layout()->padding()) {
-                padding = props->layout()->padding()->toMargins().toMargins();
-            }
-        }
-        return textRect.size().grownBy(padding);
+        size = contentsSize.expandedTo(textRect.size()).grownBy(padding);
     } break;
     case QStyle::CT_Slider: {
         auto sliderOpt = qstyleoption_cast<const QStyleOptionSlider *>(option);
@@ -1171,7 +1158,13 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             }
 
             auto elements = prepareElements(option, widget, {u"TabButton"_s});
-            auto map = layoutMap(elements, option, {u"Icon"_s, u"Text"_s});
+            QStringList subElements = {u"Icon"_s, u"Text"_s};
+            if (const auto tabbarwidget = qobject_cast<const QTabBar *>(widget)) {
+                if (tabbarwidget->tabsClosable()) {
+                    subElements.append(u"CloseButton"_s);
+                }
+            }
+            auto map = layoutMap(elements, option, subElements);
             QRect unifiedRect;
             for (const auto &m : map) {
                 unifiedRect = unifiedRect.united(m.rect.toRect());

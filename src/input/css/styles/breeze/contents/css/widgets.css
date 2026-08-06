@@ -59,23 +59,6 @@ indicatortoolbarhandle {
     border-bottom: none;
 }
 
-indicatortabclose {
-    width: var(--icon-size-small);
-    height: var(--icon-size-small);
-    icon-name: "tab-close-symbolic";
-
-    &:hovered,
-    &:pressed {
-        icon-color: var(--negative-text);
-        color: var(--negative-text);
-    }
-
-    &:disabled {
-        color: var(--button-disabled-text-color);
-        icon-color: var(--button-disabled-text-color);
-    }
-}
-
 /* Pixel Metrics. Anything named "size" only uses Width property */
 
 smalliconsize,
