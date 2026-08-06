@@ -80,7 +80,6 @@ indicatortabclose {
 
 smalliconsize,
 tabbariconsize,
-titlebarbuttoniconsize,
 lineediticonsize {
     width: var(--icon-size-small);
 }

@@ -1749,28 +1749,26 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return properties->layout()->spacing().value_or(defaultMetric);
         }
     } break;
-    case QStyle::PM_TabBarScrollButtonWidth: {
+    case QStyle::PM_TabBarScrollButtonWidth:
         return querySize(option, widget, {u"TabScrollButton"_s}).width();
-    } break;
-    case QStyle::PM_TitleBarButtonSize:
     case QStyle::PM_MenuPanelWidth:
-    case QStyle::PM_SplitterWidth: {
+    case QStyle::PM_SplitterWidth:
         return querySize(option, widget).width();
-    } break;
-    case QStyle::PM_SpinBoxSliderHeight:
     case QStyle::PM_TitleBarHeight:
+        return querySize(option, widget, {u"TitleBar"_s}).height();
+    case QStyle::PM_TitleBarButtonSize:
+    case QStyle::PM_TitleBarButtonIconSize:
+        return querySize(option, widget, {u"TitleBar"_s, u"NormalButton"_s}).width();
+    case QStyle::PM_SpinBoxSliderHeight:
     case QStyle::PM_MenuScrollerHeight:
-    case QStyle::PM_TabBarBaseHeight: {
+    case QStyle::PM_TabBarBaseHeight:
         return querySize(option, widget).height();
-    } break;
     case QStyle::PM_TreeViewIndentation:
         return querySize(option, widget, {u"TreeViewDelegate"_s, u"Indentation"_s}).width();
     case QStyle::PM_SmallIconSize:
         return querySize(option, widget, {u"SmallIconSize"_s}).width();
     case QStyle::PM_TabBarIconSize:
         return querySize(option, widget, {u"TabBarIconSize"_s}).width();
-    case QStyle::PM_TitleBarButtonIconSize:
-        return querySize(option, widget, {u"TitleBarButtonIconSize"_s}).width();
     case QStyle::PM_LineEditIconSize:
         return querySize(option, widget, {u"LineEditIconSize"_s}).width();
     case QStyle::PM_ListViewIconSize:
@@ -1797,21 +1795,6 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).height();
     case QStyle::PM_ProgressBarChunkWidth:
         return querySize(option, widget, {u"ProgressBarChunkWidth"_s}).width();
-    // Rely on QCommonStyle for now
-    case QStyle::PM_SliderTickmarkOffset:
-    case QStyle::PM_SliderSpaceAvailable:
-    case QStyle::PM_MaximumDragDistance:
-    case QStyle::PM_MenuTearoffHeight:
-    case QStyle::PM_DockWidgetSeparatorExtent:
-    case QStyle::PM_TabBarTabOverlap:
-    case QStyle::PM_DockWidgetHandleExtent:
-    case QStyle::PM_TabBarBaseOverlap:
-    case QStyle::PM_MdiSubWindowMinimizedWidth:
-    case QStyle::PM_HeaderGripMargin:
-    case QStyle::PM_DockWidgetTitleMargin:
-    case QStyle::PM_DockWidgetTitleBarButtonMargin:
-    case QStyle::PM_SubMenuOverlap:
-    case QStyle::PM_CustomBase:
     default:
         break;
     };
