@@ -1750,56 +1750,54 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
     } break;
     case QStyle::PM_TabBarScrollButtonWidth: {
-        auto elements = prepareElements(option, widget, {u"TabScrollButton"_s});
-        if (elements.isEmpty()) {
-            return defaultMetric;
-        }
-        auto properties = queryProperties(elements);
-        if (!properties) {
-            return defaultMetric;
-        }
-        return properties->layout()->width().value_or(defaultMetric);
+        return querySize(option, widget, {u"TabScrollButton"_s}).width();
     } break;
     case QStyle::PM_TitleBarButtonSize:
     case QStyle::PM_MenuPanelWidth:
     case QStyle::PM_SplitterWidth: {
-        if (properties->layout()) {
-            return properties->layout()->width().value_or(defaultMetric);
-        }
+        return querySize(option, widget).width();
     } break;
     case QStyle::PM_SpinBoxSliderHeight:
     case QStyle::PM_TitleBarHeight:
     case QStyle::PM_MenuScrollerHeight:
     case QStyle::PM_TabBarBaseHeight: {
-        if (properties->layout()) {
-            return properties->layout()->height().value_or(defaultMetric);
-        }
+        return querySize(option, widget).height();
     } break;
-    case QStyle::PM_TreeViewIndentation: {
-        auto elements = prepareElements(option, widget, {u"Indentation"_s});
-        if (elements.isEmpty()) {
-            return defaultMetric;
-        }
-        auto properties = queryProperties(elements);
-        if (!properties) {
-            return defaultMetric;
-        }
-        if (properties->layout()) {
-            return properties->layout()->width().value_or(defaultMetric);
-        }
-    } break;
-
-    case QStyle::PM_MessageBoxIconSize:
-    case QStyle::PM_ListViewIconSize:
+    case QStyle::PM_TreeViewIndentation:
+        return querySize(option, widget, {u"TreeViewDelegate"_s, u"Indentation"_s}).width();
     case QStyle::PM_SmallIconSize:
-    case QStyle::PM_ButtonIconSize:
-    case QStyle::PM_IconViewIconSize:
-    case QStyle::PM_ToolBarIconSize:
-    case QStyle::PM_ProgressBarChunkWidth:
-    case QStyle::PM_LargeIconSize:
+        return querySize(option, widget, {u"SmallIconSize"_s}).width();
     case QStyle::PM_TabBarIconSize:
+        return querySize(option, widget, {u"TabBarIconSize"_s}).width();
     case QStyle::PM_TitleBarButtonIconSize:
+        return querySize(option, widget, {u"TitleBarButtonIconSize"_s}).width();
     case QStyle::PM_LineEditIconSize:
+        return querySize(option, widget, {u"LineEditIconSize"_s}).width();
+    case QStyle::PM_ListViewIconSize:
+        return querySize(option, widget, {u"ListViewIconSize"_s}).width();
+    case QStyle::PM_ButtonIconSize:
+        return querySize(option, widget, {u"ButtonIconSize"_s}).width();
+    case QStyle::PM_ToolBarIconSize:
+        return querySize(option, widget, {u"ToolBarIconSize"_s}).width();
+    case QStyle::PM_HeaderMarkSize:
+        return querySize(option, widget, {u"HeaderMarkSize"_s}).width();
+    case QStyle::PM_IconViewIconSize:
+        return querySize(option, widget, {u"IconViewIconSize"_s}).width();
+    case QStyle::PM_LargeIconSize:
+        return querySize(option, widget, {u"LargeIconSize"_s}).width();
+    case QStyle::PM_MessageBoxIconSize:
+        return querySize(option, widget, {u"MessageBoxIconSize"_s}).width();
+    case QStyle::PM_SizeGripSize:
+        return querySize(option, widget, {u"SizeGripSize"_s}).width();
+    case QStyle::PM_TextCursorWidth:
+        return querySize(option, widget, {u"TextCursorWidth"_s}).width();
+    case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
+        return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).width();
+    case QStyle::PM_HeaderDefaultSectionSizeVertical:
+        return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).height();
+    case QStyle::PM_ProgressBarChunkWidth:
+        return querySize(option, widget, {u"ProgressBarChunkWidth"_s}).width();
+    // Rely on QCommonStyle for now
     case QStyle::PM_SliderTickmarkOffset:
     case QStyle::PM_SliderSpaceAvailable:
     case QStyle::PM_MaximumDragDistance:
@@ -1808,19 +1806,11 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_TabBarTabOverlap:
     case QStyle::PM_DockWidgetHandleExtent:
     case QStyle::PM_TabBarBaseOverlap:
-    case QStyle::PM_DialogButtonsSeparator:
-    case QStyle::PM_DialogButtonsButtonWidth:
-    case QStyle::PM_DialogButtonsButtonHeight:
     case QStyle::PM_MdiSubWindowMinimizedWidth:
-    case QStyle::PM_HeaderMarkSize:
     case QStyle::PM_HeaderGripMargin:
     case QStyle::PM_DockWidgetTitleMargin:
     case QStyle::PM_DockWidgetTitleBarButtonMargin:
-    case QStyle::PM_SizeGripSize:
-    case QStyle::PM_TextCursorWidth:
     case QStyle::PM_SubMenuOverlap:
-    case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
-    case QStyle::PM_HeaderDefaultSectionSizeVertical:
     case QStyle::PM_CustomBase:
     default:
         break;

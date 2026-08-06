@@ -983,3 +983,17 @@ QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString
     }
     return QIcon::fromTheme(name);
 }
+
+QSize querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)
+{
+    auto elements = prepareElements(option, widget, targetHierarchy);
+    if (elements.isEmpty()) {
+        return QSize(0, 0);
+    }
+    auto properties = queryProperties(elements);
+    if (!properties) {
+        return QSize(0, 0);
+    }
+
+    return QSize(properties->layout()->width().value_or(0), properties->layout()->height().value_or(0));
+}
