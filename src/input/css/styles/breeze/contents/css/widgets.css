@@ -21,3 +21,12 @@ indicatorarrowleft {
 indicatorarrowright {
     icon-name: "arrow-right-symbolic";
 }
+
+indicatorbranch {
+    &.has-children {
+        icon-name: "arrow-right-symbolic";
+        &.open {
+            icon-name: "arrow-down-symbolic";
+        }
+    }
+}
