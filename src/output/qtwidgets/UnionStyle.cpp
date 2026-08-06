@@ -843,7 +843,22 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_PanelMenu:
         drawElementBackground(painter, option, widget);
         break;
-    case QStyle::PE_IndicatorBranch:
+    case QStyle::PE_IndicatorBranch: {
+        auto defaultIconName = QString();
+        if (option->state.testFlag(State_Children)) {
+            if (option->state.testFlag(QStyle::State_Item)) {
+                defaultIconName = u"arrow-right-symbolic"_s;
+            }
+            if (option->state.testFlag(QStyle::State_Open)) {
+                defaultIconName = u"arrow-down-symbolic"_s;
+            }
+        }
+        const auto icon = queryIcon(option, widget, defaultIconName, {u"IndicatorBranch"_s});
+        auto size = qMin(option->rect.height(), pixelMetric(PM_IndicatorHeight, option, widget));
+        auto rect = centerRect(option->rect, size, size);
+        drawIcon(rect, option, painter, icon, widget);
+    }
+        return;
     case QStyle::PE_IndicatorButtonDropDown:
     case QStyle::PE_IndicatorItemViewItemCheck:
     case QStyle::PE_IndicatorDockWidgetResizeHandle:
@@ -1933,24 +1948,28 @@ void UnionStyle::drawText(const QRect &rect,
         return;
     }
 
+    int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
     QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
-    auto properties = queryProperties(elements);
     QColor penColor;
     if (overrideColor.isValid()) {
         penColor = overrideColor;
     } else {
         // TODO: hide mnemonics if requested
-        auto textColor = properties->text()->color();
-        penColor = opt->palette.text().color();
-        if (textColor) {
-            penColor = textColor->toQColor();
+        if (!elements.isEmpty()) {
+            auto properties = queryProperties(elements);
+            auto textColor = properties->text()->color();
+            penColor = opt->palette.text().color();
+            if (textColor) {
+                penColor = textColor->toQColor();
+            }
+            textFlags = textFlagsFromProperties(properties, true);
         }
     }
 
     painter->save();
     painter->setPen(penColor);
-    drawItemText(painter, rect, textFlagsFromProperties(properties, true), opt->palette, enabled, text);
+    drawItemText(painter, rect, textFlags, opt->palette, enabled, text);
     painter->restore();
 }
 
@@ -1959,7 +1978,6 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
 {
     QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
-    auto properties = queryProperties(elements);
 
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
@@ -1976,9 +1994,12 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
     QColor penColor = opt->palette.text().color(); // Use text color as fallback
     if (overrideColor.isValid()) {
         penColor = overrideColor;
-    } else if (properties->icon() && properties->icon()->color().has_value()) {
-        auto iconColor = properties->icon()->color();
-        penColor = iconColor->toQColor();
+    } else if (!elements.isEmpty()) {
+        auto properties = queryProperties(elements);
+        if (properties->icon() && properties->icon()->color().has_value()) {
+            auto iconColor = properties->icon()->color();
+            penColor = iconColor->toQColor();
+        }
     }
 
     painter->save();
