@@ -16,19 +16,10 @@ class AbstractElement : public QObject, public std::enable_shared_from_this<Abst
     Q_OBJECT
 
 public:
-    // This will dictate the needed subElements too
-    enum class ElementType {
-        Invalid = -1,
-        None,
-        Button,
-        ToolButton
-    };
-    Q_ENUM(ElementType)
-
     using Ptr = std::shared_ptr<AbstractElement>;
-    AbstractElement(ElementType type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    AbstractElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~AbstractElement() override;
-    static AbstractElement::Ptr create(ElementType type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
+    static AbstractElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     QIcon icon() const;
     void setIcon(const QIcon &icon);
@@ -38,22 +29,33 @@ public:
     void setText(const QString &text);
     bool hasText() const;
 
-    ElementType type() const;
+    bool isValid() const;
 
     virtual void draw(QPainter *painter) const;
+    virtual void drawText(QPainter *painter) const;
+    virtual void drawIcon(QPainter *painter) const;
+    virtual void drawBg(QPainter *painter) const;
     virtual void layout();
+    virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
+    virtual QRect subElementRect(QStyle::SubElement element) const;
+    virtual QRect subControlRect(QStyle::ComplexControl complexControl, QStyle::SubControl subControl) const;
 
-private:
-    ElementType m_type;
+protected:
     const QStyleOption *m_styleOption;
     const UnionStyle *m_style;
     const QWidget *m_widget;
     QIcon m_icon;
     QString m_text;
-    Union::ElementList m_elementList;
-    Union::Properties::StylePropertyGroup *m_properties;
+    Union::ElementList m_backgroundElementList;
+    Union::ElementList m_contentElementList;
+    Union::Properties::StylePropertyGroup *m_backgroundProperties;
+    Union::Properties::StylePropertyGroup *m_contentProperties;
     QMap<QString, LayoutItem> m_layoutMap;
+    QStringList m_subElementList;
 
-    virtual void drawText(QPainter *painter) const;
-    virtual void drawIcon(QPainter *painter) const;
+    virtual void updateSubElementList();
+
+    QSize applyPaddingToSize(QSize oldSize) const;
+
+    bool m_isValid;
 };
