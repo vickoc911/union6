@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Joshua Goins <josh@redstrate.com>
 
 #include "UnionStyle.h"
-#include "StyleDrawing.h"
+#include "BackgroundDrawing.h"
 #include "StyleUtils.h"
 
 #include <ElementQuery.h>
