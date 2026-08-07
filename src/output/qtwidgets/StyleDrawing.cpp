@@ -18,6 +18,8 @@
 
 static Union::LruImageCache imageCache;
 
+// TODO: this file could be renamed to BackgroundDrawing since that is what its for
+
 void drawBackground(QPainter *painter, const QRectF &mainRect, const Union::Properties::StylePropertyGroup *style)
 {
     QRectF rect = mainRect;
