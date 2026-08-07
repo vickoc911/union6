@@ -19,14 +19,8 @@ AbstractElement::AbstractElement(ElementType type, const QStyleOption *option, c
     , m_icon(QIcon())
     , m_text(QString())
 {
-    m_elementList = prepareElements(option, widget);
-    if (!m_elementList.isEmpty()) {
-        m_properties = queryProperties(m_elementList);
-        layout();
-    } else {
-        m_type = ElementType::Invalid;
-        qWarning() << "Could not find elementlist for this element!";
-    }
+    updateSubElementList();
+    layout();
 }
 
 AbstractElement::~AbstractElement()
@@ -85,8 +79,21 @@ void AbstractElement::draw(QPainter *painter) const
 
 void AbstractElement::layout()
 {
-    auto subElements = buildSubElementList(m_styleOption, m_widget);
-    m_layoutMap = layoutMap(m_elementList, m_styleOption, subElements);
+    if (m_elementList.isEmpty()) {
+        m_elementList = prepareElements(m_styleOption, m_widget, m_subElementList);
+    }
+    if (!m_elementList.isEmpty()) {
+        m_properties = queryProperties(m_elementList);
+        m_layoutMap = layoutMap(m_elementList, m_styleOption, m_subElementList);
+    } else {
+        m_type = ElementType::Invalid;
+        qWarning() << "Could not find elementlist for this element!";
+    }
+}
+
+void AbstractElement::updateSubElementList()
+{
+    m_subElementList = buildSubElementList(m_styleOption, m_widget);
 }
 
 void AbstractElement::drawText(QPainter *painter) const

@@ -43,7 +43,7 @@ public:
     virtual void draw(QPainter *painter) const;
     virtual void layout();
 
-private:
+protected:
     ElementType m_type;
     const QStyleOption *m_styleOption;
     const UnionStyle *m_style;
@@ -53,7 +53,9 @@ private:
     Union::ElementList m_elementList;
     Union::Properties::StylePropertyGroup *m_properties;
     QMap<QString, LayoutItem> m_layoutMap;
+    QStringList m_subElementList;
 
+    virtual void updateSubElementList();
     virtual void drawText(QPainter *painter) const;
     virtual void drawIcon(QPainter *painter) const;
 };

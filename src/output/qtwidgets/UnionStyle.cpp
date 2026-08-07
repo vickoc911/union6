@@ -4,6 +4,7 @@
 #include "UnionStyle.h"
 #include "BackgroundDrawing.h"
 #include "StyleUtils.h"
+#include "elements/ButtonElement.h"
 
 #include <ElementQuery.h>
 #include <QApplication>
@@ -107,8 +108,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_PushButton: {
-        drawControl(CE_PushButtonBevel, option, painter, widget);
-        drawControl(CE_PushButtonLabel, option, painter, widget);
+        // drawControl(CE_PushButtonBevel, option, painter, widget);
+        // drawControl(CE_PushButtonLabel, option, painter, widget);
+        auto ev = ButtonElement::create(AbstractElement::ElementType::Button, option, this, widget);
+        ev->draw(painter);
     }
         return;
     case QStyle::CE_ToolButtonLabel: {
