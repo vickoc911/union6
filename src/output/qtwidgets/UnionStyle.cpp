@@ -4,6 +4,7 @@
 #include "UnionStyle.h"
 #include "BackgroundDrawing.h"
 #include "StyleUtils.h"
+#include "elements/ButtonElement.h"
 
 #include <ElementQuery.h>
 #include <QApplication>
@@ -68,14 +69,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     painter->setRenderHint(QPainter::Antialiasing, true);
 
     switch (controlElement) {
-    case QStyle::CE_PushButtonBevel: {
-        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto opt = *buttonOption;
-            opt.rect = subElementRect(SE_PushButtonBevel, buttonOption, widget);
-            drawElementBackground(painter, &opt, widget);
-        }
-    }
-        return;
     case QStyle::CE_ComboBoxLabel: {
         if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
             if (!comboBoxOption->editable) {
@@ -93,17 +86,16 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
     }
         return;
+    case QStyle::CE_PushButtonBevel: {
+        auto ev = ButtonElement::create(option, this, widget);
+        ev->drawBg(painter);
+    }
+        return;
     case QStyle::CE_PushButtonLabel: {
-        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            QIcon indicator;
-            if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-                auto indicatorProps = queryProperties(prepareElements(buttonOption, widget, {u"Indicator"_s}));
-                if (indicatorProps->icon()) {
-                    indicator = QIcon::fromTheme(indicatorProps->icon()->name().value_or(u"arrow-down-symbolic"_s));
-                }
-            }
-            layoutAndDrawIconTextIndicator(buttonOption, painter, widget, buttonOption->icon, buttonOption->text, indicator);
-        }
+        auto ev = ButtonElement::create(option, this, widget);
+        ev->drawIcon(painter);
+        ev->drawText(painter);
+        ev->drawIndicator(painter);
     }
         return;
     case QStyle::CE_PushButton: {
@@ -954,15 +946,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         }
     }
     switch (contentsType) {
-    case QStyle::CT_PushButton:
-        if (const auto *buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            size = contentsSize.grownBy(padding);
-            // TODO: currently only works on indicators at start/end
-            if (buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-                size.rwidth() += pixelMetric(PM_LayoutHorizontalSpacing, buttonOption, widget);
-            }
-        }
-        break;
+    case QStyle::CT_PushButton: {
+        auto ev = ButtonElement::create(option, this, widget);
+        return ev->contentsSize(contentsSize);
+    } break;
     case QStyle::CT_ToolButton: {
         if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
             size = size.grownBy(padding);
@@ -1102,7 +1089,6 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             rect = map[u"CheckBox"_s].rect.toRect();
         }
     } break;
-    case QStyle::SE_PushButtonContents:
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_CheckBoxContents: {
         const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option);
@@ -1126,11 +1112,11 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         rect = unifiedRect;
     } break;
-
+    case QStyle::SE_PushButtonFocusRect:
+    case QStyle::SE_PushButtonContents:
     case QStyle::SE_PushButtonBevel: {
-        auto buttonElements = prepareElements(option, widget);
-        auto props = queryProperties(buttonElements);
-        rect = backgroundRectangle(option, props).toRect();
+        auto ev = ButtonElement::create(option, this, widget);
+        return ev->subElementRect(element);
     } break;
     case QStyle::SE_ShapedFrameContents:
     case QStyle::SE_LineEditContents:
@@ -1289,10 +1275,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_CheckBoxFocusRect:
     case QStyle::SE_RadioButtonFocusRect:
     case QStyle::SE_RadioButtonClickRect:
-    case QStyle::SE_PushButtonFocusRect:
     case QStyle::SE_ComboBoxFocusRect:
     case QStyle::SE_SliderFocusRect:
     case QStyle::SE_ItemViewItemFocusRect:
+    case QStyle::SE_PushButtonLayoutItem:
     case QStyle::SE_CheckBoxLayoutItem:
     case QStyle::SE_ComboBoxLayoutItem:
     case QStyle::SE_DateTimeEditLayoutItem:
@@ -1302,7 +1288,6 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_SpinBoxLayoutItem:
     case QStyle::SE_SliderLayoutItem:
     case QStyle::SE_ProgressBarLayoutItem:
-    case QStyle::SE_PushButtonLayoutItem:
     case QStyle::SE_RadioButtonLayoutItem:
     case QStyle::SE_TabWidgetLayoutItem:
     case QStyle::SE_ToolButtonLayoutItem:
