@@ -5,10 +5,11 @@
 
 #include "BackgroundDrawing.h"
 #include "StyleUtils.h"
-#include "UnionStyle.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
+
+class UnionStyle;
 
 class AbstractElement : public QObject, public std::enable_shared_from_this<AbstractElement>
 {

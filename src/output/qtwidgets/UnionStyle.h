@@ -6,6 +6,7 @@
 #include <Element.h>
 #include <Style.h>
 
+#include "elements/AbstractElement.h"
 #include <QCommonStyle>
 
 /*!
@@ -55,4 +56,7 @@ public:
                                         const QString &text = QString(),
                                         const QIcon &indicator = QIcon(),
                                         const QStringList &children = {}) const;
+
+private:
+    QMap<QWidget *, AbstractElement::Ptr> elementMap;
 };
