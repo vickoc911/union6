@@ -5,8 +5,8 @@ add_library(UnionWidgetsStyle MODULE)
 target_sources(UnionWidgetsStyle PRIVATE
         AbstractElement.cpp
         AbstractElement.h
-        StyleDrawing.cpp
-        StyleDrawing.h
+        BackgroundDrawing.cpp
+        BackgroundDrawing.h
         StyleUtils.cpp
         StyleUtils.h
         UnionStyle.cpp

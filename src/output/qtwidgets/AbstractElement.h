@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "StyleDrawing.h"
+#include "BackgroundDrawing.h"
 #include "StyleUtils.h"
 #include "UnionStyle.h"
 #include <QIcon>
