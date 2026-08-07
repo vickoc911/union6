@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 // SPDX-FileCopyrightText: 2025 Joshua Goins <josh@redstrate.com>
 
-#include "StyleDrawing.h"
+#include "BackgroundDrawing.h"
 
 #include "StyleUtils.h"
 #include <Element.h>
@@ -17,6 +17,8 @@
 #include "LruCache.h"
 
 static Union::LruImageCache imageCache;
+
+// This file handles all the background drawing related functions
 
 void drawBackground(QPainter *painter, const QRectF &mainRect, const Union::Properties::StylePropertyGroup *style)
 {
