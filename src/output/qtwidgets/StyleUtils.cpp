@@ -886,16 +886,14 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
 {
     QStringList childelements = {};
     if (const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option)) {
-        if (viewItemOption) {
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay) && !viewItemOption->text.isEmpty()) {
-                childelements.append(u"Text"_s);
-            }
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration) && !viewItemOption->icon.isNull()) {
-                childelements.append(u"Icon"_s);
-            }
-            if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-                childelements.append(u"CheckBox"_s);
-            }
+        if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay) && !viewItemOption->text.isEmpty()) {
+            childelements.append(u"Text"_s);
+        }
+        if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration) && !viewItemOption->icon.isNull()) {
+            childelements.append(u"Icon"_s);
+        }
+        if (viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
+            childelements.append(u"CheckBox"_s);
         }
     } else if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
         if (qobject_cast<const QPushButton *>(widget)) {
@@ -968,6 +966,22 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
         }
         if (titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
             childelements.append(u"ShadeButton"_s);
+        }
+    } else if (const auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
+        if (!menuItem->text.isEmpty()) {
+            childelements.append(u"Text"_s);
+        }
+        if (!menuItem->icon.isNull()) {
+            childelements.append(u"Icon"_s);
+        }
+        if (menuItem->menuHasCheckableItems) {
+            childelements.append(u"CheckBox"_s);
+        }
+        if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu) {
+            childelements.append(u"Arrow"_s);
+        }
+        if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
+            childelements.append(u"Separator"_s);
         }
     }
 
