@@ -16,9 +16,9 @@ ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyl
     , m_indicatorIcon(QIcon())
 {
     if (m_toolButtonOption) {
-        m_indicatorElements = prepareElements(m_toolButtonOption, m_widget, {u"Indicator"_s});
-        if (!m_indicatorElements.isEmpty()) {
-            m_indicatorProperties = queryProperties(m_indicatorElements);
+        m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {u"Indicator"_s});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
             if (m_indicatorProperties->icon()) {
                 m_indicatorIcon = QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString()));
             }
