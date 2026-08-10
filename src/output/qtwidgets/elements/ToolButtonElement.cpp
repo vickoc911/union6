@@ -13,14 +13,13 @@ using namespace Qt::StringLiterals;
 ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_toolButtonOption(qstyleoption_cast<const QStyleOptionToolButton *>(option))
-    , m_indicatorIcon(QIcon())
 {
     if (m_toolButtonOption) {
-        m_indicatorElements = prepareElements(m_toolButtonOption, m_widget, {u"Indicator"_s});
-        if (!m_indicatorElements.isEmpty()) {
-            m_indicatorProperties = queryProperties(m_indicatorElements);
+        m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {u"Indicator"_s});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
             if (m_indicatorProperties->icon()) {
-                m_indicatorIcon = QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString()));
+                setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
             }
         }
 
@@ -31,6 +30,8 @@ ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyl
             setText(m_toolButtonOption->text);
         }
     }
+    updateSubElementList();
+    layout();
 }
 
 ToolButtonElement::~ToolButtonElement()
@@ -102,32 +103,6 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
 ToolButtonElement::Ptr ToolButtonElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
 {
     return std::make_shared<ToolButtonElement>(option, style, widget);
-}
-
-void ToolButtonElement::drawIndicator(QPainter *painter) const
-{
-    if (!m_indicatorIcon.isNull()) {
-        QRect indicatorRect = m_layoutMap[u"Indicator"_s].rect.toRect();
-
-        drawBackground(painter, indicatorRect, m_indicatorProperties);
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-
-        const QPalette activePalette = m_styleOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = indicatorRect.size();
-        const QPixmap pixmap = m_indicatorIcon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
-        if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
-            auto iconColor = m_indicatorProperties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
-
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, indicatorRect, Qt::AlignCenter, pixmap);
-        painter->restore();
-    }
 }
 
 void ToolButtonElement::drawText(QPainter *painter) const
