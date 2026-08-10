@@ -12,15 +12,21 @@
 
 class UnionStyle;
 
-class ButtonElement : public AbstractElement, public std::enable_shared_from_this<ButtonElement>
+class CheckElement : public AbstractElement, public std::enable_shared_from_this<CheckElement>
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<ButtonElement>;
-    ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
-    ~ButtonElement() override;
-    static ButtonElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
+    enum class Type {
+        CheckBox,
+        RadioButton
+    };
+    Q_ENUM(Type)
+
+    using Ptr = std::shared_ptr<CheckElement>;
+    CheckElement(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ~CheckElement() override;
+    static CheckElement::Ptr create(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 
@@ -28,4 +34,9 @@ public:
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
     const QStyleOptionButton *m_buttonOption = nullptr;
+
+    void drawIndicator(QPainter *painter) const override;
+
+private:
+    Type m_type;
 };

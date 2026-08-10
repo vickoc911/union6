@@ -7,6 +7,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/AbstractElement.h
         elements/ButtonElement.cpp
         elements/ButtonElement.h
+        elements/CheckElement.cpp
+        elements/CheckElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
         BackgroundDrawing.cpp
