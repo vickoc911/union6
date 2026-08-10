@@ -18,7 +18,21 @@ class ButtonElement : public AbstractElement, public std::enable_shared_from_thi
 
 public:
     using Ptr = std::shared_ptr<ButtonElement>;
-    ButtonElement(ElementType type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ButtonElement() override;
-    static ButtonElement::Ptr create(ElementType type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
+    static ButtonElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
+
+    void draw(QPainter *painter) const override;
+
+    QRect subElementRect(QStyle::SubElement element) const override;
+    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+
+    const QStyleOptionButton *m_buttonOption = nullptr;
+    QIcon m_indicatorIcon;
+
+    void drawIndicator(QPainter *painter) const;
+
+private:
+    Union::ElementList m_indicatorElements;
+    Union::Properties::StylePropertyGroup *m_indicatorProperties;
 };

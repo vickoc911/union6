@@ -10,14 +10,14 @@
 
 using namespace Qt::StringLiterals;
 
-AbstractElement::AbstractElement(ElementType type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+AbstractElement::AbstractElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : QObject(nullptr)
-    , m_type(type)
     , m_styleOption(option)
     , m_style(style)
     , m_widget(widget)
     , m_icon(QIcon())
     , m_text(QString())
+    , m_isValid(false)
 {
     updateSubElementList();
     layout();
@@ -27,9 +27,9 @@ AbstractElement::~AbstractElement()
 {
 }
 
-AbstractElement::Ptr AbstractElement::create(ElementType type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+AbstractElement::Ptr AbstractElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
 {
-    return std::make_shared<AbstractElement>(type, option, style, widget);
+    return std::make_shared<AbstractElement>(option, style, widget);
 }
 
 QIcon AbstractElement::icon() const
@@ -62,38 +62,96 @@ bool AbstractElement::hasText() const
     return !m_text.isEmpty();
 }
 
-AbstractElement::ElementType AbstractElement::type() const
+bool AbstractElement::isValid() const
 {
-    return m_type;
+    return m_isValid;
 }
 
 void AbstractElement::draw(QPainter *painter) const
 {
-    if (m_type == ElementType::Invalid) {
+    if (!m_isValid) {
         return;
     }
-    drawBackground(painter, m_styleOption->rect, m_properties);
+    drawBg(painter);
     drawIcon(painter);
     drawText(painter);
 }
 
 void AbstractElement::layout()
 {
-    if (m_elementList.isEmpty()) {
-        m_elementList = prepareElements(m_styleOption, m_widget, m_subElementList);
+    // Background and content is separate
+    if (m_backgroundElementList.isEmpty()) {
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
     }
-    if (!m_elementList.isEmpty()) {
-        m_properties = queryProperties(m_elementList);
-        m_layoutMap = layoutMap(m_elementList, m_styleOption, m_subElementList);
+    if (!m_backgroundElementList.isEmpty()) {
+        m_backgroundProperties = queryProperties(m_backgroundElementList);
+    }
+
+    if (m_contentElementList.isEmpty()) {
+        m_contentElementList = prepareElements(m_styleOption, m_widget, m_subElementList);
+    }
+    if (!m_contentElementList.isEmpty()) {
+        m_contentProperties = queryProperties(m_contentElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+        m_isValid = true;
     } else {
-        m_type = ElementType::Invalid;
+        m_isValid = false;
         qWarning() << "Could not find elementlist for this element!";
     }
+}
+
+QSize AbstractElement::contentsSize(const QSize &contentsSizeFromStyle) const
+{
+    qWarning() << "contentsSize is unimplemented for" << m_styleOption;
+    return contentsSizeFromStyle;
+}
+
+QRect AbstractElement::subElementRect(QStyle::SubElement element) const
+{
+    qWarning() << "subElementRect is unimplemented for " << element;
+    return QRect();
+}
+
+QRect AbstractElement::subControlRect(QStyle::ComplexControl complexControl, QStyle::SubControl subControl) const
+{
+    qWarning() << "subControlRect is unimplemented for " << complexControl << subControl;
+    return QRect();
 }
 
 void AbstractElement::updateSubElementList()
 {
     m_subElementList = buildSubElementList(m_styleOption, m_widget);
+}
+
+QSize AbstractElement::applyPaddingToSize(QSize oldSize) const
+{
+    QSize minimumSize = oldSize;
+    QSize size = minimumSize;
+    QMargins padding;
+    if (m_backgroundProperties->layout()) {
+        auto width = m_backgroundProperties->layout()->width().value_or(1);
+        auto height = m_backgroundProperties->layout()->height().value_or(1);
+        minimumSize = QSize(width, height);
+        if (m_backgroundProperties->layout()->padding()) {
+            padding = m_backgroundProperties->layout()->padding()->toMargins().toMargins();
+        }
+        if (m_backgroundProperties->layout()->inset()) {
+            padding += m_backgroundProperties->layout()->inset()->toMargins().toMargins();
+        }
+    }
+    size = size.grownBy(padding);
+    if (size.width() < minimumSize.width()) {
+        size.setWidth(minimumSize.width());
+    }
+    if (size.height() < minimumSize.height()) {
+        size.setHeight(minimumSize.height());
+    }
+    return size;
+}
+
+void AbstractElement::drawBg(QPainter *painter) const
+{
+    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
 }
 
 void AbstractElement::drawText(QPainter *painter) const
@@ -104,12 +162,12 @@ void AbstractElement::drawText(QPainter *painter) const
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         QColor penColor = m_styleOption->palette.text().color();
         // TODO: hide mnemonics if requested
-        if (m_properties->text()) {
-            auto textColor = m_properties->text()->color();
+        if (m_contentProperties->text()) {
+            auto textColor = m_contentProperties->text()->color();
             if (textColor) {
                 penColor = textColor->toQColor();
             }
-            textFlags = textFlagsFromProperties(m_properties, true);
+            textFlags = textFlagsFromProperties(m_contentProperties, true);
         }
         painter->save();
         painter->setPen(penColor);
@@ -137,8 +195,8 @@ void AbstractElement::drawIcon(QPainter *painter) const
         const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
-        if (m_properties->icon() && m_properties->icon()->color().has_value()) {
-            auto iconColor = m_properties->icon()->color();
+        if (m_contentProperties->icon() && m_contentProperties->icon()->color().has_value()) {
+            auto iconColor = m_contentProperties->icon()->color();
             penColor = iconColor->toQColor();
         }
 
