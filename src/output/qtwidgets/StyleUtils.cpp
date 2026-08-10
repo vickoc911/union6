@@ -920,9 +920,10 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
     } else if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
         bool hasIndicator =
             toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
-        bool hasIcon = !toolButtonOption->icon.isNull();
-        bool hasText = !toolButtonOption->text.isEmpty();
-        if (hasIcon) {
+        bool hasArrows = toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
+        bool hasIcon = !toolButtonOption->icon.isNull() && toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
+        bool hasText = !toolButtonOption->text.isEmpty() && toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly;
+        if (hasIcon || hasArrows) {
             childelements.append(u"Icon"_s);
         }
         if (hasText) {
