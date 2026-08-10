@@ -17,14 +17,10 @@ CheckElement::CheckElement(Type type, const QStyleOption *option, const UnionSty
     , m_type(type)
 {
     if (m_buttonOption) {
-        m_indicatorElements = prepareElements(m_styleOption, m_widget, {u"Indicator"_s});
-        if (!m_indicatorElements.isEmpty()) {
-            m_indicatorProperties = queryProperties(m_indicatorElements);
-            if (m_indicatorProperties->icon()) {
-                m_indicatorIcon = QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString()));
-            }
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {u"Indicator"_s});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
         }
-
         if (!m_buttonOption->icon.isNull()) {
             setIcon(m_buttonOption->icon);
         }

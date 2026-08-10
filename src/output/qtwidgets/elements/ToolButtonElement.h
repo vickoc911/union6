@@ -35,6 +35,6 @@ public:
     void drawIndicator(QPainter *painter) const;
 
 private:
-    Union::ElementList m_indicatorElements;
+    Union::ElementList m_indicatorElementList;
     Union::Properties::StylePropertyGroup *m_indicatorProperties;
 };
