@@ -112,9 +112,9 @@ QRect AbstractElement::subElementRect(QStyle::SubElement element) const
     return QRect();
 }
 
-QRect AbstractElement::subControlRect(QStyle::ComplexControl complexControl, QStyle::SubControl subControl) const
+QRect AbstractElement::subControlRect(QStyle::SubControl subControl) const
 {
-    qWarning() << "subControlRect is unimplemented for " << complexControl << subControl;
+    qWarning() << "subControlRect is unimplemented for " << subControl;
     return QRect();
 }
 
