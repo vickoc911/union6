@@ -5,6 +5,7 @@
 #include "BackgroundDrawing.h"
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
+#include "elements/ToolButtonElement.h"
 
 #include <ElementQuery.h>
 #include <QApplication>
@@ -104,53 +105,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ToolButtonLabel: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-        if (!buttonOption) {
-            return;
-        }
-        auto text = buttonOption->text;
-        auto icon = buttonOption->icon;
-        // Skip text drawing for icon only buttons completely
-        if (buttonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {
-            text = QString();
-        } else if (buttonOption->toolButtonStyle == Qt::ToolButtonTextOnly) {
-            icon = QIcon();
-        }
-        if (icon.isNull() && buttonOption->toolButtonStyle != Qt::ToolButtonTextOnly && buttonOption->features.testFlag(QStyleOptionToolButton::Arrow)) {
-            QList<Union::Element::Ptr> elements = prepareElements(buttonOption, widget);
-            bool hasText = !text.isEmpty();
-            QStringList subElements = {u"Icon"_s};
-            if (hasText) {
-                subElements.append(u"Text"_s);
-            }
-            auto map = layoutMap(elements, buttonOption, subElements);
-            if (hasText) {
-                QRect textRect = map[u"Text"_s].rect.toRect();
-                drawText(textRect, buttonOption, painter, text, widget);
-            }
-            QRect iconRect = map[u"Icon"_s].rect.toRect();
-            auto subopt = *buttonOption;
-            subopt.rect = iconRect;
-
-            switch (buttonOption->arrowType) {
-            case Qt::LeftArrow:
-                drawPrimitive(PE_IndicatorArrowLeft, &subopt, painter, widget);
-                break;
-            case Qt::RightArrow:
-                drawPrimitive(PE_IndicatorArrowRight, &subopt, painter, widget);
-                break;
-            case Qt::UpArrow:
-                drawPrimitive(PE_IndicatorArrowUp, &subopt, painter, widget);
-                break;
-            case Qt::DownArrow:
-                drawPrimitive(PE_IndicatorArrowDown, &subopt, painter, widget);
-                break;
-            default:
-                break;
-            }
-        } else {
-            layoutAndDrawIconTextIndicator(buttonOption, painter, widget, icon, text);
-        }
+        auto ev = ToolButtonElement::create(option, this, widget);
+        ev->drawIcon(painter);
+        ev->drawText(painter);
+        ev->drawIndicator(painter);
     }
         return;
     case QStyle::CE_CheckBox: {
@@ -421,25 +379,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 
     switch (control) {
     case QStyle::CC_ToolButton: {
-        const auto buttonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option);
-        if (!buttonOption) {
-            return;
-        }
-        const auto elements = prepareElements(buttonOption, widget);
-        const auto properties = queryProperties(elements);
-        auto rect = subControlRect(CC_ToolButton, option, SC_ToolButton, widget);
-        drawBackground(painter, rect, properties);
-
-        drawControl(CE_ToolButtonLabel, buttonOption, painter, widget);
-        if (buttonOption->features.testFlag(QStyleOptionToolButton::Menu) || buttonOption->features.testFlag(QStyleOptionToolButton::HasMenu)) {
-            auto indicatorRect = subControlRect(CC_ToolButton, option, SC_ToolButtonMenu, widget);
-            const auto props = queryProperties(prepareElements(buttonOption, widget, {u"Indicator"_s}));
-            if (props->icon()) {
-                auto icon = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
-                drawIcon(indicatorRect, option, painter, icon, widget);
-                painter->setPen(Qt::cyan);
-            }
-        }
+        auto ev = ToolButtonElement(option, this, widget);
+        ev.draw(painter);
     }
         return;
     case QStyle::CC_GroupBox: {
@@ -951,17 +892,8 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ToolButton: {
-        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            size = size.grownBy(padding);
-            auto indicatorProps = queryProperties(prepareElements(option, widget, {u"Indicator"_s}));
-            if (indicatorProps->layout()) {
-                if (toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
-                    size.rwidth() += indicatorProps->layout()->width().value_or(0);
-                } else {
-                    size.rheight() += indicatorProps->layout()->height().value_or(0);
-                }
-            }
-        }
+        auto ev = ToolButtonElement::create(option, this, widget);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_MenuItem: {
         const auto *menuItemOpt = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
@@ -1300,28 +1232,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
     if (complexControl == CC_ToolButton) {
-        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            // Background
-            if (subControl == SC_ToolButton) {
-                auto elements = prepareElements(toolButtonOption, widget);
-                const auto properties = queryProperties(elements);
-                return visualRect(toolButtonOption->direction, toolButtonOption->rect, backgroundRectangle(toolButtonOption, properties).toRect());
-            }
-            // Menu button background
-            if (subControl == SC_ToolButtonMenu) {
-                bool hasIndicator =
-                    toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
-                if (!hasIndicator) {
-                    return QRect();
-                }
-                auto subElements = buildSubElementList(toolButtonOption, widget);
-                if (subElements.isEmpty()) {
-                    return QRect();
-                }
-                auto map = layoutMap(prepareElements(toolButtonOption, widget), toolButtonOption, subElements);
-                return visualRect(toolButtonOption->direction, toolButtonOption->rect, map[u"Indicator"_s].rect.toRect());
-            }
-        }
+        auto ev = ToolButtonElement::create(option, this, widget);
+        return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_ComboBox) {

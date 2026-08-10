@@ -38,7 +38,7 @@ public:
     virtual void layout();
     virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
     virtual QRect subElementRect(QStyle::SubElement element) const;
-    virtual QRect subControlRect(QStyle::ComplexControl complexControl, QStyle::SubControl subControl) const;
+    virtual QRect subControlRect(QStyle::SubControl subControl) const;
 
 protected:
     const QStyleOption *m_styleOption;
