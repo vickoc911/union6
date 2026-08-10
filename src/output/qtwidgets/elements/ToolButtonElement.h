@@ -28,13 +28,7 @@ public:
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
     const QStyleOptionToolButton *m_toolButtonOption = nullptr;
-    QIcon m_indicatorIcon;
 
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
-    void drawIndicator(QPainter *painter) const;
-
-private:
-    Union::ElementList m_indicatorElements;
-    Union::Properties::StylePropertyGroup *m_indicatorProperties;
 };

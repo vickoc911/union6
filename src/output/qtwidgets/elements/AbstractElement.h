@@ -29,12 +29,17 @@ public:
     void setText(const QString &text);
     bool hasText() const;
 
+    QIcon indicator() const;
+    void setIndicator(const QIcon &indicator);
+    bool hasIndicator() const;
+
     bool isValid() const;
 
     virtual void draw(QPainter *painter) const;
     virtual void drawText(QPainter *painter) const;
     virtual void drawIcon(QPainter *painter) const;
     virtual void drawBg(QPainter *painter) const;
+    virtual void drawIndicator(QPainter *painter) const;
     virtual void layout();
     virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
     virtual QRect subElementRect(QStyle::SubElement element) const;
@@ -46,10 +51,13 @@ protected:
     const QWidget *m_widget;
     QIcon m_icon;
     QString m_text;
+    QIcon m_indicator;
     Union::ElementList m_backgroundElementList;
     Union::ElementList m_contentElementList;
+    Union::ElementList m_indicatorElementList;
     Union::Properties::StylePropertyGroup *m_backgroundProperties;
     Union::Properties::StylePropertyGroup *m_contentProperties;
+    Union::Properties::StylePropertyGroup *m_indicatorProperties;
     QMap<QString, LayoutItem> m_layoutMap;
     QStringList m_subElementList;
 
