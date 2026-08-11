@@ -6,6 +6,7 @@
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
+#include "elements/MenuItemElement.h"
 #include "elements/ToolButtonElement.h"
 
 #include <ElementQuery.h>
@@ -135,30 +136,8 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_MenuItem: {
-        if (const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
-            if (menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
-                drawElementBackground(painter, menuItemOption, widget, {u"MenuSeparator"_s});
-                // TODO we need to allow text drawing on separators?
-                // if (!menuItemOption->text.isEmpty()){
-                //    auto textrect = menuItemOption->rect;
-                //    textrect.setHeight(menuItemOption->fontMetrics.height());
-                //    drawText(textrect, menuItemOption, painter, menuItemOption->text, widget);
-                //}
-            } else {
-                const auto elements = prepareElements(menuItemOption, widget, {u"MenuItem"_s});
-                auto props = queryProperties(elements);
-                drawElementBackground(painter, menuItemOption, widget, {u"MenuItem"_s});
-                layoutAndDrawIconTextIndicator(menuItemOption, painter, widget, menuItemOption->icon, menuItemOption->text, QIcon(), {u"MenuItem"_s});
-                if (menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu) {
-                    if (props->layout() && props->icon()) {
-                        auto map = layoutMap(elements, menuItemOption, {u"Arrow"_s});
-                        auto rect = map[u"Arrow"_s].rect;
-                        QIcon icon = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-right-symbolic"_s));
-                        drawIcon(rect.toRect(), menuItemOption, painter, icon, widget);
-                    }
-                }
-            }
-        }
+        auto ev = MenuItemElement::create(option, this, widget);
+        ev->draw(painter);
     }
         return;
     case QStyle::CE_ToolBoxTabShape:
@@ -878,41 +857,15 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         auto ev = ButtonElement::create(option, this, widget);
-        return ev->contentsSize(contentsSize);
+        return ev->contentsSize(size);
     } break;
     case QStyle::CT_ToolButton: {
         auto ev = ToolButtonElement::create(option, this, widget);
-        return ev->contentsSize(contentsSize);
+        return ev->contentsSize(size);
     } break;
     case QStyle::CT_MenuItem: {
-        const auto *menuItemOpt = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-        if (!menuItemOpt) {
-            return size;
-        }
-        // Handle separator separately (pun not intended)
-        if (menuItemOpt->menuItemType == QStyleOptionMenuItem::Separator) {
-            auto separatorProps = queryProperties(prepareElements(menuItemOpt, widget, {u"MenuSeparator"_s}));
-            if (separatorProps->layout()) {
-                int width = separatorProps->layout()->width().value_or(1);
-                int height = separatorProps->layout()->height().value_or(1);
-                QSize separatorSize(width, height);
-                return separatorSize.grownBy(padding);
-            }
-        } else {
-            auto menuProps = queryProperties(prepareElements(menuItemOpt, widget, {u"MenuItem"_s}));
-            if (menuProps->layout()) {
-                int width = menuProps->layout()->width().value_or(1);
-                int height = menuProps->layout()->height().value_or(1);
-                if (size.width() > width) {
-                    width = size.width();
-                }
-                if (size.height() > height) {
-                    height = size.height();
-                }
-                QSize itemSize(width, height);
-                return itemSize.grownBy(padding);
-            }
-        }
+        auto ev = MenuItemElement::create(option, this, widget);
+        return ev->contentsSize(size);
     } break;
     // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {

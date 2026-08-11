@@ -134,7 +134,7 @@ QRect AbstractElement::subControlRect(QStyle::SubControl subControl) const
 
 void AbstractElement::updateSubElementList()
 {
-    m_subElementList = buildSubElementList(m_styleOption, m_widget);
+    qWarning() << "updateSubElementList is unimplemented for" << m_widget;
 }
 
 QSize AbstractElement::applyPaddingToSize(QSize oldSize) const
