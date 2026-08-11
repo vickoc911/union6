@@ -53,7 +53,7 @@ void ToolButtonElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
+    drawBg(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);

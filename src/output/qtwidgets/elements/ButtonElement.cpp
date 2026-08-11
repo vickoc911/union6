@@ -45,7 +45,7 @@ void ButtonElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
+    drawBg(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
