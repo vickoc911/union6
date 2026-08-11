@@ -40,7 +40,7 @@ void CheckElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
+    drawBg(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
@@ -77,6 +77,20 @@ QRect CheckElement::subElementRect(QStyle::SubElement element) const
 CheckElement::Ptr CheckElement::create(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
 {
     return std::make_shared<CheckElement>(type, option, style, widget);
+}
+
+void CheckElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    m_subElementList.append(u"Indicator"_s);
+    if (m_buttonOption) {
+        if (!m_buttonOption->icon.isNull()) {
+            m_subElementList.append(u"Icon"_s);
+        }
+        if (!m_buttonOption->text.isEmpty()) {
+            m_subElementList.append(u"Text"_s);
+        }
+    }
 }
 
 void CheckElement::drawIndicator(QPainter *painter) const

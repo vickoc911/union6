@@ -45,10 +45,26 @@ void ButtonElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
+    drawBg(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
+}
+
+void ButtonElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    if (m_buttonOption) {
+        if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+            m_subElementList.append(u"Indicator"_s);
+        }
+        if (!m_buttonOption->icon.isNull()) {
+            m_subElementList.append(u"Icon"_s);
+        }
+        if (!m_buttonOption->text.isEmpty()) {
+            m_subElementList.append(u"Text"_s);
+        }
+    }
 }
 
 QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
