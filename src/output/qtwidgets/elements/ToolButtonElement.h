@@ -29,6 +29,13 @@ public:
 
     const QStyleOptionToolButton *m_toolButtonOption = nullptr;
 
+    void updateSubElementList() override;
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
+
+private:
+    bool m_hasIndicator;
+    bool m_hasArrows;
+    bool m_hasIcon;
+    bool m_hasText;
 };

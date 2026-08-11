@@ -11,6 +11,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/CheckElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
+        elements/MenuItemElement.cpp
+        elements/MenuItemElement.h
         BackgroundDrawing.cpp
         BackgroundDrawing.h
         StyleUtils.cpp
