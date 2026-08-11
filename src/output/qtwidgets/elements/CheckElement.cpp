@@ -13,7 +13,6 @@ using namespace Qt::StringLiterals;
 CheckElement::CheckElement(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_buttonOption(qstyleoption_cast<const QStyleOptionButton *>(option))
-    , m_indicatorIcon(QIcon())
     , m_type(type)
 {
     if (m_buttonOption) {

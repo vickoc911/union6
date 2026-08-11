@@ -13,7 +13,6 @@ using namespace Qt::StringLiterals;
 ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_buttonOption(qstyleoption_cast<const QStyleOptionButton *>(option))
-    , m_indicatorIcon(QIcon())
 {
     if (m_buttonOption) {
         if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
@@ -21,7 +20,7 @@ ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style
             if (!m_indicatorElementList.isEmpty()) {
                 m_indicatorProperties = queryProperties(m_indicatorElementList);
                 if (m_indicatorProperties->icon()) {
-                    m_indicatorIcon = QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString()));
+                    setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
                 }
             }
         }
@@ -57,7 +56,7 @@ QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     size = applyPaddingToSize(size);
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background
     // to get the proper contentSize
-    if (!m_indicatorIcon.isNull()) {
+    if (hasIndicator()) {
         size.rwidth() += m_layoutMap[u"Indicator"_s].rect.width() + m_backgroundProperties->layout()->spacing().value_or(0);
     }
     return size;
@@ -86,29 +85,4 @@ QRect ButtonElement::subElementRect(QStyle::SubElement element) const
 ButtonElement::Ptr ButtonElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
 {
     return std::make_shared<ButtonElement>(option, style, widget);
-}
-
-void ButtonElement::drawIndicator(QPainter *painter) const
-{
-    if (!m_indicatorIcon.isNull()) {
-        QRect indicatorRect = m_layoutMap[u"Indicator"_s].rect.toRect();
-        drawBackground(painter, indicatorRect, m_indicatorProperties);
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-
-        const QPalette activePalette = m_styleOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = indicatorRect.size();
-        const QPixmap pixmap = m_indicatorIcon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
-        if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
-            auto iconColor = m_indicatorProperties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
-
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, indicatorRect, Qt::AlignCenter, pixmap);
-        painter->restore();
-    }
 }
