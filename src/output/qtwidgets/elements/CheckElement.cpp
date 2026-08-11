@@ -79,6 +79,20 @@ CheckElement::Ptr CheckElement::create(Type type, const QStyleOption *option, co
     return std::make_shared<CheckElement>(type, option, style, widget);
 }
 
+void CheckElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    m_subElementList.append(u"Indicator"_s);
+    if (m_buttonOption) {
+        if (!m_buttonOption->icon.isNull()) {
+            m_subElementList.append(u"Icon"_s);
+        }
+        if (!m_buttonOption->text.isEmpty()) {
+            m_subElementList.append(u"Text"_s);
+        }
+    }
+}
+
 void CheckElement::drawIndicator(QPainter *painter) const
 {
     auto subopt = *m_buttonOption;

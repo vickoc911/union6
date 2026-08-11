@@ -67,6 +67,31 @@ void MenuItemElement::draw(QPainter *painter) const
     }
 }
 
+void MenuItemElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    if (m_menuItemOption) {
+        if (!m_menuItemOption->text.isEmpty()) {
+            m_subElementList.append(u"Text"_s);
+        }
+        if (!m_menuItemOption->icon.isNull()) {
+            m_subElementList.append(u"Icon"_s);
+        }
+        if (m_menuItemOption->menuHasCheckableItems) {
+            m_subElementList.append(u"CheckBox"_s);
+        }
+        if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu) {
+            m_subElementList.append(u"Arrow"_s);
+        }
+        if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
+            m_subElementList.append(u"Separator"_s);
+        }
+        if (m_menuItemOption->checkType != QStyleOptionMenuItem::NotCheckable) {
+            m_subElementList.append(u"Indicator"_s);
+        }
+    }
+}
+
 void MenuItemElement::layout()
 {
     // Background and content is separate

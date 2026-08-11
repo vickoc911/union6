@@ -13,8 +13,17 @@ using namespace Qt::StringLiterals;
 ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_toolButtonOption(qstyleoption_cast<const QStyleOptionToolButton *>(option))
+    , m_hasIndicator(false)
+    , m_hasArrows(false)
+    , m_hasIcon(false)
+    , m_hasText(false)
 {
     if (m_toolButtonOption) {
+        m_hasIndicator =
+            m_toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
+        m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
+        m_hasIcon = !m_toolButtonOption->icon.isNull() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
+        m_hasText = !m_toolButtonOption->text.isEmpty() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly;
         m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {u"Indicator"_s});
         if (!m_indicatorElementList.isEmpty()) {
             m_indicatorProperties = queryProperties(m_indicatorElementList);
@@ -48,6 +57,22 @@ void ToolButtonElement::draw(QPainter *painter) const
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
+}
+
+void ToolButtonElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    if (m_toolButtonOption) {
+        if (m_hasIcon || m_hasArrows) {
+            m_subElementList.append(u"Icon"_s);
+        }
+        if (m_hasText) {
+            m_subElementList.append(u"Text"_s);
+        }
+        if (m_hasIndicator) {
+            m_subElementList.append(u"Indicator"_s);
+        }
+    }
 }
 
 QSize ToolButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
