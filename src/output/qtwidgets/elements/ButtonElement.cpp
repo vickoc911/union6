@@ -32,6 +32,8 @@ ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style
             setText(m_buttonOption->text);
         }
     }
+    updateSubElementList();
+    layout();
 }
 
 ButtonElement::~ButtonElement()
