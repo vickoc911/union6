@@ -577,14 +577,17 @@ QStringList setupMemberList(const QWidget *widget)
     return members;
 }
 
-QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements)
+QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElementList)
 {
     QMap<QString, LayoutItem> map;
     QList<LayoutItem> items;
+    QStringList subElements = subElementList;
 
+    // If subelement list is empty, just use default widget item.
+    // This ensures any custom components get layouted too.
     if (subElements.empty()) {
-        qWarning() << "No sublements given, returning empty map!" << elements << opt->type;
-        return map;
+        qDebug() << "No sublements given, using Widget placeholder for" << elements << opt->type;
+        subElements = {u"Widget"_s};
     }
 
     // TODO: Go through all elements, create rectangles for them
@@ -982,6 +985,9 @@ QStringList buildSubElementList(const QStyleOption *option, const QWidget *widge
         }
         if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
             childelements.append(u"Separator"_s);
+        }
+        if (menuItem->checkType != QStyleOptionMenuItem::NotCheckable) {
+            childelements.append(u"Indicator"_s);
         }
     }
 
