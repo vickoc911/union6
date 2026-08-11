@@ -28,11 +28,4 @@ public:
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
     const QStyleOptionButton *m_buttonOption = nullptr;
-    QIcon m_indicatorIcon;
-
-    void drawIndicator(QPainter *painter) const;
-
-private:
-    Union::ElementList m_indicatorElementList;
-    Union::Properties::StylePropertyGroup *m_indicatorProperties;
 };

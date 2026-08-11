@@ -17,6 +17,7 @@ AbstractElement::AbstractElement(const QStyleOption *option, const UnionStyle *s
     , m_widget(widget)
     , m_icon(QIcon())
     , m_text(QString())
+    , m_indicator(QIcon())
     , m_isValid(false)
 {
     updateSubElementList();
@@ -60,6 +61,21 @@ void AbstractElement::setText(const QString &text)
 bool AbstractElement::hasText() const
 {
     return !m_text.isEmpty();
+}
+
+QIcon AbstractElement::indicator() const
+{
+    return m_indicator;
+}
+
+void AbstractElement::setIndicator(const QIcon &indicator)
+{
+    m_indicator = indicator;
+}
+
+bool AbstractElement::hasIndicator() const
+{
+    return !m_indicator.isNull();
 }
 
 bool AbstractElement::isValid() const
@@ -203,6 +219,31 @@ void AbstractElement::drawIcon(QPainter *painter) const
         painter->save();
         painter->setPen(penColor);
         m_style->drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        painter->restore();
+    }
+}
+
+void AbstractElement::drawIndicator(QPainter *painter) const
+{
+    if (hasIndicator()) {
+        QRect indicatorRect = m_layoutMap[u"Indicator"_s].rect.toRect();
+        drawBackground(painter, indicatorRect, m_indicatorProperties);
+        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+
+        const QPalette activePalette = m_styleOption->palette;
+        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
+        auto iconSize = indicatorRect.size();
+        const QPixmap pixmap = m_indicator.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+
+        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
+        if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
+            auto iconColor = m_indicatorProperties->icon()->color();
+            penColor = iconColor->toQColor();
+        }
+
+        painter->save();
+        painter->setPen(penColor);
+        m_style->drawItemPixmap(painter, indicatorRect, Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }
