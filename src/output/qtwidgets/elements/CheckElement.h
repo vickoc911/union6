@@ -35,6 +35,7 @@ public:
 
     const QStyleOptionButton *m_buttonOption = nullptr;
 
+    void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
 
 private:
