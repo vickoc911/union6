@@ -139,6 +139,9 @@ void AbstractElement::updateSubElementList()
 
 QSize AbstractElement::applyPaddingToSize(QSize oldSize) const
 {
+    if (!m_isValid) {
+        return oldSize;
+    }
     QSize minimumSize = oldSize;
     QSize size = minimumSize;
     QMargins padding;
@@ -170,7 +173,7 @@ void AbstractElement::drawBg(QPainter *painter) const
 
 void AbstractElement::drawText(QPainter *painter) const
 {
-    if (hasText()) {
+    if (hasText() && m_isValid) {
         QRect textRect = m_layoutMap[u"Text"_s].rect.toRect();
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
@@ -192,7 +195,7 @@ void AbstractElement::drawText(QPainter *painter) const
 
 void AbstractElement::drawIcon(QPainter *painter) const
 {
-    if (hasIcon()) {
+    if (hasIcon() && m_isValid) {
         QRect iconRect = m_layoutMap[u"Icon"_s].rect.toRect();
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
@@ -223,7 +226,7 @@ void AbstractElement::drawIcon(QPainter *painter) const
 
 void AbstractElement::drawIndicator(QPainter *painter) const
 {
-    if (hasIndicator()) {
+    if (hasIndicator() && m_isValid) {
         QRect indicatorRect = m_layoutMap[u"Indicator"_s].rect.toRect();
         drawBackground(painter, indicatorRect, m_indicatorProperties);
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
