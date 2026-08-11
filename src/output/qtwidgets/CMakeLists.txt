@@ -9,6 +9,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ButtonElement.h
         elements/CheckElement.cpp
         elements/CheckElement.h
+        elements/TabElement.cpp
+        elements/TabElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
         elements/MenuItemElement.cpp
