@@ -30,6 +30,8 @@ ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyl
             setText(m_toolButtonOption->text);
         }
     }
+    updateSubElementList();
+    layout();
 }
 
 ToolButtonElement::~ToolButtonElement()

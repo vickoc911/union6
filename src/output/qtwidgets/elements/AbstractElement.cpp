@@ -20,8 +20,6 @@ AbstractElement::AbstractElement(const QStyleOption *option, const UnionStyle *s
     , m_indicator(QIcon())
     , m_isValid(false)
 {
-    updateSubElementList();
-    layout();
 }
 
 AbstractElement::~AbstractElement()

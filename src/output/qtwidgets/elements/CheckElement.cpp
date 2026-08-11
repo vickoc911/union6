@@ -27,6 +27,8 @@ CheckElement::CheckElement(Type type, const QStyleOption *option, const UnionSty
             setText(m_buttonOption->text);
         }
     }
+    updateSubElementList();
+    layout();
 }
 
 CheckElement::~CheckElement()
