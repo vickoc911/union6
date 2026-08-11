@@ -38,5 +38,7 @@ private:
     Union::Properties::StylePropertyGroup *m_indicatorProperties;
     bool m_isSeparator;
     bool m_hasSubMenu;
+    bool m_hasCheckBox;
+    bool m_hasRadioButton;
     QString m_shortcutText;
 };
