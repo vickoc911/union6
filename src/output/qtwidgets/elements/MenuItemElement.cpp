@@ -15,11 +15,15 @@ MenuItemElement::MenuItemElement(const QStyleOption *option, const UnionStyle *s
     , m_menuItemOption(qstyleoption_cast<const QStyleOptionMenuItem *>(option))
     , m_isSeparator(false)
     , m_hasSubMenu(false)
+    , m_hasCheckBox(false)
+    , m_hasRadioButton(false)
     , m_shortcutText(QString())
 {
     if (m_menuItemOption) {
         m_isSeparator = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator);
         m_hasSubMenu = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu);
+        m_hasCheckBox = (m_menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive);
+        m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
 
         if (m_hasSubMenu) {
             m_indicatorElementList = prepareElements(m_menuItemOption, widget, {u"MenuItem"_s});
@@ -53,6 +57,14 @@ void MenuItemElement::draw(QPainter *painter) const
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
+    if (m_hasCheckBox || m_hasRadioButton) {
+        QStyleOptionButton button;
+        button.initFrom(m_widget);
+        button.rect = m_layoutMap[u"Indicator"_s].rect.toRect();
+        button.state = m_menuItemOption->state;
+        button.state.setFlag(QStyle::State_On, m_menuItemOption->checked);
+        drawElementBackground(painter, &button, m_widget, {m_hasCheckBox ? u"CheckBox"_s : u"RadioButton"_s, u"Indicator"_s});
+    }
 }
 
 void MenuItemElement::layout()
@@ -72,6 +84,9 @@ void MenuItemElement::layout()
 
     QStringList subElements;
     QString itemText = text();
+    if (m_hasCheckBox || m_hasRadioButton) {
+        subElements.append(u"Indicator"_s);
+    }
     if (hasIcon()) {
         subElements.append(u"Icon"_s);
     }
@@ -90,6 +105,7 @@ void MenuItemElement::layout()
     if (m_isSeparator) {
         subElements.append(u"Separator"_s);
     }
+
     if (subElements.empty()) {
         m_isValid = false;
         return;
