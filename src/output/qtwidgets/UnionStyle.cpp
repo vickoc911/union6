@@ -857,15 +857,15 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         auto ev = ButtonElement::create(option, this, widget);
-        return ev->contentsSize(contentsSize);
+        return ev->contentsSize(size);
     } break;
     case QStyle::CT_ToolButton: {
         auto ev = ToolButtonElement::create(option, this, widget);
-        return ev->contentsSize(contentsSize);
+        return ev->contentsSize(size);
     } break;
     case QStyle::CT_MenuItem: {
         auto ev = MenuItemElement::create(option, this, widget);
-        return ev->contentsSize(contentsSize);
+        return ev->contentsSize(size);
     } break;
     // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {
