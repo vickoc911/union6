@@ -6,6 +6,7 @@
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
+#include "elements/ComboBoxElement.h"
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
@@ -78,12 +79,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 
     switch (controlElement) {
     case QStyle::CE_ComboBoxLabel: {
-        if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-            if (!comboBoxOption->editable) {
-                auto subopt = *comboBoxOption;
-                subopt.rect = subControlRect(CC_ComboBox, comboBoxOption, SC_ComboBoxEditField, widget);
-                layoutAndDrawIconTextIndicator(&subopt, painter, widget, comboBoxOption->currentIcon, comboBoxOption->currentText);
-            }
+        auto ev = ComboBoxElement::create(option, this, widget);
+        ev->drawIcon(painter);
+        if (!ev->isEditable()) {
+            ev->drawText(painter);
         }
     }
         return;
@@ -290,14 +289,10 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         if (!comboBoxOption) {
             return;
         }
-        drawElementBackground(painter, comboBoxOption, widget);
+        auto ev = ComboBoxElement::create(comboBoxOption, this, widget);
+        ev->drawBg(painter);
         drawControl(CE_ComboBoxLabel, comboBoxOption, painter, widget);
-        auto indicatorRect = subControlRect(CC_ComboBox, comboBoxOption, SC_ComboBoxArrow, widget);
-        const auto props = queryProperties(prepareElements(comboBoxOption, widget, {u"Indicator"_s}));
-        if (props->icon()) {
-            auto icon = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
-            drawIcon(indicatorRect, option, painter, icon, widget);
-        }
+        ev->drawIndicator(painter);
     }
         return;
     case QStyle::CC_SpinBox: {
@@ -753,19 +748,8 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     } break;
     // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {
-        auto elements = prepareElements(option, widget);
-        QStringList childelements = {u"Icon"_s, u"Text"_s, u"Indicator"_s};
-        auto map = layoutMap(elements, option, childelements);
-        QRect unifiedRect;
-        for (const auto &m : map) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
-        }
-        // Follow the contents width
-        if (unifiedRect.width() < contentsSize.width()) {
-            unifiedRect.setWidth(contentsSize.width());
-        }
-        size = unifiedRect.size().grownBy(padding);
-        size.rwidth() += pixelMetric(PM_LayoutLeftMargin, option, widget);
+        auto ev = ComboBoxElement::create(option, this, widget);
+        return ev->contentsSize(size);
     } break;
     case QStyle::CT_TabBarTab: {
         auto ev = TabElement::create(option, this, widget);
@@ -950,36 +934,8 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
     }
 
     if (complexControl == CC_ComboBox) {
-        // cast option and check
-        const auto comboBoxOption(qstyleoption_cast<const QStyleOptionComboBox *>(option));
-        if (!comboBoxOption) {
-            return QCommonStyle::subControlRect(CC_ComboBox, option, subControl, widget);
-        }
-        switch (subControl) {
-        case SC_ComboBoxFrame:
-        case SC_ComboBoxListBoxPopup:
-            return option->rect;
-
-        case SC_ComboBoxArrow: {
-            auto elements = prepareElements(option, widget);
-            auto map = layoutMap(elements, option, {u"Indicator"_s});
-            auto rect = map[u"Indicator"_s].rect;
-            const int spacing(pixelMetric(PM_LayoutVerticalSpacing, option, widget));
-            rect = rect.adjusted(-spacing, 0, spacing, 0);
-            return visualRect(option->direction, option->rect, rect.toRect());
-        }
-
-        case SC_ComboBoxEditField: {
-            QRect labelRect;
-            auto rect = option->rect;
-            auto indicatorRect = subControlRect(CC_ComboBox, option, SC_ComboBoxArrow, widget);
-            labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
-            return visualRect(option->direction, option->rect, labelRect);
-        }
-
-        default:
-            break;
-        }
+        auto ev = ComboBoxElement::create(option, this, widget);
+        return ev->subControlRect(subControl);
     }
     if (complexControl == CC_GroupBox) {
         auto ev = GroupBoxElement::create(option, this, widget);
@@ -1616,72 +1572,4 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
     painter->setPen(penColor);
     drawItemPixmap(painter, rect, Qt::AlignCenter, pixmap);
     painter->restore();
-}
-
-void UnionStyle::layoutAndDrawIconTextIndicator(const QStyleOption *opt,
-                                                QPainter *painter,
-                                                const QWidget *widget,
-                                                const QIcon &icon,
-                                                const QString &text,
-                                                const QIcon &indicator,
-                                                const QStringList &children) const
-{
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget, children);
-
-    QString itemText = text;
-    QString shortcutText;
-    bool hasIcon = !icon.isNull();
-    bool hasText = !itemText.isEmpty();
-    bool hasIndicator = !indicator.isNull();
-
-    QStringList subElements;
-    if (hasIcon) {
-        subElements.append(u"Icon"_s);
-    }
-    if (hasText) {
-        subElements.append(u"Text"_s);
-        const int tabPosition(itemText.indexOf(QLatin1Char('\t')));
-        if (tabPosition >= 0) {
-            subElements.append(u"ShortcutText"_s);
-            shortcutText = itemText.mid(tabPosition + 1);
-            itemText = itemText.left(tabPosition);
-        }
-    }
-    if (hasIndicator) {
-        subElements.append(u"Indicator"_s);
-    }
-    // Nothing to draw, just return
-    if (subElements.isEmpty()) {
-        return;
-    }
-    auto map = layoutMap(elements, opt, subElements);
-
-    if (hasText) {
-        QRect textRect = map[u"Text"_s].rect.toRect();
-        drawText(textRect, opt, painter, itemText, widget);
-    }
-
-    if (hasIcon) {
-        QRect iconRect = map[u"Icon"_s].rect.toRect();
-        drawIcon(iconRect, opt, painter, icon, widget);
-    }
-
-    if (hasIndicator) {
-        QRect indicatorRect = map[u"Indicator"_s].rect.toRect();
-        drawIcon(indicatorRect, opt, painter, indicator, widget);
-    }
-
-    // ShortcutText is just like a regular text element but handled with different name
-    // and has different coloration, so override the default colors
-    if (!shortcutText.isEmpty()) {
-        QRect textRect = map[u"ShortcutText"_s].rect.toRect();
-        auto shortcutHierarchy = children;
-        shortcutHierarchy.append(u"ShortcutText"_s);
-        const auto properties = queryProperties(prepareElements(opt, widget, shortcutHierarchy));
-        QColor overrideColor;
-        if (properties->text() && properties->text()->color().has_value()) {
-            overrideColor = properties->text()->color()->toQColor();
-        }
-        drawText(textRect, opt, painter, shortcutText, widget, overrideColor);
-    }
 }
