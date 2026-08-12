@@ -6,6 +6,7 @@
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
+#include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
@@ -210,29 +211,15 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_MenuBarItem:
         drawElementBackground(painter, option, widget, {u"MenuBarItem"_s});
         return;
-    case QStyle::CE_HeaderLabel:
-        if (const auto header = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto props = queryProperties(prepareElements(header, widget, {u"HeaderViewDelegate"_s}));
-            QIcon sortIndicator;
-            switch (header->sortIndicator) {
-            case QStyleOptionHeader::None:
-                break;
-            case QStyleOptionHeader::SortUp:
-                if (props->icon()) {
-                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-up-symbolic"_s));
-                }
-                break;
-            case QStyleOptionHeader::SortDown:
-                if (props->icon()) {
-                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
-                }
-                break;
-            }
-            layoutAndDrawIconTextIndicator(header, painter, widget, sortIndicator, header->text, QIcon(), {u"HeaderViewDelegate"_s});
-        }
+    case QStyle::CE_HeaderLabel: {
+        auto ev = HeaderElement::create(option, this, widget);
+        ev->drawIcon(painter);
+        ev->drawText(painter);
+    }
         return;
     case QStyle::CE_HeaderSection: {
-        drawElementBackground(painter, option, widget, {u"HeaderViewDelegate"_s});
+        auto ev = HeaderElement::create(option, this, widget);
+        ev->drawBg(painter);
     }
         return;
     case QStyle::CE_Header:
@@ -712,24 +699,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
         return;
     case QStyle::PE_IndicatorHeaderArrow: {
-        if (const auto header = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto props = queryProperties(prepareElements(header, widget, {u"HeaderViewDelegate"_s}));
-            QIcon sortIndicator;
-            switch (header->sortIndicator) {
-            case QStyleOptionHeader::None:
-                break;
-            case QStyleOptionHeader::SortUp:
-                if (props->icon()) {
-                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-up-symbolic"_s));
-                }
-                break;
-            case QStyleOptionHeader::SortDown:
-                if (props->icon()) {
-                    sortIndicator = QIcon::fromTheme(props->icon()->name().value_or(u"arrow-down-symbolic"_s));
-                }
-                break;
-            }
-            drawIcon(header->rect, option, painter, sortIndicator, widget);
+        if (qstyleoption_cast<const QStyleOptionHeader *>(option)) {
+            auto ev = HeaderElement::create(option, this, widget);
+            ev->drawIcon(painter);
         } else {
             // Fallback
             if (option->state.testFlags(State_UpArrow)) {
@@ -915,11 +887,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     } break;
     case QStyle::SE_HeaderArrow:
     case QStyle::SE_HeaderLabel: {
-        auto elements = prepareElements(option, widget, {u"HeaderViewDelegate"_s});
-        QStringList childelements = {u"Text"_s, u"Icon"_s};
-        auto map = layoutMap(elements, option, childelements);
-        auto mapItem = (element == SE_HeaderLabel) ? u"Text"_s : u"Icon"_s;
-        rect = map[mapItem].rect.toRect();
+        auto ev = HeaderElement::create(option, this, widget);
+        return ev->subElementRect(element);
     } break;
     case QStyle::SE_TabBarTabText: {
         auto ev = TabElement::create(option, this, widget);
