@@ -1,0 +1,131 @@
+// SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+// SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
+
+#include "GroupBoxElement.h"
+#include "UnionStyle.h"
+#include <QApplication>
+#include <QDebug>
+#include <QGroupBox>
+#include <QPainter>
+#include <QStyle>
+
+using namespace Qt::StringLiterals;
+
+GroupBoxElement::GroupBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+    : AbstractElement(option, style, widget)
+    , m_groupBoxOption(qstyleoption_cast<const QStyleOptionGroupBox *>(option))
+    , m_isCheckable(false)
+{
+    if (auto groupBox = qobject_cast<const QGroupBox *>(m_widget)) {
+        if (groupBox->isCheckable()) {
+            m_isCheckable = true;
+        }
+    }
+    if (m_groupBoxOption) {
+        if (!m_groupBoxOption->text.isEmpty()) {
+            setText(m_groupBoxOption->text);
+        }
+    }
+    layout();
+}
+
+GroupBoxElement::~GroupBoxElement()
+{
+}
+
+void GroupBoxElement::draw(QPainter *painter) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    drawBg(painter);
+    drawIcon(painter);
+    drawText(painter);
+}
+
+QSize GroupBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
+{
+    return contentsSizeFromStyle;
+}
+
+void GroupBoxElement::layout()
+{
+    // We only layout by background, m_contentElementList etc are ignored
+    if (m_backgroundElementList.isEmpty()) {
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
+    }
+    if (!m_backgroundElementList.isEmpty()) {
+        m_backgroundProperties = queryProperties(m_backgroundElementList);
+        m_isValid = true;
+    }
+}
+
+QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
+{
+    if (!m_isValid) {
+        qWarning() << "subControlRect for " << subControl << "is not valid";
+        return QRect();
+    }
+
+    QRect rect;
+
+    switch (subControl) {
+    case QStyle::SC_GroupBoxLabel: {
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Text"_s});
+        rect = map[u"Text"_s].rect.toRect();
+    } break;
+    case QStyle::SC_GroupBoxContents: {
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Text"_s});
+        rect = map[u"GroupBox"_s].rect.toRect();
+    } break;
+    case QStyle::SC_GroupBoxCheckBox: {
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Icon"_s});
+        rect = map[u"Icon"_s].rect.toRect();
+    } break;
+    case QStyle::SC_GroupBoxFrame: {
+        return m_styleOption->rect;
+    }
+    default:
+        break;
+    }
+
+    return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, rect);
+}
+
+GroupBoxElement::Ptr GroupBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+{
+    return std::make_shared<GroupBoxElement>(option, style, widget);
+}
+
+void GroupBoxElement::drawText(QPainter *painter) const
+{
+    if ((m_groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && hasText()) {
+        QRect textRect = subControlRect(QStyle::SC_GroupBoxLabel);
+        int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
+        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+        QColor penColor = m_styleOption->palette.text().color();
+        // TODO: hide mnemonics if requested
+        if (m_backgroundProperties->text()) {
+            auto textColor = m_backgroundProperties->text()->color();
+            if (textColor) {
+                penColor = textColor->toQColor();
+            }
+            textFlags = textFlagsFromProperties(m_backgroundProperties, false);
+        }
+        painter->save();
+        painter->setPen(penColor);
+        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
+        painter->restore();
+    }
+}
+
+void GroupBoxElement::drawIcon(QPainter *painter) const
+{
+    if (m_isCheckable) {
+        QStyleOptionButton checkbox;
+        checkbox.rect = subControlRect(QStyle::SC_GroupBoxCheckBox);
+        checkbox.state = m_groupBoxOption->state;
+        m_style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &checkbox, painter, m_widget);
+    }
+}

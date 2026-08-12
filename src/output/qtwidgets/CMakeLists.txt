@@ -9,6 +9,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ButtonElement.h
         elements/CheckElement.cpp
         elements/CheckElement.h
+        elements/GroupBoxElement.cpp
+        elements/GroupBoxElement.h
         elements/HeaderElement.cpp
         elements/HeaderElement.h
         elements/ItemViewElement.cpp
