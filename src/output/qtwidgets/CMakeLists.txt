@@ -17,6 +17,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ToolButtonElement.h
         elements/MenuItemElement.cpp
         elements/MenuItemElement.h
+        elements/ProgressBarElement.cpp
+        elements/ProgressBarElement.h
         BackgroundDrawing.cpp
         BackgroundDrawing.h
         StyleUtils.cpp
