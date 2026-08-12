@@ -1,0 +1,136 @@
+// SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+// SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
+
+#include "ComboBoxElement.h"
+#include "UnionStyle.h"
+#include <QApplication>
+#include <QDebug>
+#include <QPainter>
+#include <QStyle>
+
+using namespace Qt::StringLiterals;
+
+ComboBoxElement::ComboBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+    : AbstractElement(option, style, widget)
+    , m_comboBoxOption(qstyleoption_cast<const QStyleOptionComboBox *>(option))
+    , m_spacing(0)
+    , m_editable(false)
+{
+    if (m_comboBoxOption) {
+        m_editable = m_comboBoxOption->editable;
+
+        m_indicatorElementList = prepareElements(m_comboBoxOption, m_widget, {u"Indicator"_s});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
+            if (m_indicatorProperties->icon()) {
+                setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
+            }
+            if (m_indicatorProperties->layout()) {
+                m_spacing = m_indicatorProperties->layout()->spacing().value_or(1);
+            }
+        }
+
+        if (!m_comboBoxOption->currentIcon.isNull()) {
+            setIcon(m_comboBoxOption->currentIcon);
+        }
+        if (!m_comboBoxOption->currentText.isEmpty()) {
+            setText(m_comboBoxOption->currentText);
+        }
+    }
+    updateSubElementList();
+    layout();
+}
+
+ComboBoxElement::~ComboBoxElement()
+{
+}
+
+bool ComboBoxElement::isEditable() const
+{
+    return m_editable;
+}
+
+void ComboBoxElement::draw(QPainter *painter) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    drawBg(painter);
+    drawIcon(painter);
+    if (!m_editable) {
+        drawText(painter);
+    }
+    drawIndicator(painter);
+}
+
+void ComboBoxElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    if (m_comboBoxOption) {
+        m_subElementList.append(u"Indicator"_s);
+        if (hasText()) {
+            m_subElementList.append(u"Text"_s);
+        }
+        if (hasIcon()) {
+            m_subElementList.append(u"Icon"_s);
+        }
+    }
+}
+
+QSize ComboBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
+{
+    QStringList childelements = {u"Icon"_s, u"Text"_s, u"Indicator"_s};
+    auto map = layoutMap(m_backgroundElementList, m_styleOption, childelements);
+    QRect unifiedRect;
+    for (const auto &m : map) {
+        unifiedRect = unifiedRect.united(m.rect.toRect());
+    }
+    // Follow the contents width
+    if (unifiedRect.width() < contentsSizeFromStyle.width()) {
+        unifiedRect.setWidth(contentsSizeFromStyle.width());
+    }
+    auto size = applyPaddingToSize(unifiedRect.size());
+    if (m_indicatorProperties && m_indicatorProperties->layout()) {
+        size.rwidth() += m_indicatorProperties->layout()->spacing().value_or(1);
+    }
+    return size;
+}
+
+QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
+{
+    if (!m_isValid) {
+        qWarning() << "subControlRect for " << subControl << "is not valid";
+        return QRect();
+    }
+
+    switch (subControl) {
+    case QStyle::SC_ComboBoxFrame:
+    case QStyle::SC_ComboBoxListBoxPopup:
+        return m_styleOption->rect;
+
+    case QStyle::SC_ComboBoxArrow: {
+        auto map = layoutMap(m_backgroundElementList, m_comboBoxOption, {u"Indicator"_s});
+        auto rect = map[u"Indicator"_s].rect;
+        rect = rect.adjusted(-m_spacing, 0, m_spacing, 0);
+        return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, rect.toRect());
+    }
+
+    case QStyle::SC_ComboBoxEditField: {
+        QRect labelRect;
+        auto rect = m_styleOption->rect;
+        auto indicatorRect = subControlRect(QStyle::SC_ComboBoxArrow);
+        labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
+        return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, labelRect);
+    }
+
+    default:
+        break;
+    }
+    return QRect();
+}
+
+ComboBoxElement::Ptr ComboBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+{
+    return std::make_shared<ComboBoxElement>(option, style, widget);
+}
