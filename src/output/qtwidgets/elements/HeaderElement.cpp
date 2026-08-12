@@ -15,7 +15,6 @@ HeaderElement::HeaderElement(const QStyleOption *option, const UnionStyle *style
     , m_headerOption(qstyleoption_cast<const QStyleOptionHeader *>(option))
 {
     if (m_headerOption) {
-        setIcon(sortIndicator());
         if (!m_headerOption->text.isEmpty()) {
             setText(m_headerOption->text);
         }
@@ -31,7 +30,7 @@ HeaderElement::~HeaderElement()
 QIcon HeaderElement::sortIndicator()
 {
     QIcon sortIndicator;
-    if (m_headerOption) {
+    if (m_headerOption && m_contentProperties) {
         switch (m_headerOption->sortIndicator) {
         case QStyleOptionHeader::None:
             break;
@@ -66,6 +65,7 @@ void HeaderElement::layout()
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
+        setIcon(sortIndicator());
         m_isValid = true;
     } else {
         m_isValid = false;
