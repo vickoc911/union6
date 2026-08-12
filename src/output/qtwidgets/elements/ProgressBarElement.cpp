@@ -1,0 +1,159 @@
+// SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+// SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
+
+#include "ProgressBarElement.h"
+#include "UnionStyle.h"
+#include <QApplication>
+#include <QDebug>
+#include <QPainter>
+#include <QStyle>
+
+using namespace Qt::StringLiterals;
+
+ProgressBarElement::ProgressBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+    : AbstractElement(option, style, widget)
+    , m_progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+{
+    if (m_progressBarOption) {
+        if (!m_progressBarOption->text.isEmpty()) {
+            setText(m_progressBarOption->text);
+        }
+    }
+    updateSubElementList();
+    layout();
+}
+
+ProgressBarElement::~ProgressBarElement()
+{
+}
+
+void ProgressBarElement::draw(QPainter *painter) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    drawGroove(painter);
+    drawTrack(painter);
+    drawText(painter);
+    drawIndicator(painter);
+}
+
+void ProgressBarElement::drawGroove(QPainter *painter) const
+{
+    if (m_progressBarOption) {
+        auto groove = subElementRect(QStyle::SE_ProgressBarGroove);
+        drawBackground(painter, groove, m_backgroundProperties);
+    }
+}
+void ProgressBarElement::drawTrack(QPainter *painter) const
+{
+    if (m_progressBarOption) {
+        auto progress = subElementRect(QStyle::SE_ProgressBarContents);
+        drawBackground(painter, progress, m_contentProperties);
+    }
+}
+
+void ProgressBarElement::updateSubElementList()
+{
+    m_subElementList.clear();
+    if (m_progressBarOption) {
+        if (!m_progressBarOption->text.isEmpty()) {
+            m_subElementList.append(u"Text"_s);
+        }
+    }
+}
+
+void ProgressBarElement::layout()
+{
+    if (m_backgroundElementList.isEmpty()) {
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
+    }
+    if (!m_backgroundElementList.isEmpty()) {
+        m_backgroundProperties = queryProperties(m_backgroundElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+    }
+
+    if (m_contentElementList.isEmpty()) {
+        m_contentElementList = prepareElements(m_styleOption, m_widget, {u"ProgressBar"_s, u"Track"_s});
+    }
+    if (!m_contentElementList.isEmpty()) {
+        m_contentProperties = queryProperties(m_contentElementList);
+        m_isValid = true;
+    } else {
+        m_isValid = false;
+        qWarning() << "Could not find elementlist for this element!";
+    }
+}
+
+QSize ProgressBarElement::contentsSize(const QSize &contentsSizeFromStyle) const
+{
+    return contentsSizeFromStyle;
+}
+
+QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
+{
+    if (!m_progressBarOption) {
+        return QRect();
+    }
+    if (element == QStyle::SE_ProgressBarLabel) {
+        // Copied and repurposed from Breeze
+        const bool textVisible(m_progressBarOption->textVisible);
+        const bool busy(m_progressBarOption->minimum == 0 && m_progressBarOption->maximum == 0);
+        if (!textVisible || busy) {
+            return QRect();
+        }
+        auto textFlags = textFlagsFromProperties(m_backgroundProperties, false);
+        int textWidth = qMax(m_progressBarOption->fontMetrics.size(textFlags, m_progressBarOption->text).width(),
+                             m_progressBarOption->fontMetrics.size(textFlags, u"100%"_s).width());
+        auto rect = centerRect(m_progressBarOption->rect, textWidth, m_progressBarOption->rect.height());
+        rect.setLeft(rect.right() - textWidth + 1);
+        rect = m_style->visualRect(m_progressBarOption->direction, m_progressBarOption->rect, rect);
+        return rect;
+    } else if (element == QStyle::SE_ProgressBarContents) {
+        // Copied from Breeze
+        const auto rect(subElementRect(QStyle::SE_ProgressBarGroove));
+        const bool busy(m_progressBarOption->minimum == 0 && m_progressBarOption->maximum == 0);
+        if (busy) {
+            return rect;
+        }
+        const bool horizontal(m_progressBarOption->state.testFlag(QStyle::State_Horizontal));
+        bool reverse = (horizontal && (m_progressBarOption->direction == Qt::RightToLeft)) || !horizontal;
+        if (m_progressBarOption->invertedAppearance) {
+            reverse = !reverse;
+        }
+        const int progress(m_progressBarOption->progress - m_progressBarOption->minimum);
+        const int steps(qMax(m_progressBarOption->maximum - m_progressBarOption->minimum, 1));
+        const qreal position = qreal(progress) / qreal(steps);
+        const int indicatorSize(position * (horizontal ? rect.width() : rect.height()));
+        QRect indicatorRect;
+        if (horizontal) {
+            indicatorRect = QRect(rect.left() + (reverse ? rect.width() - indicatorSize : 0), rect.y(), indicatorSize, rect.height());
+        } else {
+            indicatorRect = QRect(rect.x(), reverse ? (rect.bottom() - indicatorSize + 1) : rect.top(), rect.width(), indicatorSize);
+        }
+        return indicatorRect;
+    } else if (element == QStyle::SE_ProgressBarGroove) {
+        // Copied and repurposed from Breeze
+        qreal width = 0;
+        qreal height = 0;
+        if (m_backgroundProperties->layout()) {
+            width = m_backgroundProperties->layout()->width().value_or(width);
+            height = m_backgroundProperties->layout()->height().value_or(height);
+        }
+        auto rect = m_progressBarOption->rect;
+        rect.setHeight(height);
+        rect.setWidth(width);
+        if (m_progressBarOption->state.testFlag(QStyle::State_Horizontal)) {
+            rect = centerRect(m_progressBarOption->rect, width, height);
+        } else {
+            rect = centerRect(m_progressBarOption->rect, height, width);
+        }
+        return m_style->visualRect(m_progressBarOption->direction, m_progressBarOption->rect, rect);
+    };
+    return QRect();
+}
+
+ProgressBarElement::Ptr ProgressBarElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+{
+    return std::make_shared<ProgressBarElement>(option, style, widget);
+}
