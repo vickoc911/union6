@@ -6,6 +6,7 @@
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
+#include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/MenuItemElement.h"
@@ -280,38 +281,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     }
         return;
     case QStyle::CC_GroupBox: {
-        const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox *>(option);
-        if (!groupBoxOption) {
-            return;
-        }
-        const auto elements = prepareElements(groupBoxOption, widget);
-        const auto properties = queryProperties(elements);
-        auto rect = backgroundRectangle(groupBoxOption, properties).toRect();
-        if (groupBoxOption->subControls.testFlag(QStyle::SC_GroupBoxFrame)) {
-            drawBackground(painter, rect, properties);
-        }
-        if ((groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && !groupBoxOption->text.isEmpty()) {
-            QRect textRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-            QColor textColor = properties->text()->color().value().toQColor();
-
-            painter->setPen(textColor);
-            drawItemText(painter,
-                         textRect,
-                         textFlagsFromProperties(properties, false),
-                         groupBoxOption->palette,
-                         groupBoxOption->state & State_Enabled,
-                         groupBoxOption->text,
-                         textColor.isValid() ? QPalette::NoRole : QPalette::WindowText);
-        }
-
-        if (auto groupBox = qobject_cast<const QGroupBox *>(widget)) {
-            if (groupBox->isCheckable()) {
-                QStyleOptionButton checkbox;
-                checkbox.rect = subControlRect(CC_GroupBox, option, SC_GroupBoxCheckBox, widget);
-                checkbox.state = groupBoxOption->state;
-                drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
-            }
-        }
+        auto ev = GroupBoxElement(option, this, widget);
+        ev.draw(painter);
     }
         return;
     case QStyle::CC_ComboBox: {
@@ -1011,31 +982,8 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
         }
     }
     if (complexControl == CC_GroupBox) {
-        switch (subControl) {
-        case SC_GroupBoxLabel: {
-            auto elements = prepareElements(option, widget);
-            auto map = layoutMap(elements, option, {u"GroupBox"_s, u"Text"_s});
-            auto rect = map[u"Text"_s].rect.toRect();
-            return visualRect(option->direction, option->rect, rect);
-        }
-        case SC_GroupBoxContents: {
-            auto elements = prepareElements(option, widget);
-            auto map = layoutMap(elements, option, {u"GroupBox"_s, u"Text"_s});
-            auto rect = map[u"GroupBox"_s].rect.toRect();
-            return visualRect(option->direction, option->rect, rect);
-        }
-        case SC_GroupBoxCheckBox: {
-            auto elements = prepareElements(option, widget);
-            auto map = layoutMap(elements, option, {u"GroupBox"_s, u"Icon"_s});
-            auto rect = map[u"Icon"_s].rect.toRect();
-            return visualRect(option->direction, option->rect, rect);
-        }
-        case SC_GroupBoxFrame: {
-            return option->rect;
-        }
-        default:
-            break;
-        }
+        auto ev = GroupBoxElement::create(option, this, widget);
+        return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_ScrollBar) {
