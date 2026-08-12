@@ -6,6 +6,7 @@
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
+#include "elements/ItemViewElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/TabElement.h"
 #include "elements/ToolButtonElement.h"
@@ -169,46 +170,8 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ItemViewItem: {
-        const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option);
-        if (!viewItemOption) {
-            return;
-        }
-        // Dont allow drawing outside of the area
-        painter->save();
-        painter->setClipRect(option->rect);
-        QStyleOptionViewItem subopt = *viewItemOption;
-        // Draw background
-        auto elements = prepareElements(&subopt, widget, {u"ItemViewItem"_s});
-        auto props = queryProperties(elements);
-        subopt.rect = backgroundRectangle(option, props).toRect();
-        drawBackground(painter, subopt.rect, props);
-        // Draw text
-        if (subopt.features.testFlag(QStyleOptionViewItem::HasDisplay)) {
-            subopt.rect = subElementRect(SE_ItemViewItemText, &subopt, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), viewItemOption->text, QIcon(), {u"ItemViewItem"_s});
-        }
-        // Draw indicator
-        if (subopt.features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-            QStyleOptionButton checkbox;
-            switch (subopt.checkState) {
-            case Qt::Unchecked:
-                checkbox.state.setFlag(State_Off);
-                break;
-            case Qt::PartiallyChecked:
-                checkbox.state.setFlag(State_NoChange);
-                break;
-            case Qt::Checked:
-                checkbox.state.setFlag(State_On);
-                break;
-            }
-            checkbox.state.setFlag(State_Enabled, viewItemOption->state.testFlag(State_Enabled));
-            checkbox.rect = subElementRect(SE_ItemViewItemCheckIndicator, viewItemOption, widget);
-            drawPrimitive(PE_IndicatorCheckBox, &checkbox, painter, widget);
-        } else if (subopt.features.testFlag(QStyleOptionViewItem::HasDecoration)) {
-            subopt.rect = subElementRect(SE_ItemViewItemDecoration, viewItemOption, widget);
-            layoutAndDrawIconTextIndicator(&subopt, painter, widget, viewItemOption->icon, QString(), QIcon(), {u"ItemViewItem"_s});
-        }
-        painter->restore();
+        auto ev = ItemViewElement::create(option, this, widget);
+        ev->draw(painter);
     }
         return;
     case QStyle::CE_ProgressBarGroove: {
@@ -893,9 +856,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return size;
         }
     } break;
-    case QStyle::CT_ItemViewItem:
-        size = size.grownBy(padding);
-        break;
+    case QStyle::CT_ItemViewItem: {
+        auto ev = ItemViewElement::create(option, this, widget);
+        size = ev->contentsSize(size);
+    } break;
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
@@ -937,23 +901,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ItemViewItemText:
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator: {
-        const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option);
-        QStringList childelements = buildSubElementList(viewItemOption, widget);
-        if (childelements.isEmpty()) {
-            return QRect();
-        }
-        auto elements = prepareElements(option, widget, {u"ItemViewItem"_s});
-        auto map = layoutMap(elements, option, childelements);
-
-        if (element == SE_ItemViewItemText) {
-            rect = map[u"Text"_s].rect.toRect();
-        }
-        if (element == SE_ItemViewItemDecoration) {
-            rect = map[u"Icon"_s].rect.toRect();
-        }
-        if (element == SE_ItemViewItemCheckIndicator) {
-            rect = map[u"CheckBox"_s].rect.toRect();
-        }
+        auto ev = ItemViewElement::create(option, this, widget);
+        return ev->subElementRect(element);
     } break;
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_RadioButtonIndicator: {
