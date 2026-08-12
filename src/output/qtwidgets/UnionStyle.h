@@ -49,13 +49,6 @@ public:
                   const QString &text,
                   const QWidget *widget = nullptr,
                   const QColor &overrideColor = QColor()) const;
-    void layoutAndDrawIconTextIndicator(const QStyleOption *option,
-                                        QPainter *painter,
-                                        const QWidget *widget = nullptr,
-                                        const QIcon &icon = QIcon(),
-                                        const QString &text = QString(),
-                                        const QIcon &indicator = QIcon(),
-                                        const QStringList &children = {}) const;
 
 private:
     QMap<QWidget *, AbstractElement::Ptr> elementMap;
