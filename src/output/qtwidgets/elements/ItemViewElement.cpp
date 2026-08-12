@@ -93,7 +93,7 @@ void ItemViewElement::drawIndicator(QPainter *painter) const
         checkbox.state.setFlag(QStyle::State_Enabled, m_viewItemOption->state.testFlag(QStyle::State_Enabled));
         checkbox.rect = m_style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, m_viewItemOption, m_widget);
         painter->save();
-        m_style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &checkbox, painter, m_widget);
+        m_style->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &checkbox, painter, m_widget);
         painter->restore();
     }
 }
