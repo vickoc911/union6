@@ -99,6 +99,7 @@ void AbstractElement::layout()
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
     }
 
     if (m_contentElementList.isEmpty()) {
@@ -106,7 +107,6 @@ void AbstractElement::layout()
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
-        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
         m_isValid = true;
     } else {
         m_isValid = false;
