@@ -8,6 +8,7 @@
 #include "elements/CheckElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/MenuItemElement.h"
+#include "elements/ProgressBarElement.h"
 #include "elements/TabElement.h"
 #include "elements/ToolButtonElement.h"
 
@@ -175,34 +176,18 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ProgressBarGroove: {
-        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-            auto subopt = *progressBarOption;
-            auto groove = subElementRect(SE_ProgressBarGroove, progressBarOption, widget);
-            subopt.rect = groove;
-            drawElementBackground(painter, &subopt, widget);
-        }
+        auto ev = ProgressBarElement::create(option, this, widget);
+        ev->drawGroove(painter);
     }
         return;
     case QStyle::CE_ProgressBarContents: {
-        const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option);
-        if (!progressBarOption) {
-            return;
-        }
-        auto elements = prepareElements(progressBarOption, widget, {u"ProgressBar"_s, u"Track"_s});
-        auto props = queryProperties(elements);
-        auto progress = subElementRect(SE_ProgressBarContents, progressBarOption, widget);
-        drawBackground(painter, progress, props);
+        auto ev = ProgressBarElement::create(option, this, widget);
+        ev->drawTrack(painter);
     }
         return;
     case QStyle::CE_ProgressBarLabel: {
-        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-            if (progressBarOption->textVisible) {
-                auto subopt = *progressBarOption;
-                auto rect = subElementRect(SE_ProgressBarLabel, progressBarOption, widget);
-                subopt.rect = rect;
-                layoutAndDrawIconTextIndicator(&subopt, painter, widget, QIcon(), progressBarOption->text);
-            }
-        }
+        auto ev = ProgressBarElement::create(option, this, widget);
+        ev->drawText(painter);
     }
         return;
     case QStyle::CE_ProgressBar:
@@ -944,76 +929,11 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         return ev->subElementRect(element);
     } break;
-    case QStyle::SE_ProgressBarLabel: {
-        // Copied and repurposed from Breeze
-        const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
-        if (!progressBarOption) {
-            return QRect();
-        }
-        const bool textVisible(progressBarOption->textVisible);
-        const bool busy(progressBarOption->minimum == 0 && progressBarOption->maximum == 0);
-        if (!textVisible || busy) {
-            return QRect();
-        }
-
-        auto props = queryProperties(prepareElements(option, widget));
-        auto textFlags = textFlagsFromProperties(props, false);
-        int textWidth = qMax(option->fontMetrics.size(textFlags, progressBarOption->text).width(), option->fontMetrics.size(textFlags, u"100%"_s).width());
-        auto rect = centerRect(option->rect, textWidth, option->rect.height());
-        rect.setLeft(rect.right() - textWidth + 1);
-        rect = visualRect(option->direction, option->rect, rect);
-        return rect;
-    } break;
-    case QStyle::SE_ProgressBarContents: {
-        // Copied from Breeze
-        const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
-        if (!progressBarOption) {
-            return QRect();
-        }
-        const auto rect(subElementRect(SE_ProgressBarGroove, progressBarOption, widget));
-        const bool busy(progressBarOption->minimum == 0 && progressBarOption->maximum == 0);
-        if (busy) {
-            return rect;
-        }
-        const bool horizontal(progressBarOption->state.testFlag(QStyle::State_Horizontal));
-        bool reverse = (horizontal && (option->direction == Qt::RightToLeft)) || !horizontal;
-        if (progressBarOption->invertedAppearance) {
-            reverse = !reverse;
-        }
-        const int progress(progressBarOption->progress - progressBarOption->minimum);
-        const int steps(qMax(progressBarOption->maximum - progressBarOption->minimum, 1));
-        const qreal position = qreal(progress) / qreal(steps);
-        const int indicatorSize(position * (horizontal ? rect.width() : rect.height()));
-        QRect indicatorRect;
-        if (horizontal) {
-            indicatorRect = QRect(rect.left() + (reverse ? rect.width() - indicatorSize : 0), rect.y(), indicatorSize, rect.height());
-        } else {
-            indicatorRect = QRect(rect.x(), reverse ? (rect.bottom() - indicatorSize + 1) : rect.top(), rect.width(), indicatorSize);
-        }
-        return indicatorRect;
-    } break;
+    case QStyle::SE_ProgressBarLabel:
+    case QStyle::SE_ProgressBarContents:
     case QStyle::SE_ProgressBarGroove: {
-        // Copied and repurposed from Breeze
-        const auto progressBarOption(qstyleoption_cast<const QStyleOptionProgressBar *>(option));
-        if (!progressBarOption) {
-            return QRect();
-        }
-        auto props = queryProperties(prepareElements(option, widget));
-        qreal width = 0;
-        qreal height = 0;
-        if (props->layout()) {
-            width = props->layout()->width().value_or(width);
-            height = props->layout()->height().value_or(height);
-        }
-        rect = option->rect;
-        rect.setHeight(height);
-        rect.setWidth(width);
-        if (progressBarOption->state.testFlag(QStyle::State_Horizontal)) {
-            rect = centerRect(option->rect, width, height);
-        } else {
-            rect = centerRect(option->rect, height, width);
-        }
-        return visualRect(option->direction, option->rect, rect);
+        auto ev = ProgressBarElement::create(option, this, widget);
+        return ev->subElementRect(element);
     } break;
     case QStyle::SE_DockWidgetTitleBarText:
     case QStyle::SE_DockWidgetCloseButton:
