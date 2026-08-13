@@ -137,7 +137,7 @@ void AbstractElement::updateSubElementList()
     qWarning() << "updateSubElementList is unimplemented for" << m_widget;
 }
 
-QSize AbstractElement::applyPaddingToSize(QSize oldSize) const
+QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
 {
     if (!m_isValid) {
         return oldSize;
@@ -156,12 +156,22 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize) const
             padding += m_backgroundProperties->layout()->inset()->toMargins().toMargins();
         }
     }
-    size = size.grownBy(padding);
-    if (size.width() < minimumSize.width()) {
-        size.setWidth(minimumSize.width());
-    }
-    if (size.height() < minimumSize.height()) {
-        size.setHeight(minimumSize.height());
+    if (shrink) {
+        size = size.shrunkBy(padding);
+        if (size.width() < 0) {
+            size.setWidth(0);
+        }
+        if (size.height() < 0) {
+            size.setHeight(0);
+        }
+    } else {
+        size = size.grownBy(padding);
+        if (size.width() < minimumSize.width()) {
+            size.setWidth(minimumSize.width());
+        }
+        if (size.height() < minimumSize.height()) {
+            size.setHeight(minimumSize.height());
+        }
     }
     return size;
 }
