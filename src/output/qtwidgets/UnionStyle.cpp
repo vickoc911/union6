@@ -16,6 +16,7 @@
 #include "elements/SliderElement.h"
 #include "elements/SpinBoxElement.h"
 #include "elements/TabElement.h"
+#include "elements/TitleBarElement.h"
 #include "elements/ToolButtonElement.h"
 
 #include <ElementQuery.h>
@@ -314,43 +315,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     }
         return;
     case QStyle::CC_TitleBar: {
-        const auto titleBarOption = qstyleoption_cast<const QStyleOptionTitleBar *>(option);
-        if (!titleBarOption) {
-            return;
-        }
-        drawElementBackground(painter, titleBarOption, widget, {u"TitleBar"_s});
-        auto map = layoutMap(prepareElements(titleBarOption, widget, {u"TitleBar"_s}), titleBarOption, buildSubElementList(titleBarOption, widget));
-        if (!titleBarOption->text.isEmpty()
-            && (titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
-            drawText(map[u"Text"_s].rect.toRect(), titleBarOption, painter, titleBarOption->text, widget);
-        }
-        if (!titleBarOption->icon.isNull()) {
-            drawIcon(map[u"Icon"_s].rect.toRect(), titleBarOption, painter, titleBarOption->icon, widget);
-        }
-        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
-            const auto icon = queryIcon(titleBarOption, widget, u"help-contextual-symbolic"_s, {u"TitleBar"_s, u"HelpButton"_s});
-            drawIcon(map[u"HelpButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
-        }
-        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
-            const auto icon = queryIcon(titleBarOption, widget, u"window-minimize-symbolic"_s, {u"TitleBar"_s, u"MinimizeButton"_s});
-            drawIcon(map[u"MinimizeButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
-        }
-        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
-            const auto icon = queryIcon(titleBarOption, widget, u"window-maximize-symbolic"_s, {u"TitleBar"_s, u"MaximizeButton"_s});
-            drawIcon(map[u"MaximizeButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
-        }
-        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
-            const auto icon = queryIcon(titleBarOption, widget, u"window-close-symbolic"_s, {u"TitleBar"_s, u"CloseButton"_s});
-            drawIcon(map[u"CloseButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
-        }
-        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
-            const auto icon = queryIcon(titleBarOption, widget, u"application-menu-symbolic"_s, {u"TitleBar"_s, u"SystemMenu"_s});
-            drawIcon(map[u"SystemMenu"_s].rect.toRect(), titleBarOption, painter, icon, widget);
-        }
-        if (titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
-            const auto icon = queryIcon(titleBarOption, widget, u"window-shade-symbolic"_s, {u"TitleBar"_s, u"ShadeButton"_s});
-            drawIcon(map[u"ShadeButton"_s].rect.toRect(), titleBarOption, painter, icon, widget);
-        }
+        auto ev = TitleBarElement::create(option, this, widget);
+        ev->draw(painter);
     }
         return;
     // Rely on QCommonStyle
@@ -824,33 +790,8 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
     }
 
     if (complexControl == CC_TitleBar) {
-        if (const auto titleBar = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
-            auto elements = prepareElements(option, widget, {u"TitleBar"_s});
-            auto subElements = buildSubElementList(titleBar, widget);
-            auto map = layoutMap(elements, option, subElements);
-            switch (subControl) {
-            case SC_TitleBarSysMenu:
-                return map[u"SystemMenu"_s].rect.toRect();
-            case SC_TitleBarMinButton:
-                return map[u"MinimizeButton"_s].rect.toRect();
-            case SC_TitleBarMaxButton:
-                return map[u"MaximizeButton"_s].rect.toRect();
-            case SC_TitleBarCloseButton:
-                return map[u"CloseButton"_s].rect.toRect();
-            case SC_TitleBarNormalButton:
-                return map[u"NormalButton"_s].rect.toRect();
-            case SC_TitleBarShadeButton:
-            case SC_TitleBarUnshadeButton:
-                return map[u"ShadeButton"_s].rect.toRect();
-            case SC_TitleBarContextHelpButton:
-                return map[u"HelpButton"_s].rect.toRect();
-            case SC_TitleBarLabel:
-                return map[u"Text"_s].rect.toRect();
-                break;
-            default:
-                break;
-            }
-        }
+        auto ev = TitleBarElement::create(option, this, widget);
+        return ev->subControlRect(subControl);
     }
     // Leave Dial and MDIControls to QCommonStyle for now
     return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
