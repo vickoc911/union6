@@ -12,6 +12,7 @@
 #include "elements/ItemViewElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
+#include "elements/ScrollBarElement.h"
 #include "elements/SpinBoxElement.h"
 #include "elements/TabElement.h"
 #include "elements/ToolButtonElement.h"
@@ -302,18 +303,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     }
         return;
     case QStyle::CC_ScrollBar: {
-        // Draw background, then let QCommonStyle handle rest;
-        auto scrollbarProps = queryProperties(prepareElements(option, widget));
-        // If scrollbar has no background color, QStyle gets confused and doesnt draw anything,
-        // causing visual glitches. In those cases, use the ApplicationWindow background color.
-        if (scrollbarProps->background() && scrollbarProps->background()->color().has_value()) {
-            drawBackground(painter, option->rect, scrollbarProps);
-        } else {
-            drawBackground(painter, option->rect, queryProperties(prepareElements(option, widget, {u"ApplicationWindow"_s})));
-        }
-        auto rect = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
-        drawBackground(painter, rect, scrollbarProps);
-        QCommonStyle::drawComplexControl(control, option, painter, widget);
+        auto ev = ScrollBarElement::create(option, this, widget);
+        ev->draw(painter);
     }
         return;
     case QStyle::CC_Slider: {
@@ -931,69 +922,8 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
     }
 
     if (complexControl == CC_ScrollBar) {
-        // Copied from Breeze
-        auto rect = option->rect;
-        if (widget) {
-            rect = widget->visibleRegion().boundingRect();
-        }
-        if (subControl == SC_ScrollBarSlider) {
-            auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
-            if (!sliderOption) {
-                return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
-            }
-            const bool horizontal = (sliderOption->state.testFlag(State_Horizontal));
-            auto groove = visualRect(option->direction, rect, subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget));
-
-            int space(horizontal ? groove.width() : groove.height());
-            int thickness = 0;
-            QMargins padding;
-            auto props = queryProperties(prepareElements(option, widget, {u"Slider"_s}));
-            if (props->layout()) {
-                auto scrollProps = queryProperties(prepareElements(option, widget));
-                if (scrollProps->layout() && scrollProps->layout()->padding()) {
-                    padding = scrollProps->layout()->padding()->toMargins().toMargins();
-                }
-                if (sliderOption->orientation == Qt::Horizontal) {
-                    thickness = props->layout()->height().value_or(0);
-                } else {
-                    thickness = props->layout()->width().value_or(0);
-                }
-            }
-
-            // Return early with just padding changes
-            if (sliderOption->minimum == sliderOption->maximum) {
-                if (horizontal) {
-                    auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
-                    return visualRect(option->direction, rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
-                } else {
-                    auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
-                    return visualRect(option->direction, rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
-                }
-            }
-
-            int sliderSize = space * qreal(sliderOption->pageStep) / (sliderOption->maximum - sliderOption->minimum + sliderOption->pageStep);
-            sliderSize = qMax(sliderSize, qMax(thickness, pixelMetric(PM_ScrollBarSliderMin, option, widget)));
-            sliderSize = qMin(sliderSize, space);
-            space -= sliderSize;
-            if (space <= 0) {
-                return groove;
-            }
-            int pos = qRound(qreal(sliderOption->sliderPosition - sliderOption->minimum) / (sliderOption->maximum - sliderOption->minimum) * space);
-            if (sliderOption->upsideDown) {
-                pos = space - pos;
-            }
-            if (horizontal) {
-                auto rect = QRect(groove.left() + pos, groove.top(), sliderSize, groove.height());
-                return visualRect(option->direction, rect, rect.adjusted(padding.left(), thickness, -padding.right(), -thickness));
-            } else {
-                auto rect = QRect(groove.left(), groove.top() + pos, groove.width(), sliderSize);
-                return visualRect(option->direction, rect, rect.adjusted(thickness, padding.top(), -thickness, -padding.bottom()));
-            }
-        } else if (subControl == SC_ScrollBarGroove) {
-            return visualRect(option->direction, option->rect, rect);
-        } else {
-            return QRect();
-        }
+        auto ev = ScrollBarElement::create(option, this, widget);
+        return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_Slider) {
@@ -1117,6 +1047,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_ButtonShiftHorizontal:
     case QStyle::PM_ButtonShiftVertical:
     case QStyle::PM_TabBar_ScrollButtonOverlap:
+        return 0;
     case QStyle::PM_ScrollView_ScrollBarOverlap:
         return 0;
     // Due to how QWidgets works, we just return the average padding size now
@@ -1261,8 +1192,8 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
     } break;
     // Currently we only have one spacing value
-    case QStyle::PM_CheckBoxLabelSpacing:
     case QStyle::PM_ScrollView_ScrollBarSpacing:
+    case QStyle::PM_CheckBoxLabelSpacing:
     case QStyle::PM_RadioButtonLabelSpacing:
     case QStyle::PM_TabBarTabHSpace:
     case QStyle::PM_TabBarTabVSpace:
