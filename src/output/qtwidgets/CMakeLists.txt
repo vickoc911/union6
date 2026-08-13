@@ -19,6 +19,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ItemViewElement.h
         elements/ScrollBarElement.cpp
         elements/ScrollBarElement.h
+        elements/SliderElement.cpp
+        elements/SliderElement.h
         elements/SpinBoxElement.cpp
         elements/SpinBoxElement.h
         elements/TabElement.cpp
