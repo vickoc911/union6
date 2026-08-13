@@ -3,6 +3,14 @@
 
 add_library(UnionWidgetsStyle MODULE)
 target_sources(UnionWidgetsStyle PRIVATE
+        BackgroundDrawing.cpp
+        BackgroundDrawing.h
+        StyleUtils.cpp
+        StyleUtils.h
+        UnionStyle.cpp
+        UnionStyle.h
+        UnionStylePlugin.cpp
+        UnionStylePlugin.h
         elements/AbstractElement.cpp
         elements/AbstractElement.h
         elements/ButtonElement.cpp
@@ -17,6 +25,10 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/HeaderElement.h
         elements/ItemViewElement.cpp
         elements/ItemViewElement.h
+        elements/MenuItemElement.cpp
+        elements/MenuItemElement.h
+        elements/ProgressBarElement.cpp
+        elements/ProgressBarElement.h
         elements/ScrollBarElement.cpp
         elements/ScrollBarElement.h
         elements/SliderElement.cpp
@@ -25,20 +37,10 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/SpinBoxElement.h
         elements/TabElement.cpp
         elements/TabElement.h
+        elements/TitleBarElement.cpp
+        elements/TitleBarElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
-        elements/MenuItemElement.cpp
-        elements/MenuItemElement.h
-        elements/ProgressBarElement.cpp
-        elements/ProgressBarElement.h
-        BackgroundDrawing.cpp
-        BackgroundDrawing.h
-        StyleUtils.cpp
-        StyleUtils.h
-        UnionStyle.cpp
-        UnionStyle.h
-        UnionStylePlugin.cpp
-        UnionStylePlugin.h
 )
 target_link_libraries(UnionWidgetsStyle
         PUBLIC

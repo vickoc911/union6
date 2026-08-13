@@ -77,8 +77,7 @@ void ToolButtonElement::updateSubElementList()
 
 QSize ToolButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    Q_UNUSED(contentsSizeFromStyle);
-    QSize size = subControlRect(QStyle::SC_ToolButton).size();
+    QSize size = subControlRect(QStyle::SC_ToolButton).size().boundedTo(contentsSizeFromStyle);
     size = applyPaddingToSize(size);
 
     if (m_toolButtonOption && m_indicatorProperties && m_indicatorProperties->layout()) {
@@ -101,7 +100,13 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
 
     QRect backgroundRect = backgroundRectangle(m_styleOption, m_backgroundProperties).toRect();
     if (subControl == QStyle::SC_ToolButton) {
-        return backgroundRect;
+        QRect rect = m_styleOption->rect;
+        QRect unifiedRect;
+        for (const auto &m : m_layoutMap) {
+            unifiedRect = unifiedRect.united(m.rect.toRect());
+        }
+        rect = unifiedRect;
+        return rect;
     }
     if (subControl == QStyle::SC_ToolButtonMenu) {
         QRect menuRect = m_layoutMap[u"Indicator"_s].rect.toRect();
@@ -115,14 +120,7 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
         }
         return menuRect;
     }
-
-    QRect rect = m_styleOption->rect;
-    QRect unifiedRect;
-    for (const auto &m : m_layoutMap) {
-        unifiedRect = unifiedRect.united(m.rect.toRect());
-    }
-    rect = unifiedRect;
-    return rect;
+    return QRect();
 }
 
 ToolButtonElement::Ptr ToolButtonElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
