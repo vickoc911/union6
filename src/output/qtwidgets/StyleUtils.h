@@ -84,12 +84,6 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
 QRect centerRect(const QRect &rect, int width, int height);
 
 /*!
- * \brief Helper function to build a list of subelements (icon, text, indicator) depending on
- * which items are being drawn
- */
-QStringList buildSubElementList(const QStyleOption *option, const QWidget *widget);
-
-/*!
  * \brief Helper function for getting correct icon from properties.
  */
 
