@@ -63,7 +63,7 @@ protected:
 
     virtual void updateSubElementList();
 
-    QSize applyPaddingToSize(QSize oldSize) const;
+    QSize applyPaddingToSize(QSize oldSize, bool shrink = false) const;
 
     bool m_isValid;
 };
