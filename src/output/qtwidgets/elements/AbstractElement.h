@@ -19,6 +19,9 @@ public:
     using Ptr = std::shared_ptr<AbstractElement>;
     AbstractElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~AbstractElement() override;
+    /*!
+     * \brief Create a shared pointer to the element. Use this instead of regular instantiation.
+     */
     static AbstractElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     QIcon icon() const;
@@ -33,16 +36,50 @@ public:
     void setIndicator(const QIcon &indicator);
     bool hasIndicator() const;
 
+    /*!
+     * \brief Returns the validity status. If the element has no properties loaded,
+     * it is not valid and can not be drawn.
+     */
     bool isValid() const;
 
+    /*!
+     * \brief Draw the whole element, including text, icon, background and indicator.
+     */
     virtual void draw(QPainter *painter) const;
+    /*!
+     * \brief Draw text of the element.
+     */
     virtual void drawText(QPainter *painter) const;
+    /*!
+     * \brief Draw icon of the element.
+     */
     virtual void drawIcon(QPainter *painter) const;
+    /*!
+     * \brief Draw background of the element.
+     */
     virtual void drawBg(QPainter *painter) const;
+    /*!
+     * \brief Draw the indicator of the element. This can vary from secondary icon, such as drop-down
+     * arrow icon, to a checkbox, depending on the element.
+     */
     virtual void drawIndicator(QPainter *painter) const;
+    /*!
+     * \brief Prepare the layoutMap of the element, and create the required properties.
+     * By default this creates proeprties for background and content.
+     */
     virtual void layout();
+    /*!
+     * \brief Return the contents size of the element. Depending on the element, this can apply
+     * padding.
+     */
     virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
+    /*!
+     * \brief Return a subelement rectangle. If not found, empty QRect() is returned instead.
+     */
     virtual QRect subElementRect(QStyle::SubElement element) const;
+    /*!
+     * \brief Return a subcontrol rectangle. If not found, empty QRect() is returned instead.
+     */
     virtual QRect subControlRect(QStyle::SubControl subControl) const;
 
 protected:
@@ -55,14 +92,23 @@ protected:
     Union::ElementList m_backgroundElementList;
     Union::ElementList m_contentElementList;
     Union::ElementList m_indicatorElementList;
+    // Holds the properties for the background: This is the top-level properties of the item
+    // by default.
     Union::Properties::StylePropertyGroup *m_backgroundProperties;
+    // Holds the properties for any contents, such as text and icon.
+    // This can vary a lot depending on the element.
     Union::Properties::StylePropertyGroup *m_contentProperties;
+    // Holds the properties for any indicators, such as dropdown arrows.
+    // This can vary a lot depending on the element.
     Union::Properties::StylePropertyGroup *m_indicatorProperties;
     QMap<QString, LayoutItem> m_layoutMap;
     QStringList m_subElementList;
 
+    // Updates the m_subElementList with any values that are used when fetching a layout, so
+    // that the element gets a proper hierarchy.
     virtual void updateSubElementList();
 
+    // Utilizes the background property to apply a padding to the given size.
     QSize applyPaddingToSize(QSize oldSize, bool shrink = false) const;
 
     bool m_isValid;
