@@ -695,7 +695,16 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_DockWidgetFloatButton:
     case QStyle::SE_DockWidgetIcon: {
         if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
-            QStringList childelements = buildSubElementList(dockOption, widget);
+            QStringList childelements;
+            if (dockOption->closable) {
+                childelements.append(u"CloseButton"_s);
+            }
+            if (dockOption->floatable) {
+                childelements.append(u"FloatButton"_s);
+            }
+            if (!dockOption->title.isEmpty()) {
+                childelements.append(u"Text"_s);
+            }
             if (childelements.isEmpty()) {
                 return QRect();
             }
