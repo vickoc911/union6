@@ -12,6 +12,7 @@
 #include "elements/ItemViewElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
+#include "elements/SpinBoxElement.h"
 #include "elements/TabElement.h"
 #include "elements/ToolButtonElement.h"
 
@@ -296,24 +297,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     }
         return;
     case QStyle::CC_SpinBox: {
-        const auto spinBoxOpt = qstyleoption_cast<const QStyleOptionSpinBox *>(option);
-        if (!spinBoxOpt) {
-            return;
-        }
-        auto elements = prepareElements(spinBoxOpt, widget);
-        drawElementBackground(painter, spinBoxOpt, widget);
-        // For spinbox we need to manually create the indicator buttons
-        if (spinBoxOpt->buttonSymbols != QAbstractSpinBox::NoButtons) {
-            bool arrows = (spinBoxOpt->buttonSymbols == QAbstractSpinBox::UpDownArrows);
-            // Increase
-            auto up = *spinBoxOpt;
-            up.rect = subControlRect(CC_SpinBox, spinBoxOpt, SC_SpinBoxUp, widget);
-            drawPrimitive(arrows ? PE_IndicatorSpinUp : PE_IndicatorSpinPlus, &up, painter, widget);
-            // Decrease
-            auto down = *spinBoxOpt;
-            down.rect = subControlRect(CC_SpinBox, spinBoxOpt, SC_SpinBoxDown, widget);
-            drawPrimitive(arrows ? PE_IndicatorSpinDown : PE_IndicatorSpinMinus, &down, painter, widget);
-        }
+        auto ev = SpinBoxElement::create(option, this, widget);
+        ev->draw(painter);
     }
         return;
     case QStyle::CC_ScrollBar: {
@@ -771,6 +756,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         auto ev = ItemViewElement::create(option, this, widget);
         size = ev->contentsSize(size);
     } break;
+    case QStyle::CT_SpinBox: {
+        auto ev = SpinBoxElement::create(option, this, widget);
+        size = ev->contentsSize(size);
+    }
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
@@ -782,7 +771,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_MenuBarItem:
     case QStyle::CT_Menu:
     case QStyle::CT_ScrollBar:
-    case QStyle::CT_SpinBox:
     case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
     case QStyle::CT_HeaderSection:
@@ -1072,18 +1060,10 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
         }
     }
 
-    /* Use what qcommonstyle provides for now
-        if (cc == CC_SpinBox){
-            switch (sc) {
-                case            SC_SpinBoxUp:
-                case            SC_SpinBoxDown :
-                case            SC_SpinBoxFrame:
-                case            SC_SpinBoxEditField:
-                default:
-                    break;
-            }
-        }
-    */
+    if (complexControl == CC_SpinBox) {
+        auto ev = SpinBoxElement::create(option, this, widget);
+        return ev->subControlRect(subControl);
+    }
 
     if (complexControl == CC_TitleBar) {
         if (const auto titleBar = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
