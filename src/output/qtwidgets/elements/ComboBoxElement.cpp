@@ -80,19 +80,15 @@ void ComboBoxElement::updateSubElementList()
 
 QSize ComboBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QStringList childelements = {u"Icon"_s, u"Text"_s, u"Indicator"_s};
-    auto map = layoutMap(m_backgroundElementList, m_styleOption, childelements);
     QRect unifiedRect;
-    for (const auto &m : map) {
-        unifiedRect = unifiedRect.united(m.rect.toRect());
+    for (const auto &m : m_layoutMap) {
+        unifiedRect = unifiedRect.united(m.rect.toRect().normalized());
     }
     // Follow the contents width
-    if (unifiedRect.width() < contentsSizeFromStyle.width()) {
-        unifiedRect.setWidth(contentsSizeFromStyle.width());
-    }
+    unifiedRect.setWidth(contentsSizeFromStyle.width());
     auto size = applyPaddingToSize(unifiedRect.size());
     if (m_indicatorProperties && m_indicatorProperties->layout()) {
-        size.rwidth() += m_indicatorProperties->layout()->spacing().value_or(1);
+        size.rwidth() += m_indicatorProperties->layout()->spacing().value_or(20);
     }
     return size;
 }
@@ -106,6 +102,7 @@ QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
 
     switch (subControl) {
     case QStyle::SC_ComboBoxFrame:
+        return backgroundRectangle(m_styleOption, m_backgroundProperties).toRect();
     case QStyle::SC_ComboBoxListBoxPopup:
         return m_styleOption->rect;
 
@@ -121,6 +118,11 @@ QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
         auto rect = m_styleOption->rect;
         auto indicatorRect = subControlRect(QStyle::SC_ComboBoxArrow);
         labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
+        // Add some spacing between the icon and text in edit field
+        if (m_backgroundProperties->layout() && !m_comboBoxOption->currentIcon.isNull()) {
+            auto spacing = m_backgroundProperties->layout()->spacing().value_or(5);
+            labelRect.adjust(spacing, 0, spacing, 0);
+        }
         return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, labelRect);
     }
 

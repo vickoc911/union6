@@ -29,6 +29,8 @@ public:
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
     void layout() override;
     void drawIndicator(QPainter *painter) const override;
+    void drawText(QPainter *painter) const override;
+    void drawIcon(QPainter *painter) const override;
 
     const QStyleOptionViewItem *m_viewItemOption = nullptr;
 };

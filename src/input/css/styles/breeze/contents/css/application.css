@@ -174,7 +174,7 @@ groupbox {
         color: var(--window-text-color);
     }
     icon-alignment: content start start 0;
-    text-alignment: content center stack-fill 0;
+    text-alignment: content fill start 1;
     layout-alignment: content start stack-fill 1;
     width: 200px;
 }
