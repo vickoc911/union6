@@ -101,11 +101,11 @@ swipedelegate {
 }
 
 itemviewitem {
-    inset: 1px;
+    inset: 2px;
+    padding: 5px;
     icon-alignment: content start center 0;
     text-alignment: content start center 1;
     icon-size: var(--small-element-size);
-    spacing: var(--small-spacing);
     text-wrap-mode: no-wrap;
     text-elide: right;
 
