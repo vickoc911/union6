@@ -357,8 +357,25 @@ QVariantMap attributesFromOption(const QStyleOption *option)
             return map;
         }
         break;
+    case QStyleOption::SO_ViewItem: {
+        if (const auto optionViewItem = static_cast<const QStyleOptionViewItem *>(option)) {
+            QVariantMap map;
+            if (optionViewItem->decorationPosition == QStyleOptionViewItem::Top) {
+                map[u"display"_s] = QVariant(u"text-under-icon"_s);
+            }
+            if (optionViewItem->decorationPosition == QStyleOptionViewItem::Bottom) {
+                map[u"display"_s] = QVariant(u"text-below-icon"_s);
+            }
+            if (optionViewItem->decorationPosition == QStyleOptionViewItem::Left) {
+                map[u"display"_s] = QVariant(u"text-after-icon"_s);
+            }
+            if (optionViewItem->decorationPosition == QStyleOptionViewItem::Right) {
+                map[u"display"_s] = QVariant(u"text-before-icon"_s);
+            }
+            return map;
+        }
+    }
     case QStyleOption::SO_TabBarBase:
-    case QStyleOption::SO_ViewItem:
     case QStyleOption::SO_Default:
     case QStyleOption::SO_FocusRect:
     case QStyleOption::SO_Button:
@@ -645,6 +662,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             auto optiontext = textFromOption(opt);
+            // if we are a menuitem and have a shortcut, we need to split the text with /t and place them according their alignments
             const int tabPosition(optiontext.indexOf(QLatin1Char('\t')));
             if (tabPosition >= 0) {
                 QString accelerator(optiontext.mid(tabPosition + 1));
@@ -654,7 +672,6 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
                     optiontext = optiontext.left(tabPosition);
                 }
             }
-            // if we are a menuitem and have a shortcut, we need to split the text with /t and place them according their alignments
             elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlagsFromProperties(properties, true), optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
@@ -872,7 +889,7 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
     textFlags |= textAlign;
     // Do not add wrap flags if we get DontClip
     // This could be done better
-    if (textWrap == Qt::TextDontClip) {
+    if (textWrap != Qt::TextDontClip) {
         textFlags |= textWrap;
     }
     textFlags |= textElide;
