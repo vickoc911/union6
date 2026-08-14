@@ -19,9 +19,6 @@ ItemViewElement::ItemViewElement(const QStyleOption *option, const UnionStyle *s
             m_indicatorElementList = prepareElements(m_styleOption, m_widget, {u"CheckBox"_s});
             if (!m_indicatorElementList.isEmpty()) {
                 m_indicatorProperties = queryProperties(m_indicatorElementList);
-                if (m_indicatorProperties->icon()) {
-                    setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
-                }
             }
         }
 
@@ -91,7 +88,12 @@ void ItemViewElement::drawIndicator(QPainter *painter) const
             break;
         }
         checkbox.state.setFlag(QStyle::State_Enabled, m_viewItemOption->state.testFlag(QStyle::State_Enabled));
-        checkbox.rect = m_style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, m_viewItemOption, m_widget);
+        auto checkBoxRect = m_style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, m_viewItemOption, m_widget);
+        // Use iconSize to make sure the checkbox is correct size here
+        if (m_contentProperties && m_contentProperties->icon()) {
+            checkBoxRect = centerRect(checkBoxRect, m_contentProperties->icon()->width().value_or(0), m_contentProperties->icon()->height().value_or(0));
+        }
+        checkbox.rect = checkBoxRect;
         painter->save();
         m_style->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &checkbox, painter, m_widget);
         painter->restore();
@@ -117,7 +119,12 @@ void ItemViewElement::updateSubElementList()
 
 QSize ItemViewElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return applyPaddingToSize(contentsSizeFromStyle);
+    Q_UNUSED(contentsSizeFromStyle);
+    const auto textSize = subElementRect(QStyle::SE_ItemViewItemText).size();
+    const auto decorationSize = subElementRect(QStyle::SE_ItemViewItemDecoration).size();
+    const auto checkboxSize = subElementRect(QStyle::SE_ItemViewItemCheckIndicator).size();
+    const auto combinedSize = textSize.expandedTo(decorationSize.expandedTo(checkboxSize));
+    return applyPaddingToSize(combinedSize);
 }
 
 QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
@@ -130,18 +137,17 @@ QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
     if (m_subElementList.isEmpty()) {
         return QRect();
     }
-    auto elements = prepareElements(m_viewItemOption, m_widget, {u"ItemViewItem"_s});
-    auto map = layoutMap(elements, m_viewItemOption, m_subElementList);
 
     QRect rect;
     if (element == QStyle::SE_ItemViewItemText) {
-        rect = map[u"Text"_s].rect.toRect();
+        rect = m_layoutMap[u"Text"_s].rect.toRect();
     }
     if (element == QStyle::SE_ItemViewItemDecoration) {
-        rect = map[u"Icon"_s].rect.toRect();
+        // DecorationSize can be changed by user, so use it by default
+        rect = centerRect(m_layoutMap[u"Icon"_s].rect.toRect(), m_viewItemOption->decorationSize.width(), m_viewItemOption->decorationSize.height());
     }
     if (element == QStyle::SE_ItemViewItemCheckIndicator) {
-        rect = map[u"CheckBox"_s].rect.toRect();
+        rect = m_layoutMap[u"CheckBox"_s].rect.toRect();
     }
     return rect;
 }
@@ -149,4 +155,58 @@ QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
 ItemViewElement::Ptr ItemViewElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
 {
     return std::make_shared<ItemViewElement>(option, style, widget);
+}
+
+void ItemViewElement::drawText(QPainter *painter) const
+{
+    if (hasText() && m_isValid) {
+        QRect textRect = m_style->subElementRect(QStyle::SE_ItemViewItemText, m_viewItemOption, m_widget);
+        int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
+        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+        QColor penColor = m_styleOption->palette.text().color();
+        // TODO: hide mnemonics if requested
+        if (m_backgroundProperties->text()) {
+            auto textColor = m_backgroundProperties->text()->color();
+            if (textColor) {
+                penColor = textColor->toQColor();
+            }
+            textFlags = textFlagsFromProperties(m_backgroundProperties, false);
+        }
+
+        painter->save();
+        painter->setPen(penColor);
+        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
+        painter->restore();
+    }
+}
+
+void ItemViewElement::drawIcon(QPainter *painter) const
+{
+    if (hasIcon() && m_isValid) {
+        QRect iconRect = m_style->subElementRect(QStyle::SE_ItemViewItemDecoration, m_viewItemOption, m_widget);
+        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+
+        const QPalette activePalette = m_styleOption->palette;
+        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
+        auto iconSize = iconRect.size();
+        // Toolbutton can override the regular icon size
+        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(m_styleOption)) {
+            // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
+            if (toolButtonOption->icon.name() == m_icon.name()) {
+                iconSize = toolButtonOption->iconSize;
+            }
+        }
+        const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+
+        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
+        if (m_backgroundProperties->icon() && m_backgroundProperties->icon()->color().has_value()) {
+            auto iconColor = m_backgroundProperties->icon()->color();
+            penColor = iconColor->toQColor();
+        }
+
+        painter->save();
+        painter->setPen(penColor);
+        m_style->drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        painter->restore();
+    }
 }

@@ -148,22 +148,27 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ToolBoxTabShape:
-    case QStyle::CE_ToolBoxTabLabel:
-    case QStyle::CE_ToolBoxTab:
-        return;
     case QStyle::CE_TabBarTabShape: {
         auto ev = TabElement::create(option, this, widget);
         ev->drawBg(painter);
     }
         return;
+    case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel: {
         auto ev = TabElement::create(option, this, widget);
         // TODO: handle vertical tabs
         if (ev->isVertical()) {
-            QCommonStyle::drawControl(CE_TabBarTabLabel, option, painter, widget);
+            QCommonStyle::drawControl(controlElement, option, painter, widget);
         } else {
             ev->drawIcon(painter);
             ev->drawText(painter);
+        }
+    }
+        return;
+    case QStyle::CE_ToolBoxTab: {
+        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
+            drawControl(CE_ToolBoxTabShape, tabOption, painter, widget);
+            drawControl(CE_ToolBoxTabLabel, tabOption, painter, widget);
         }
     }
         return;
@@ -546,64 +551,40 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
-    // TODO use subelement rects to build the thing if possible
-    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
-    QSize minimumSize(contentsSize.width(), contentsSize.height());
-    auto elements = prepareElements(option, widget);
-    if (elements.isEmpty()) {
-        return size;
-    }
-    auto properties = queryProperties(elements);
-    if (!properties) {
-        return size;
-    }
-    QMargins padding;
-    if (properties->layout()) {
-        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
-        auto width = properties->layout()->width().value_or(1) + frameWidth;
-        auto height = properties->layout()->height().value_or(1) + frameWidth;
-        minimumSize = QSize(width, height);
-        if (properties->layout()->padding()) {
-            padding = properties->layout()->padding()->toMargins().toMargins();
-        }
-        if (properties->layout()->inset()) {
-            padding += properties->layout()->inset()->toMargins().toMargins();
-        }
-    }
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         auto ev = ButtonElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ToolButton: {
         auto ev = ToolButtonElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_MenuItem: {
         auto ev = MenuItemElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
-    // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {
         auto ev = ComboBoxElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_TabBarTab: {
         auto ev = TabElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_Slider: {
         auto ev = SliderElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ItemViewItem: {
         auto ev = ItemViewElement::create(option, this, widget);
-        size = ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_SpinBox: {
         auto ev = SpinBoxElement::create(option, this, widget);
-        size = ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     }
+    // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
@@ -622,7 +603,22 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_CustomBase:
         break;
     }
-
+    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
+    QSize minimumSize(contentsSize.width(), contentsSize.height());
+    auto elements = prepareElements(option, widget);
+    if (elements.isEmpty()) {
+        return size;
+    }
+    auto properties = queryProperties(elements);
+    if (!properties) {
+        return size;
+    }
+    if (properties->layout()) {
+        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
+        auto width = properties->layout()->width().value_or(1) + frameWidth;
+        auto height = properties->layout()->height().value_or(1) + frameWidth;
+        minimumSize = QSize(width, height);
+    }
     if (size.width() < minimumSize.width()) {
         size.setWidth(minimumSize.width());
     }
@@ -636,11 +632,6 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 {
     QRect rect;
     switch (element) {
-    case QStyle::SE_TreeViewDisclosureItem: {
-        auto elements = prepareElements(option, widget);
-        auto map = layoutMap(elements, option, {u"Indicator"_s});
-        rect = map[u"Indicator"_s].rect.toRect();
-    } break;
     case QStyle::SE_ItemViewItemText:
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator: {
@@ -727,6 +718,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
     } break;
     // Follow defaults
+    case QStyle::SE_TreeViewDisclosureItem:
     case QStyle::SE_TabWidgetTabContents:
     case QStyle::SE_ToolBoxTabContents:
     case QStyle::SE_TabBarTabLeftButton:
@@ -1185,6 +1177,10 @@ void UnionStyle::polish(QWidget *widget)
         if (scrollArea->frameShadow() == QFrame::Sunken && scrollArea->focusPolicy() & Qt::StrongFocus) {
             scrollArea->setAttribute(Qt::WA_Hover);
         }
+    }
+    if (qobject_cast<QScrollBar *>(widget)) {
+        // remove opaque painting for scrollbars
+        widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     }
 
     widget->setProperty(property_union_member_list, setupMemberList(widget));

@@ -96,7 +96,7 @@ void MenuItemElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {u"Menu"_s});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
