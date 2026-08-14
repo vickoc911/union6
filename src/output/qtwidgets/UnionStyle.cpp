@@ -148,22 +148,27 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ToolBoxTabShape:
-    case QStyle::CE_ToolBoxTabLabel:
-    case QStyle::CE_ToolBoxTab:
-        return;
     case QStyle::CE_TabBarTabShape: {
         auto ev = TabElement::create(option, this, widget);
         ev->drawBg(painter);
     }
         return;
+    case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel: {
         auto ev = TabElement::create(option, this, widget);
         // TODO: handle vertical tabs
         if (ev->isVertical()) {
-            QCommonStyle::drawControl(CE_TabBarTabLabel, option, painter, widget);
+            QCommonStyle::drawControl(controlElement, option, painter, widget);
         } else {
             ev->drawIcon(painter);
             ev->drawText(painter);
+        }
+    }
+        return;
+    case QStyle::CE_ToolBoxTab: {
+        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
+            drawControl(CE_ToolBoxTabShape, tabOption, painter, widget);
+            drawControl(CE_ToolBoxTabLabel, tabOption, painter, widget);
         }
     }
         return;
