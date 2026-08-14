@@ -1191,6 +1191,10 @@ void UnionStyle::polish(QWidget *widget)
             scrollArea->setAttribute(Qt::WA_Hover);
         }
     }
+    if (qobject_cast<QScrollBar *>(widget)) {
+        // remove opaque painting for scrollbars
+        widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
+    }
 
     widget->setProperty(property_union_member_list, setupMemberList(widget));
 
