@@ -13,12 +13,14 @@ using namespace Qt::StringLiterals;
 SpinBoxElement::SpinBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_spinBoxOption(qstyleoption_cast<const QStyleOptionSpinBox *>(option))
+    , m_hasButtons(true)
 {
     if (m_spinBoxOption) {
         m_indicatorElementList = prepareElements(m_spinBoxOption, m_widget, {u"Indicator"_s});
         if (!m_indicatorElementList.isEmpty()) {
             m_indicatorProperties = queryProperties(m_indicatorElementList);
         }
+        m_hasButtons = (m_spinBoxOption->buttonSymbols != QAbstractSpinBox::NoButtons);
     }
     updateSubElementList();
     layout();
@@ -59,13 +61,19 @@ void SpinBoxElement::updateSubElementList()
 
 QSize SpinBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QRegion r;
-    const auto upRect = subControlRect(QStyle::SC_SpinBoxUp);
-    const auto downRect = subControlRect(QStyle::SC_SpinBoxDown);
-    const auto editFieldRect = subControlRect(QStyle::SC_SpinBoxEditField);
-    const auto frameRect = subControlRect(QStyle::SC_SpinBoxFrame);
-    r.setRects({upRect, downRect, editFieldRect, frameRect});
-    return r.boundingRect().size().expandedTo(contentsSizeFromStyle);
+    const int frameWidth = m_style->pixelMetric(QStyle::PM_SpinBoxFrameWidth, m_spinBoxOption, m_widget);
+    auto size = contentsSizeFromStyle;
+    size += QSize(2 * frameWidth, 2 * frameWidth);
+    if (m_hasButtons) {
+        auto topButton = subControlRect(QStyle::SC_SpinBoxUp).size();
+        auto bottomButton = subControlRect(QStyle::SC_SpinBoxDown).size();
+        const auto height = topButton.height() + bottomButton.height();
+        const auto buttonWidth = topButton.expandedTo(bottomButton).width();
+        size.rwidth() += buttonWidth;
+        size.setHeight(height);
+    }
+
+    return size;
 }
 
 QRect SpinBoxElement::subControlRect(QStyle::SubControl subControl) const

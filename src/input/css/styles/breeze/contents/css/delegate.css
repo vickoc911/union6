@@ -144,11 +144,13 @@ swipedelegate {
 }
 
 itemviewitem {
-    inset: 1px;
+    inset: 2px;
+    padding: 5px;
     icon-alignment: content start center 0;
     text-alignment: content start center 1;
     icon-size: var(--small-element-size);
-    spacing: var(--small-spacing);
+    text-wrap-mode: no-wrap;
+    text-elide: right;
 
     & > checkbox {
         layout-alignment: content start center 0;
@@ -195,6 +197,20 @@ itemviewitem {
         &.position-end {
             border: none;
             border-radius: 0px;
+        }
+    }
+    &.inside-list {
+        &[display="text-under-icon"]
+        {
+            icon-alignment: content fill stack-center 0;
+            text-alignment: content center stack-fill 1;
+            text-wrap-mode: wrap;
+        }
+        &[display="text-below-icon"]
+        {
+            text-alignment: content center stack-center 0;
+            icon-alignment: content fill stack-fill 1;
+            text-wrap-mode: wrap;
         }
     }
 }
