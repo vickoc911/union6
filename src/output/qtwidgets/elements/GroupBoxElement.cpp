@@ -68,20 +68,36 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
         return QRect();
     }
 
-    QRect rect;
+    QRect finalRect;
 
     switch (subControl) {
     case QStyle::SC_GroupBoxLabel: {
         auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Text"_s});
-        rect = map[u"Text"_s].rect.toRect();
+        finalRect = map[u"Text"_s].rect.toRect();
     } break;
     case QStyle::SC_GroupBoxContents: {
         auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Text"_s});
-        rect = map[u"GroupBox"_s].rect.toRect();
+        auto layoutRect = map[u"GroupBox"_s].rect.toRect();
+        QMargins padding;
+        QRect frameRect = m_groupBoxOption->rect;
+        // Use layouting for the starting position, otherwise follow what Fusion does
+        frameRect.setX(layoutRect.x());
+        frameRect.setY(layoutRect.y());
+        if (m_backgroundProperties->layout()) {
+            padding = m_backgroundProperties->layout()->padding()->toMargins().toMargins();
+        }
+        frameRect.adjust(0, 0, 0, -padding.bottom());
+        const int fontMetricsHeight = hasText() ? 0 : m_groupBoxOption->fontMetrics.height();
+        int indicatorHeight = 0;
+        if (m_isCheckable) {
+            indicatorHeight = m_style->pixelMetric(QStyle::PM_IndicatorHeight, m_styleOption, m_widget);
+        }
+        const int topMargin = qMax(indicatorHeight, fontMetricsHeight);
+        finalRect = frameRect.adjusted(padding.left(), padding.top() + topMargin, -padding.bottom(), -padding.right());
     } break;
     case QStyle::SC_GroupBoxCheckBox: {
         auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Icon"_s});
-        rect = map[u"Icon"_s].rect.toRect();
+        finalRect = map[u"Icon"_s].rect.toRect();
     } break;
     case QStyle::SC_GroupBoxFrame: {
         return m_styleOption->rect;
@@ -90,7 +106,7 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
         break;
     }
 
-    return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, rect);
+    return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, finalRect);
 }
 
 GroupBoxElement::Ptr GroupBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
