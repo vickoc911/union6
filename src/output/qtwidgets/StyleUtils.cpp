@@ -892,7 +892,6 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
         textFlags |= textWrap;
     }
     textFlags |= textElide;
-    textFlags |= Qt::TextShowMnemonic;
     return textFlags;
 }
 

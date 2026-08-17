@@ -72,7 +72,9 @@ using namespace Qt::StringLiterals;
 
 UnionStyle::UnionStyle()
     : QCommonStyle()
+    , m_showMnemonics(false)
 {
+    qApp->installEventFilter(this);
     Union::StyleRegistry::instance()->load();
 }
 
@@ -1120,6 +1122,8 @@ int UnionStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWid
         return false;
     case SH_ScrollBar_LeftClickAbsolutePosition:
         return true;
+    case SH_UnderlineShortcut:
+        return true;
     default:
         return QCommonStyle::styleHint(hint, option, widget, returnData);
     }
@@ -1224,6 +1228,18 @@ void UnionStyle::drawText(const QRect &rect,
     painter->restore();
 }
 
+void UnionStyle::drawItemText(QPainter *painter,
+                              const QRect &rect,
+                              int flags,
+                              const QPalette &pal,
+                              bool enabled,
+                              const QString &text,
+                              QPalette::ColorRole textRole) const
+{
+    flags |= m_showMnemonics ? Qt::TextShowMnemonic : Qt::TextHideMnemonic;
+    QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
+}
+
 void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget, const QColor &overrideColor)
     const
 {
@@ -1257,4 +1273,40 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
     painter->setPen(penColor);
     drawItemPixmap(painter, rect, Qt::AlignCenter, pixmap);
     painter->restore();
+}
+
+void UnionStyle::setMnemonics(bool enabled)
+{
+    if (m_showMnemonics != enabled) {
+        m_showMnemonics = enabled;
+        const auto widgets = qApp->topLevelWidgets();
+        for (QWidget *widget : widgets) {
+            widget->update();
+        }
+    }
+}
+
+bool UnionStyle::eventFilter(QObject *object, QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::KeyPress:
+        if (static_cast<QKeyEvent *>(event)->key() == Qt::Key_Alt) {
+            setMnemonics(true);
+        }
+        break;
+
+    case QEvent::KeyRelease:
+        if (static_cast<QKeyEvent *>(event)->key() == Qt::Key_Alt) {
+            setMnemonics(false);
+        }
+        break;
+
+    case QEvent::ApplicationStateChange:
+        setMnemonics(false);
+        break;
+
+    default:
+        break;
+    }
+    return parent()->eventFilter(object, event);
 }
