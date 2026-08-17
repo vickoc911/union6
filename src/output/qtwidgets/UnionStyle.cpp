@@ -302,7 +302,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         }
         auto ev = ComboBoxElement::create(comboBoxOption, this, widget);
         ev->drawBg(painter);
-        drawControl(CE_ComboBoxLabel, comboBoxOption, painter, widget);
+        // Do not draw the text and icon again, as its being handled by QStyle in CE_ComboBoxLabel
         ev->drawIndicator(painter);
     }
         return;
