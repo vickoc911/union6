@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ProgressBarElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -58,7 +59,7 @@ void ProgressBarElement::updateSubElementList()
     m_subElementList.clear();
     if (m_progressBarOption) {
         if (!m_progressBarOption->text.isEmpty()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
     }
 }
@@ -74,7 +75,7 @@ void ProgressBarElement::layout()
     }
 
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, {u"ProgressBar"_s, u"Track"_s});
+        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::ProgressBar, ElementString::Track});
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -87,7 +88,7 @@ void ProgressBarElement::layout()
 
 QSize ProgressBarElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const

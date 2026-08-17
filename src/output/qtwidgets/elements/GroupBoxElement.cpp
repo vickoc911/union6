@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "GroupBoxElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -46,7 +47,7 @@ void GroupBoxElement::draw(QPainter *painter) const
 
 QSize GroupBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 void GroupBoxElement::layout()
@@ -72,12 +73,12 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
 
     switch (subControl) {
     case QStyle::SC_GroupBoxLabel: {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"Text"_s});
-        finalRect = map[u"Text"_s].rect.toRect();
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::Text});
+        finalRect = map[ElementString::Text].rect.toRect();
     } break;
     case QStyle::SC_GroupBoxContents: {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"GroupBox"_s, u"Text"_s});
-        auto textRect = map[u"Text"_s].rect.toRect();
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::GroupBox, ElementString::Text});
+        auto textRect = map[ElementString::Text].rect.toRect();
         QMargins padding;
         QRect frameRect = m_groupBoxOption->rect;
         frameRect = frameRect.adjusted(0, textRect.height(), 0, 0);
@@ -94,8 +95,8 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
         return frameRect.adjusted(padding.left(), padding.top() + topMargin, -padding.bottom(), -padding.right());
     } break;
     case QStyle::SC_GroupBoxCheckBox: {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"Icon"_s});
-        finalRect = map[u"Icon"_s].rect.toRect();
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::Icon});
+        finalRect = map[ElementString::Icon].rect.toRect();
     } break;
     case QStyle::SC_GroupBoxFrame: {
         return m_styleOption->rect;

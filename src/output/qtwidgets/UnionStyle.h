@@ -50,6 +50,19 @@ public:
                   const QWidget *widget = nullptr,
                   const QColor &overrideColor = QColor()) const;
 
+    bool eventFilter(QObject *object, QEvent *event) override;
+
+    void drawItemText(QPainter *painter,
+                      const QRect &rect,
+                      int flags,
+                      const QPalette &pal,
+                      bool enabled,
+                      const QString &text,
+                      QPalette::ColorRole textRole = QPalette::NoRole) const override;
+
 private:
     QMap<QWidget *, AbstractElement::Ptr> elementMap;
+
+    bool m_showMnemonics;
+    void setMnemonics(bool enabled);
 };

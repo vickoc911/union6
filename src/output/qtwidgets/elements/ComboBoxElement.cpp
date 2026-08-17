@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ComboBoxElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -19,7 +20,7 @@ ComboBoxElement::ComboBoxElement(const QStyleOption *option, const UnionStyle *s
     if (m_comboBoxOption) {
         m_editable = m_comboBoxOption->editable;
 
-        m_indicatorElementList = prepareElements(m_comboBoxOption, m_widget, {u"Indicator"_s});
+        m_indicatorElementList = prepareElements(m_comboBoxOption, m_widget, {ElementString::Indicator});
         if (!m_indicatorElementList.isEmpty()) {
             m_indicatorProperties = queryProperties(m_indicatorElementList);
             if (m_indicatorProperties->icon()) {
@@ -68,12 +69,12 @@ void ComboBoxElement::updateSubElementList()
 {
     m_subElementList.clear();
     if (m_comboBoxOption) {
-        m_subElementList.append(u"Indicator"_s);
+        m_subElementList.append(ElementString::Indicator);
         if (hasText()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
         if (hasIcon()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
     }
 }
@@ -107,8 +108,8 @@ QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
         return m_styleOption->rect;
 
     case QStyle::SC_ComboBoxArrow: {
-        auto map = layoutMap(m_backgroundElementList, m_comboBoxOption, {u"Indicator"_s});
-        auto rect = map[u"Indicator"_s].rect;
+        auto map = layoutMap(m_backgroundElementList, m_comboBoxOption, {ElementString::Indicator});
+        auto rect = map[ElementString::Indicator].rect;
         rect = rect.adjusted(-m_spacing, 0, m_spacing, 0);
         return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, rect.toRect());
     }
