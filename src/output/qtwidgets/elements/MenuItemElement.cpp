@@ -157,6 +157,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
             if (m_contentProperties->layout()) {
                 int width = m_contentProperties->layout()->width().value_or(1);
                 int height = m_contentProperties->layout()->height().value_or(1);
+                int spacing = m_backgroundProperties->layout()->spacing().value_or(0);
                 if (minimumSize.width() > width) {
                     width = minimumSize.width();
                 }
@@ -164,6 +165,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
                     height = minimumSize.height();
                 }
                 QSize itemSize(width, height);
+                itemSize.rwidth() += m_menuItemOption->maxIconWidth + spacing;
                 return applyPaddingToSize(itemSize);
             }
         }
