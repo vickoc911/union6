@@ -584,7 +584,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     } break;
     case QStyle::CT_SpinBox: {
         auto ev = SpinBoxElement::create(option, this, widget);
-        return size = ev->contentsSize(size);
+        return size = ev->contentsSize(contentsSize);
     }
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
