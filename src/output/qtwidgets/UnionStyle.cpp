@@ -551,30 +551,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
-    // TODO use subelement rects to build the thing if possible
     QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
-    QSize minimumSize(contentsSize.width(), contentsSize.height());
-    auto elements = prepareElements(option, widget);
-    if (elements.isEmpty()) {
-        return size;
-    }
-    auto properties = queryProperties(elements);
-    if (!properties) {
-        return size;
-    }
-    QMargins padding;
-    if (properties->layout()) {
-        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
-        auto width = properties->layout()->width().value_or(1) + frameWidth;
-        auto height = properties->layout()->height().value_or(1) + frameWidth;
-        minimumSize = QSize(width, height);
-        if (properties->layout()->padding()) {
-            padding = properties->layout()->padding()->toMargins().toMargins();
-        }
-        if (properties->layout()->inset()) {
-            padding += properties->layout()->inset()->toMargins().toMargins();
-        }
-    }
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         auto ev = ButtonElement::create(option, this, widget);
@@ -603,11 +580,11 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     } break;
     case QStyle::CT_ItemViewItem: {
         auto ev = ItemViewElement::create(option, this, widget);
-        size = ev->contentsSize(size);
+        return size = ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_SpinBox: {
         auto ev = SpinBoxElement::create(option, this, widget);
-        size = ev->contentsSize(size);
+        return size = ev->contentsSize(size);
     }
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
@@ -627,7 +604,21 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_CustomBase:
         break;
     }
-
+    QSize minimumSize(contentsSize.width(), contentsSize.height());
+    auto elements = prepareElements(option, widget);
+    if (elements.isEmpty()) {
+        return size;
+    }
+    auto properties = queryProperties(elements);
+    if (!properties) {
+        return size;
+    }
+    if (properties->layout()) {
+        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
+        auto width = properties->layout()->width().value_or(1) + frameWidth;
+        auto height = properties->layout()->height().value_or(1) + frameWidth;
+        minimumSize = QSize(width, height);
+    }
     if (size.width() < minimumSize.width()) {
         size.setWidth(minimumSize.width());
     }
