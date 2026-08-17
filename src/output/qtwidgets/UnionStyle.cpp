@@ -551,41 +551,40 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
-    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         auto ev = ButtonElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ToolButton: {
         auto ev = ToolButtonElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_MenuItem: {
         auto ev = MenuItemElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
-    // Use defaults from qcommonstyle
     case QStyle::CT_ComboBox: {
         auto ev = ComboBoxElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_TabBarTab: {
         auto ev = TabElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_Slider: {
         auto ev = SliderElement::create(option, this, widget);
-        return ev->contentsSize(size);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ItemViewItem: {
         auto ev = ItemViewElement::create(option, this, widget);
-        return size = ev->contentsSize(contentsSize);
+        return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_SpinBox: {
         auto ev = SpinBoxElement::create(option, this, widget);
-        return size = ev->contentsSize(contentsSize);
+        return ev->contentsSize(contentsSize);
     }
+    // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
@@ -604,6 +603,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_CustomBase:
         break;
     }
+    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
     QSize minimumSize(contentsSize.width(), contentsSize.height());
     auto elements = prepareElements(option, widget);
     if (elements.isEmpty()) {
