@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ButtonElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -16,7 +17,7 @@ ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style
 {
     if (m_buttonOption) {
         if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {u"Indicator"_s});
+            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
             if (!m_indicatorElementList.isEmpty()) {
                 m_indicatorProperties = queryProperties(m_indicatorElementList);
                 if (m_indicatorProperties->icon()) {
@@ -56,13 +57,13 @@ void ButtonElement::updateSubElementList()
     m_subElementList.clear();
     if (m_buttonOption) {
         if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            m_subElementList.append(u"Indicator"_s);
+            m_subElementList.append(ElementString::Indicator);
         }
         if (!m_buttonOption->icon.isNull()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (!m_buttonOption->text.isEmpty()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
     }
 }
@@ -75,7 +76,7 @@ QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background
     // to get the proper contentSize
     if (hasIndicator()) {
-        size.rwidth() += m_layoutMap[u"Indicator"_s].rect.width() + m_backgroundProperties->layout()->spacing().value_or(0);
+        size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + m_backgroundProperties->layout()->spacing().value_or(0);
     }
     return size;
 }

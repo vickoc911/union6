@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "TabElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -58,13 +59,13 @@ void TabElement::updateSubElementList()
     m_subElementList.clear();
     if (m_tabOption) {
         if (m_isClosable) {
-            m_subElementList.append(u"CloseButton"_s);
+            m_subElementList.append(ElementString::CloseButton);
         }
         if (!m_tabOption->icon.isNull()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (!m_tabOption->text.isEmpty()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
     }
 }
@@ -77,14 +78,14 @@ void TabElement::layout()
     }
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {u"TabButton"_s});
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::Tab});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
 
     if (m_contentElementList.isEmpty()) {
-        QStringList elements = {u"TabButton"_s};
+        QStringList elements = {ElementString::Tab};
         elements.append(m_subElementList);
         m_contentElementList = prepareElements(m_styleOption, m_widget, elements);
     }
@@ -98,9 +99,16 @@ void TabElement::layout()
 
 QSize TabElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QSize size = contentsSizeFromStyle;
-    size = applyPaddingToSize(size);
-    return size;
+    const auto frameSize = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_styleOption, m_widget);
+    const auto size = applyPaddingToSize(contentsSizeFromStyle);
+    QMargins frameMargins;
+    if (m_isVertical) {
+        frameMargins = QMargins(frameSize, 0, frameSize, 0);
+    } else {
+        frameMargins = QMargins(0, frameSize, 0, frameSize);
+    }
+
+    return size.grownBy(frameMargins);
 }
 
 QRect TabElement::subElementRect(QStyle::SubElement element) const

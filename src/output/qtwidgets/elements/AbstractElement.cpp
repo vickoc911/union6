@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "AbstractElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -184,7 +185,7 @@ void AbstractElement::drawBg(QPainter *painter) const
 void AbstractElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {
-        QRect textRect = m_layoutMap[u"Text"_s].rect.toRect();
+        QRect textRect = m_layoutMap[ElementString::Text].rect.toRect();
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         QColor penColor = m_styleOption->palette.text().color();
@@ -206,7 +207,7 @@ void AbstractElement::drawText(QPainter *painter) const
 void AbstractElement::drawIcon(QPainter *painter) const
 {
     if (hasIcon() && m_isValid) {
-        QRect iconRect = m_layoutMap[u"Icon"_s].rect.toRect();
+        QRect iconRect = m_layoutMap[ElementString::Icon].rect.toRect();
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_styleOption->palette;
@@ -237,7 +238,7 @@ void AbstractElement::drawIcon(QPainter *painter) const
 void AbstractElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator() && m_isValid) {
-        QRect indicatorRect = m_layoutMap[u"Indicator"_s].rect.toRect();
+        QRect indicatorRect = m_layoutMap[ElementString::Indicator].rect.toRect();
         drawBackground(painter, indicatorRect, m_indicatorProperties);
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 

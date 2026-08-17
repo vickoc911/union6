@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "SpinBoxElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -16,7 +17,7 @@ SpinBoxElement::SpinBoxElement(const QStyleOption *option, const UnionStyle *sty
     , m_hasButtons(true)
 {
     if (m_spinBoxOption) {
-        m_indicatorElementList = prepareElements(m_spinBoxOption, m_widget, {u"Indicator"_s});
+        m_indicatorElementList = prepareElements(m_spinBoxOption, m_widget, {ElementString::Indicator});
         if (!m_indicatorElementList.isEmpty()) {
             m_indicatorProperties = queryProperties(m_indicatorElementList);
         }
@@ -55,7 +56,7 @@ void SpinBoxElement::updateSubElementList()
 {
     m_subElementList.clear();
     if (m_spinBoxOption) {
-        m_subElementList.append(u"Indicator"_s);
+        m_subElementList.append(ElementString::Indicator);
     }
 }
 
@@ -86,7 +87,7 @@ QRect SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     QRect rect;
     // Based on QCommonStyle. We only draw the "constrained" look for now.
     if (m_spinBoxOption) {
-        const QRect buttonRect = m_layoutMap[u"Indicator"_s].rect.toRect();
+        const QRect buttonRect = m_layoutMap[ElementString::Indicator].rect.toRect();
         QRect bgRect = m_spinBoxOption->rect;
         if (m_backgroundProperties->layout()) {
             bgRect.setWidth(qMax(bgRect.width(), (int)m_backgroundProperties->layout()->width().value_or(0)));
