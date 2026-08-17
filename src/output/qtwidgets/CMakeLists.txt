@@ -5,6 +5,7 @@ add_library(UnionWidgetsStyle MODULE)
 target_sources(UnionWidgetsStyle PRIVATE
         BackgroundDrawing.cpp
         BackgroundDrawing.h
+        SharedNames.h
         StyleUtils.cpp
         StyleUtils.h
         UnionStyle.cpp

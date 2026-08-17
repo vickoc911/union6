@@ -56,7 +56,7 @@ Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList 
  * property "_union_member_list" to the widget. This can be used to get the whole parental
  * hierarchy of the widget
  */
-QStringList setupMemberList(const QWidget *widget);
+QStringList widgetToElementHierarchy(const QWidget *widget);
 
 /*!
  * \brief Layouts list of elements, then returns a map of LayoutItems that contain information such as rectangles.
@@ -93,3 +93,9 @@ QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString
  * \brief Helper function to query the size of the element from properties.
  */
 QSize querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy = {});
+
+/*!
+ * \brief Tries to match styleOption type to a potential element.
+ * Used when widget is null.
+ */
+QString styleOptionToElementName(const QStyleOption *option);

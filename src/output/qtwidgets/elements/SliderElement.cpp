@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "SliderElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -45,7 +46,7 @@ void SliderElement::layout()
 
     // Indicator is the handle
     if (m_indicatorElementList.isEmpty()) {
-        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {u"Handle"_s});
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Handle});
     }
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
@@ -105,7 +106,7 @@ void SliderElement::draw(QPainter *painter) const
 
     // Tickmark drawing is copied from breeze
     if (m_sliderOption->subControls.testFlag(QStyle::SC_SliderTickmarks)) {
-        auto tickmarkElements = prepareElements(m_sliderOption, m_widget, {u"Tickmark"_s});
+        auto tickmarkElements = prepareElements(m_sliderOption, m_widget, {ElementString::TickMark});
         auto props = queryProperties(tickmarkElements);
         if (!props->layout()) {
             return;
@@ -172,19 +173,17 @@ void SliderElement::updateSubElementList()
 
 QSize SliderElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QRegion r;
-    auto grooveRect = subControlRect(QStyle::SC_SliderGroove);
-    auto tickRect = subControlRect(QStyle::SC_SliderTickmarks);
-    auto handleRect = subControlRect(QStyle::SC_SliderHandle);
-    r.setRects({grooveRect, tickRect, handleRect});
-    auto size = applyPaddingToSize(r.boundingRect().size());
+    auto grooveRect = subControlRect(QStyle::SC_SliderGroove).size();
+    auto tickRect = subControlRect(QStyle::SC_SliderTickmarks).size();
+    auto handleRect = subControlRect(QStyle::SC_SliderHandle).size();
+    auto combinedSize = grooveRect.expandedTo(tickRect.expandedTo(handleRect));
     // Add some extra spacing so that we can draw the handle outside of the groove
     if (m_isHorizontal) {
-        size.rwidth() += handleRect.width();
+        combinedSize.rwidth() += handleRect.width();
     } else {
-        size.rheight() += handleRect.height();
+        combinedSize.rheight() += handleRect.height();
     }
-    return contentsSizeFromStyle.expandedTo(size);
+    return contentsSizeFromStyle.expandedTo(applyPaddingToSize(combinedSize));
 }
 
 QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
@@ -257,7 +256,7 @@ SliderElement::Ptr SliderElement::create(const QStyleOption *option, const Union
 QList<QRect> SliderElement::tickLines() const
 {
     QList<QRect> tickLines;
-    auto tickMarkProps = queryProperties(prepareElements(m_sliderOption, m_widget, {u"TickMark"_s}));
+    auto tickMarkProps = queryProperties(prepareElements(m_sliderOption, m_widget, {ElementString::TickMark}));
     if (!tickMarkProps && !tickMarkProps->layout()) {
         return tickLines;
     }
