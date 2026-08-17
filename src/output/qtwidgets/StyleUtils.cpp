@@ -612,10 +612,9 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     // Use the original opt->rect as the main container
     // move any subelements in it according their given rules
 
-    QRectF availableSpace = opt->rect;
-
     // Get spacing for main item
     auto properties = queryProperties(elements);
+    QRectF availableSpace = backgroundRectangle(opt, properties);
     int globalSpacing = 0;
     QMargins padding;
     if (properties->layout()->padding()) {

@@ -30,4 +30,7 @@ public:
     const QStyleOptionSpinBox *m_spinBoxOption = nullptr;
 
     void updateSubElementList() override;
+
+private:
+    bool m_hasButtons;
 };
