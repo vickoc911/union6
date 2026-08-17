@@ -641,11 +641,6 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 {
     QRect rect;
     switch (element) {
-    case QStyle::SE_TreeViewDisclosureItem: {
-        auto elements = prepareElements(option, widget);
-        auto map = layoutMap(elements, option, {u"Indicator"_s});
-        rect = map[u"Indicator"_s].rect.toRect();
-    } break;
     case QStyle::SE_ItemViewItemText:
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator: {
@@ -732,6 +727,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
     } break;
     // Follow defaults
+    case QStyle::SE_TreeViewDisclosureItem:
     case QStyle::SE_TabWidgetTabContents:
     case QStyle::SE_ToolBoxTabContents:
     case QStyle::SE_TabBarTabLeftButton:
