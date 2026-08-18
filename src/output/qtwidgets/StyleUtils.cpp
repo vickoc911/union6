@@ -510,8 +510,10 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
     if (widget) {
         elementTypes = widget->property(property_union_member_list).toStringList();
         if (elementTypes.isEmpty()) {
-            elementTypes = setupMemberList(widget);
+            elementTypes = widgetToElementHierarchy(widget);
         }
+    } else {
+        elementTypes = {styleOptionToElementName(opt)};
     }
 
     elementTypes.append(targetHierarchy);
@@ -538,7 +540,7 @@ Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList 
     return query->properties();
 }
 
-QStringList setupMemberList(const QWidget *widget)
+QStringList widgetToElementHierarchy(const QWidget *widget)
 {
     if (!widget) {
         return QStringList();
@@ -592,6 +594,89 @@ QStringList setupMemberList(const QWidget *widget)
     }
 
     return members;
+}
+
+QString styleOptionToElementName(const QStyleOption *option)
+{
+    if (!option) {
+        return u"Widget"_s; // Default items that have no styleoption.
+    }
+    switch ((QStyleOption::OptionType)option->type) {
+    case QStyleOption::SO_Default:
+        return u"Widget"_s;
+    case QStyleOption::SO_FocusRect:
+        return u"FocusFrame"_s;
+    case QStyleOption::SO_Button:
+        return u"Button"_s;
+    case QStyleOption::SO_Tab:
+        return u"TabButton"_s;
+    case QStyleOption::SO_MenuItem:
+        return u"MenuItem"_s;
+    case QStyleOption::SO_Frame:
+    case QStyleOption::SO_TabWidgetFrame:
+        return u"Frame"_s;
+    case QStyleOption::SO_ProgressBar:
+        return u"ProgressBar"_s;
+    case QStyleOption::SO_ToolBox:
+        return u"ToolBox"_s;
+    case QStyleOption::SO_Header:
+        return u"Header"_s;
+    case QStyleOption::SO_DockWidget:
+        return u"DockWidget"_s;
+    case QStyleOption::SO_ViewItem:
+        return u"ItemViewItem"_s;
+    case QStyleOption::SO_TabBarBase:
+        return u"TabBar"_s;
+    case QStyleOption::SO_RubberBand:
+        return u"RubberBand"_s;
+    case QStyleOption::SO_ToolBar:
+        return u"ToolBar"_s;
+    case QStyleOption::SO_GraphicsItem:
+        return u"GraphicsItem"_s;
+    case QStyleOption::SO_Slider:
+        return u"Slider"_s;
+    case QStyleOption::SO_SpinBox:
+        return u"SpinBox"_s;
+    case QStyleOption::SO_ToolButton:
+        return u"ToolButton"_s;
+    case QStyleOption::SO_ComboBox:
+        return u"ComboBox"_s;
+    case QStyleOption::SO_TitleBar:
+        return u"TitleBar"_s;
+    case QStyleOption::SO_GroupBox:
+        return u"GroupBox"_s;
+    case QStyleOption::SO_SizeGrip:
+        return u"SizeGrip"_s;
+    case QStyleOption::SO_CustomBase:
+        // Just return "Widget"
+        break;
+    // Handle complex cases by casting in case they resolve to one of these
+    case QStyleOption::SO_Complex:
+    case QStyleOption::SO_ComplexCustomBase: {
+        if (qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
+            return u"ComboBox"_s;
+        }
+        if (qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
+            return u"GroupBox"_s;
+        }
+        if (qstyleoption_cast<const QStyleOptionSizeGrip *>(option)) {
+            return u"SizeGrip"_s;
+        }
+        if (qstyleoption_cast<const QStyleOptionSlider *>(option)) {
+            return u"Slider"_s;
+        }
+        if (qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
+            return u"SpinBox"_s;
+        }
+        if (qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
+            return u"TitleBar"_s;
+        }
+        if (qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
+            return u"ToolButton"_s;
+        }
+    } break;
+    }
+    return u"Widget"_s;
 }
 
 QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElementList)

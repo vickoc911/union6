@@ -1187,7 +1187,7 @@ void UnionStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     }
 
-    widget->setProperty(property_union_member_list, setupMemberList(widget));
+    widget->setProperty(property_union_member_list, widgetToElementHierarchy(widget));
 
     QCommonStyle::polish(widget);
 }
