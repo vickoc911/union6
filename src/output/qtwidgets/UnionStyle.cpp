@@ -587,6 +587,10 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         auto ev = SpinBoxElement::create(option, this, widget);
         return ev->contentsSize(contentsSize);
     }
+    case QStyle::CT_ScrollBar: {
+        auto ev = ScrollBarElement::create(option, this, widget);
+        return ev->contentsSize(contentsSize);
+    }
     // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
@@ -598,7 +602,6 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     case QStyle::CT_ProgressBar:
     case QStyle::CT_MenuBarItem:
     case QStyle::CT_Menu:
-    case QStyle::CT_ScrollBar:
     case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
     case QStyle::CT_HeaderSection:

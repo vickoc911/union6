@@ -31,4 +31,7 @@ public:
 
     void drawBg(QPainter *painter) const override;
     void updateSubElementList() override;
+
+private:
+    bool m_horizontal;
 };
