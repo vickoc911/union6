@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class TabElement : public AbstractElement, public std::enable_shared_from_this<TabElement>
+class TabElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<TabElement>;
-    TabElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    TabElement(const QStyleOptionTab *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~TabElement() override;
-    static TabElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 
@@ -29,11 +27,10 @@ public:
     QRect subElementRect(QStyle::SubElement element) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionTab *m_tabOption = nullptr;
-
     bool isVertical() const;
 
 private:
+    const QStyleOptionTab *m_tabOption = nullptr;
     bool m_isVertical;
     bool m_isClosable;
     void tabLayout(QRect *textRect, QRect *iconRect) const;

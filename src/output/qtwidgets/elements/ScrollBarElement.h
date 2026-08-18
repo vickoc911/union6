@@ -12,23 +12,23 @@
 
 class UnionStyle;
 
-class ScrollBarElement : public AbstractElement, public std::enable_shared_from_this<ScrollBarElement>
+class ScrollBarElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<ScrollBarElement>;
-    ScrollBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ScrollBarElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ScrollBarElement() override;
-    static ScrollBarElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionSlider *m_scrollBarOption = nullptr;
-
-    void drawBg(QPainter *painter) const override;
+    void drawBackground(QPainter *painter) const override;
     void updateSubElementList() override;
+
+private:
+    const QStyleOptionSlider *m_scrollBarOption = nullptr;
+    bool m_horizontal;
 };

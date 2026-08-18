@@ -11,18 +11,13 @@
 
 class UnionStyle;
 
-class AbstractElement : public QObject, public std::enable_shared_from_this<AbstractElement>
+class AbstractElement : public QObject
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<AbstractElement>;
     AbstractElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~AbstractElement() override;
-    /*!
-     * \brief Create a shared pointer to the element. Use this instead of regular instantiation.
-     */
-    static AbstractElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     QIcon icon() const;
     void setIcon(const QIcon &icon);
@@ -57,7 +52,7 @@ public:
     /*!
      * \brief Draw background of the element.
      */
-    virtual void drawBg(QPainter *painter) const;
+    virtual void drawBackground(QPainter *painter) const;
     /*!
      * \brief Draw the indicator of the element. This can vary from secondary icon, such as drop-down
      * arrow icon, to a checkbox, depending on the element.
@@ -69,8 +64,7 @@ public:
      */
     virtual void layout();
     /*!
-     * \brief Return the contents size of the element. Depending on the element, this can apply
-     * padding.
+     * \brief Return the contents size of the element with padding applied by default.
      */
     virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
     /*!

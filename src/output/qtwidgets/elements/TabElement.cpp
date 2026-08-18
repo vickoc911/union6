@@ -12,29 +12,28 @@
 
 using namespace Qt::StringLiterals;
 
-TabElement::TabElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+TabElement::TabElement(const QStyleOptionTab *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_tabOption(qstyleoption_cast<const QStyleOptionTab *>(option))
+    , m_tabOption(option)
     , m_isVertical(false)
     , m_isClosable(false)
 {
-    if (m_tabOption) {
-        m_isVertical = m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::RoundedWest || m_tabOption->shape == QTabBar::TriangularEast
-            || m_tabOption->shape == QTabBar::TriangularWest;
+    m_isVertical = m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::RoundedWest || m_tabOption->shape == QTabBar::TriangularEast
+        || m_tabOption->shape == QTabBar::TriangularWest;
 
-        if (const auto tabbarwidget = qobject_cast<const QTabBar *>(widget)) {
-            if (tabbarwidget->tabsClosable()) {
-                m_isClosable = true;
-            }
-        }
-
-        if (!m_tabOption->icon.isNull()) {
-            setIcon(m_tabOption->icon);
-        }
-        if (!m_tabOption->text.isEmpty()) {
-            setText(m_tabOption->text);
+    if (const auto tabbarwidget = qobject_cast<const QTabBar *>(widget)) {
+        if (tabbarwidget->tabsClosable()) {
+            m_isClosable = true;
         }
     }
+
+    if (!m_tabOption->icon.isNull()) {
+        setIcon(m_tabOption->icon);
+    }
+    if (!m_tabOption->text.isEmpty()) {
+        setText(m_tabOption->text);
+    }
+
     updateSubElementList();
     layout();
 }
@@ -48,7 +47,7 @@ void TabElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
@@ -57,16 +56,14 @@ void TabElement::draw(QPainter *painter) const
 void TabElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_tabOption) {
-        if (m_isClosable) {
-            m_subElementList.append(ElementString::CloseButton);
-        }
-        if (!m_tabOption->icon.isNull()) {
-            m_subElementList.append(ElementString::Icon);
-        }
-        if (!m_tabOption->text.isEmpty()) {
-            m_subElementList.append(ElementString::Text);
-        }
+    if (m_isClosable) {
+        m_subElementList.append(ElementString::CloseButton);
+    }
+    if (!m_tabOption->icon.isNull()) {
+        m_subElementList.append(ElementString::Icon);
+    }
+    if (!m_tabOption->text.isEmpty()) {
+        m_subElementList.append(ElementString::Text);
     }
 }
 
@@ -78,7 +75,7 @@ void TabElement::layout()
     }
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::Tab});
+        m_backgroundElementList = prepareElements(m_tabOption, m_widget, {ElementString::Tab});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
@@ -87,19 +84,19 @@ void TabElement::layout()
     if (m_contentElementList.isEmpty()) {
         QStringList elements = {ElementString::Tab};
         elements.append(m_subElementList);
-        m_contentElementList = prepareElements(m_styleOption, m_widget, elements);
+        m_contentElementList = prepareElements(m_tabOption, m_widget, elements);
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
     }
 
-    m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+    m_layoutMap = layoutMap(m_backgroundElementList, m_tabOption, m_subElementList);
     m_isValid = true;
 }
 
 QSize TabElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    const auto frameSize = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_styleOption, m_widget);
+    const auto frameSize = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_tabOption, m_widget);
     const auto size = applyPaddingToSize(contentsSizeFromStyle);
     QMargins frameMargins;
     if (m_isVertical) {
@@ -127,12 +124,7 @@ QRect TabElement::subElementRect(QStyle::SubElement element) const
             unifiedRect = unifiedRect.transposed();
         }
     }
-    return m_styleOption->rect;
-}
-
-TabElement::Ptr TabElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<TabElement>(option, style, widget);
+    return m_tabOption->rect;
 }
 
 bool TabElement::isVertical() const
