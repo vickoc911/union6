@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ItemViewElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -16,7 +17,7 @@ ItemViewElement::ItemViewElement(const QStyleOption *option, const UnionStyle *s
 {
     if (m_viewItemOption) {
         if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {u"CheckBox"_s});
+            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox});
             if (!m_indicatorElementList.isEmpty()) {
                 m_indicatorProperties = queryProperties(m_indicatorElementList);
             }
@@ -41,7 +42,7 @@ void ItemViewElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {u"ItemViewItem"_s});
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::ItemViewItem});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
@@ -104,15 +105,15 @@ void ItemViewElement::updateSubElementList()
 {
     m_subElementList.clear();
     if (m_viewItemOption) {
-        m_subElementList.append(u"ItemViewItem"_s);
+        m_subElementList.append(ElementString::ItemViewItem);
         if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-            m_subElementList.append(u"CheckBox"_s);
+            m_subElementList.append(ElementString::CheckBox);
         }
         if (!m_viewItemOption->icon.isNull()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (!m_viewItemOption->text.isEmpty()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
     }
 }
@@ -140,14 +141,14 @@ QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
 
     QRect rect;
     if (element == QStyle::SE_ItemViewItemText) {
-        rect = m_layoutMap[u"Text"_s].rect.toRect();
+        rect = m_layoutMap[ElementString::Text].rect.toRect();
     }
     if (element == QStyle::SE_ItemViewItemDecoration) {
         // DecorationSize can be changed by user, so use it by default
-        rect = centerRect(m_layoutMap[u"Icon"_s].rect.toRect(), m_viewItemOption->decorationSize.width(), m_viewItemOption->decorationSize.height());
+        rect = centerRect(m_layoutMap[ElementString::Icon].rect.toRect(), m_viewItemOption->decorationSize.width(), m_viewItemOption->decorationSize.height());
     }
     if (element == QStyle::SE_ItemViewItemCheckIndicator) {
-        rect = m_layoutMap[u"CheckBox"_s].rect.toRect();
+        rect = m_layoutMap[ElementString::CheckBox].rect.toRect();
     }
     return rect;
 }

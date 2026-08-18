@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ScrollBarElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -55,7 +56,7 @@ void ScrollBarElement::drawBg(QPainter *painter) const
     if (m_backgroundProperties->background() && m_backgroundProperties->background()->color().has_value()) {
         drawBackground(painter, m_scrollBarOption->rect, m_backgroundProperties);
     } else {
-        drawBackground(painter, m_scrollBarOption->rect, queryProperties(prepareElements(m_scrollBarOption, m_widget, {u"ApplicationWindow"_s})));
+        drawBackground(painter, m_scrollBarOption->rect, queryProperties(prepareElements(m_scrollBarOption, m_widget, {ElementString::ApplicationWindow})));
     }
 }
 
@@ -63,7 +64,7 @@ void ScrollBarElement::updateSubElementList()
 {
     m_subElementList.clear();
     if (m_scrollBarOption) {
-        m_subElementList.append(u"Handle"_s);
+        m_subElementList.append(ElementString::Handle);
     }
 }
 

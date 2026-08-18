@@ -3,6 +3,7 @@
 
 #include "UnionStyle.h"
 #include "BackgroundDrawing.h"
+#include "SharedNames.h"
 #include "StyleUtils.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
@@ -207,19 +208,19 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_ProgressBarLabel, option, painter, widget);
         return;
     case QStyle::CE_ScrollBarSlider:
-        drawElementBackground(painter, option, widget, {u"Handle"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Handle});
         return;
     case QStyle::CE_ShapedFrame:
-        drawElementBackground(painter, option, widget, {u"Frame"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Frame});
         return;
     case QStyle::CE_FocusFrame:
-        drawElementBackground(painter, option, widget, {u"FocusFrame"_s});
+        drawElementBackground(painter, option, widget, {ElementString::FocusFrame});
         return;
     case QStyle::CE_ToolBar:
         drawElementBackground(painter, option, widget);
         return;
     case QStyle::CE_MenuBarItem:
-        drawElementBackground(painter, option, widget, {u"MenuBarItem"_s});
+        drawElementBackground(painter, option, widget, {ElementString::MenuItem});
         return;
     case QStyle::CE_HeaderLabel: {
         auto ev = HeaderElement::create(option, this, widget);
@@ -237,13 +238,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_HeaderLabel, option, painter, widget);
         return;
     case QStyle::CE_Splitter:
-        drawElementBackground(painter, option, widget, {u"Splitter"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Splitter});
         return;
     case QStyle::CE_RubberBand:
-        drawElementBackground(painter, option, widget, {u"RubberBand"_s});
+        drawElementBackground(painter, option, widget, {ElementString::RubberBand});
         return;
     case QStyle::CE_SizeGrip:
-        drawElementBackground(painter, option, widget, {u"SizeGrip"_s});
+        drawElementBackground(painter, option, widget, {ElementString::SizeGrip});
         return;
     case QStyle::CE_DockWidgetTitle: {
         if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
@@ -377,14 +378,14 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
-        drawElementBackground(painter, option, widget, {u"Item"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Item});
         return;
     case QStyle::PE_FrameMenu:
-        drawElementBackground(painter, option, widget, {u"Menu"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Menu});
         return;
     case QStyle::PE_Widget:
         // Relates to PE_Frame
-        drawElementBackground(painter, option, widget, {u"Panel"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Panel});
         return;
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
@@ -396,44 +397,44 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawElementBackground(painter, option, widget);
         return;
     case QStyle::PE_PanelItemViewItem:
-        drawElementBackground(painter, option, widget, {u"ItemViewItem"_s});
+        drawElementBackground(painter, option, widget, {ElementString::ItemViewItem});
         return;
     case QStyle::PE_PanelItemViewRow:
-        drawElementBackground(painter, option, widget, {u"ItemViewRow"_s});
+        drawElementBackground(painter, option, widget, {ElementString::ItemViewRow});
         return;
     case QStyle::PE_PanelScrollAreaCorner:
-        drawElementBackground(painter, option, widget, {u"ScrollAreaCorner"_s});
+        drawElementBackground(painter, option, widget, {ElementString::ScrollAreaCorner});
         return;
     case QStyle::PE_PanelTipLabel:
-        drawElementBackground(painter, option, widget, {u"ToolTip"_s});
+        drawElementBackground(painter, option, widget, {ElementString::ToolTip});
         return;
     case QStyle::PE_FrameFocusRect:
-        drawElementBackground(painter, option, widget, {u"FocusFrame"_s});
+        drawElementBackground(painter, option, widget, {ElementString::FocusFrame});
         return;
         // Indicators
     case QStyle::PE_IndicatorCheckBox:
-        drawElementBackground(painter, option, widget, {u"CheckBox"_s, u"Indicator"_s});
+        drawElementBackground(painter, option, widget, {ElementString::CheckBox, ElementString::Indicator});
         return;
     case QStyle::PE_IndicatorRadioButton:
-        drawElementBackground(painter, option, widget, {u"RadioButton"_s, u"Indicator"_s});
+        drawElementBackground(painter, option, widget, {ElementString::RadioButton, ElementString::Indicator});
         return;
     case QStyle::PE_IndicatorArrowLeft: {
-        const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {u"IndicatorArrowLeft"_s});
+        const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
     case QStyle::PE_IndicatorArrowUp: {
-        const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {u"IndicatorArrowUp"_s});
+        const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
     case QStyle::PE_IndicatorArrowRight: {
-        const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {u"IndicatorArrowRight"_s});
+        const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
     case QStyle::PE_IndicatorArrowDown: {
-        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {u"IndicatorArrowDown"_s});
+        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
         drawIcon(option->rect, option, painter, icon, widget);
         return;
     }
@@ -444,7 +445,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         auto up = (element == PE_IndicatorSpinUp);
         auto spinboxElements = prepareElements(option, widget);
         auto element = Union::Element::create();
-        element->setType(u"Indicator"_s);
+        element->setType(ElementString::Indicator);
         element->setStates(statesFromOption(option));
         auto hints = hintsFromOption(option);
         // Use the constrained look for now
@@ -462,7 +463,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     }
         return;
     case QStyle::PE_FrameLineEdit:
-        drawElementBackground(painter, option, widget, {u"TextField"_s});
+        drawElementBackground(painter, option, widget, {ElementString::TextField});
         return;
     case QStyle::PE_Frame:
     case QStyle::PE_FrameDefaultButton:
@@ -492,14 +493,14 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
                 defaultIconName = u"arrow-down-symbolic"_s;
             }
         }
-        const auto icon = queryIcon(option, widget, defaultIconName, {u"IndicatorBranch"_s});
-        auto size = querySize(option, widget, {u"TreeViewDelegate"_s, u"Indicator"_s});
+        const auto icon = queryIcon(option, widget, defaultIconName, {ElementString::IndicatorBranch});
+        auto size = querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indicator});
         auto rect = centerRect(option->rect, size.width(), size.height());
         drawIcon(rect, option, painter, icon, widget);
     }
         return;
     case QStyle::PE_IndicatorButtonDropDown: {
-        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {u"IndicatorButtonDropDown"_s});
+        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
         drawIcon(option->rect, option, painter, icon, widget);
     }
         return;
@@ -522,20 +523,20 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     }
         return;
     case QStyle::PE_IndicatorProgressChunk:
-        drawElementBackground(painter, option, widget, {u"IndicatorProgressChunk"_s});
+        drawElementBackground(painter, option, widget, {ElementString::IndicatorProgressChunk});
         return;
     case QStyle::PE_IndicatorToolBarHandle:
-        drawElementBackground(painter, option, widget, {u"IndicatorToolBarHandle"_s});
+        drawElementBackground(painter, option, widget, {ElementString::IndicatorToolBarHandle});
         return;
     case QStyle::PE_IndicatorToolBarSeparator:
-        drawElementBackground(painter, option, widget, {u"IndicatorToolBarSeparator"_s});
+        drawElementBackground(painter, option, widget, {ElementString::IndicatorToolBarSeparator});
         return;
     case QStyle::PE_IndicatorColumnViewArrow:
         drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
         return;
     case QStyle::PE_IndicatorTabClose: {
-        drawElementBackground(painter, option, widget, {u"TabButton"_s, u"CloseButton"_s});
-        const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {u"IndicatorTabClose"_s});
+        drawElementBackground(painter, option, widget, {ElementString::Tab, ElementString::CloseButton});
+        const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {ElementString::IndicatorTabClose});
         drawIcon(option->rect, option, painter, icon, widget);
     }
         return;
@@ -690,32 +691,32 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
             QStringList childelements;
             if (dockOption->closable) {
-                childelements.append(u"CloseButton"_s);
+                childelements.append(ElementString::CloseButton);
             }
             if (dockOption->floatable) {
-                childelements.append(u"FloatButton"_s);
+                childelements.append(ElementString::FloatButton);
             }
             if (!dockOption->title.isEmpty()) {
-                childelements.append(u"Text"_s);
+                childelements.append(ElementString::Text);
             }
             if (childelements.isEmpty()) {
                 return QRect();
             }
-            auto elements = prepareElements(option, widget, {u"DockWidget"_s});
+            auto elements = prepareElements(option, widget, {ElementString::DockWidget});
             auto map = layoutMap(elements, option, childelements);
 
             if (element == SE_DockWidgetTitleBarText) {
-                rect = map[u"Text"_s].rect.toRect();
+                rect = map[ElementString::Text].rect.toRect();
             }
             if (element == SE_DockWidgetFloatButton) {
-                rect = map[u"FloatButton"_s].rect.toRect();
+                rect = map[ElementString::FloatButton].rect.toRect();
             }
             if (element == SE_DockWidgetCloseButton) {
-                rect = map[u"CloseButton"_s].rect.toRect();
+                rect = map[ElementString::CloseButton].rect.toRect();
             }
             // The styleoption has no icon, yet there is whole thing for an icon? Wtf.
             if (element == SE_DockWidgetIcon) {
-                rect = map[u"Icon"_s].rect.toRect();
+                rect = map[ElementString::Icon].rect.toRect();
             }
         }
     } break;
@@ -865,7 +866,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_TabCloseIndicatorWidth:
     case QStyle::PM_TabCloseIndicatorHeight:
     case QStyle::PM_ExclusiveIndicatorHeight: {
-        auto elements = prepareElements(option, widget, {u"Indicator"_s});
+        auto elements = prepareElements(option, widget, {ElementString::Indicator});
         if (elements.isEmpty()) {
             return defaultMetric;
         }
@@ -897,7 +898,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     } break;
     case QStyle::PM_SliderControlThickness: {
         auto scrollbaroption = qstyleoption_cast<const QStyleOptionSlider *>(option);
-        auto elements = prepareElements(option, widget, {u"Handle"_s});
+        auto elements = prepareElements(option, widget, {ElementString::Handle});
         if (elements.isEmpty()) {
             return defaultMetric;
         }
@@ -922,10 +923,10 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         auto toolBarOption = qstyleoption_cast<const QStyleOptionToolBar *>(option);
         QStringList childelements;
         if (metric == PM_ToolBarHandleExtent) {
-            childelements.append(u"Handle"_s);
+            childelements.append(ElementString::Handle);
         }
         if (metric == PM_ToolBarExtensionExtent) {
-            childelements.append(u"Extension"_s);
+            childelements.append(ElementString::Extension);
         }
         auto elements = prepareElements(option, widget, childelements);
         if (elements.isEmpty()) {
@@ -978,51 +979,51 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
     } break;
     case QStyle::PM_TabBarScrollButtonWidth:
-        return querySize(option, widget, {u"TabScrollButton"_s}).width();
+        return querySize(option, widget, {ElementString::TabScrollButton}).width();
     case QStyle::PM_MenuPanelWidth:
     case QStyle::PM_SplitterWidth:
         return querySize(option, widget).width();
     case QStyle::PM_TitleBarHeight:
-        return querySize(option, widget, {u"TitleBar"_s}).height();
+        return querySize(option, widget, {ElementString::TitleBar}).height();
     case QStyle::PM_TitleBarButtonSize:
     case QStyle::PM_TitleBarButtonIconSize:
-        return querySize(option, widget, {u"TitleBar"_s, u"NormalButton"_s}).width();
+        return querySize(option, widget, {ElementString::TitleBar, ElementString::NormalButton}).width();
     case QStyle::PM_SpinBoxSliderHeight:
     case QStyle::PM_MenuScrollerHeight:
     case QStyle::PM_TabBarBaseHeight:
         return querySize(option, widget).height();
     case QStyle::PM_TreeViewIndentation:
-        return querySize(option, widget, {u"TreeViewDelegate"_s, u"Indentation"_s}).width();
+        return querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indentation}).width();
     case QStyle::PM_SmallIconSize:
-        return querySize(option, widget, {u"SmallIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::SmallIconSize}).width();
     case QStyle::PM_TabBarIconSize:
-        return querySize(option, widget, {u"TabBarIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::TabBarIconSize}).width();
     case QStyle::PM_LineEditIconSize:
-        return querySize(option, widget, {u"LineEditIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::LineEditIconSize}).width();
     case QStyle::PM_ListViewIconSize:
-        return querySize(option, widget, {u"ListViewIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::ListViewIconSize}).width();
     case QStyle::PM_ButtonIconSize:
-        return querySize(option, widget, {u"ButtonIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::ButtonIconSize}).width();
     case QStyle::PM_ToolBarIconSize:
-        return querySize(option, widget, {u"ToolBarIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::ToolBarIconSize}).width();
     case QStyle::PM_HeaderMarkSize:
-        return querySize(option, widget, {u"HeaderMarkSize"_s}).width();
+        return querySize(option, widget, {ElementString::HeaderMarkSize}).width();
     case QStyle::PM_IconViewIconSize:
-        return querySize(option, widget, {u"IconViewIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::IconViewIconSize}).width();
     case QStyle::PM_LargeIconSize:
-        return querySize(option, widget, {u"LargeIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::LargeIconSize}).width();
     case QStyle::PM_MessageBoxIconSize:
-        return querySize(option, widget, {u"MessageBoxIconSize"_s}).width();
+        return querySize(option, widget, {ElementString::MessageBoxIconSize}).width();
     case QStyle::PM_SizeGripSize:
-        return querySize(option, widget, {u"SizeGripSize"_s}).width();
+        return querySize(option, widget, {ElementString::SizeGripSize}).width();
     case QStyle::PM_TextCursorWidth:
-        return querySize(option, widget, {u"TextCursorWidth"_s}).width();
+        return querySize(option, widget, {ElementString::TextCursorWidth}).width();
     case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
-        return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).width();
+        return querySize(option, widget, {ElementString::HeaderDefaultSectionSize}).width();
     case QStyle::PM_HeaderDefaultSectionSizeVertical:
-        return querySize(option, widget, {u"HeaderDefaultSectionSize"_s}).height();
+        return querySize(option, widget, {ElementString::HeaderDefaultSectionSize}).height();
     case QStyle::PM_ProgressBarChunkWidth:
-        return querySize(option, widget, {u"ProgressBarChunkWidth"_s}).width();
+        return querySize(option, widget, {ElementString::ProgressBarChunkWidth}).width();
     default:
         break;
     };
@@ -1135,7 +1136,7 @@ void UnionStyle::polish(QApplication *application)
 
     // Set global window color
     auto element = Union::Element::create();
-    element->setType(u"ApplicationWindow"_s);
+    element->setType(ElementString::ApplicationWindow);
 
     const auto style = Union::StyleRegistry::instance()->defaultStyle();
     const auto matches = style->matches({element});

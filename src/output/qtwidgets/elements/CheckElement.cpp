@@ -8,6 +8,8 @@
 #include <QPainter>
 #include <QStyle>
 
+#include "SharedNames.h"
+
 using namespace Qt::StringLiterals;
 
 CheckElement::CheckElement(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
@@ -16,7 +18,7 @@ CheckElement::CheckElement(Type type, const QStyleOption *option, const UnionSty
     , m_type(type)
 {
     if (m_buttonOption) {
-        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {u"Indicator"_s});
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
         if (!m_indicatorElementList.isEmpty()) {
             m_indicatorProperties = queryProperties(m_indicatorElementList);
         }
@@ -59,14 +61,14 @@ QRect CheckElement::subElementRect(QStyle::SubElement element) const
     }
 
     if (element == QStyle::SE_CheckBoxIndicator || element == QStyle::SE_RadioButtonIndicator) {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {u"Indicator"_s});
-        return map[u"Indicator"_s].rect.toRect();
+        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::Indicator});
+        return map[ElementString::Indicator].rect.toRect();
     }
 
     QRect rect = m_styleOption->rect;
     QRect unifiedRect;
     for (const auto &m : m_layoutMap) {
-        if (m.elementName != u"Indicator"_s) {
+        if (m.elementName != ElementString::Indicator) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }
     }
@@ -82,13 +84,13 @@ CheckElement::Ptr CheckElement::create(Type type, const QStyleOption *option, co
 void CheckElement::updateSubElementList()
 {
     m_subElementList.clear();
-    m_subElementList.append(u"Indicator"_s);
+    m_subElementList.append(ElementString::Indicator);
     if (m_buttonOption) {
         if (!m_buttonOption->icon.isNull()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (!m_buttonOption->text.isEmpty()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
     }
 }
@@ -98,9 +100,9 @@ void CheckElement::drawIndicator(QPainter *painter) const
     auto subopt = *m_buttonOption;
     if (m_type == CheckElement::Type::CheckBox) {
         subopt.rect = subElementRect(QStyle::SE_CheckBoxIndicator);
-        drawElementBackground(painter, &subopt, m_widget, {u"CheckBox"_s, u"Indicator"_s});
+        drawElementBackground(painter, &subopt, m_widget, {ElementString::CheckBox, ElementString::Indicator});
     } else {
         subopt.rect = subElementRect(QStyle::SE_RadioButtonIndicator);
-        drawElementBackground(painter, &subopt, m_widget, {u"RadioButton"_s, u"Indicator"_s});
+        drawElementBackground(painter, &subopt, m_widget, {ElementString::RadioButton, ElementString::Indicator});
     }
 }

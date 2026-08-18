@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2025 Joshua Goins <josh@redstrate.com>
 
 #include "StyleUtils.h"
+#include "SharedNames.h"
 #include <ElementQuery.h>
 #include <StyleRegistry.h>
 
@@ -548,39 +549,39 @@ QStringList widgetToElementHierarchy(const QWidget *widget)
     QStringList members;
     // We will have to check what items the widget inherits from,
     // as far as I know there is no better way to do this.
-    const QMap<const char *, QString> parentClasses = {{"QCheckBox", u"CheckBox"_s},
-                                                       {"QRadioButton", u"RadioButton"_s},
-                                                       {"QPushButton", u"Button"_s},
-                                                       {"QToolButton", u"ToolButton"_s},
-                                                       {"QDial", u"Dial"_s},
-                                                       {"QScrollBar", u"ScrollBar"_s},
-                                                       {"QSlider", u"Slider"_s},
-                                                       {"QAbstractSpinBox", u"SpinBox"_s},
-                                                       {"QComboBox", u"ComboBox"_s},
-                                                       {"QDialog", u"Dialog"_s},
-                                                       {"QDialogButtonBox", u"DialogButtonBox"_s},
-                                                       {"QDockWidget", u"Dock"_s},
-                                                       {"QFocusFrame", u"FocusFrame"_s},
-                                                       {"QFrame", u"Frame"_s},
-                                                       {"QGroupBox", u"GroupBox"_s},
-                                                       {"QKeySequenceEit", u"KeySequenceEdit"_s},
-                                                       {"QLineEdit", u"TextField"_s},
-                                                       {"QMainWindow", u"ApplicationWindow"_s},
-                                                       {"QMdiSubWinow", u"MdiSubWindow"_s},
-                                                       {"QMenu", u"Menu"_s},
-                                                       {"QMenuBar", u"MenuBar"_s},
-                                                       {"QProgressBar", u"ProgressBar"_s},
-                                                       {"QRubberBand", u"RubberBand"_s},
-                                                       {"QSizeGrip", u"SizeGrip"_s},
-                                                       {"QSplitterHandle", u"SplitterHandle"_s},
-                                                       {"QStatusBar", u"StatusBar"_s},
-                                                       {"QTabBar", u"TabBar"_s},
-                                                       {"QTabWidget", u"TabWidget"_s},
-                                                       {"QToolBar", u"ToolBar"_s},
-                                                       {"QAbstractScrollArea", u"ScrollArea"_s},
-                                                       {"QListView", u"ListView"_s},
-                                                       {"QTreeView", u"QTreeViewDelegate"_s},
-                                                       {"QSplitter", u"Splitter"_s}};
+    const QMap<const char *, QString> parentClasses = {{"QCheckBox", ElementString::CheckBox},
+                                                       {"QRadioButton", ElementString::RadioButton},
+                                                       {"QPushButton", ElementString::Button},
+                                                       {"QToolButton", ElementString::ToolButton},
+                                                       {"QDial", ElementString::Dial},
+                                                       {"QScrollBar", ElementString::ScrollBar},
+                                                       {"QSlider", ElementString::Slider},
+                                                       {"QAbstractSpinBox", ElementString::SpinBox},
+                                                       {"QComboBox", ElementString::ComboBox},
+                                                       {"QDialog", ElementString::Dialog},
+                                                       {"QDialogButtonBox", ElementString::DialogButtonBox},
+                                                       {"QDockWidget", ElementString::Dock},
+                                                       {"QFocusFrame", ElementString::FocusFrame},
+                                                       {"QFrame", ElementString::Frame},
+                                                       {"QGroupBox", ElementString::GroupBox},
+                                                       {"QKeySequenceEdit", ElementString::KeySequenceEdit},
+                                                       {"QLineEdit", ElementString::TextField},
+                                                       {"QMainWindow", ElementString::ApplicationWindow},
+                                                       {"QMdiSubWinow", ElementString::MdiSubWindow},
+                                                       {"QMenu", ElementString::Menu},
+                                                       {"QMenuBar", ElementString::MenuBar},
+                                                       {"QProgressBar", ElementString::ProgressBar},
+                                                       {"QRubberBand", ElementString::RubberBand},
+                                                       {"QSizeGrip", ElementString::SizeGrip},
+                                                       {"QSplitterHandle", ElementString::SplitterHandle},
+                                                       {"QStatusBar", ElementString::StatusBar},
+                                                       {"QTabBar", ElementString::TabBar},
+                                                       {"QTabWidget", ElementString::TabWidget},
+                                                       {"QToolBar", ElementString::ToolBar},
+                                                       {"QAbstractScrollArea", ElementString::ScrollArea},
+                                                       {"QListView", ElementString::ListView},
+                                                       {"QTreeView", ElementString::TreeViewDelegate},
+                                                       {"QSplitter", ElementString::Splitter}};
 
     auto currentWidget = widget;
     while (currentWidget) {
@@ -599,54 +600,54 @@ QStringList widgetToElementHierarchy(const QWidget *widget)
 QString styleOptionToElementName(const QStyleOption *option)
 {
     if (!option) {
-        return u"Widget"_s; // Default items that have no styleoption.
+        return ElementString::Widget; // Default items that have no styleoption.
     }
     switch ((QStyleOption::OptionType)option->type) {
     case QStyleOption::SO_Default:
-        return u"Widget"_s;
+        return ElementString::Widget;
     case QStyleOption::SO_FocusRect:
-        return u"FocusFrame"_s;
+        return ElementString::FocusFrame;
     case QStyleOption::SO_Button:
-        return u"Button"_s;
+        return ElementString::Button;
     case QStyleOption::SO_Tab:
-        return u"TabButton"_s;
+        return ElementString::Tab;
     case QStyleOption::SO_MenuItem:
-        return u"MenuItem"_s;
+        return ElementString::MenuItem;
     case QStyleOption::SO_Frame:
     case QStyleOption::SO_TabWidgetFrame:
-        return u"Frame"_s;
+        return ElementString::Frame;
     case QStyleOption::SO_ProgressBar:
-        return u"ProgressBar"_s;
+        return ElementString::ProgressBar;
     case QStyleOption::SO_ToolBox:
-        return u"ToolBox"_s;
+        return ElementString::ToolBox;
     case QStyleOption::SO_Header:
-        return u"Header"_s;
+        return ElementString::Header;
     case QStyleOption::SO_DockWidget:
-        return u"DockWidget"_s;
+        return ElementString::DockWidget;
     case QStyleOption::SO_ViewItem:
-        return u"ItemViewItem"_s;
+        return ElementString::ItemViewItem;
     case QStyleOption::SO_TabBarBase:
-        return u"TabBar"_s;
+        return ElementString::TabBar;
     case QStyleOption::SO_RubberBand:
-        return u"RubberBand"_s;
+        return ElementString::RubberBand;
     case QStyleOption::SO_ToolBar:
-        return u"ToolBar"_s;
+        return ElementString::ToolBar;
     case QStyleOption::SO_GraphicsItem:
-        return u"GraphicsItem"_s;
+        return ElementString::GraphicsItem;
     case QStyleOption::SO_Slider:
-        return u"Slider"_s;
+        return ElementString::Slider;
     case QStyleOption::SO_SpinBox:
-        return u"SpinBox"_s;
+        return ElementString::SpinBox;
     case QStyleOption::SO_ToolButton:
-        return u"ToolButton"_s;
+        return ElementString::ToolButton;
     case QStyleOption::SO_ComboBox:
-        return u"ComboBox"_s;
+        return ElementString::ComboBox;
     case QStyleOption::SO_TitleBar:
-        return u"TitleBar"_s;
+        return ElementString::TitleBar;
     case QStyleOption::SO_GroupBox:
-        return u"GroupBox"_s;
+        return ElementString::GroupBox;
     case QStyleOption::SO_SizeGrip:
-        return u"SizeGrip"_s;
+        return ElementString::SizeGrip;
     case QStyleOption::SO_CustomBase:
         // Just return "Widget"
         break;
@@ -654,29 +655,29 @@ QString styleOptionToElementName(const QStyleOption *option)
     case QStyleOption::SO_Complex:
     case QStyleOption::SO_ComplexCustomBase: {
         if (qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-            return u"ComboBox"_s;
+            return ElementString::ComboBox;
         }
         if (qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
-            return u"GroupBox"_s;
+            return ElementString::GroupBox;
         }
         if (qstyleoption_cast<const QStyleOptionSizeGrip *>(option)) {
-            return u"SizeGrip"_s;
+            return ElementString::SizeGrip;
         }
         if (qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            return u"Slider"_s;
+            return ElementString::Slider;
         }
         if (qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
-            return u"SpinBox"_s;
+            return ElementString::SpinBox;
         }
         if (qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
-            return u"TitleBar"_s;
+            return ElementString::TitleBar;
         }
         if (qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            return u"ToolButton"_s;
+            return ElementString::ToolButton;
         }
     } break;
     }
-    return u"Widget"_s;
+    return ElementString::Widget;
 }
 
 QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElementList)
@@ -689,7 +690,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     // This ensures any custom components get layouted too.
     if (subElements.empty()) {
         qDebug() << "No sublements given, using Widget placeholder for" << elements << opt->type << opt->styleObject;
-        subElements = {u"Widget"_s};
+        subElements = {ElementString::Widget};
     }
 
     // TODO: Go through all elements, create rectangles for them
@@ -714,7 +715,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     for (const auto &subElement : subElements) {
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
-        if (subElement != u"Icon"_s && subElement != u"Text"_s) {
+        if (subElement != ElementString::Icon && subElement != ElementString::Text) {
             auto unionElement = Union::Element::create();
             unionElement->setType(subElement);
             unionElement->setStates(statesFromOption(opt));
@@ -730,7 +731,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         QRectF elementRect = availableSpace;
         // NOTE: For now icon and text are their own things, so check them separately.
         // in future this should be unnecessary.
-        if (subElement == u"Icon"_s) {
+        if (subElement == ElementString::Icon) {
             // Toolbutton can override the icon size
             if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
                 elementRect.setWidth(toolButtonOption->iconSize.width());
@@ -742,7 +743,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             horizontalAlignment = properties->icon()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->icon()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             order = properties->icon()->alignment()->order().value_or(0);
-        } else if (subElement == u"Text"_s || subElement == u"ShortcutText"_s) {
+        } else if (subElement == ElementString::Text || subElement == ElementString::ShortcutText) {
             horizontalAlignment = properties->text()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
             verticalAlignment = properties->text()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
             auto optiontext = textFromOption(opt);
@@ -750,7 +751,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             const int tabPosition(optiontext.indexOf(QLatin1Char('\t')));
             if (tabPosition >= 0) {
                 QString accelerator(optiontext.mid(tabPosition + 1));
-                if (subElement == u"ShortcutText"_s) {
+                if (subElement == ElementString::ShortcutText) {
                     optiontext = optiontext.mid(tabPosition + 1);
                 } else {
                     optiontext = optiontext.left(tabPosition);
