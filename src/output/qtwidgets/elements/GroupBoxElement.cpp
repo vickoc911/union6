@@ -47,7 +47,7 @@ void GroupBoxElement::draw(QPainter *painter) const
 
 QSize GroupBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 void GroupBoxElement::layout()
