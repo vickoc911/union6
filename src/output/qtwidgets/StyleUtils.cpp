@@ -27,29 +27,26 @@ Union::Element::States statesFromOption(const QStyleOption *option)
     if (option->state.testFlag(QStyle::State_None)) {
         return states;
     }
-    if (option->state.testFlag(QStyle::State_MouseOver)) {
-        states.setFlag(Union::Element::State::Hovered);
-    }
-    if (option->state.testFlag(QStyle::State_HasFocus)) {
-        states.setFlag(Union::Element::State::ActiveFocus);
-    }
-    if (!option->state.testFlag(QStyle::State_Enabled)) {
-        states.setFlag(Union::Element::State::Disabled);
-    }
+
+    states.setFlag(Union::Element::State::Hovered, option->state.testFlag(QStyle::State_MouseOver));
+    states.setFlag(Union::Element::State::ActiveFocus, option->state.testFlag(QStyle::State_HasFocus));
+    states.setFlag(Union::Element::State::VisualFocus,
+                   option->state.testFlag(QStyle::State_KeyboardFocusChange) && option->state.testFlag(QStyle::State_HasFocus));
+    states.setFlag(Union::Element::State::Disabled, !option->state.testFlag(QStyle::State_Enabled));
+    states.setFlag(Union::Element::State::Highlighted, option->state.testFlag(QStyle::State_Selected));
+
     if (option->state.testFlag(QStyle::State_On)) {
         states.setFlag(Union::Element::State::Checked);
     }
     if (option->state.testFlag(QStyle::State_Off)) {
         states.setFlag(Union::Element::State::Checked, false);
     }
+
     if (option->state.testFlag(QStyle::State_Sunken)) {
         states.setFlag(Union::Element::State::Pressed);
     }
     if (option->state.testFlag(QStyle::State_Raised)) {
         states.setFlag(Union::Element::State::Pressed, false);
-    }
-    if (option->state.testFlag(QStyle::State_Selected)) {
-        states.setFlag(Union::Element::State::Highlighted);
     }
 
     return states;
