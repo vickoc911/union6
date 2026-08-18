@@ -88,7 +88,7 @@ void ProgressBarElement::layout()
 
 QSize ProgressBarElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const

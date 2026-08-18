@@ -50,7 +50,7 @@ void CheckElement::draw(QPainter *painter) const
 
 QSize CheckElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect CheckElement::subElementRect(QStyle::SubElement element) const

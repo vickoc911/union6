@@ -964,12 +964,13 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             }
         }
     } break;
+    // Apparently these are the Tab bar sizes
+    case QStyle::PM_TabBarTabHSpace:
+    case QStyle::PM_TabBarTabVSpace:
     // Currently we only have one spacing value
     case QStyle::PM_ScrollView_ScrollBarSpacing:
     case QStyle::PM_CheckBoxLabelSpacing:
     case QStyle::PM_RadioButtonLabelSpacing:
-    case QStyle::PM_TabBarTabHSpace:
-    case QStyle::PM_TabBarTabVSpace:
     case QStyle::PM_MenuBarItemSpacing:
     case QStyle::PM_ToolBarItemSpacing:
     case QStyle::PM_LayoutHorizontalSpacing:

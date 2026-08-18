@@ -99,9 +99,16 @@ void TabElement::layout()
 
 QSize TabElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QSize size = contentsSizeFromStyle;
-    size = applyPaddingToSize(size);
-    return size;
+    const auto frameSize = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_styleOption, m_widget);
+    const auto size = applyPaddingToSize(contentsSizeFromStyle);
+    QMargins frameMargins;
+    if (m_isVertical) {
+        frameMargins = QMargins(frameSize, 0, frameSize, 0);
+    } else {
+        frameMargins = QMargins(0, frameSize, 0, frameSize);
+    }
+
+    return size.grownBy(frameMargins);
 }
 
 QRect TabElement::subElementRect(QStyle::SubElement element) const

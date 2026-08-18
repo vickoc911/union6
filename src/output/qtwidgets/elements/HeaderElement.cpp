@@ -91,7 +91,7 @@ void HeaderElement::updateSubElementList()
 
 QSize HeaderElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect HeaderElement::subElementRect(QStyle::SubElement element) const

@@ -173,19 +173,17 @@ void SliderElement::updateSubElementList()
 
 QSize SliderElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QRegion r;
-    auto grooveRect = subControlRect(QStyle::SC_SliderGroove);
-    auto tickRect = subControlRect(QStyle::SC_SliderTickmarks);
-    auto handleRect = subControlRect(QStyle::SC_SliderHandle);
-    r.setRects({grooveRect, tickRect, handleRect});
-    auto size = applyPaddingToSize(r.boundingRect().size());
+    auto grooveRect = subControlRect(QStyle::SC_SliderGroove).size();
+    auto tickRect = subControlRect(QStyle::SC_SliderTickmarks).size();
+    auto handleRect = subControlRect(QStyle::SC_SliderHandle).size();
+    auto combinedSize = grooveRect.expandedTo(tickRect.expandedTo(handleRect));
     // Add some extra spacing so that we can draw the handle outside of the groove
     if (m_isHorizontal) {
-        size.rwidth() += handleRect.width();
+        combinedSize.rwidth() += handleRect.width();
     } else {
-        size.rheight() += handleRect.height();
+        combinedSize.rheight() += handleRect.height();
     }
-    return contentsSizeFromStyle.expandedTo(size);
+    return contentsSizeFromStyle.expandedTo(applyPaddingToSize(combinedSize));
 }
 
 QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
