@@ -12,7 +12,7 @@
 
 class UnionStyle;
 
-class CheckElement : public AbstractElement, public std::enable_shared_from_this<CheckElement>
+class CheckElement : public AbstractElement
 {
     Q_OBJECT
 
@@ -23,21 +23,17 @@ public:
     };
     Q_ENUM(Type)
 
-    using Ptr = std::shared_ptr<CheckElement>;
-    CheckElement(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    CheckElement(Type type, const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~CheckElement() override;
-    static CheckElement::Ptr create(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 
     QRect subElementRect(QStyle::SubElement element) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
-
-    const QStyleOptionButton *m_buttonOption = nullptr;
 
     void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
 
 private:
+    const QStyleOptionButton *m_buttonOption = nullptr;
     Type m_type;
 };

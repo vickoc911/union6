@@ -12,22 +12,20 @@
 
 using namespace Qt::StringLiterals;
 
-CheckElement::CheckElement(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+CheckElement::CheckElement(Type type, const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_buttonOption(qstyleoption_cast<const QStyleOptionButton *>(option))
+    , m_buttonOption(option)
     , m_type(type)
 {
-    if (m_buttonOption) {
-        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
-        if (!m_indicatorElementList.isEmpty()) {
-            m_indicatorProperties = queryProperties(m_indicatorElementList);
-        }
-        if (!m_buttonOption->icon.isNull()) {
-            setIcon(m_buttonOption->icon);
-        }
-        if (!m_buttonOption->text.isEmpty()) {
-            setText(m_buttonOption->text);
-        }
+    m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
+    if (!m_indicatorElementList.isEmpty()) {
+        m_indicatorProperties = queryProperties(m_indicatorElementList);
+    }
+    if (!m_buttonOption->icon.isNull()) {
+        setIcon(m_buttonOption->icon);
+    }
+    if (!m_buttonOption->text.isEmpty()) {
+        setText(m_buttonOption->text);
     }
     updateSubElementList();
     layout();
@@ -42,15 +40,10 @@ void CheckElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
-}
-
-QSize CheckElement::contentsSize(const QSize &contentsSizeFromStyle) const
-{
-    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect CheckElement::subElementRect(QStyle::SubElement element) const
@@ -76,22 +69,15 @@ QRect CheckElement::subElementRect(QStyle::SubElement element) const
     return rect;
 }
 
-CheckElement::Ptr CheckElement::create(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<CheckElement>(type, option, style, widget);
-}
-
 void CheckElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::Indicator);
-    if (m_buttonOption) {
-        if (!m_buttonOption->icon.isNull()) {
-            m_subElementList.append(ElementString::Icon);
-        }
-        if (!m_buttonOption->text.isEmpty()) {
-            m_subElementList.append(ElementString::Text);
-        }
+    if (!m_buttonOption->icon.isNull()) {
+        m_subElementList.append(ElementString::Icon);
+    }
+    if (!m_buttonOption->text.isEmpty()) {
+        m_subElementList.append(ElementString::Text);
     }
 }
 

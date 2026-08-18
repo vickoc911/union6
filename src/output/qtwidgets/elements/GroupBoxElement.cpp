@@ -12,21 +12,22 @@
 
 using namespace Qt::StringLiterals;
 
-GroupBoxElement::GroupBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+GroupBoxElement::GroupBoxElement(const QStyleOptionGroupBox *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_groupBoxOption(qstyleoption_cast<const QStyleOptionGroupBox *>(option))
+    , m_groupBoxOption(option)
     , m_isCheckable(false)
 {
+    // This info is only in the widget itself
     if (auto groupBox = qobject_cast<const QGroupBox *>(m_widget)) {
         if (groupBox->isCheckable()) {
             m_isCheckable = true;
         }
     }
-    if (m_groupBoxOption) {
-        if (!m_groupBoxOption->text.isEmpty()) {
-            setText(m_groupBoxOption->text);
-        }
+
+    if (!m_groupBoxOption->text.isEmpty()) {
+        setText(m_groupBoxOption->text);
     }
+
     layout();
 }
 
@@ -34,27 +35,11 @@ GroupBoxElement::~GroupBoxElement()
 {
 }
 
-void GroupBoxElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-
-    drawBg(painter);
-    drawIcon(painter);
-    drawText(painter);
-}
-
-QSize GroupBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
-{
-    return applyPaddingToSize(contentsSizeFromStyle);
-}
-
 void GroupBoxElement::layout()
 {
     // We only layout by background, m_contentElementList etc are ignored
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
+        m_backgroundElementList = prepareElements(m_groupBoxOption, m_widget);
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
@@ -73,11 +58,11 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
 
     switch (subControl) {
     case QStyle::SC_GroupBoxLabel: {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::Text});
+        auto map = layoutMap(m_backgroundElementList, m_groupBoxOption, {ElementString::Text});
         finalRect = map[ElementString::Text].rect.toRect();
     } break;
     case QStyle::SC_GroupBoxContents: {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::GroupBox, ElementString::Text});
+        auto map = layoutMap(m_backgroundElementList, m_groupBoxOption, {ElementString::GroupBox, ElementString::Text});
         auto textRect = map[ElementString::Text].rect.toRect();
         QMargins padding;
         QRect frameRect = m_groupBoxOption->rect;
@@ -89,28 +74,23 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
         const int fontMetricsHeight = hasText() ? 0 : m_groupBoxOption->fontMetrics.height();
         int indicatorHeight = 0;
         if (m_isCheckable) {
-            indicatorHeight = m_style->pixelMetric(QStyle::PM_IndicatorHeight, m_styleOption, m_widget);
+            indicatorHeight = m_style->pixelMetric(QStyle::PM_IndicatorHeight, m_groupBoxOption, m_widget);
         }
         const int topMargin = qMax(indicatorHeight, fontMetricsHeight);
         return frameRect.adjusted(padding.left(), padding.top() + topMargin, -padding.bottom(), -padding.right());
     } break;
     case QStyle::SC_GroupBoxCheckBox: {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::Icon});
+        auto map = layoutMap(m_backgroundElementList, m_groupBoxOption, {ElementString::Icon});
         finalRect = map[ElementString::Icon].rect.toRect();
     } break;
     case QStyle::SC_GroupBoxFrame: {
-        return m_styleOption->rect;
+        return m_groupBoxOption->rect;
     }
     default:
         break;
     }
 
-    return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, finalRect);
-}
-
-GroupBoxElement::Ptr GroupBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<GroupBoxElement>(option, style, widget);
+    return m_style->visualRect(m_groupBoxOption->direction, m_groupBoxOption->rect, finalRect);
 }
 
 void GroupBoxElement::drawText(QPainter *painter) const
@@ -118,9 +98,8 @@ void GroupBoxElement::drawText(QPainter *painter) const
     if ((m_groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && hasText()) {
         QRect textRect = subControlRect(QStyle::SC_GroupBoxLabel);
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-        QColor penColor = m_styleOption->palette.text().color();
-        // TODO: hide mnemonics if requested
+        const bool enabled = m_groupBoxOption->state.testFlag(QStyle::State_Enabled);
+        QColor penColor = m_groupBoxOption->palette.text().color();
         if (m_backgroundProperties->text()) {
             auto textColor = m_backgroundProperties->text()->color();
             if (textColor) {
@@ -129,8 +108,11 @@ void GroupBoxElement::drawText(QPainter *painter) const
             textFlags = textFlagsFromProperties(m_backgroundProperties, false);
         }
         painter->save();
+        if (m_backgroundProperties->text() && m_backgroundProperties->text()->font().has_value()) {
+            painter->setFont(m_backgroundProperties->text()->font().value());
+        }
         painter->setPen(penColor);
-        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
+        m_style->drawItemText(painter, textRect, textFlags, m_groupBoxOption->palette, enabled, m_text);
         painter->restore();
     }
 }

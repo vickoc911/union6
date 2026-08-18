@@ -12,29 +12,26 @@
 
 class UnionStyle;
 
-class MenuItemElement : public AbstractElement, public std::enable_shared_from_this<MenuItemElement>
+class MenuItemElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<MenuItemElement>;
-    MenuItemElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    MenuItemElement(const QStyleOptionMenuItem *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~MenuItemElement() override;
-    static MenuItemElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionMenuItem *m_menuItemOption = nullptr;
-
     void updateSubElementList() override;
-    void drawBg(QPainter *painter) const override;
+    void drawBackground(QPainter *painter) const override;
     void drawText(QPainter *painter) const override;
     void drawIndicator(QPainter *painter) const override;
     void layout() override;
 
 private:
+    const QStyleOptionMenuItem *m_menuItemOption = nullptr;
     Union::ElementList m_indicatorElementList;
     Union::Properties::StylePropertyGroup *m_indicatorProperties;
     bool m_isSeparator;

@@ -11,17 +11,15 @@
 
 using namespace Qt::StringLiterals;
 
-TitleBarElement::TitleBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+TitleBarElement::TitleBarElement(const QStyleOptionTitleBar *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_titleBarOption(qstyleoption_cast<const QStyleOptionTitleBar *>(option))
+    , m_titleBarOption(option)
 {
-    if (m_titleBarOption) {
-        if (!m_titleBarOption->icon.isNull()) {
-            setIcon(m_titleBarOption->icon);
-        }
-        if (!m_titleBarOption->text.isEmpty()) {
-            setText(m_titleBarOption->text);
-        }
+    if (!m_titleBarOption->icon.isNull()) {
+        setIcon(m_titleBarOption->icon);
+    }
+    if (!m_titleBarOption->text.isEmpty()) {
+        setText(m_titleBarOption->text);
     }
     updateSubElementList();
     layout();
@@ -37,10 +35,7 @@ void TitleBarElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBg(painter);
-    if (!m_titleBarOption) {
-        return;
-    }
+    drawBackground(painter);
     drawElementBackground(painter, m_titleBarOption, m_widget, {ElementString::TitleBar});
     if (!m_titleBarOption->text.isEmpty()
         && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
@@ -78,32 +73,30 @@ void TitleBarElement::draw(QPainter *painter) const
 void TitleBarElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_titleBarOption) {
-        if (!m_titleBarOption->text.isEmpty()
-            && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
-            m_subElementList.append(ElementString::Text);
-        }
-        if (!m_titleBarOption->icon.isNull()) {
-            m_subElementList.append(ElementString::Icon);
-        }
-        if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
-            m_subElementList.append(ElementString::HelpButton);
-        }
-        if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
-            m_subElementList.append(ElementString::MinimizeButton);
-        }
-        if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
-            m_subElementList.append(ElementString::MaximizeButton);
-        }
-        if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
-            m_subElementList.append(ElementString::CloseButton);
-        }
-        if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
-            m_subElementList.append(ElementString::SystemMenu);
-        }
-        if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
-            m_subElementList.append(ElementString::ShadeButton);
-        }
+    if (!m_titleBarOption->text.isEmpty()
+        && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
+        m_subElementList.append(ElementString::Text);
+    }
+    if (!m_titleBarOption->icon.isNull()) {
+        m_subElementList.append(ElementString::Icon);
+    }
+    if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
+        m_subElementList.append(ElementString::HelpButton);
+    }
+    if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
+        m_subElementList.append(ElementString::MinimizeButton);
+    }
+    if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
+        m_subElementList.append(ElementString::MaximizeButton);
+    }
+    if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
+        m_subElementList.append(ElementString::CloseButton);
+    }
+    if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
+        m_subElementList.append(ElementString::SystemMenu);
+    }
+    if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
+        m_subElementList.append(ElementString::ShadeButton);
     }
 }
 
@@ -111,15 +104,15 @@ void TitleBarElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::TitleBar});
+        m_backgroundElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
-        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_titleBarOption, m_subElementList);
     }
 
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::TitleBar});
+        m_contentElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -139,10 +132,6 @@ QRect TitleBarElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
         qWarning() << "subControlRect for " << subControl << "is not valid";
-        return QRect();
-    }
-
-    if (!m_titleBarOption) {
         return QRect();
     }
 
@@ -169,9 +158,4 @@ QRect TitleBarElement::subControlRect(QStyle::SubControl subControl) const
         break;
     }
     return QRect();
-}
-
-TitleBarElement::Ptr TitleBarElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<TitleBarElement>(option, style, widget);
 }

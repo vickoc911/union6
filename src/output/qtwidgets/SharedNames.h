@@ -54,6 +54,7 @@ static const QString ScrollArea = u"ScrollArea"_s;
 static const QString ScrollAreaCorner = u"ScrollAreaCorner"_s;
 static const QString ScrollBar = u"ScrollBar"_s;
 static const QString Separator = u"Separator"_s;
+static const QString TitledSeparator = u"TitledSeparator"_s;
 static const QString ShadeButton = u"ShadeButton"_s;
 static const QString ShortcutText = u"ShortcutText"_s;
 static const QString SizeGrip = u"SizeGrip"_s;

@@ -27,29 +27,26 @@ Union::Element::States statesFromOption(const QStyleOption *option)
     if (option->state.testFlag(QStyle::State_None)) {
         return states;
     }
-    if (option->state.testFlag(QStyle::State_MouseOver)) {
-        states.setFlag(Union::Element::State::Hovered);
-    }
-    if (option->state.testFlag(QStyle::State_HasFocus)) {
-        states.setFlag(Union::Element::State::ActiveFocus);
-    }
-    if (!option->state.testFlag(QStyle::State_Enabled)) {
-        states.setFlag(Union::Element::State::Disabled);
-    }
+
+    states.setFlag(Union::Element::State::Hovered, option->state.testFlag(QStyle::State_MouseOver));
+    states.setFlag(Union::Element::State::ActiveFocus, option->state.testFlag(QStyle::State_HasFocus));
+    states.setFlag(Union::Element::State::VisualFocus,
+                   option->state.testFlag(QStyle::State_KeyboardFocusChange) && option->state.testFlag(QStyle::State_HasFocus));
+    states.setFlag(Union::Element::State::Disabled, !option->state.testFlag(QStyle::State_Enabled));
+    states.setFlag(Union::Element::State::Highlighted, option->state.testFlag(QStyle::State_Selected));
+
     if (option->state.testFlag(QStyle::State_On)) {
         states.setFlag(Union::Element::State::Checked);
     }
     if (option->state.testFlag(QStyle::State_Off)) {
         states.setFlag(Union::Element::State::Checked, false);
     }
+
     if (option->state.testFlag(QStyle::State_Sunken)) {
         states.setFlag(Union::Element::State::Pressed);
     }
     if (option->state.testFlag(QStyle::State_Raised)) {
         states.setFlag(Union::Element::State::Pressed, false);
-    }
-    if (option->state.testFlag(QStyle::State_Selected)) {
-        states.setFlag(Union::Element::State::Highlighted);
     }
 
     return states;
@@ -186,9 +183,12 @@ QStringList hintsFromOption(const QStyleOption *option)
         }
     } break;
     case QStyleOption::SO_MenuItem: {
-        if (const auto opt = qstyleoption_cast<const QStyleOptionMenuItemV2 *>(option)) {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
             if (opt->checked) {
                 hints.append(u"with-submenu"_s);
+            }
+            if (opt->menuItemType == QStyleOptionMenuItem::Separator && !opt->text.isEmpty()) {
+                hints.append(u"with-title"_s);
             }
         }
     } break;
@@ -517,7 +517,16 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
         elementTypes = {styleOptionToElementName(opt)};
     }
 
-    elementTypes.append(targetHierarchy);
+    // Meld duplicate elements that appear next to each other
+    if (elementTypes.isEmpty()) {
+        elementTypes.append(targetHierarchy);
+    } else {
+        for (const auto &target : targetHierarchy) {
+            if (elementTypes.last() != target) {
+                elementTypes.append(target);
+            }
+        }
+    }
 
     for (const auto &elementType : elementTypes) {
         auto unionElement = Union::Element::create();
@@ -757,7 +766,14 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
                     optiontext = optiontext.left(tabPosition);
                 }
             }
-            elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlagsFromProperties(properties, true), optiontext);
+            // When layouting, ensure we take mnemonics into account
+            auto textFlags = textFlagsFromProperties(properties, true);
+            textFlags |= Qt::TextShowMnemonic;
+            auto fontMetrics = opt->fontMetrics;
+            if (properties->text() && properties->text()->font().has_value()) {
+                fontMetrics = QFontMetrics(properties->text()->font().value());
+            }
+            elementRect = fontMetrics.boundingRect(availableSpace.toRect(), textFlags, optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
             elementRect.setWidth(properties->layout()->width().value_or(0));
