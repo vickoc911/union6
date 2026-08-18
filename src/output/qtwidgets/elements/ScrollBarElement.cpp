@@ -11,10 +11,12 @@
 
 using namespace Qt::StringLiterals;
 
-ScrollBarElement::ScrollBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+ScrollBarElement::ScrollBarElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_scrollBarOption(qstyleoption_cast<const QStyleOptionSlider *>(option))
+    , m_scrollBarOption(option)
+    , m_horizontal(false)
 {
+    m_horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
     updateSubElementList();
     layout();
 }
@@ -29,7 +31,7 @@ void ScrollBarElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBg(painter);
+    drawBackground(painter);
 
     if (m_scrollBarOption->subControls & QStyle::SC_ScrollBarSlider) {
         QStyleOptionSlider subopt = *m_scrollBarOption;
@@ -49,23 +51,16 @@ void ScrollBarElement::draw(QPainter *painter) const
     }
 }
 
-void ScrollBarElement::drawBg(QPainter *painter) const
+void ScrollBarElement::drawBackground(QPainter *painter) const
 {
-    // If scrollbar has no background color, QStyle gets confused and doesnt draw anything,
-    // causing visual glitches. In those cases, use the ApplicationWindow background color.
-    if (m_backgroundProperties->background() && m_backgroundProperties->background()->color().has_value()) {
-        drawBackground(painter, m_scrollBarOption->rect, m_backgroundProperties);
-    } else {
-        drawBackground(painter, m_scrollBarOption->rect, queryProperties(prepareElements(m_scrollBarOption, m_widget, {ElementString::ApplicationWindow})));
-    }
+    const auto rect = subControlRect(QStyle::SC_ScrollBarGroove);
+    drawBackgroundRectangle(painter, rect, m_backgroundProperties);
 }
 
 void ScrollBarElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_scrollBarOption) {
-        m_subElementList.append(ElementString::Handle);
-    }
+    m_subElementList.append(ElementString::Handle);
 }
 
 QSize ScrollBarElement::contentsSize(const QSize &contentsSizeFromStyle) const
@@ -86,10 +81,9 @@ QRect ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
         rect = m_widget->visibleRegion().boundingRect();
     }
     if (subControl == QStyle::SC_ScrollBarSlider) {
-        const bool horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
         auto groove = m_style->visualRect(m_scrollBarOption->direction, rect, subControlRect(QStyle::SC_ScrollBarGroove));
 
-        int space(horizontal ? groove.width() : groove.height());
+        int space(m_horizontal ? groove.width() : groove.height());
         int thickness = 0;
         QMargins padding;
 
@@ -105,7 +99,7 @@ QRect ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
         // Return early with just padding changes
         if (m_scrollBarOption->minimum == m_scrollBarOption->maximum) {
             const auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
-            if (horizontal) {
+            if (m_horizontal) {
                 return m_style->visualRect(m_scrollBarOption->direction, rect, rect.marginsRemoved(padding));
             } else {
                 return m_style->visualRect(m_scrollBarOption->direction, rect, rect.marginsRemoved(padding));
@@ -118,7 +112,7 @@ QRect ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
         space -= sliderSize;
         if (space <= 0) {
             const auto rect = QRect(groove.left(), groove.top(), groove.width(), groove.height());
-            if (horizontal) {
+            if (m_horizontal) {
                 return m_style->visualRect(m_scrollBarOption->direction, rect, rect.marginsRemoved(padding));
             } else {
                 return m_style->visualRect(m_scrollBarOption->direction, rect, rect.marginsRemoved(padding));
@@ -129,7 +123,7 @@ QRect ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
         if (m_scrollBarOption->upsideDown) {
             pos = space - pos;
         }
-        if (horizontal) {
+        if (m_horizontal) {
             const auto rect = QRect(groove.left() + pos, groove.top(), sliderSize, groove.height());
             return m_style->visualRect(m_scrollBarOption->direction, rect, rect.marginsRemoved(padding));
         } else {
@@ -141,9 +135,4 @@ QRect ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
     } else {
         return QRect();
     }
-}
-
-ScrollBarElement::Ptr ScrollBarElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ScrollBarElement>(option, style, widget);
 }

@@ -61,8 +61,6 @@ public:
                       QPalette::ColorRole textRole = QPalette::NoRole) const override;
 
 private:
-    QMap<QWidget *, AbstractElement::Ptr> elementMap;
-
     bool m_showMnemonics;
     void setMnemonics(bool enabled);
 };

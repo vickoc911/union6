@@ -20,7 +20,7 @@ static Union::LruImageCache imageCache;
 
 // This file handles all the background drawing related functions
 
-void drawBackground(QPainter *painter, const QRectF &mainRect, const Union::Properties::StylePropertyGroup *style)
+void drawBackgroundRectangle(QPainter *painter, const QRectF &mainRect, const Union::Properties::StylePropertyGroup *style)
 {
     QRectF rect = mainRect;
     // Remove any insets we may have, we do not want to draw them
@@ -409,5 +409,5 @@ void drawCornerProperty(QPainter *painter,
 void drawElementBackground(QPainter *painter, const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)
 {
     const auto properties = queryProperties(prepareElements(option, widget, targetHierarchy));
-    drawBackground(painter, option->rect, properties);
+    drawBackgroundRectangle(painter, option->rect, properties);
 }

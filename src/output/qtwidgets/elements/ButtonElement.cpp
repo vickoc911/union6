@@ -11,27 +11,25 @@
 
 using namespace Qt::StringLiterals;
 
-ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+ButtonElement::ButtonElement(const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_buttonOption(qstyleoption_cast<const QStyleOptionButton *>(option))
+    , m_buttonOption(option)
 {
-    if (m_buttonOption) {
-        if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
-            if (!m_indicatorElementList.isEmpty()) {
-                m_indicatorProperties = queryProperties(m_indicatorElementList);
-                if (m_indicatorProperties->icon()) {
-                    setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
-                }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
+            if (m_indicatorProperties->icon()) {
+                setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
             }
         }
+    }
 
-        if (!m_buttonOption->icon.isNull()) {
-            setIcon(m_buttonOption->icon);
-        }
-        if (!m_buttonOption->text.isEmpty()) {
-            setText(m_buttonOption->text);
-        }
+    if (!m_buttonOption->icon.isNull()) {
+        setIcon(m_buttonOption->icon);
+    }
+    if (!m_buttonOption->text.isEmpty()) {
+        setText(m_buttonOption->text);
     }
     updateSubElementList();
     layout();
@@ -46,7 +44,7 @@ void ButtonElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
@@ -76,7 +74,11 @@ QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background
     // to get the proper contentSize
     if (hasIndicator()) {
-        size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + m_backgroundProperties->layout()->spacing().value_or(0);
+        qreal spacing = 0;
+        if (m_backgroundProperties->layout()) {
+            spacing = m_backgroundProperties->layout()->spacing().value_or(0);
+        }
+        size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + spacing;
     }
     return size;
 }
@@ -99,9 +101,4 @@ QRect ButtonElement::subElementRect(QStyle::SubElement element) const
     }
     rect = unifiedRect;
     return rect;
-}
-
-ButtonElement::Ptr ButtonElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ButtonElement>(option, style, widget);
 }

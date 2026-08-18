@@ -12,29 +12,26 @@
 
 class UnionStyle;
 
-class SliderElement : public AbstractElement, public std::enable_shared_from_this<SliderElement>
+class SliderElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<SliderElement>;
-    SliderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    SliderElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~SliderElement() override;
-    static SliderElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionSlider *m_sliderOption = nullptr;
-
     void layout() override;
 
-    void drawBg(QPainter *painter) const override;
+    void drawBackground(QPainter *painter) const override;
     void updateSubElementList() override;
 
 private:
+    const QStyleOptionSlider *m_sliderOption = nullptr;
     bool m_isHorizontal;
     bool m_isInverted;
     bool m_isReverse;

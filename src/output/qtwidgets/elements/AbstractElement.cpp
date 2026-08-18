@@ -27,11 +27,6 @@ AbstractElement::~AbstractElement()
 {
 }
 
-AbstractElement::Ptr AbstractElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<AbstractElement>(option, style, widget);
-}
-
 QIcon AbstractElement::icon() const
 {
     return m_icon;
@@ -87,7 +82,7 @@ void AbstractElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
 }
@@ -117,8 +112,7 @@ void AbstractElement::layout()
 
 QSize AbstractElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    qWarning() << "contentsSize is unimplemented for" << m_styleOption;
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect AbstractElement::subElementRect(QStyle::SubElement element) const
@@ -143,9 +137,9 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
     if (!m_isValid) {
         return oldSize;
     }
-    QSize minimumSize = oldSize;
-    QSize size = minimumSize;
-    QMargins padding;
+    QSizeF minimumSize = oldSize;
+    QSizeF size = minimumSize;
+    QMarginsF padding;
     if (m_backgroundProperties->layout()) {
         auto width = m_backgroundProperties->layout()->width().value_or(1);
         auto height = m_backgroundProperties->layout()->height().value_or(1);
@@ -174,12 +168,12 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
             size.setHeight(minimumSize.height());
         }
     }
-    return size;
+    return size.toSize();
 }
 
-void AbstractElement::drawBg(QPainter *painter) const
+void AbstractElement::drawBackground(QPainter *painter) const
 {
-    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
+    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties);
 }
 
 void AbstractElement::drawText(QPainter *painter) const
@@ -189,7 +183,6 @@ void AbstractElement::drawText(QPainter *painter) const
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         QColor penColor = m_styleOption->palette.text().color();
-        // TODO: hide mnemonics if requested
         if (m_contentProperties->text()) {
             auto textColor = m_contentProperties->text()->color();
             if (textColor) {
@@ -198,6 +191,9 @@ void AbstractElement::drawText(QPainter *painter) const
             textFlags = textFlagsFromProperties(m_contentProperties, true);
         }
         painter->save();
+        if (m_contentProperties->text() && m_contentProperties->text()->font().has_value()) {
+            painter->setFont(m_contentProperties->text()->font().value());
+        }
         painter->setPen(penColor);
         m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
         painter->restore();
@@ -239,7 +235,7 @@ void AbstractElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator() && m_isValid) {
         QRect indicatorRect = m_layoutMap[ElementString::Indicator].rect.toRect();
-        drawBackground(painter, indicatorRect, m_indicatorProperties);
+        drawBackgroundRectangle(painter, indicatorRect, m_indicatorProperties);
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_styleOption->palette;

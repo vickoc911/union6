@@ -11,25 +11,24 @@
 
 using namespace Qt::StringLiterals;
 
-ItemViewElement::ItemViewElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+ItemViewElement::ItemViewElement(const QStyleOptionViewItem *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_viewItemOption(qstyleoption_cast<const QStyleOptionViewItem *>(option))
+    , m_viewItemOption(option)
 {
-    if (m_viewItemOption) {
-        if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox});
-            if (!m_indicatorElementList.isEmpty()) {
-                m_indicatorProperties = queryProperties(m_indicatorElementList);
-            }
-        }
-
-        if (!m_viewItemOption->icon.isNull() && m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
-            setIcon(m_viewItemOption->icon);
-        }
-        if (!m_viewItemOption->text.isEmpty() && m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
-            setText(m_viewItemOption->text);
+    if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
         }
     }
+
+    if (!m_viewItemOption->icon.isNull() && m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
+        setIcon(m_viewItemOption->icon);
+    }
+    if (!m_viewItemOption->text.isEmpty() && m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
+        setText(m_viewItemOption->text);
+    }
+
     updateSubElementList();
     layout();
 }
@@ -42,15 +41,15 @@ void ItemViewElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::ItemViewItem});
+        m_backgroundElementList = prepareElements(m_viewItemOption, m_widget, {ElementString::ItemViewItem});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
-        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_viewItemOption, m_subElementList);
     }
 
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, m_subElementList);
+        m_contentElementList = prepareElements(m_viewItemOption, m_widget, m_subElementList);
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -66,7 +65,7 @@ void ItemViewElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
@@ -104,17 +103,15 @@ void ItemViewElement::drawIndicator(QPainter *painter) const
 void ItemViewElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_viewItemOption) {
-        m_subElementList.append(ElementString::ItemViewItem);
-        if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-            m_subElementList.append(ElementString::CheckBox);
-        }
-        if (!m_viewItemOption->icon.isNull()) {
-            m_subElementList.append(ElementString::Icon);
-        }
-        if (!m_viewItemOption->text.isEmpty()) {
-            m_subElementList.append(ElementString::Text);
-        }
+    m_subElementList.append(ElementString::ItemViewItem);
+    if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
+        m_subElementList.append(ElementString::CheckBox);
+    }
+    if (!m_viewItemOption->icon.isNull()) {
+        m_subElementList.append(ElementString::Icon);
+    }
+    if (!m_viewItemOption->text.isEmpty()) {
+        m_subElementList.append(ElementString::Text);
     }
 }
 
@@ -153,19 +150,13 @@ QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
     return rect;
 }
 
-ItemViewElement::Ptr ItemViewElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ItemViewElement>(option, style, widget);
-}
-
 void ItemViewElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {
         QRect textRect = m_style->subElementRect(QStyle::SE_ItemViewItemText, m_viewItemOption, m_widget);
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-        QColor penColor = m_styleOption->palette.text().color();
-        // TODO: hide mnemonics if requested
+        const bool enabled = m_viewItemOption->state.testFlag(QStyle::State_Enabled);
+        QColor penColor = m_viewItemOption->palette.text().color();
         if (m_backgroundProperties->text()) {
             auto textColor = m_backgroundProperties->text()->color();
             if (textColor) {
@@ -173,10 +164,12 @@ void ItemViewElement::drawText(QPainter *painter) const
             }
             textFlags = textFlagsFromProperties(m_backgroundProperties, false);
         }
-
         painter->save();
+        if (m_backgroundProperties->text() && m_backgroundProperties->text()->font().has_value()) {
+            painter->setFont(m_backgroundProperties->text()->font().value());
+        }
         painter->setPen(penColor);
-        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
+        m_style->drawItemText(painter, textRect, textFlags, m_viewItemOption->palette, enabled, m_text);
         painter->restore();
     }
 }
@@ -185,18 +178,11 @@ void ItemViewElement::drawIcon(QPainter *painter) const
 {
     if (hasIcon() && m_isValid) {
         QRect iconRect = m_style->subElementRect(QStyle::SE_ItemViewItemDecoration, m_viewItemOption, m_widget);
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+        const bool enabled = m_viewItemOption->state.testFlag(QStyle::State_Enabled);
 
-        const QPalette activePalette = m_styleOption->palette;
+        const QPalette activePalette = m_viewItemOption->palette;
         const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
         auto iconSize = iconRect.size();
-        // Toolbutton can override the regular icon size
-        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(m_styleOption)) {
-            // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
-            if (toolButtonOption->icon.name() == m_icon.name()) {
-                iconSize = toolButtonOption->iconSize;
-            }
-        }
         const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
