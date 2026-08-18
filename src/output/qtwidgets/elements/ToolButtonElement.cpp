@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ToolButtonElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -24,7 +25,7 @@ ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyl
         m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
         m_hasIcon = !m_toolButtonOption->icon.isNull() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
         m_hasText = !m_toolButtonOption->text.isEmpty() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly;
-        m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {u"Indicator"_s});
+        m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {ElementString::Indicator});
         if (!m_indicatorElementList.isEmpty()) {
             m_indicatorProperties = queryProperties(m_indicatorElementList);
             if (m_indicatorProperties->icon()) {
@@ -64,13 +65,13 @@ void ToolButtonElement::updateSubElementList()
     m_subElementList.clear();
     if (m_toolButtonOption) {
         if (m_hasIcon || m_hasArrows) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (m_hasText) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
         if (m_hasIndicator) {
-            m_subElementList.append(u"Indicator"_s);
+            m_subElementList.append(ElementString::Indicator);
         }
     }
 }
@@ -109,7 +110,7 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
         return rect;
     }
     if (subControl == QStyle::SC_ToolButtonMenu) {
-        QRect menuRect = m_layoutMap[u"Indicator"_s].rect.toRect();
+        QRect menuRect = m_layoutMap[ElementString::Indicator].rect.toRect();
         // Set the click area to full height/width, so that its easier to click
         if (m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
             menuRect.setTop(backgroundRect.top());
@@ -134,7 +135,7 @@ void ToolButtonElement::drawText(QPainter *painter) const
         return;
     }
     if (hasText()) {
-        QRect textRect = m_layoutMap[u"Text"_s].rect.toRect();
+        QRect textRect = m_layoutMap[ElementString::Text].rect.toRect();
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         QColor penColor = m_styleOption->palette.text().color();
@@ -159,7 +160,7 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         return;
     }
 
-    QRect iconRect = m_layoutMap[u"Icon"_s].rect.toRect();
+    QRect iconRect = m_layoutMap[ElementString::Icon].rect.toRect();
     if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow)) {
         auto subopt = *m_toolButtonOption;
         subopt.rect = iconRect;

@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "TitleBarElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -40,37 +41,37 @@ void TitleBarElement::draw(QPainter *painter) const
     if (!m_titleBarOption) {
         return;
     }
-    drawElementBackground(painter, m_titleBarOption, m_widget, {u"TitleBar"_s});
+    drawElementBackground(painter, m_titleBarOption, m_widget, {ElementString::TitleBar});
     if (!m_titleBarOption->text.isEmpty()
         && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
-        m_style->drawText(m_layoutMap[u"Text"_s].rect.toRect(), m_titleBarOption, painter, m_titleBarOption->text, m_widget);
+        m_style->drawText(m_layoutMap[ElementString::Text].rect.toRect(), m_titleBarOption, painter, m_titleBarOption->text, m_widget);
     }
     if (!m_titleBarOption->icon.isNull()) {
-        m_style->drawIcon(m_layoutMap[u"Icon"_s].rect.toRect(), m_titleBarOption, painter, m_titleBarOption->icon, m_widget);
+        m_style->drawIcon(m_layoutMap[ElementString::Icon].rect.toRect(), m_titleBarOption, painter, m_titleBarOption->icon, m_widget);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
-        const auto icon = queryIcon(m_titleBarOption, m_widget, u"help-contextual-symbolic"_s, {u"TitleBar"_s, u"HelpButton"_s});
-        m_style->drawIcon(m_layoutMap[u"HelpButton"_s].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
+        const auto icon = queryIcon(m_titleBarOption, m_widget, u"help-contextual-symbolic"_s, {ElementString::TitleBar, ElementString::HelpButton});
+        m_style->drawIcon(m_layoutMap[ElementString::HelpButton].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
-        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-minimize-symbolic"_s, {u"TitleBar"_s, u"MinimizeButton"_s});
-        m_style->drawIcon(m_layoutMap[u"MinimizeButton"_s].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
+        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-minimize-symbolic"_s, {ElementString::TitleBar, ElementString::MinimizeButton});
+        m_style->drawIcon(m_layoutMap[ElementString::MinimizeButton].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
-        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-maximize-symbolic"_s, {u"TitleBar"_s, u"MaximizeButton"_s});
-        m_style->drawIcon(m_layoutMap[u"MaximizeButton"_s].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
+        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-maximize-symbolic"_s, {ElementString::TitleBar, ElementString::MaximizeButton});
+        m_style->drawIcon(m_layoutMap[ElementString::MaximizeButton].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
-        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-close-symbolic"_s, {u"TitleBar"_s, u"CloseButton"_s});
-        m_style->drawIcon(m_layoutMap[u"CloseButton"_s].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
+        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-close-symbolic"_s, {ElementString::TitleBar, ElementString::CloseButton});
+        m_style->drawIcon(m_layoutMap[ElementString::CloseButton].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
-        const auto icon = queryIcon(m_titleBarOption, m_widget, u"application-menu-symbolic"_s, {u"TitleBar"_s, u"SystemMenu"_s});
-        m_style->drawIcon(m_layoutMap[u"SystemMenu"_s].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
+        const auto icon = queryIcon(m_titleBarOption, m_widget, u"application-menu-symbolic"_s, {ElementString::TitleBar, ElementString::SystemMenu});
+        m_style->drawIcon(m_layoutMap[ElementString::SystemMenu].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
-        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-shade-symbolic"_s, {u"TitleBar"_s, u"ShadeButton"_s});
-        m_style->drawIcon(m_layoutMap[u"ShadeButton"_s].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
+        const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-shade-symbolic"_s, {ElementString::TitleBar, ElementString::ShadeButton});
+        m_style->drawIcon(m_layoutMap[ElementString::ShadeButton].rect.toRect(), m_titleBarOption, painter, icon, m_widget);
     }
 }
 
@@ -80,28 +81,28 @@ void TitleBarElement::updateSubElementList()
     if (m_titleBarOption) {
         if (!m_titleBarOption->text.isEmpty()
             && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
         if (!m_titleBarOption->icon.isNull()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
-            m_subElementList.append(u"HelpButton"_s);
+            m_subElementList.append(ElementString::HelpButton);
         }
         if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
-            m_subElementList.append(u"MinimizeButton"_s);
+            m_subElementList.append(ElementString::MinimizeButton);
         }
         if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
-            m_subElementList.append(u"MaximizeButton"_s);
+            m_subElementList.append(ElementString::MaximizeButton);
         }
         if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
-            m_subElementList.append(u"CloseButton"_s);
+            m_subElementList.append(ElementString::CloseButton);
         }
         if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
-            m_subElementList.append(u"SystemMenu"_s);
+            m_subElementList.append(ElementString::SystemMenu);
         }
         if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
-            m_subElementList.append(u"ShadeButton"_s);
+            m_subElementList.append(ElementString::ShadeButton);
         }
     }
 }
@@ -110,7 +111,7 @@ void TitleBarElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {u"TitleBar"_s});
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::TitleBar});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
@@ -118,7 +119,7 @@ void TitleBarElement::layout()
     }
 
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, {u"TitleBar"_s});
+        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::TitleBar});
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -147,22 +148,22 @@ QRect TitleBarElement::subControlRect(QStyle::SubControl subControl) const
 
     switch (subControl) {
     case QStyle::SC_TitleBarSysMenu:
-        return m_layoutMap[u"SystemMenu"_s].rect.toRect();
+        return m_layoutMap[ElementString::SystemMenu].rect.toRect();
     case QStyle::SC_TitleBarMinButton:
-        return m_layoutMap[u"MinimizeButton"_s].rect.toRect();
+        return m_layoutMap[ElementString::MinimizeButton].rect.toRect();
     case QStyle::SC_TitleBarMaxButton:
-        return m_layoutMap[u"MaximizeButton"_s].rect.toRect();
+        return m_layoutMap[ElementString::MaximizeButton].rect.toRect();
     case QStyle::SC_TitleBarCloseButton:
-        return m_layoutMap[u"CloseButton"_s].rect.toRect();
+        return m_layoutMap[ElementString::CloseButton].rect.toRect();
     case QStyle::SC_TitleBarNormalButton:
-        return m_layoutMap[u"NormalButton"_s].rect.toRect();
+        return m_layoutMap[ElementString::NormalButton].rect.toRect();
     case QStyle::SC_TitleBarShadeButton:
     case QStyle::SC_TitleBarUnshadeButton:
-        return m_layoutMap[u"ShadeButton"_s].rect.toRect();
+        return m_layoutMap[ElementString::ShadeButton].rect.toRect();
     case QStyle::SC_TitleBarContextHelpButton:
-        return m_layoutMap[u"HelpButton"_s].rect.toRect();
+        return m_layoutMap[ElementString::HelpButton].rect.toRect();
     case QStyle::SC_TitleBarLabel:
-        return m_layoutMap[u"Text"_s].rect.toRect();
+        return m_layoutMap[ElementString::Text].rect.toRect();
         break;
     default:
         break;

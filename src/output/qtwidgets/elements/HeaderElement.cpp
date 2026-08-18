@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "HeaderElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -53,7 +54,7 @@ void HeaderElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {u"HeaderViewDelegate"_s});
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::HeaderViewDelegate});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
@@ -61,7 +62,7 @@ void HeaderElement::layout()
     }
 
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, {u"HeaderViewDelegate"_s});
+        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::HeaderViewDelegate});
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -85,7 +86,7 @@ void HeaderElement::draw(QPainter *painter) const
 
 void HeaderElement::updateSubElementList()
 {
-    m_subElementList = {u"Text"_s, u"Icon"_s};
+    m_subElementList = {ElementString::Text, ElementString::Icon};
 }
 
 QSize HeaderElement::contentsSize(const QSize &contentsSizeFromStyle) const
@@ -101,7 +102,7 @@ QRect HeaderElement::subElementRect(QStyle::SubElement element) const
     }
     QRect rect;
     if (element == QStyle::SE_HeaderArrow || element == QStyle::SE_HeaderLabel) {
-        auto mapItem = (element == QStyle::SE_HeaderLabel) ? u"Text"_s : u"Icon"_s;
+        auto mapItem = (element == QStyle::SE_HeaderLabel) ? ElementString::Text : ElementString::Icon;
         rect = m_layoutMap[mapItem].rect.toRect();
     }
     return rect;

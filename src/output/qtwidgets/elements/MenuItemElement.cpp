@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "MenuItemElement.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -26,7 +27,7 @@ MenuItemElement::MenuItemElement(const QStyleOption *option, const UnionStyle *s
         m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
 
         if (m_hasSubMenu) {
-            m_indicatorElementList = prepareElements(m_menuItemOption, widget, {u"MenuItem"_s});
+            m_indicatorElementList = prepareElements(m_menuItemOption, widget, {ElementString::MenuItem});
             m_indicatorProperties = queryProperties(m_indicatorElementList);
             if (m_indicatorProperties->layout() && m_indicatorProperties->icon()) {
                 setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(u"arrow-right-symbolic"_s)));
@@ -60,10 +61,10 @@ void MenuItemElement::draw(QPainter *painter) const
     if (m_hasCheckBox || m_hasRadioButton) {
         QStyleOptionButton button;
         button.initFrom(m_widget);
-        button.rect = m_layoutMap[u"Indicator"_s].rect.toRect();
+        button.rect = m_layoutMap[ElementString::Indicator].rect.toRect();
         button.state = m_menuItemOption->state;
         button.state.setFlag(QStyle::State_On, m_menuItemOption->checked);
-        drawElementBackground(painter, &button, m_widget, {m_hasCheckBox ? u"CheckBox"_s : u"RadioButton"_s, u"Indicator"_s});
+        drawElementBackground(painter, &button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator});
     }
 }
 
@@ -72,22 +73,22 @@ void MenuItemElement::updateSubElementList()
     m_subElementList.clear();
     if (m_menuItemOption) {
         if (!m_menuItemOption->text.isEmpty()) {
-            m_subElementList.append(u"Text"_s);
+            m_subElementList.append(ElementString::Text);
         }
         if (!m_menuItemOption->icon.isNull()) {
-            m_subElementList.append(u"Icon"_s);
+            m_subElementList.append(ElementString::Icon);
         }
         if (m_menuItemOption->menuHasCheckableItems) {
-            m_subElementList.append(u"CheckBox"_s);
+            m_subElementList.append(ElementString::CheckBox);
         }
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu) {
-            m_subElementList.append(u"Arrow"_s);
+            m_subElementList.append(ElementString::Arrow);
         }
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
-            m_subElementList.append(u"Separator"_s);
+            m_subElementList.append(ElementString::Separator);
         }
         if (m_menuItemOption->checkType != QStyleOptionMenuItem::NotCheckable) {
-            m_subElementList.append(u"Indicator"_s);
+            m_subElementList.append(ElementString::Indicator);
         }
     }
 }
@@ -96,13 +97,13 @@ void MenuItemElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {u"Menu"_s});
+        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::Menu});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
 
-    m_contentElementList = prepareElements(m_styleOption, m_widget, {u"MenuItem"_s});
+    m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem});
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
     }
@@ -110,25 +111,25 @@ void MenuItemElement::layout()
     QStringList subElements;
     QString itemText = text();
     if (m_hasCheckBox || m_hasRadioButton) {
-        subElements.append(u"Indicator"_s);
+        subElements.append(ElementString::Indicator);
     }
     if (hasIcon()) {
-        subElements.append(u"Icon"_s);
+        subElements.append(ElementString::Icon);
     }
     if (hasText()) {
-        subElements.append(u"Text"_s);
+        subElements.append(ElementString::Text);
         const int tabPosition(itemText.indexOf(QLatin1Char('\t')));
         if (tabPosition >= 0) {
-            subElements.append(u"ShortcutText"_s);
+            subElements.append(ElementString::ShortcutText);
             m_shortcutText = itemText.mid(tabPosition + 1);
             m_text = itemText.left(tabPosition);
         }
     }
     if (hasIndicator()) {
-        subElements.append(u"Arrow"_s);
+        subElements.append(ElementString::Arrow);
     }
     if (m_isSeparator) {
-        subElements.append(u"Separator"_s);
+        subElements.append(ElementString::Separator);
     }
 
     if (subElements.empty()) {
@@ -146,7 +147,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
     // Handle separator separately (pun not intended)
     if (m_menuItemOption) {
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
-            auto separatorProps = queryProperties(prepareElements(m_menuItemOption, m_widget, {u"MenuSeparator"_s}));
+            auto separatorProps = queryProperties(prepareElements(m_menuItemOption, m_widget, {ElementString::MenuSeparator}));
             if (separatorProps->layout()) {
                 int width = separatorProps->layout()->width().value_or(1);
                 int height = separatorProps->layout()->height().value_or(1);
@@ -181,9 +182,9 @@ MenuItemElement::Ptr MenuItemElement::create(const QStyleOption *option, const U
 void MenuItemElement::drawBg(QPainter *painter) const
 {
     if (m_isSeparator) {
-        drawElementBackground(painter, m_menuItemOption, m_widget, {u"MenuSeparator"_s});
+        drawElementBackground(painter, m_menuItemOption, m_widget, {ElementString::MenuSeparator});
     } else {
-        drawElementBackground(painter, m_menuItemOption, m_widget, {u"MenuItem"_s});
+        drawElementBackground(painter, m_menuItemOption, m_widget, {ElementString::MenuItem});
     }
 }
 
@@ -192,7 +193,7 @@ void MenuItemElement::drawText(QPainter *painter) const
     int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
     const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
     if (hasText()) {
-        QRect textRect = m_layoutMap[u"Text"_s].rect.toRect();
+        QRect textRect = m_layoutMap[ElementString::Text].rect.toRect();
         QColor color = m_styleOption->palette.text().color();
         // TODO: hide mnemonics if requested
         if (m_contentProperties->text()) {
@@ -210,10 +211,10 @@ void MenuItemElement::drawText(QPainter *painter) const
     // ShortcutText is just like a regular text element but handled with different name
     // and has different coloration, so override the default colors
     if (!m_shortcutText.isEmpty()) {
-        auto shortcutElements = prepareElements(m_styleOption, m_widget, {u"MenuItem"_s, u"ShortcutText"_s});
+        auto shortcutElements = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem, ElementString::ShortcutText});
         const auto properties = queryProperties(shortcutElements);
-        auto map = layoutMap(m_contentElementList, m_styleOption, {u"ShortcutText"_s});
-        QRect textRect = map[u"ShortcutText"_s].rect.toRect();
+        auto map = layoutMap(m_contentElementList, m_styleOption, {ElementString::ShortcutText});
+        QRect textRect = map[ElementString::ShortcutText].rect.toRect();
         QColor shortcutColor = m_styleOption->palette.text().color();
         if (properties->text() && properties->text()->color().has_value()) {
             shortcutColor = properties->text()->color()->toQColor();
@@ -229,7 +230,7 @@ void MenuItemElement::drawText(QPainter *painter) const
 void MenuItemElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator()) {
-        QRect indicatorRect = m_layoutMap[u"Arrow"_s].rect.toRect();
+        QRect indicatorRect = m_layoutMap[ElementString::Arrow].rect.toRect();
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_styleOption->palette;
