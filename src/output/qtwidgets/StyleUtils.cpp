@@ -514,7 +514,12 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
         elementTypes = {styleOptionToElementName(opt)};
     }
 
-    elementTypes.append(targetHierarchy);
+    // Meld duplicate elements that appear next to each other
+    for (const auto &target : targetHierarchy) {
+        if (!elementTypes.isEmpty() && elementTypes.last() != target) {
+            elementTypes.append(target);
+        }
+    }
 
     for (const auto &elementType : elementTypes) {
         auto unionElement = Union::Element::create();
