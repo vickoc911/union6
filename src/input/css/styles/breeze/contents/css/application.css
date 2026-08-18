@@ -182,9 +182,14 @@ groupbox {
 focusframe,
 dockwidget {
     border-radius: var(--corner-radius);
-    &:visual-focus {
+    &:visual-focus,
+    &:active-focus {
         border: 1px solid var(--highlight-color);
     }
+}
+
+focusframe {
+    inset: 2px;
 }
 
 dockwidget {
