@@ -391,7 +391,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_PanelLineEdit:
         // For spinboxes and comboboxes, we do not want to draw this element
         // TODO: remove if this is not needed after making the complex controls
-        if (widget->parentWidget()->inherits("QComboBox") || widget->parentWidget()->inherits("QAbstractSpinBox")) {
+        if (!widget || widget->parentWidget()->inherits("QComboBox") || widget->parentWidget()->inherits("QAbstractSpinBox")) {
             return;
         }
         drawElementBackground(painter, option, widget);
