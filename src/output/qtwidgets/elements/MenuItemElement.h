@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class MenuItemElement : public AbstractElement, public std::enable_shared_from_this<MenuItemElement>
+class MenuItemElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<MenuItemElement>;
     MenuItemElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~MenuItemElement() override;
-    static MenuItemElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

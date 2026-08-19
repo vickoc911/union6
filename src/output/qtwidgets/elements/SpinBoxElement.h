@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class SpinBoxElement : public AbstractElement, public std::enable_shared_from_this<SpinBoxElement>
+class SpinBoxElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<SpinBoxElement>;
     SpinBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~SpinBoxElement() override;
-    static SpinBoxElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

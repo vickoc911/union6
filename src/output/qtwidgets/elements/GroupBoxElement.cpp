@@ -108,11 +108,6 @@ QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
     return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, finalRect);
 }
 
-GroupBoxElement::Ptr GroupBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<GroupBoxElement>(option, style, widget);
-}
-
 void GroupBoxElement::drawText(QPainter *painter) const
 {
     if ((m_groupBoxOption->subControls & QStyle::SC_GroupBoxLabel) && hasText()) {

@@ -170,8 +170,3 @@ QRect TitleBarElement::subControlRect(QStyle::SubControl subControl) const
     }
     return QRect();
 }
-
-TitleBarElement::Ptr TitleBarElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<TitleBarElement>(option, style, widget);
-}

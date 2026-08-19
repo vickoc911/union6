@@ -76,11 +76,6 @@ QRect CheckElement::subElementRect(QStyle::SubElement element) const
     return rect;
 }
 
-CheckElement::Ptr CheckElement::create(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<CheckElement>(type, option, style, widget);
-}
-
 void CheckElement::updateSubElementList()
 {
     m_subElementList.clear();

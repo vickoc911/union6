@@ -107,8 +107,3 @@ QRect HeaderElement::subElementRect(QStyle::SubElement element) const
     }
     return rect;
 }
-
-HeaderElement::Ptr HeaderElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<HeaderElement>(option, style, widget);
-}

@@ -140,8 +140,3 @@ QRect ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
         return QRect();
     }
 }
-
-ScrollBarElement::Ptr ScrollBarElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ScrollBarElement>(option, style, widget);
-}

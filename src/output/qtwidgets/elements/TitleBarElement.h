@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class TitleBarElement : public AbstractElement, public std::enable_shared_from_this<TitleBarElement>
+class TitleBarElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<TitleBarElement>;
     TitleBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~TitleBarElement() override;
-    static TitleBarElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

@@ -27,11 +27,6 @@ AbstractElement::~AbstractElement()
 {
 }
 
-AbstractElement::Ptr AbstractElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<AbstractElement>(option, style, widget);
-}
-
 QIcon AbstractElement::icon() const
 {
     return m_icon;

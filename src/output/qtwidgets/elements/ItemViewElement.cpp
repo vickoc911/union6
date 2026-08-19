@@ -153,11 +153,6 @@ QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
     return rect;
 }
 
-ItemViewElement::Ptr ItemViewElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ItemViewElement>(option, style, widget);
-}
-
 void ItemViewElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {

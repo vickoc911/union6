@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class GroupBoxElement : public AbstractElement, public std::enable_shared_from_this<GroupBoxElement>
+class GroupBoxElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<GroupBoxElement>;
     GroupBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~GroupBoxElement() override;
-    static GroupBoxElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

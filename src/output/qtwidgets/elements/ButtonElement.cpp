@@ -104,8 +104,3 @@ QRect ButtonElement::subElementRect(QStyle::SubElement element) const
     rect = unifiedRect;
     return rect;
 }
-
-ButtonElement::Ptr ButtonElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ButtonElement>(option, style, widget);
-}
