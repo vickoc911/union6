@@ -124,11 +124,6 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
     return QRect();
 }
 
-ToolButtonElement::Ptr ToolButtonElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ToolButtonElement>(option, style, widget);
-}
-
 void ToolButtonElement::drawText(QPainter *painter) const
 {
     if (m_toolButtonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {

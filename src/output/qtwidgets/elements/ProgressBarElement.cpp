@@ -153,8 +153,3 @@ QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
     };
     return QRect();
 }
-
-ProgressBarElement::Ptr ProgressBarElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ProgressBarElement>(option, style, widget);
-}

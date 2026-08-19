@@ -117,8 +117,3 @@ QRect SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     }
     return rect;
 }
-
-SpinBoxElement::Ptr SpinBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<SpinBoxElement>(option, style, widget);
-}

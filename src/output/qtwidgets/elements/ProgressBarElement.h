@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class ProgressBarElement : public AbstractElement, public std::enable_shared_from_this<ProgressBarElement>
+class ProgressBarElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<ProgressBarElement>;
     ProgressBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ProgressBarElement() override;
-    static ProgressBarElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

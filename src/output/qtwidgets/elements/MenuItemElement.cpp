@@ -194,11 +194,6 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return minimumSize;
 }
 
-MenuItemElement::Ptr MenuItemElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<MenuItemElement>(option, style, widget);
-}
-
 void MenuItemElement::drawBg(QPainter *painter) const
 {
     if (m_isSeparator) {

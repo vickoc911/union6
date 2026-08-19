@@ -132,8 +132,3 @@ QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
     }
     return QRect();
 }
-
-ComboBoxElement::Ptr ComboBoxElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<ComboBoxElement>(option, style, widget);
-}

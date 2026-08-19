@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class ButtonElement : public AbstractElement, public std::enable_shared_from_this<ButtonElement>
+class ButtonElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<ButtonElement>;
     ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ButtonElement() override;
-    static ButtonElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

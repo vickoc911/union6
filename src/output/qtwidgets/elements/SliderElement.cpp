@@ -248,11 +248,6 @@ QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
     return QRect();
 }
 
-SliderElement::Ptr SliderElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<SliderElement>(option, style, widget);
-}
-
 QList<QRect> SliderElement::tickLines() const
 {
     QList<QRect> tickLines;

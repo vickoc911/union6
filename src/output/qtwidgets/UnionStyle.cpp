@@ -86,7 +86,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 
     switch (controlElement) {
     case QStyle::CE_ComboBoxLabel: {
-        auto ev = ComboBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<ComboBoxElement>(option, this, widget);
         ev->drawIcon(painter);
         if (!ev->isEditable()) {
             ev->drawText(painter);
@@ -94,12 +94,12 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_PushButtonBevel: {
-        auto ev = ButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ButtonElement>(option, this, widget);
         ev->drawBg(painter);
     }
         return;
     case QStyle::CE_PushButtonLabel: {
-        auto ev = ButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ButtonElement>(option, this, widget);
         ev->drawIcon(painter);
         ev->drawText(painter);
         ev->drawIndicator(painter);
@@ -111,20 +111,20 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ToolButtonLabel: {
-        auto ev = ToolButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ToolButtonElement>(option, this, widget);
         ev->drawIcon(painter);
         ev->drawText(painter);
         ev->drawIndicator(painter);
     }
         return;
     case QStyle::CE_CheckBoxLabel: {
-        auto ev = CheckElement::create(CheckElement::Type::CheckBox, option, this, widget);
+        auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, option, this, widget);
         ev->drawText(painter);
     }
         return;
     case QStyle::CE_CheckBox: {
         if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = CheckElement::create(CheckElement::Type::CheckBox, option, this, widget);
+            auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, option, this, widget);
             ev->drawBg(painter);
             ev->drawIndicator(painter);
             drawControl(CE_CheckBoxLabel, buttonOption, painter, widget);
@@ -132,13 +132,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_RadioButtonLabel: {
-        auto ev = CheckElement::create(CheckElement::Type::RadioButton, option, this, widget);
+        auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, option, this, widget);
         ev->drawText(painter);
     }
         return;
     case QStyle::CE_RadioButton: {
         if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = CheckElement::create(CheckElement::Type::RadioButton, option, this, widget);
+            auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, option, this, widget);
             ev->drawBg(painter);
             ev->drawIndicator(painter);
             drawControl(CE_RadioButtonLabel, buttonOption, painter, widget);
@@ -146,19 +146,19 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_MenuItem: {
-        auto ev = MenuItemElement::create(option, this, widget);
+        auto ev = std::make_shared<MenuItemElement>(option, this, widget);
         ev->draw(painter);
     }
         return;
     case QStyle::CE_ToolBoxTabShape:
     case QStyle::CE_TabBarTabShape: {
-        auto ev = TabElement::create(option, this, widget);
+        auto ev = std::make_shared<TabElement>(option, this, widget);
         ev->drawBg(painter);
     }
         return;
     case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel: {
-        auto ev = TabElement::create(option, this, widget);
+        auto ev = std::make_shared<TabElement>(option, this, widget);
         // TODO: handle vertical tabs
         if (ev->isVertical()) {
             QCommonStyle::drawControl(controlElement, option, painter, widget);
@@ -183,22 +183,22 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ItemViewItem: {
-        auto ev = ItemViewElement::create(option, this, widget);
+        auto ev = std::make_shared<ItemViewElement>(option, this, widget);
         ev->draw(painter);
     }
         return;
     case QStyle::CE_ProgressBarGroove: {
-        auto ev = ProgressBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ProgressBarElement>(option, this, widget);
         ev->drawGroove(painter);
     }
         return;
     case QStyle::CE_ProgressBarContents: {
-        auto ev = ProgressBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ProgressBarElement>(option, this, widget);
         ev->drawTrack(painter);
     }
         return;
     case QStyle::CE_ProgressBarLabel: {
-        auto ev = ProgressBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ProgressBarElement>(option, this, widget);
         ev->drawText(painter);
     }
         return;
@@ -223,13 +223,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElementBackground(painter, option, widget, {ElementString::MenuItem});
         return;
     case QStyle::CE_HeaderLabel: {
-        auto ev = HeaderElement::create(option, this, widget);
+        auto ev = std::make_shared<HeaderElement>(option, this, widget);
         ev->drawIcon(painter);
         ev->drawText(painter);
     }
         return;
     case QStyle::CE_HeaderSection: {
-        auto ev = HeaderElement::create(option, this, widget);
+        auto ev = std::make_shared<HeaderElement>(option, this, widget);
         ev->drawBg(painter);
     }
         return;
@@ -301,29 +301,29 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
         if (!comboBoxOption) {
             return;
         }
-        auto ev = ComboBoxElement::create(comboBoxOption, this, widget);
+        auto ev = std::make_shared<ComboBoxElement>(comboBoxOption, this, widget);
         ev->drawBg(painter);
         // Do not draw the text and icon again, as its being handled by QStyle in CE_ComboBoxLabel
         ev->drawIndicator(painter);
     }
         return;
     case QStyle::CC_SpinBox: {
-        auto ev = SpinBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<SpinBoxElement>(option, this, widget);
         ev->draw(painter);
     }
         return;
     case QStyle::CC_ScrollBar: {
-        auto ev = ScrollBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ScrollBarElement>(option, this, widget);
         ev->draw(painter);
     }
         return;
     case QStyle::CC_Slider: {
-        auto ev = SliderElement::create(option, this, widget);
+        auto ev = std::make_shared<SliderElement>(option, this, widget);
         ev->draw(painter);
     }
         return;
     case QStyle::CC_TitleBar: {
-        auto ev = TitleBarElement::create(option, this, widget);
+        auto ev = std::make_shared<TitleBarElement>(option, this, widget);
         ev->draw(painter);
     }
         return;
@@ -510,7 +510,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_IndicatorHeaderArrow: {
         if (qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto ev = HeaderElement::create(option, this, widget);
+            auto ev = std::make_shared<HeaderElement>(option, this, widget);
             ev->drawIcon(painter);
         } else {
             // Fallback
@@ -556,39 +556,39 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
 {
     switch (contentsType) {
     case QStyle::CT_PushButton: {
-        auto ev = ButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ButtonElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ToolButton: {
-        auto ev = ToolButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ToolButtonElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_MenuItem: {
-        auto ev = MenuItemElement::create(option, this, widget);
+        auto ev = std::make_shared<MenuItemElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ComboBox: {
-        auto ev = ComboBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<ComboBoxElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_TabBarTab: {
-        auto ev = TabElement::create(option, this, widget);
+        auto ev = std::make_shared<TabElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_Slider: {
-        auto ev = SliderElement::create(option, this, widget);
+        auto ev = std::make_shared<SliderElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_ItemViewItem: {
-        auto ev = ItemViewElement::create(option, this, widget);
+        auto ev = std::make_shared<ItemViewElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     } break;
     case QStyle::CT_SpinBox: {
-        auto ev = SpinBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<SpinBoxElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     }
     case QStyle::CT_ScrollBar: {
-        auto ev = ScrollBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ScrollBarElement>(option, this, widget);
         return ev->contentsSize(contentsSize);
     }
     // Use defaults from qcommonstyle
@@ -641,23 +641,23 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ItemViewItemText:
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator: {
-        auto ev = ItemViewElement::create(option, this, widget);
+        auto ev = std::make_shared<ItemViewElement>(option, this, widget);
         return ev->subElementRect(element);
     } break;
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_RadioButtonIndicator: {
-        auto ev = CheckElement::create(CheckElement::Type::RadioButton, option, this, widget);
+        auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, option, this, widget);
         return ev->subElementRect(element);
     } break;
     case QStyle::SE_CheckBoxIndicator:
     case QStyle::SE_CheckBoxContents: {
-        auto ev = CheckElement::create(CheckElement::Type::CheckBox, option, this, widget);
+        auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, option, this, widget);
         return ev->subElementRect(element);
     } break;
     case QStyle::SE_PushButtonFocusRect:
     case QStyle::SE_PushButtonContents:
     case QStyle::SE_PushButtonBevel: {
-        auto ev = ButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ButtonElement>(option, this, widget);
         return ev->subElementRect(element);
     } break;
     case QStyle::SE_ShapedFrameContents:
@@ -670,11 +670,11 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     } break;
     case QStyle::SE_HeaderArrow:
     case QStyle::SE_HeaderLabel: {
-        auto ev = HeaderElement::create(option, this, widget);
+        auto ev = std::make_shared<HeaderElement>(option, this, widget);
         return ev->subElementRect(element);
     } break;
     case QStyle::SE_TabBarTabText: {
-        auto ev = TabElement::create(option, this, widget);
+        auto ev = std::make_shared<TabElement>(option, this, widget);
         // TODO: handle vertical tabs
         if (ev->isVertical()) {
             return QCommonStyle::subElementRect(element, option, widget);
@@ -684,7 +684,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ProgressBarLabel:
     case QStyle::SE_ProgressBarContents:
     case QStyle::SE_ProgressBarGroove: {
-        auto ev = ProgressBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ProgressBarElement>(option, this, widget);
         return ev->subElementRect(element);
     } break;
     case QStyle::SE_DockWidgetTitleBarText:
@@ -768,36 +768,36 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
     if (complexControl == CC_ToolButton) {
-        auto ev = ToolButtonElement::create(option, this, widget);
+        auto ev = std::make_shared<ToolButtonElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_ComboBox) {
-        auto ev = ComboBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<ComboBoxElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
     if (complexControl == CC_GroupBox) {
-        auto ev = GroupBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<GroupBoxElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_ScrollBar) {
-        auto ev = ScrollBarElement::create(option, this, widget);
+        auto ev = std::make_shared<ScrollBarElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_Slider) {
-        auto ev = SliderElement::create(option, this, widget);
+        auto ev = std::make_shared<SliderElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_SpinBox) {
-        auto ev = SpinBoxElement::create(option, this, widget);
+        auto ev = std::make_shared<SpinBoxElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
 
     if (complexControl == CC_TitleBar) {
-        auto ev = TitleBarElement::create(option, this, widget);
+        auto ev = std::make_shared<TitleBarElement>(option, this, widget);
         return ev->subControlRect(subControl);
     }
     // Leave Dial and MDIControls to QCommonStyle for now

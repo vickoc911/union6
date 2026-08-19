@@ -12,15 +12,13 @@
 
 class UnionStyle;
 
-class SliderElement : public AbstractElement, public std::enable_shared_from_this<SliderElement>
+class SliderElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<SliderElement>;
     SliderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~SliderElement() override;
-    static SliderElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     void draw(QPainter *painter) const override;
 

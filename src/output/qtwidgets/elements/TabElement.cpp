@@ -130,11 +130,6 @@ QRect TabElement::subElementRect(QStyle::SubElement element) const
     return m_styleOption->rect;
 }
 
-TabElement::Ptr TabElement::create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
-{
-    return std::make_shared<TabElement>(option, style, widget);
-}
-
 bool TabElement::isVertical() const
 {
     return m_isVertical;

@@ -11,18 +11,13 @@
 
 class UnionStyle;
 
-class AbstractElement : public QObject, public std::enable_shared_from_this<AbstractElement>
+class AbstractElement : public QObject
 {
     Q_OBJECT
 
 public:
-    using Ptr = std::shared_ptr<AbstractElement>;
     AbstractElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~AbstractElement() override;
-    /*!
-     * \brief Create a shared pointer to the element. Use this instead of regular instantiation.
-     */
-    static AbstractElement::Ptr create(const QStyleOption *option, const UnionStyle *style, const QWidget *widget);
 
     QIcon icon() const;
     void setIcon(const QIcon &icon);
