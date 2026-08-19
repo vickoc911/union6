@@ -167,6 +167,11 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
                 }
                 QSize itemSize(width, height);
                 itemSize.rwidth() += m_menuItemOption->maxIconWidth + spacing;
+                if (m_menuItemOption->menuHasCheckableItems) {
+                    const bool exclusive = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
+                    itemSize.rwidth() +=
+                        m_style->pixelMetric(exclusive ? QStyle::PM_ExclusiveIndicatorWidth : QStyle::PM_IndicatorWidth, m_menuItemOption, m_widget) + spacing;
+                }
                 return applyPaddingToSize(itemSize);
             }
         }
