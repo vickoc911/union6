@@ -37,7 +37,7 @@ void SpinBoxElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBg(painter);
+    drawBackground(painter);
     // For spinbox we need to manually create the indicator buttons
     if (m_spinBoxOption->buttonSymbols != QAbstractSpinBox::NoButtons) {
         bool arrows = (m_spinBoxOption->buttonSymbols == QAbstractSpinBox::UpDownArrows);

@@ -54,7 +54,7 @@ void ToolButtonElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);

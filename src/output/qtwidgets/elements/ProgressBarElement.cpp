@@ -43,14 +43,14 @@ void ProgressBarElement::drawGroove(QPainter *painter) const
 {
     if (m_progressBarOption) {
         auto groove = subElementRect(QStyle::SE_ProgressBarGroove);
-        drawBackground(painter, groove, m_backgroundProperties);
+        drawBackgroundRectangle(painter, groove, m_backgroundProperties);
     }
 }
 void ProgressBarElement::drawTrack(QPainter *painter) const
 {
     if (m_progressBarOption) {
         auto progress = subElementRect(QStyle::SE_ProgressBarContents);
-        drawBackground(painter, progress, m_contentProperties);
+        drawBackgroundRectangle(painter, progress, m_contentProperties);
     }
 }
 

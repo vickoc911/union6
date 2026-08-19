@@ -95,7 +95,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_PushButtonBevel: {
         auto ev = std::make_shared<ButtonElement>(option, this, widget);
-        ev->drawBg(painter);
+        ev->drawBackground(painter);
     }
         return;
     case QStyle::CE_PushButtonLabel: {
@@ -125,7 +125,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_CheckBox: {
         if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
             auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, option, this, widget);
-            ev->drawBg(painter);
+            ev->drawBackground(painter);
             ev->drawIndicator(painter);
             drawControl(CE_CheckBoxLabel, buttonOption, painter, widget);
         }
@@ -139,7 +139,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_RadioButton: {
         if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
             auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, option, this, widget);
-            ev->drawBg(painter);
+            ev->drawBackground(painter);
             ev->drawIndicator(painter);
             drawControl(CE_RadioButtonLabel, buttonOption, painter, widget);
         }
@@ -153,7 +153,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ToolBoxTabShape:
     case QStyle::CE_TabBarTabShape: {
         auto ev = std::make_shared<TabElement>(option, this, widget);
-        ev->drawBg(painter);
+        ev->drawBackground(painter);
     }
         return;
     case QStyle::CE_ToolBoxTabLabel:
@@ -230,7 +230,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_HeaderSection: {
         auto ev = std::make_shared<HeaderElement>(option, this, widget);
-        ev->drawBg(painter);
+        ev->drawBackground(painter);
     }
         return;
     case QStyle::CE_Header:
@@ -302,7 +302,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
             return;
         }
         auto ev = std::make_shared<ComboBoxElement>(comboBoxOption, this, widget);
-        ev->drawBg(painter);
+        ev->drawBackground(painter);
         // Do not draw the text and icon again, as its being handled by QStyle in CE_ComboBoxLabel
         ev->drawIndicator(painter);
     }
@@ -455,7 +455,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         element->setAttributes(attributesFromOption(option));
         spinboxElements.append(element);
         auto props = queryProperties(spinboxElements);
-        drawBackground(painter, option->rect, props);
+        drawBackgroundRectangle(painter, option->rect, props);
         if (props->icon()) {
             auto icon = QIcon::fromTheme(props->icon()->name().value_or(up ? u"arrow-up-symbolic"_s : u"arrow-down-symbolic"_s));
             drawIcon(option->rect, option, painter, icon, widget);
