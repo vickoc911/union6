@@ -76,7 +76,11 @@ QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background
     // to get the proper contentSize
     if (hasIndicator()) {
-        size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + m_backgroundProperties->layout()->spacing().value_or(0);
+        qreal spacing = 0;
+        if (m_backgroundProperties->layout()) {
+            spacing = m_backgroundProperties->layout()->spacing().value_or(0);
+        }
+        size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + spacing;
     }
     return size;
 }
