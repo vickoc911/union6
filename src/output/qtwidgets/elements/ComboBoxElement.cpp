@@ -57,7 +57,7 @@ void ComboBoxElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     if (!m_editable) {
         drawText(painter);

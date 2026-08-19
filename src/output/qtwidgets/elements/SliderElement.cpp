@@ -72,7 +72,7 @@ void SliderElement::draw(QPainter *painter) const
     }
 
     // Background
-    drawBg(painter);
+    drawBackground(painter);
 
     if (!m_sliderOption) {
         return;
@@ -102,7 +102,7 @@ void SliderElement::draw(QPainter *painter) const
             progress.setHeight(progressHeight);
         }
     }
-    drawBackground(painter, progress, m_contentProperties);
+    drawBackgroundRectangle(painter, progress, m_contentProperties);
 
     // Tickmark drawing is copied from breeze
     if (m_sliderOption->subControls.testFlag(QStyle::SC_SliderTickmarks)) {
@@ -154,13 +154,13 @@ void SliderElement::draw(QPainter *painter) const
     // This requires making the contentSize large enough to hold the extents of the
     // handle, and then drawing it in correct position.
     auto handle = subControlRect(QStyle::SC_SliderHandle);
-    drawBackground(painter, handle, m_indicatorProperties);
+    drawBackgroundRectangle(painter, handle, m_indicatorProperties);
 }
 
-void SliderElement::drawBg(QPainter *painter) const
+void SliderElement::drawBackground(QPainter *painter) const
 {
     auto grooveRect = subControlRect(QStyle::SC_SliderGroove);
-    drawBackground(painter, grooveRect, m_backgroundProperties);
+    drawBackgroundRectangle(painter, grooveRect, m_backgroundProperties);
 }
 
 void SliderElement::updateSubElementList()

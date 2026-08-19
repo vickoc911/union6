@@ -27,7 +27,7 @@ public:
 
     const QStyleOptionSlider *m_scrollBarOption = nullptr;
 
-    void drawBg(QPainter *painter) const override;
+    void drawBackground(QPainter *painter) const override;
     void updateSubElementList() override;
 
 private:

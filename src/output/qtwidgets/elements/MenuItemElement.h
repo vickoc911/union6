@@ -27,7 +27,7 @@ public:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
 
     void updateSubElementList() override;
-    void drawBg(QPainter *painter) const override;
+    void drawBackground(QPainter *painter) const override;
     void drawText(QPainter *painter) const override;
     void drawIndicator(QPainter *painter) const override;
     void layout() override;

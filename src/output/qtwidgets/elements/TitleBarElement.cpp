@@ -37,7 +37,7 @@ void TitleBarElement::draw(QPainter *painter) const
         return;
     }
 
-    drawBg(painter);
+    drawBackground(painter);
     if (!m_titleBarOption) {
         return;
     }

@@ -54,7 +54,7 @@ void MenuItemElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
     drawIndicator(painter);
@@ -194,7 +194,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return minimumSize;
 }
 
-void MenuItemElement::drawBg(QPainter *painter) const
+void MenuItemElement::drawBackground(QPainter *painter) const
 {
     if (m_isSeparator) {
         drawElementBackground(painter, m_menuItemOption, m_widget, {ElementString::MenuSeparator});

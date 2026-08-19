@@ -29,7 +29,7 @@ public:
 
     void layout() override;
 
-    void drawBg(QPainter *painter) const override;
+    void drawBackground(QPainter *painter) const override;
     void updateSubElementList() override;
 
 private:

@@ -82,7 +82,7 @@ void AbstractElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBg(painter);
+    drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
 }
@@ -172,9 +172,9 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
     return size.toSize();
 }
 
-void AbstractElement::drawBg(QPainter *painter) const
+void AbstractElement::drawBackground(QPainter *painter) const
 {
-    drawBackground(painter, m_styleOption->rect, m_backgroundProperties);
+    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties);
 }
 
 void AbstractElement::drawText(QPainter *painter) const
@@ -236,7 +236,7 @@ void AbstractElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator() && m_isValid) {
         QRect indicatorRect = m_layoutMap[ElementString::Indicator].rect.toRect();
-        drawBackground(painter, indicatorRect, m_indicatorProperties);
+        drawBackgroundRectangle(painter, indicatorRect, m_indicatorProperties);
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_styleOption->palette;
