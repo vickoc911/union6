@@ -183,9 +183,12 @@ QStringList hintsFromOption(const QStyleOption *option)
         }
     } break;
     case QStyleOption::SO_MenuItem: {
-        if (const auto opt = qstyleoption_cast<const QStyleOptionMenuItemV2 *>(option)) {
+        if (const auto opt = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
             if (opt->checked) {
                 hints.append(u"with-submenu"_s);
+            }
+            if (opt->menuItemType == QStyleOptionMenuItem::Separator && !opt->text.isEmpty()) {
+                hints.append(u"with-title"_s);
             }
         }
     } break;
@@ -766,7 +769,11 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             // When layouting, ensure we take mnemonics into account
             auto textFlags = textFlagsFromProperties(properties, true);
             textFlags |= Qt::TextShowMnemonic;
-            elementRect = opt->fontMetrics.boundingRect(availableSpace.toRect(), textFlags, optiontext);
+            auto fontMetrics = opt->fontMetrics;
+            if (properties->text() && properties->text()->font().has_value()) {
+                fontMetrics = QFontMetrics(properties->text()->font().value());
+            }
+            elementRect = fontMetrics.boundingRect(availableSpace.toRect(), textFlags, optiontext);
             order = properties->text()->alignment()->order().value_or(0);
         } else {
             elementRect.setWidth(properties->layout()->width().value_or(0));
