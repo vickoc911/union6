@@ -34,17 +34,6 @@ GroupBoxElement::~GroupBoxElement()
 {
 }
 
-void GroupBoxElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-}
-
 QSize GroupBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
     return applyPaddingToSize(contentsSizeFromStyle);
