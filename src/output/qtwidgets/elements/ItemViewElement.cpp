@@ -165,7 +165,6 @@ void ItemViewElement::drawText(QPainter *painter) const
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         QColor penColor = m_styleOption->palette.text().color();
-        // TODO: hide mnemonics if requested
         if (m_backgroundProperties->text()) {
             auto textColor = m_backgroundProperties->text()->color();
             if (textColor) {
@@ -173,8 +172,10 @@ void ItemViewElement::drawText(QPainter *painter) const
             }
             textFlags = textFlagsFromProperties(m_backgroundProperties, false);
         }
-
         painter->save();
+        if (m_backgroundProperties->text() && m_backgroundProperties->text()->font().has_value()) {
+            painter->setFont(m_backgroundProperties->text()->font().value());
+        }
         painter->setPen(penColor);
         m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
         painter->restore();

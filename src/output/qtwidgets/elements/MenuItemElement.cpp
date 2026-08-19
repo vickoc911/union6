@@ -85,7 +85,7 @@ void MenuItemElement::updateSubElementList()
             m_subElementList.append(ElementString::Arrow);
         }
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
-            m_subElementList.append(ElementString::Separator);
+            m_subElementList.append(ElementString::MenuSeparator);
         }
         if (m_menuItemOption->checkType != QStyleOptionMenuItem::NotCheckable) {
             m_subElementList.append(ElementString::Indicator);
@@ -103,38 +103,46 @@ void MenuItemElement::layout()
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
 
-    m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem});
+    if (m_isSeparator) {
+        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuSeparator});
+
+    } else {
+        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem});
+    }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
     }
 
     QStringList subElements;
     QString itemText = text();
-    if (m_hasCheckBox || m_hasRadioButton) {
-        subElements.append(ElementString::Indicator);
-    }
-    if (hasIcon()) {
-        subElements.append(ElementString::Icon);
-    }
-    if (hasText()) {
-        subElements.append(ElementString::Text);
-        const int tabPosition(itemText.indexOf(QLatin1Char('\t')));
-        if (tabPosition >= 0) {
-            subElements.append(ElementString::ShortcutText);
-            m_shortcutText = itemText.mid(tabPosition + 1);
-            m_text = itemText.left(tabPosition);
-        }
-    }
-    if (hasIndicator()) {
-        subElements.append(ElementString::Arrow);
-    }
     if (m_isSeparator) {
-        subElements.append(ElementString::Separator);
-    }
+        if (hasText()) {
+            subElements.append(ElementString::Text);
+        }
+    } else {
+        if (m_hasCheckBox || m_hasRadioButton) {
+            subElements.append(ElementString::Indicator);
+        }
+        if (hasIcon()) {
+            subElements.append(ElementString::Icon);
+        }
+        if (hasText()) {
+            subElements.append(ElementString::Text);
+            const int tabPosition(itemText.indexOf(QLatin1Char('\t')));
+            if (tabPosition >= 0) {
+                subElements.append(ElementString::ShortcutText);
+                m_shortcutText = itemText.mid(tabPosition + 1);
+                m_text = itemText.left(tabPosition);
+            }
+        }
+        if (hasIndicator()) {
+            subElements.append(ElementString::Arrow);
+        }
 
-    if (subElements.empty()) {
-        m_isValid = false;
-        return;
+        if (subElements.empty()) {
+            m_isValid = false;
+            return;
+        }
     }
 
     m_layoutMap = layoutMap(m_contentElementList, m_styleOption, subElements);
@@ -147,10 +155,17 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
     // Handle separator separately (pun not intended)
     if (m_menuItemOption) {
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
-            auto separatorProps = queryProperties(prepareElements(m_menuItemOption, m_widget, {ElementString::MenuSeparator}));
-            if (separatorProps->layout()) {
-                int width = separatorProps->layout()->width().value_or(1);
-                int height = separatorProps->layout()->height().value_or(1);
+            if (m_contentProperties->layout()) {
+                int width = m_contentProperties->layout()->width().value_or(1);
+                int height = m_contentProperties->layout()->height().value_or(1);
+                if (hasText()) {
+                    if (minimumSize.width() > width) {
+                        width = minimumSize.width();
+                    }
+                    if (minimumSize.height() > height) {
+                        height = minimumSize.height();
+                    }
+                }
                 QSize separatorSize(width, height);
                 return applyPaddingToSize(separatorSize);
             }
@@ -196,26 +211,13 @@ void MenuItemElement::drawBg(QPainter *painter) const
 void MenuItemElement::drawText(QPainter *painter) const
 {
     int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
-    const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
     if (hasText()) {
-        QRect textRect = m_layoutMap[ElementString::Text].rect.toRect();
-        QColor color = m_styleOption->palette.text().color();
-        // TODO: hide mnemonics if requested
-        if (m_contentProperties->text()) {
-            auto textColor = m_contentProperties->text()->color();
-            if (textColor) {
-                color = textColor->toQColor();
-            }
-            textFlags = textFlagsFromProperties(m_contentProperties, true);
-        }
-        painter->save();
-        painter->setPen(color);
-        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
-        painter->restore();
+        AbstractElement::drawText(painter);
     }
     // ShortcutText is just like a regular text element but handled with different name
     // and has different coloration, so override the default colors
     if (!m_shortcutText.isEmpty()) {
+        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         auto shortcutElements = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem, ElementString::ShortcutText});
         const auto properties = queryProperties(shortcutElements);
         auto map = layoutMap(m_contentElementList, m_styleOption, {ElementString::ShortcutText});

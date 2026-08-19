@@ -134,24 +134,7 @@ void ToolButtonElement::drawText(QPainter *painter) const
     if (m_toolButtonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {
         return;
     }
-    if (hasText()) {
-        QRect textRect = m_layoutMap[ElementString::Text].rect.toRect();
-        int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-        QColor penColor = m_styleOption->palette.text().color();
-        // TODO: hide mnemonics if requested
-        if (m_contentProperties->text()) {
-            auto textColor = m_contentProperties->text()->color();
-            if (textColor) {
-                penColor = textColor->toQColor();
-            }
-            textFlags = textFlagsFromProperties(m_contentProperties, true);
-        }
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
-        painter->restore();
-    }
+    AbstractElement::drawText(painter);
 }
 
 void ToolButtonElement::drawIcon(QPainter *painter) const
