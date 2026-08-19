@@ -143,9 +143,9 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
     if (!m_isValid) {
         return oldSize;
     }
-    QSize minimumSize = oldSize;
-    QSize size = minimumSize;
-    QMargins padding;
+    QSizeF minimumSize = oldSize;
+    QSizeF size = minimumSize;
+    QMarginsF padding;
     if (m_backgroundProperties->layout()) {
         auto width = m_backgroundProperties->layout()->width().value_or(1);
         auto height = m_backgroundProperties->layout()->height().value_or(1);
@@ -174,7 +174,7 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
             size.setHeight(minimumSize.height());
         }
     }
-    return size;
+    return size.toSize();
 }
 
 void AbstractElement::drawBg(QPainter *painter) const
