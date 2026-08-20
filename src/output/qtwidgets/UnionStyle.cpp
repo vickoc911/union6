@@ -583,47 +583,45 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return ev->contentsSize(contentsSize);
         }
         break;
+    case QStyle::CT_CheckBox:
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_RadioButton:
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_GroupBox:
+        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_ProgressBar:
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_HeaderSection:
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
     // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
-    case QStyle::CT_LineEdit:
-    case QStyle::CT_GroupBox:
-    case QStyle::CT_CheckBox:
-    case QStyle::CT_RadioButton:
-    case QStyle::CT_ProgressBar:
     case QStyle::CT_MenuBarItem:
+    case QStyle::CT_LineEdit:
     case QStyle::CT_Menu:
     case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
-    case QStyle::CT_HeaderSection:
     case QStyle::CT_MdiControls:
     case QStyle::CT_CustomBase:
         break;
     }
-    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
-    QSize minimumSize(contentsSize.width(), contentsSize.height());
-    auto elements = prepareElements(option, widget);
-    if (elements.isEmpty()) {
-        return size;
-    }
-    auto properties = queryProperties(elements);
-    if (!properties) {
-        return size;
-    }
-    if (properties->layout()) {
-        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
-        auto width = properties->layout()->width().value_or(1) + frameWidth;
-        auto height = properties->layout()->height().value_or(1) + frameWidth;
-        minimumSize = QSize(width, height);
-    }
-    if (size.width() < minimumSize.width()) {
-        size.setWidth(minimumSize.width());
-    }
-    if (size.height() < minimumSize.height()) {
-        size.setHeight(minimumSize.height());
-    }
-    return size;
+    return QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
 }
 
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
