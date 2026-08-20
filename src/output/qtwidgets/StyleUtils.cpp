@@ -257,56 +257,6 @@ QStringList hintsFromOption(const QStyleOption *option)
     return hints;
 }
 
-Union::Element::ColorSet colorsetFromOption(const QStyleOption *option)
-{
-    /*
-     *     enum class ColorSet {
-     *  None,
-     *  View,
-     *  Window,
-     *  Button,
-     *  Selection,
-     *  Tooltip,
-     *  Complementary,
-     *  Header,
-    };*/
-    if (!option) {
-        return Union::Element::ColorSet::None;
-    }
-    switch ((QStyleOption::OptionType)option->type) {
-    case QStyleOption::SO_Default:
-    case QStyleOption::SO_FocusRect:
-    case QStyleOption::SO_Tab:
-    case QStyleOption::SO_MenuItem:
-    case QStyleOption::SO_Frame:
-    case QStyleOption::SO_ProgressBar:
-    case QStyleOption::SO_ToolBox:
-    case QStyleOption::SO_Header:
-    case QStyleOption::SO_DockWidget:
-    case QStyleOption::SO_ViewItem:
-    case QStyleOption::SO_TabWidgetFrame:
-    case QStyleOption::SO_TabBarBase:
-    case QStyleOption::SO_GraphicsItem:
-    case QStyleOption::SO_ToolBar:
-    case QStyleOption::SO_Complex:
-    case QStyleOption::SO_Slider:
-    case QStyleOption::SO_SpinBox:
-    case QStyleOption::SO_ComboBox:
-    case QStyleOption::SO_TitleBar:
-    case QStyleOption::SO_SizeGrip:
-        return Union::Element::ColorSet::None;
-    case QStyleOption::SO_Button:
-    case QStyleOption::SO_ToolButton:
-        return Union::Element::ColorSet::Button;
-    case QStyleOption::SO_RubberBand:
-        return Union::Element::ColorSet::Selection;
-    case QStyleOption::SO_GroupBox:
-        return Union::Element::ColorSet::Complementary;
-    default:
-        return Union::Element::ColorSet::None;
-    }
-}
-
 QVariantMap attributesFromOption(const QStyleOption *option)
 {
     if (!option) {
@@ -533,7 +483,6 @@ Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widge
         unionElement->setType(elementType);
         unionElement->setStates(statesFromOption(opt));
         unionElement->setHints(hintsFromOption(opt));
-        unionElement->setColorSet(colorsetFromOption(opt));
         unionElement->setAttributes(attributesFromOption(opt));
         elements.append(unionElement);
     }
@@ -729,7 +678,6 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
             unionElement->setType(subElement);
             unionElement->setStates(statesFromOption(opt));
             unionElement->setHints(hintsFromOption(opt));
-            unionElement->setColorSet(colorsetFromOption(opt));
             unionElement->setAttributes(attributesFromOption(opt));
             currentHierarchy.append(unionElement);
         }

@@ -26,6 +26,7 @@ public:
     CheckElement(Type type, const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~CheckElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     QRect subElementRect(QStyle::SubElement element) const override;

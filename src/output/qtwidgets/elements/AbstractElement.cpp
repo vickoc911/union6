@@ -90,17 +90,13 @@ void AbstractElement::draw(QPainter *painter) const
 void AbstractElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
-    }
+    m_backgroundElementList = prepareElements(m_styleOption, m_widget);
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, m_subElementList);
-    }
+    m_contentElementList = prepareElements(m_styleOption, m_widget, m_subElementList);
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_isValid = true;
@@ -130,6 +126,10 @@ QRect AbstractElement::subControlRect(QStyle::SubControl subControl) const
 void AbstractElement::updateSubElementList()
 {
     qWarning() << "updateSubElementList is unimplemented for" << m_widget;
+}
+
+void AbstractElement::update()
+{
 }
 
 QSize AbstractElement::applyPaddingToSize(QSize oldSize, PaddingDirection direction) const

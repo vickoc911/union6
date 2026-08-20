@@ -3,10 +3,12 @@
 
 #pragma once
 
+#include "LruCache.h"
 #include <Element.h>
 #include <Style.h>
 
 #include "elements/AbstractElement.h"
+#include "elements/CheckElement.h"
 #include <QCommonStyle>
 
 /*!
@@ -63,4 +65,39 @@ public:
 private:
     bool m_showMnemonics;
     void setMnemonics(bool enabled);
+    mutable Union::LruCache<size_t, std::shared_ptr<AbstractElement>> m_elementCache;
+
+    template<typename ElementType, typename StyleOptionType>
+    std::shared_ptr<ElementType> cachedElement(size_t hash, const QStyleOption *option, const QWidget *widget) const
+    {
+        if (const auto opt = qstyleoption_cast<const StyleOptionType *>(option)) {
+            std::shared_ptr<ElementType> element;
+            if (m_elementCache.contains(hash)) {
+                element = std::static_pointer_cast<ElementType>(m_elementCache.value(hash).value());
+                element->update();
+            } else {
+                element = std::make_shared<ElementType>(opt, this, widget);
+                m_elementCache.insert(hash, element);
+            }
+            return element;
+        }
+        return nullptr;
+    }
+
+    template<typename ElementType = CheckElement, typename StyleOptionType = QStyleOptionButton>
+    std::shared_ptr<ElementType> cachedCheckElement(size_t hash, const QStyleOption *option, const QWidget *widget, CheckElement::Type type) const
+    {
+        if (const auto opt = qstyleoption_cast<const StyleOptionType *>(option)) {
+            std::shared_ptr<ElementType> element;
+            if (m_elementCache.contains(hash)) {
+                element = std::static_pointer_cast<ElementType>(m_elementCache.value(hash).value());
+                element->update();
+            } else {
+                element = std::make_shared<ElementType>(type, opt, this, widget);
+                m_elementCache.insert(hash, element);
+            }
+            return element;
+        }
+        return nullptr;
+    }
 };
