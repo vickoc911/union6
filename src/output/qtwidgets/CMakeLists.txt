@@ -26,6 +26,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/HeaderElement.h
         elements/ItemViewElement.cpp
         elements/ItemViewElement.h
+        elements/LineEditElement.cpp
+        elements/LineEditElement.h
         elements/MenuItemElement.cpp
         elements/MenuItemElement.h
         elements/ProgressBarElement.cpp

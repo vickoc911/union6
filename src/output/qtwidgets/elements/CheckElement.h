@@ -27,7 +27,6 @@ public:
     ~CheckElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
 
     QRect subElementRect(QStyle::SubElement element) const override;
 

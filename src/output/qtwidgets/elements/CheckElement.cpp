@@ -26,7 +26,11 @@ CheckElement::~CheckElement()
 
 void CheckElement::update()
 {
-    m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
+    if (m_type == CheckElement::Type::CheckBox) {
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox, ElementString::Indicator});
+    } else {
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::RadioButton, ElementString::Indicator});
+    }
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
     }
@@ -37,17 +41,6 @@ void CheckElement::update()
     layout();
 }
 
-void CheckElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
-}
-
 QRect CheckElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
@@ -56,11 +49,16 @@ QRect CheckElement::subElementRect(QStyle::SubElement element) const
     }
 
     if (element == QStyle::SE_CheckBoxIndicator || element == QStyle::SE_RadioButtonIndicator) {
-        auto map = layoutMap(m_backgroundElementList, m_styleOption, {ElementString::Indicator});
-        return map[ElementString::Indicator].rect.toRect();
+        if (m_buttonOption->styleObject) {
+            // The indicator is drawn as part of something
+            return m_layoutMap[ElementString::Indicator].rect.toRect();
+        } else {
+            // The indicator is drawn standalone (PE_IndicatorCheckBox for example)
+            return m_buttonOption->rect;
+        }
     }
 
-    QRect rect = m_styleOption->rect;
+    QRect rect = m_buttonOption->rect;
     QRect unifiedRect;
     for (const auto &m : m_layoutMap) {
         if (m.elementName != ElementString::Indicator) {
@@ -85,12 +83,9 @@ void CheckElement::updateSubElementList()
 
 void CheckElement::drawIndicator(QPainter *painter) const
 {
-    auto subopt = *m_buttonOption;
     if (m_type == CheckElement::Type::CheckBox) {
-        subopt.rect = subElementRect(QStyle::SE_CheckBoxIndicator);
-        drawElementBackground(painter, &subopt, m_widget, {ElementString::CheckBox, ElementString::Indicator});
+        drawBackgroundRectangle(painter, subElementRect(QStyle::SE_CheckBoxIndicator), m_indicatorProperties);
     } else {
-        subopt.rect = subElementRect(QStyle::SE_RadioButtonIndicator);
-        drawElementBackground(painter, &subopt, m_widget, {ElementString::RadioButton, ElementString::Indicator});
+        drawBackgroundRectangle(painter, subElementRect(QStyle::SE_RadioButtonIndicator), m_indicatorProperties);
     }
 }
