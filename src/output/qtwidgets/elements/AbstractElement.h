@@ -81,6 +81,11 @@ public:
      */
     virtual QRect subControlRect(QStyle::SubControl subControl) const;
 
+    /*!
+     * \brief Updates the properties of the element, such as text and layouting
+     */
+    virtual void update();
+
 protected:
     const QStyleOption *m_styleOption;
     const UnionStyle *m_style;

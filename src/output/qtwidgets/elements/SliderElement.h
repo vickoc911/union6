@@ -20,6 +20,7 @@ public:
     SliderElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~SliderElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     QRect subControlRect(QStyle::SubControl subControl) const override;

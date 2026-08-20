@@ -20,6 +20,7 @@ public:
     ProgressBarElement(const QStyleOptionProgressBar *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ProgressBarElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;

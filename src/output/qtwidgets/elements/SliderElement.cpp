@@ -18,6 +18,15 @@ SliderElement::SliderElement(const QStyleOptionSlider *option, const UnionStyle 
     , m_isInverted(false)
     , m_isReverse(false)
 {
+    update();
+}
+
+SliderElement::~SliderElement()
+{
+}
+
+void SliderElement::update()
+{
     m_isHorizontal = m_sliderOption->state.testFlag(QStyle::State_Horizontal);
     m_isInverted = m_sliderOption->upsideDown;
     m_isReverse = m_isHorizontal && m_sliderOption->direction == Qt::RightToLeft;
@@ -28,32 +37,25 @@ SliderElement::SliderElement(const QStyleOptionSlider *option, const UnionStyle 
     layout();
 }
 
-SliderElement::~SliderElement()
-{
-}
-
 void SliderElement::layout()
 {
     // Background is the groove
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_sliderOption, m_widget);
-    }
+    m_backgroundElementList = prepareElements(m_sliderOption, m_widget);
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
 
     // Indicator is the handle
-    if (m_indicatorElementList.isEmpty()) {
-        m_indicatorElementList = prepareElements(m_sliderOption, m_widget, {ElementString::Handle});
-    }
+    m_indicatorElementList = prepareElements(m_sliderOption, m_widget, {ElementString::Handle});
+
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
     }
 
     // Contents is the fill
-    if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_sliderOption, m_widget, m_subElementList);
-    }
+    m_contentElementList = prepareElements(m_sliderOption, m_widget, m_subElementList);
+
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_isValid = true;

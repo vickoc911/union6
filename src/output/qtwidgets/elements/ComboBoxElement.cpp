@@ -17,8 +17,15 @@ ComboBoxElement::ComboBoxElement(const QStyleOptionComboBox *option, const Union
     , m_spacing(0)
     , m_editable(false)
 {
+    update();
+}
+
+void ComboBoxElement::update()
+{
     m_editable = m_comboBoxOption->editable;
 
+    setIndicator(QIcon());
+    m_spacing = 0;
     m_indicatorElementList = prepareElements(m_comboBoxOption, m_widget, {ElementString::Indicator});
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
@@ -30,13 +37,8 @@ ComboBoxElement::ComboBoxElement(const QStyleOptionComboBox *option, const Union
         }
     }
 
-    if (!m_comboBoxOption->currentIcon.isNull()) {
-        setIcon(m_comboBoxOption->currentIcon);
-    }
-    if (!m_comboBoxOption->currentText.isEmpty()) {
-        setText(m_comboBoxOption->currentText);
-    }
-
+    setIcon(m_comboBoxOption->currentIcon);
+    setText(m_comboBoxOption->currentText);
     updateSubElementList();
     layout();
 }
