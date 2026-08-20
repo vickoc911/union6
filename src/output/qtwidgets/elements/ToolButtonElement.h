@@ -17,7 +17,7 @@ class ToolButtonElement : public AbstractElement
     Q_OBJECT
 
 public:
-    ToolButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ToolButtonElement(const QStyleOptionToolButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ToolButtonElement() override;
 
     void draw(QPainter *painter) const override;
@@ -25,13 +25,12 @@ public:
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionToolButton *m_toolButtonOption = nullptr;
-
     void updateSubElementList() override;
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
 
 private:
+    const QStyleOptionToolButton *m_toolButtonOption = nullptr;
     bool m_hasIndicator;
     bool m_hasArrows;
     bool m_hasIcon;

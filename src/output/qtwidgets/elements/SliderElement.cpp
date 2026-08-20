@@ -11,20 +11,18 @@
 
 using namespace Qt::StringLiterals;
 
-SliderElement::SliderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+SliderElement::SliderElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_sliderOption(qstyleoption_cast<const QStyleOptionSlider *>(option))
+    , m_sliderOption(option)
     , m_isHorizontal(false)
     , m_isInverted(false)
     , m_isReverse(false)
 {
-    if (m_sliderOption) {
-        m_isHorizontal = m_sliderOption->state.testFlag(QStyle::State_Horizontal);
-        m_isInverted = m_sliderOption->upsideDown;
-        m_isReverse = m_isHorizontal && m_sliderOption->direction == Qt::RightToLeft;
-        if (m_isInverted) {
-            m_isReverse = !m_isReverse;
-        }
+    m_isHorizontal = m_sliderOption->state.testFlag(QStyle::State_Horizontal);
+    m_isInverted = m_sliderOption->upsideDown;
+    m_isReverse = m_isHorizontal && m_sliderOption->direction == Qt::RightToLeft;
+    if (m_isInverted) {
+        m_isReverse = !m_isReverse;
     }
     updateSubElementList();
     layout();
@@ -38,7 +36,7 @@ void SliderElement::layout()
 {
     // Background is the groove
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget);
+        m_backgroundElementList = prepareElements(m_sliderOption, m_widget);
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
@@ -46,7 +44,7 @@ void SliderElement::layout()
 
     // Indicator is the handle
     if (m_indicatorElementList.isEmpty()) {
-        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Handle});
+        m_indicatorElementList = prepareElements(m_sliderOption, m_widget, {ElementString::Handle});
     }
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
@@ -54,7 +52,7 @@ void SliderElement::layout()
 
     // Contents is the fill
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, m_subElementList);
+        m_contentElementList = prepareElements(m_sliderOption, m_widget, m_subElementList);
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -73,10 +71,6 @@ void SliderElement::draw(QPainter *painter) const
 
     // Background
     drawBackground(painter);
-
-    if (!m_sliderOption) {
-        return;
-    }
 
     // Progressbar
     const auto grooveRect = subControlRect(QStyle::SC_SliderGroove);
@@ -166,9 +160,7 @@ void SliderElement::drawBackground(QPainter *painter) const
 void SliderElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_sliderOption) {
-        m_subElementList.append(u"Fill"_s);
-    }
+    m_subElementList.append(u"Fill"_s);
 }
 
 QSize SliderElement::contentsSize(const QSize &contentsSizeFromStyle) const
@@ -193,57 +185,55 @@ QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
         return QRect();
     }
 
-    if (m_sliderOption) {
-        // Copied from Breeze
-        auto rect(m_sliderOption->rect);
-        auto frameWidth = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_sliderOption, m_widget);
-        if (m_widget) {
-            rect = m_widget->visibleRegion().boundingRect();
+    // Copied from Breeze
+    auto rect(m_sliderOption->rect);
+    auto frameWidth = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_sliderOption, m_widget);
+    if (m_widget) {
+        rect = m_widget->visibleRegion().boundingRect();
+    }
+
+    if (subControl == QStyle::SC_SliderHandle) {
+        int handleHeight = 1;
+        int handleWidth = 1;
+        if (m_indicatorProperties->layout()) {
+            handleHeight = m_indicatorProperties->layout()->height().value_or(6);
+            handleWidth = m_indicatorProperties->layout()->width().value_or(6);
         }
 
-        if (subControl == QStyle::SC_SliderHandle) {
-            int handleHeight = 1;
-            int handleWidth = 1;
-            if (m_indicatorProperties->layout()) {
-                handleHeight = m_indicatorProperties->layout()->height().value_or(6);
-                handleWidth = m_indicatorProperties->layout()->width().value_or(6);
-            }
-
-            QRect handleRect(centerRect(rect, handleWidth, handleHeight));
-            const int sliderPos = m_style->sliderPositionFromValue(m_sliderOption->minimum,
-                                                                   m_sliderOption->maximum,
-                                                                   m_sliderOption->sliderPosition,
-                                                                   (m_isHorizontal ? (rect.width() - handleWidth) : (rect.height() - handleHeight)),
-                                                                   m_sliderOption->upsideDown);
-            if (m_isHorizontal) {
-                handleRect.moveLeft(rect.x() + sliderPos);
-            } else {
-                handleRect.moveTop(rect.y() + sliderPos);
-            }
-            handleRect = m_style->visualRect(m_sliderOption->direction, rect, handleRect);
-            return handleRect;
-        } else if (subControl == QStyle::SC_SliderGroove) {
-            int grooveHeight = 1;
-            int grooveWidth = 1;
-            if (m_backgroundProperties->layout()) {
-                grooveHeight = m_backgroundProperties->layout()->height().value_or(6);
-                grooveWidth = m_backgroundProperties->layout()->width().value_or(6);
-            }
-
-            auto grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
-
-            // centering
-            if (m_isHorizontal) {
-                grooveRect = centerRect(rect, grooveRect.width(), grooveHeight);
-            } else {
-                grooveRect = centerRect(rect, grooveWidth, grooveRect.height());
-            }
-            return m_style->visualRect(m_sliderOption->direction, rect, grooveRect);
-        } else if (subControl == QStyle::SC_SliderTickmarks && m_sliderOption->tickPosition != QSlider::NoTicks) {
-            QRegion r;
-            r.setRects(tickLines());
-            return r.boundingRect();
+        QRect handleRect(centerRect(rect, handleWidth, handleHeight));
+        const int sliderPos = m_style->sliderPositionFromValue(m_sliderOption->minimum,
+                                                               m_sliderOption->maximum,
+                                                               m_sliderOption->sliderPosition,
+                                                               (m_isHorizontal ? (rect.width() - handleWidth) : (rect.height() - handleHeight)),
+                                                               m_sliderOption->upsideDown);
+        if (m_isHorizontal) {
+            handleRect.moveLeft(rect.x() + sliderPos);
+        } else {
+            handleRect.moveTop(rect.y() + sliderPos);
         }
+        handleRect = m_style->visualRect(m_sliderOption->direction, rect, handleRect);
+        return handleRect;
+    } else if (subControl == QStyle::SC_SliderGroove) {
+        int grooveHeight = 1;
+        int grooveWidth = 1;
+        if (m_backgroundProperties->layout()) {
+            grooveHeight = m_backgroundProperties->layout()->height().value_or(6);
+            grooveWidth = m_backgroundProperties->layout()->width().value_or(6);
+        }
+
+        auto grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
+
+        // centering
+        if (m_isHorizontal) {
+            grooveRect = centerRect(rect, grooveRect.width(), grooveHeight);
+        } else {
+            grooveRect = centerRect(rect, grooveWidth, grooveRect.height());
+        }
+        return m_style->visualRect(m_sliderOption->direction, rect, grooveRect);
+    } else if (subControl == QStyle::SC_SliderTickmarks && m_sliderOption->tickPosition != QSlider::NoTicks) {
+        QRegion r;
+        r.setRects(tickLines());
+        return r.boundingRect();
     }
     return QRect();
 }

@@ -17,7 +17,7 @@ class ProgressBarElement : public AbstractElement
     Q_OBJECT
 
 public:
-    ProgressBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ProgressBarElement(const QStyleOptionProgressBar *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ProgressBarElement() override;
 
     void draw(QPainter *painter) const override;
@@ -25,10 +25,10 @@ public:
     void updateSubElementList() override;
     void layout() override;
     QRect subElementRect(QStyle::SubElement element) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
+    void drawBackground(QPainter *painter) const override;
+    void drawIndicator(QPainter *painter) const override;
+
+private:
     const QStyleOptionProgressBar *m_progressBarOption = nullptr;
-
-    void drawGroove(QPainter *painter) const;
-    void drawTrack(QPainter *painter) const;
 };

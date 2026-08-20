@@ -17,14 +17,12 @@ class MenuItemElement : public AbstractElement
     Q_OBJECT
 
 public:
-    MenuItemElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    MenuItemElement(const QStyleOptionMenuItem *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~MenuItemElement() override;
 
     void draw(QPainter *painter) const override;
 
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
-
-    const QStyleOptionMenuItem *m_menuItemOption = nullptr;
 
     void updateSubElementList() override;
     void drawBackground(QPainter *painter) const override;
@@ -33,6 +31,7 @@ public:
     void layout() override;
 
 private:
+    const QStyleOptionMenuItem *m_menuItemOption = nullptr;
     Union::ElementList m_indicatorElementList;
     Union::Properties::StylePropertyGroup *m_indicatorProperties;
     bool m_isSeparator;

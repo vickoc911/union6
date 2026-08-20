@@ -17,7 +17,7 @@ class SpinBoxElement : public AbstractElement
     Q_OBJECT
 
 public:
-    SpinBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    SpinBoxElement(const QStyleOptionSpinBox *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~SpinBoxElement() override;
 
     void draw(QPainter *painter) const override;
@@ -25,10 +25,9 @@ public:
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionSpinBox *m_spinBoxOption = nullptr;
-
     void updateSubElementList() override;
 
 private:
+    const QStyleOptionSpinBox *m_spinBoxOption = nullptr;
     bool m_hasButtons;
 };

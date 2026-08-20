@@ -17,18 +17,16 @@ class GroupBoxElement : public AbstractElement
     Q_OBJECT
 
 public:
-    GroupBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    GroupBoxElement(const QStyleOptionGroupBox *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~GroupBoxElement() override;
 
     void layout() override;
     QRect subControlRect(QStyle::SubControl subControl) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
-
-    const QStyleOptionGroupBox *m_groupBoxOption = nullptr;
 
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
 
 private:
+    const QStyleOptionGroupBox *m_groupBoxOption = nullptr;
     bool m_isCheckable;
 };

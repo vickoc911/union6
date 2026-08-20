@@ -11,35 +11,34 @@
 
 using namespace Qt::StringLiterals;
 
-ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+ToolButtonElement::ToolButtonElement(const QStyleOptionToolButton *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_toolButtonOption(qstyleoption_cast<const QStyleOptionToolButton *>(option))
+    , m_toolButtonOption(option)
     , m_hasIndicator(false)
     , m_hasArrows(false)
     , m_hasIcon(false)
     , m_hasText(false)
 {
-    if (m_toolButtonOption) {
-        m_hasIndicator =
-            m_toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
-        m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
-        m_hasIcon = !m_toolButtonOption->icon.isNull() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
-        m_hasText = !m_toolButtonOption->text.isEmpty() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly;
-        m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {ElementString::Indicator});
-        if (!m_indicatorElementList.isEmpty()) {
-            m_indicatorProperties = queryProperties(m_indicatorElementList);
-            if (m_indicatorProperties->icon()) {
-                setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
-            }
-        }
-
-        if (!m_toolButtonOption->icon.isNull()) {
-            setIcon(m_toolButtonOption->icon);
-        }
-        if (!m_toolButtonOption->text.isEmpty()) {
-            setText(m_toolButtonOption->text);
+    m_hasIndicator =
+        m_toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
+    m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
+    m_hasIcon = !m_toolButtonOption->icon.isNull() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
+    m_hasText = !m_toolButtonOption->text.isEmpty() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly;
+    m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {ElementString::Indicator});
+    if (!m_indicatorElementList.isEmpty()) {
+        m_indicatorProperties = queryProperties(m_indicatorElementList);
+        if (m_indicatorProperties->icon()) {
+            setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
         }
     }
+
+    if (!m_toolButtonOption->icon.isNull()) {
+        setIcon(m_toolButtonOption->icon);
+    }
+    if (!m_toolButtonOption->text.isEmpty()) {
+        setText(m_toolButtonOption->text);
+    }
+
     updateSubElementList();
     layout();
 }
@@ -63,16 +62,14 @@ void ToolButtonElement::draw(QPainter *painter) const
 void ToolButtonElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_toolButtonOption) {
-        if (m_hasIcon || m_hasArrows) {
-            m_subElementList.append(ElementString::Icon);
-        }
-        if (m_hasText) {
-            m_subElementList.append(ElementString::Text);
-        }
-        if (m_hasIndicator) {
-            m_subElementList.append(ElementString::Indicator);
-        }
+    if (m_hasIcon || m_hasArrows) {
+        m_subElementList.append(ElementString::Icon);
+    }
+    if (m_hasText) {
+        m_subElementList.append(ElementString::Text);
+    }
+    if (m_hasIndicator) {
+        m_subElementList.append(ElementString::Indicator);
     }
 }
 
@@ -81,7 +78,7 @@ QSize ToolButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     QSize size = subControlRect(QStyle::SC_ToolButton).size().boundedTo(contentsSizeFromStyle);
     size = applyPaddingToSize(size);
 
-    if (m_toolButtonOption && m_indicatorProperties && m_indicatorProperties->layout()) {
+    if (m_indicatorProperties && m_indicatorProperties->layout()) {
         if (m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
             size.rwidth() += m_indicatorProperties->layout()->width().value_or(0);
         } else {
@@ -99,9 +96,9 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
         return QRect();
     }
 
-    QRect backgroundRect = backgroundRectangle(m_styleOption, m_backgroundProperties).toRect();
+    QRect backgroundRect = backgroundRectangle(m_toolButtonOption, m_backgroundProperties).toRect();
     if (subControl == QStyle::SC_ToolButton) {
-        QRect rect = m_styleOption->rect;
+        QRect rect = m_toolButtonOption->rect;
         QRect unifiedRect;
         for (const auto &m : m_layoutMap) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
@@ -160,13 +157,13 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         }
         return;
     } else if (hasIcon()) {
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-        const QPalette activePalette = m_styleOption->palette;
+        const bool enabled = m_toolButtonOption->state.testFlag(QStyle::State_Enabled);
+        const QPalette activePalette = m_toolButtonOption->palette;
         const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
         auto iconSize = iconRect.size();
 
         // Toolbutton can override the regular icon size
-        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(m_styleOption)) {
+        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(m_toolButtonOption)) {
             // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
             if (toolButtonOption->icon.name() == m_icon.name()) {
                 iconSize = toolButtonOption->iconSize;
@@ -174,7 +171,7 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         }
         const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
-        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
+        QColor penColor = m_toolButtonOption->palette.text().color(); // Use text color as fallback
         if (m_contentProperties->icon() && m_contentProperties->icon()->color().has_value()) {
             auto iconColor = m_contentProperties->icon()->color();
             penColor = iconColor->toQColor();

@@ -11,27 +11,25 @@
 
 using namespace Qt::StringLiterals;
 
-ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+ButtonElement::ButtonElement(const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_buttonOption(qstyleoption_cast<const QStyleOptionButton *>(option))
+    , m_buttonOption(option)
 {
-    if (m_buttonOption) {
-        if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
-            m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
-            if (!m_indicatorElementList.isEmpty()) {
-                m_indicatorProperties = queryProperties(m_indicatorElementList);
-                if (m_indicatorProperties->icon()) {
-                    setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
-                }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
+            if (m_indicatorProperties->icon()) {
+                setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
             }
         }
+    }
 
-        if (!m_buttonOption->icon.isNull()) {
-            setIcon(m_buttonOption->icon);
-        }
-        if (!m_buttonOption->text.isEmpty()) {
-            setText(m_buttonOption->text);
-        }
+    if (!m_buttonOption->icon.isNull()) {
+        setIcon(m_buttonOption->icon);
+    }
+    if (!m_buttonOption->text.isEmpty()) {
+        setText(m_buttonOption->text);
     }
     updateSubElementList();
     layout();

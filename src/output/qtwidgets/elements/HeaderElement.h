@@ -17,18 +17,16 @@ class HeaderElement : public AbstractElement
     Q_OBJECT
 
 public:
-    HeaderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    HeaderElement(const QStyleOptionHeader *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~HeaderElement() override;
 
     void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;
     QRect subElementRect(QStyle::SubElement element) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
     void layout() override;
 
-    const QStyleOptionHeader *m_headerOption = nullptr;
-
 private:
+    const QStyleOptionHeader *m_headerOption = nullptr;
     QIcon sortIndicator();
 };

@@ -11,14 +11,12 @@
 
 using namespace Qt::StringLiterals;
 
-ScrollBarElement::ScrollBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+ScrollBarElement::ScrollBarElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_scrollBarOption(qstyleoption_cast<const QStyleOptionSlider *>(option))
+    , m_scrollBarOption(option)
     , m_horizontal(false)
 {
-    if (m_scrollBarOption) {
-        m_horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
-    }
+    m_horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
     updateSubElementList();
     layout();
 }
@@ -62,9 +60,7 @@ void ScrollBarElement::drawBackground(QPainter *painter) const
 void ScrollBarElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_scrollBarOption) {
-        m_subElementList.append(ElementString::Handle);
-    }
+    m_subElementList.append(ElementString::Handle);
 }
 
 QSize ScrollBarElement::contentsSize(const QSize &contentsSizeFromStyle) const

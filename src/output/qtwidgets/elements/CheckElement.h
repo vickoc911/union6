@@ -23,19 +23,17 @@ public:
     };
     Q_ENUM(Type)
 
-    CheckElement(Type type, const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    CheckElement(Type type, const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~CheckElement() override;
 
     void draw(QPainter *painter) const override;
 
     QRect subElementRect(QStyle::SubElement element) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
-
-    const QStyleOptionButton *m_buttonOption = nullptr;
 
     void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
 
 private:
+    const QStyleOptionButton *m_buttonOption = nullptr;
     Type m_type;
 };
