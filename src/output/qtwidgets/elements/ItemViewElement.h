@@ -21,7 +21,6 @@ public:
     ~ItemViewElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;
     QRect subElementRect(QStyle::SubElement element) const override;
