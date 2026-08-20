@@ -32,7 +32,17 @@ void ScrollBarElement::draw(QPainter *painter) const
     }
 
     drawBackground(painter);
+    drawIndicator(painter);
+}
 
+void ScrollBarElement::drawBackground(QPainter *painter) const
+{
+    const auto rect = subControlRect(QStyle::SC_ScrollBarGroove);
+    drawBackgroundRectangle(painter, rect, m_backgroundProperties);
+}
+
+void ScrollBarElement::drawIndicator(QPainter *painter) const
+{
     if (m_scrollBarOption->subControls & QStyle::SC_ScrollBarSlider) {
         QStyleOptionSlider subopt = *m_scrollBarOption;
         subopt.rect = m_scrollBarOption->rect;
@@ -49,12 +59,6 @@ void ScrollBarElement::draw(QPainter *painter) const
             }
         }
     }
-}
-
-void ScrollBarElement::drawBackground(QPainter *painter) const
-{
-    const auto rect = subControlRect(QStyle::SC_ScrollBarGroove);
-    drawBackgroundRectangle(painter, rect, m_backgroundProperties);
 }
 
 void ScrollBarElement::updateSubElementList()
