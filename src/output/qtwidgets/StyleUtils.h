@@ -27,7 +27,6 @@ const char property_union_member_list[] = "_union_member_list";
  */
 Union::Element::States statesFromOption(const QStyleOption *option);
 QStringList hintsFromOption(const QStyleOption *option);
-Union::Element::ColorSet colorsetFromOption(const QStyleOption *option);
 QVariantMap attributesFromOption(const QStyleOption *option);
 
 Qt::Alignment toQtAlignment(Union::Properties::AlignmentPropertyGroup *alignmentGroup);
