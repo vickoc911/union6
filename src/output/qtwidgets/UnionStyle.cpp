@@ -11,6 +11,7 @@
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
+#include "elements/LineEditElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
 #include "elements/ScrollBarElement.h"
@@ -369,11 +370,13 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
         // For spinboxes and comboboxes, we do not want to draw this element
-        // TODO: remove if this is not needed after making the complex controls
+        // TODO: maybe this should be handleable by the CSS
         if (!widget || widget->parentWidget()->inherits("QComboBox") || widget->parentWidget()->inherits("QAbstractSpinBox")) {
             return;
         }
-        drawElementBackground(painter, option, widget);
+        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::PE_PanelItemViewItem:
         drawElementBackground(painter, option, widget, {ElementString::ItemViewItem});
@@ -392,10 +395,14 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
         // Indicators
     case QStyle::PE_IndicatorCheckBox:
-        drawElementBackground(painter, option, widget, {ElementString::CheckBox, ElementString::Indicator});
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+            ev->drawIndicator(painter);
+        }
         return;
     case QStyle::PE_IndicatorRadioButton:
-        drawElementBackground(painter, option, widget, {ElementString::RadioButton, ElementString::Indicator});
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+            ev->drawIndicator(painter);
+        }
         return;
     case QStyle::PE_IndicatorArrowLeft: {
         const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
@@ -441,7 +448,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     }
         return;
     case QStyle::PE_FrameLineEdit:
-        drawElementBackground(painter, option, widget, {ElementString::TextField});
+        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::PE_Frame:
     case QStyle::PE_FrameDefaultButton:
@@ -579,47 +588,49 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return ev->contentsSize(contentsSize);
         }
         break;
+    case QStyle::CT_CheckBox:
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_RadioButton:
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_GroupBox:
+        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_ProgressBar:
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_HeaderSection:
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_LineEdit:
+        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
     // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
     case QStyle::CT_MenuBar:
-    case QStyle::CT_LineEdit:
-    case QStyle::CT_GroupBox:
-    case QStyle::CT_CheckBox:
-    case QStyle::CT_RadioButton:
-    case QStyle::CT_ProgressBar:
     case QStyle::CT_MenuBarItem:
     case QStyle::CT_Menu:
     case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
-    case QStyle::CT_HeaderSection:
     case QStyle::CT_MdiControls:
     case QStyle::CT_CustomBase:
         break;
     }
-    QSize size = QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
-    QSize minimumSize(contentsSize.width(), contentsSize.height());
-    auto elements = prepareElements(option, widget);
-    if (elements.isEmpty()) {
-        return size;
-    }
-    auto properties = queryProperties(elements);
-    if (!properties) {
-        return size;
-    }
-    if (properties->layout()) {
-        auto frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
-        auto width = properties->layout()->width().value_or(1) + frameWidth;
-        auto height = properties->layout()->height().value_or(1) + frameWidth;
-        minimumSize = QSize(width, height);
-    }
-    if (size.width() < minimumSize.width()) {
-        size.setWidth(minimumSize.width());
-    }
-    if (size.height() < minimumSize.height()) {
-        size.setHeight(minimumSize.height());
-    }
-    return size;
+    return QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
 }
 
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
@@ -654,8 +665,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             return ev->subElementRect(element);
         }
     } break;
-    case QStyle::SE_ShapedFrameContents:
     case QStyle::SE_LineEditContents:
+    case QStyle::SE_ShapedFrameContents:
     case QStyle::SE_FrameContents: {
         auto frameElements = prepareElements(option, widget);
         auto props = queryProperties(frameElements);
@@ -822,6 +833,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     if (!properties) {
         return defaultMetric;
     }
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
 
     switch (metric) {
     // Don't shift button text when sunken
@@ -1010,7 +1022,10 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_TabBarIconSize:
         return querySize(option, widget, {ElementString::TabBarIconSize}).width();
     case QStyle::PM_LineEditIconSize:
-        return querySize(option, widget, {ElementString::LineEditIconSize}).width();
+        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            return ev->iconSize().width();
+        }
+        break;
     case QStyle::PM_ListViewIconSize:
         return querySize(option, widget, {ElementString::ListViewIconSize}).width();
     case QStyle::PM_ButtonIconSize:
