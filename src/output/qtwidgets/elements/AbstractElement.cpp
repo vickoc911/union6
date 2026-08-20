@@ -132,7 +132,7 @@ void AbstractElement::updateSubElementList()
     qWarning() << "updateSubElementList is unimplemented for" << m_widget;
 }
 
-QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
+QSize AbstractElement::applyPaddingToSize(QSize oldSize, PaddingDirection direction) const
 {
     if (!m_isValid) {
         return oldSize;
@@ -151,7 +151,7 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, bool shrink) const
             padding += m_backgroundProperties->layout()->inset()->toMargins().toMargins();
         }
     }
-    if (shrink) {
+    if (direction == PaddingDirection::Inward) {
         size = size.shrunkBy(padding);
         if (size.width() < 0) {
             size.setWidth(0);
