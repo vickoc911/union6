@@ -81,6 +81,7 @@ void AbstractElement::draw(QPainter *painter) const
     drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
+    drawIndicator(painter);
 }
 
 void AbstractElement::layout()

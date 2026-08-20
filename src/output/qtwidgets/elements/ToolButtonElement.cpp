@@ -47,18 +47,6 @@ void ToolButtonElement::update()
     layout();
 }
 
-void ToolButtonElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
-}
-
 void ToolButtonElement::updateSubElementList()
 {
     m_subElementList.clear();
