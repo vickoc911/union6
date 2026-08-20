@@ -20,6 +20,7 @@ public:
     MenuItemElement(const QStyleOptionMenuItem *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~MenuItemElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;

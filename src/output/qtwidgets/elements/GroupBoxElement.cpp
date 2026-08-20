@@ -17,33 +17,37 @@ GroupBoxElement::GroupBoxElement(const QStyleOptionGroupBox *option, const Union
     , m_groupBoxOption(option)
     , m_isCheckable(false)
 {
-    // This info is only in the widget itself
-    if (auto groupBox = qobject_cast<const QGroupBox *>(m_widget)) {
-        if (groupBox->isCheckable()) {
-            m_isCheckable = true;
-        }
-    }
-
-    if (!m_groupBoxOption->text.isEmpty()) {
-        setText(m_groupBoxOption->text);
-    }
-
-    layout();
+    update();
 }
 
 GroupBoxElement::~GroupBoxElement()
 {
 }
 
+void GroupBoxElement::update()
+{
+    // This info is only in the widget itself
+    m_isCheckable = false;
+    if (auto groupBox = qobject_cast<const QGroupBox *>(m_widget)) {
+        if (groupBox->isCheckable()) {
+            m_isCheckable = true;
+        }
+    }
+
+    setText(m_groupBoxOption->text);
+    layout();
+}
+
 void GroupBoxElement::layout()
 {
     // We only layout by background, m_contentElementList etc are ignored
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_groupBoxOption, m_widget);
-    }
+
+    m_backgroundElementList = prepareElements(m_groupBoxOption, m_widget);
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_isValid = true;
+    } else {
+        m_isValid = false;
     }
 }
 

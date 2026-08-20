@@ -15,15 +15,18 @@ ProgressBarElement::ProgressBarElement(const QStyleOptionProgressBar *option, co
     : AbstractElement(option, style, widget)
     , m_progressBarOption(option)
 {
-    if (!m_progressBarOption->text.isEmpty()) {
-        setText(m_progressBarOption->text);
-    }
-    updateSubElementList();
-    layout();
+    update();
 }
 
 ProgressBarElement::~ProgressBarElement()
 {
+}
+
+void ProgressBarElement::update()
+{
+    setText(m_progressBarOption->text);
+    updateSubElementList();
+    layout();
 }
 
 void ProgressBarElement::draw(QPainter *painter) const
@@ -50,25 +53,22 @@ void ProgressBarElement::drawIndicator(QPainter *painter) const
 void ProgressBarElement::updateSubElementList()
 {
     m_subElementList.clear();
-
-        if (!m_progressBarOption->text.isEmpty()) {
-            m_subElementList.append(ElementString::Text);
-        }
+    if (hasText()) {
+        m_subElementList.append(ElementString::Text);
+    }
 }
 
 void ProgressBarElement::layout()
 {
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_progressBarOption, m_widget);
-    }
+    m_backgroundElementList = prepareElements(m_progressBarOption, m_widget);
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, m_progressBarOption, m_subElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
         m_contentElementList = prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Track});
-    }
+
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_isValid = true;

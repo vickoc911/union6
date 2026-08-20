@@ -20,6 +20,7 @@ public:
     ItemViewElement(const QStyleOptionViewItem *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ItemViewElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;

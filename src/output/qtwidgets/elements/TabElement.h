@@ -20,6 +20,7 @@ public:
     TabElement(const QStyleOptionTab *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~TabElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     void layout() override;

@@ -17,22 +17,24 @@ CheckElement::CheckElement(Type type, const QStyleOptionButton *option, const Un
     , m_buttonOption(option)
     , m_type(type)
 {
-    m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
-    if (!m_indicatorElementList.isEmpty()) {
-        m_indicatorProperties = queryProperties(m_indicatorElementList);
-    }
-    if (!m_buttonOption->icon.isNull()) {
-        setIcon(m_buttonOption->icon);
-    }
-    if (!m_buttonOption->text.isEmpty()) {
-        setText(m_buttonOption->text);
-    }
-    updateSubElementList();
-    layout();
+    update();
 }
 
 CheckElement::~CheckElement()
 {
+}
+
+void CheckElement::update()
+{
+    m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
+    if (!m_indicatorElementList.isEmpty()) {
+        m_indicatorProperties = queryProperties(m_indicatorElementList);
+    }
+
+    setIcon(m_buttonOption->icon);
+    setText(m_buttonOption->text);
+    updateSubElementList();
+    layout();
 }
 
 void CheckElement::draw(QPainter *painter) const

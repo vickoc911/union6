@@ -16,6 +16,15 @@ SpinBoxElement::SpinBoxElement(const QStyleOptionSpinBox *option, const UnionSty
     , m_spinBoxOption(option)
     , m_hasButtons(true)
 {
+    update();
+}
+
+SpinBoxElement::~SpinBoxElement()
+{
+}
+
+void SpinBoxElement::update()
+{
     m_indicatorElementList = prepareElements(m_spinBoxOption, m_widget, {ElementString::Indicator});
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
@@ -23,10 +32,6 @@ SpinBoxElement::SpinBoxElement(const QStyleOptionSpinBox *option, const UnionSty
     m_hasButtons = (m_spinBoxOption->buttonSymbols != QAbstractSpinBox::NoButtons);
     updateSubElementList();
     layout();
-}
-
-SpinBoxElement::~SpinBoxElement()
-{
 }
 
 void SpinBoxElement::draw(QPainter *painter) const

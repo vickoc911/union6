@@ -15,42 +15,45 @@ ItemViewElement::ItemViewElement(const QStyleOptionViewItem *option, const Union
     : AbstractElement(option, style, widget)
     , m_viewItemOption(option)
 {
-    if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
-        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox});
-        if (!m_indicatorElementList.isEmpty()) {
-            m_indicatorProperties = queryProperties(m_indicatorElementList);
-        }
-    }
-
-    if (!m_viewItemOption->icon.isNull() && m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
-        setIcon(m_viewItemOption->icon);
-    }
-    if (!m_viewItemOption->text.isEmpty() && m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
-        setText(m_viewItemOption->text);
-    }
-
-    updateSubElementList();
-    layout();
+    update();
 }
 
 ItemViewElement::~ItemViewElement()
 {
 }
 
+void ItemViewElement::update()
+{
+    if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
+        m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox});
+        if (!m_indicatorElementList.isEmpty()) {
+            m_indicatorProperties = queryProperties(m_indicatorElementList);
+        }
+    }
+    setIcon(QIcon());
+    setText(QString());
+    if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDecoration)) {
+        setIcon(m_viewItemOption->icon);
+    }
+    if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasDisplay)) {
+        setText(m_viewItemOption->text);
+    }
+    updateSubElementList();
+    layout();
+}
+
 void ItemViewElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_viewItemOption, m_widget, {ElementString::ItemViewItem});
-    }
+    m_backgroundElementList = prepareElements(m_viewItemOption, m_widget, {ElementString::ItemViewItem});
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, m_viewItemOption, m_subElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
         m_contentElementList = prepareElements(m_viewItemOption, m_widget, m_subElementList);
-    }
+
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_isValid = true;

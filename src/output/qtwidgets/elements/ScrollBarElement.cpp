@@ -16,13 +16,18 @@ ScrollBarElement::ScrollBarElement(const QStyleOptionSlider *option, const Union
     , m_scrollBarOption(option)
     , m_horizontal(false)
 {
-    m_horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
-    updateSubElementList();
-    layout();
+    update();
 }
 
 ScrollBarElement::~ScrollBarElement()
 {
+}
+
+void ScrollBarElement::update()
+{
+    m_horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
+    updateSubElementList();
+    layout();
 }
 
 void ScrollBarElement::draw(QPainter *painter) const

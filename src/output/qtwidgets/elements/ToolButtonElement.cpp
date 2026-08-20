@@ -19,32 +19,32 @@ ToolButtonElement::ToolButtonElement(const QStyleOptionToolButton *option, const
     , m_hasIcon(false)
     , m_hasText(false)
 {
+    update();
+}
+
+ToolButtonElement::~ToolButtonElement()
+{
+}
+
+void ToolButtonElement::update()
+{
     m_hasIndicator =
         m_toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
     m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
     m_hasIcon = !m_toolButtonOption->icon.isNull() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
     m_hasText = !m_toolButtonOption->text.isEmpty() && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonIconOnly;
     m_indicatorElementList = prepareElements(m_toolButtonOption, m_widget, {ElementString::Indicator});
+    setIndicator(QIcon());
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
         if (m_indicatorProperties->icon()) {
             setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
         }
     }
-
-    if (!m_toolButtonOption->icon.isNull()) {
-        setIcon(m_toolButtonOption->icon);
-    }
-    if (!m_toolButtonOption->text.isEmpty()) {
-        setText(m_toolButtonOption->text);
-    }
-
+    setIcon(m_toolButtonOption->icon);
+    setText(m_toolButtonOption->text);
     updateSubElementList();
     layout();
-}
-
-ToolButtonElement::~ToolButtonElement()
-{
 }
 
 void ToolButtonElement::draw(QPainter *painter) const
