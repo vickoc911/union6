@@ -21,7 +21,6 @@ public:
     ~ToolButtonElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
 
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;

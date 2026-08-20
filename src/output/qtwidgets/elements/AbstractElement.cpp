@@ -16,10 +16,6 @@ AbstractElement::AbstractElement(const QStyleOption *option, const UnionStyle *s
     , m_styleOption(option)
     , m_style(style)
     , m_widget(widget)
-    , m_icon(QIcon())
-    , m_text(QString())
-    , m_indicator(QIcon())
-    , m_isValid(false)
 {
 }
 
@@ -85,6 +81,7 @@ void AbstractElement::draw(QPainter *painter) const
     drawBackground(painter);
     drawIcon(painter);
     drawText(painter);
+    drawIndicator(painter);
 }
 
 void AbstractElement::layout()
