@@ -15,6 +15,15 @@ ItemViewElement::ItemViewElement(const QStyleOptionViewItem *option, const Union
     : AbstractElement(option, style, widget)
     , m_viewItemOption(option)
 {
+    update();
+}
+
+ItemViewElement::~ItemViewElement()
+{
+}
+
+void ItemViewElement::update()
+{
     if (m_viewItemOption->features.testFlag(QStyleOptionViewItem::HasCheckIndicator)) {
         m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox});
         if (!m_indicatorElementList.isEmpty()) {
@@ -33,24 +42,18 @@ ItemViewElement::ItemViewElement(const QStyleOptionViewItem *option, const Union
     layout();
 }
 
-ItemViewElement::~ItemViewElement()
-{
-}
-
 void ItemViewElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_viewItemOption, m_widget, {ElementString::ItemViewItem});
-    }
+    m_backgroundElementList = prepareElements(m_viewItemOption, m_widget, {ElementString::ItemViewItem});
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, m_viewItemOption, m_subElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
         m_contentElementList = prepareElements(m_viewItemOption, m_widget, m_subElementList);
-    }
+
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_isValid = true;

@@ -15,15 +15,20 @@ HeaderElement::HeaderElement(const QStyleOptionHeader *option, const UnionStyle 
     : AbstractElement(option, style, widget)
     , m_headerOption(option)
 {
+    update();
+}
+
+HeaderElement::~HeaderElement()
+{
+}
+
+void HeaderElement::update()
+{
     if (!m_headerOption->text.isEmpty()) {
         setText(m_headerOption->text);
     }
     updateSubElementList();
     layout();
-}
-
-HeaderElement::~HeaderElement()
-{
 }
 
 QIcon HeaderElement::sortIndicator()
@@ -51,17 +56,14 @@ QIcon HeaderElement::sortIndicator()
 void HeaderElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_headerOption, m_widget, {ElementString::HeaderViewDelegate});
-    }
+
+    m_backgroundElementList = prepareElements(m_headerOption, m_widget, {ElementString::HeaderViewDelegate});
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, m_headerOption, m_subElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_headerOption, m_widget, {ElementString::HeaderViewDelegate});
-    }
+    m_contentElementList = prepareElements(m_headerOption, m_widget, {ElementString::HeaderViewDelegate});
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         setIcon(sortIndicator());

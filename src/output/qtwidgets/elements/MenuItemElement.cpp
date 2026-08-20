@@ -20,13 +20,22 @@ MenuItemElement::MenuItemElement(const QStyleOptionMenuItem *option, const Union
     , m_hasRadioButton(false)
     , m_shortcutText(QString())
 {
+    update();
+}
+
+MenuItemElement::~MenuItemElement()
+{
+}
+
+void MenuItemElement::update()
+{
     m_isSeparator = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator);
     m_hasSubMenu = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu);
     m_hasCheckBox = (m_menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive);
     m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
 
     if (m_hasSubMenu) {
-        m_indicatorElementList = prepareElements(m_menuItemOption, widget, {ElementString::MenuItem});
+        m_indicatorElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem});
         m_indicatorProperties = queryProperties(m_indicatorElementList);
         if (m_indicatorProperties->layout() && m_indicatorProperties->icon()) {
             setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(u"arrow-right-symbolic"_s)));
@@ -42,10 +51,6 @@ MenuItemElement::MenuItemElement(const QStyleOptionMenuItem *option, const Union
 
     updateSubElementList();
     layout();
-}
-
-MenuItemElement::~MenuItemElement()
-{
 }
 
 void MenuItemElement::draw(QPainter *painter) const
@@ -93,9 +98,8 @@ void MenuItemElement::updateSubElementList()
 void MenuItemElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::Menu});
-    }
+    m_backgroundElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::Menu});
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }

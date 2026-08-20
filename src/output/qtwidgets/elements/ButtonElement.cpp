@@ -15,6 +15,15 @@ ButtonElement::ButtonElement(const QStyleOptionButton *option, const UnionStyle 
     : AbstractElement(option, style, widget)
     , m_buttonOption(option)
 {
+    update();
+}
+
+ButtonElement::~ButtonElement()
+{
+}
+
+void ButtonElement::update()
+{
     if (m_buttonOption->features.testFlag(QStyleOptionButton::HasMenu)) {
         m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
         if (!m_indicatorElementList.isEmpty()) {
@@ -33,10 +42,6 @@ ButtonElement::ButtonElement(const QStyleOptionButton *option, const UnionStyle 
     }
     updateSubElementList();
     layout();
-}
-
-ButtonElement::~ButtonElement()
-{
 }
 
 void ButtonElement::draw(QPainter *painter) const

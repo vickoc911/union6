@@ -20,6 +20,7 @@ public:
     ComboBoxElement(const QStyleOptionComboBox *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ComboBoxElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     QRect subControlRect(QStyle::SubControl subControl) const override;

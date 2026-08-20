@@ -15,6 +15,15 @@ TitleBarElement::TitleBarElement(const QStyleOptionTitleBar *option, const Union
     : AbstractElement(option, style, widget)
     , m_titleBarOption(option)
 {
+    update();
+}
+
+TitleBarElement::~TitleBarElement()
+{
+}
+
+void TitleBarElement::update()
+{
     if (!m_titleBarOption->icon.isNull()) {
         setIcon(m_titleBarOption->icon);
     }
@@ -23,10 +32,6 @@ TitleBarElement::TitleBarElement(const QStyleOptionTitleBar *option, const Union
     }
     updateSubElementList();
     layout();
-}
-
-TitleBarElement::~TitleBarElement()
-{
 }
 
 void TitleBarElement::draw(QPainter *painter) const
@@ -103,17 +108,15 @@ void TitleBarElement::updateSubElementList()
 void TitleBarElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
-    }
+    m_backgroundElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, m_titleBarOption, m_subElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
         m_contentElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
-    }
+
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_isValid = true;

@@ -17,6 +17,15 @@ CheckElement::CheckElement(Type type, const QStyleOptionButton *option, const Un
     , m_buttonOption(option)
     , m_type(type)
 {
+    update();
+}
+
+CheckElement::~CheckElement()
+{
+}
+
+void CheckElement::update()
+{
     m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::Indicator});
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
@@ -29,10 +38,6 @@ CheckElement::CheckElement(Type type, const QStyleOptionButton *option, const Un
     }
     updateSubElementList();
     layout();
-}
-
-CheckElement::~CheckElement()
-{
 }
 
 void CheckElement::draw(QPainter *painter) const

@@ -17,6 +17,11 @@ ComboBoxElement::ComboBoxElement(const QStyleOptionComboBox *option, const Union
     , m_spacing(0)
     , m_editable(false)
 {
+    update();
+}
+
+void ComboBoxElement::update()
+{
     m_editable = m_comboBoxOption->editable;
 
     m_indicatorElementList = prepareElements(m_comboBoxOption, m_widget, {ElementString::Indicator});

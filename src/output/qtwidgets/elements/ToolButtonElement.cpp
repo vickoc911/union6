@@ -19,6 +19,15 @@ ToolButtonElement::ToolButtonElement(const QStyleOptionToolButton *option, const
     , m_hasIcon(false)
     , m_hasText(false)
 {
+    update();
+}
+
+ToolButtonElement::~ToolButtonElement()
+{
+}
+
+void ToolButtonElement::update()
+{
     m_hasIndicator =
         m_toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
     m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
@@ -41,10 +50,6 @@ ToolButtonElement::ToolButtonElement(const QStyleOptionToolButton *option, const
 
     updateSubElementList();
     layout();
-}
-
-ToolButtonElement::~ToolButtonElement()
-{
 }
 
 void ToolButtonElement::draw(QPainter *painter) const
