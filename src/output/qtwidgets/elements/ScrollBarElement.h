@@ -26,6 +26,7 @@ public:
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
     void drawBackground(QPainter *painter) const override;
+    void drawIndicator(QPainter *painter) const override;
     void updateSubElementList() override;
 
 private:
