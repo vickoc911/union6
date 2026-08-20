@@ -392,10 +392,14 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
         // Indicators
     case QStyle::PE_IndicatorCheckBox:
-        drawElementBackground(painter, option, widget, {ElementString::CheckBox, ElementString::Indicator});
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+            ev->drawIndicator(painter);
+        }
         return;
     case QStyle::PE_IndicatorRadioButton:
-        drawElementBackground(painter, option, widget, {ElementString::RadioButton, ElementString::Indicator});
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+            ev->drawIndicator(painter);
+        }
         return;
     case QStyle::PE_IndicatorArrowLeft: {
         const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
