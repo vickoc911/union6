@@ -112,8 +112,7 @@ void AbstractElement::layout()
 
 QSize AbstractElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    qWarning() << "contentsSize is unimplemented for" << m_styleOption;
-    return contentsSizeFromStyle;
+    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect AbstractElement::subElementRect(QStyle::SubElement element) const

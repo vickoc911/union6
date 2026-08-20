@@ -11,14 +11,12 @@
 
 using namespace Qt::StringLiterals;
 
-HeaderElement::HeaderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+HeaderElement::HeaderElement(const QStyleOptionHeader *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_headerOption(qstyleoption_cast<const QStyleOptionHeader *>(option))
+    , m_headerOption(option)
 {
-    if (m_headerOption) {
-        if (!m_headerOption->text.isEmpty()) {
-            setText(m_headerOption->text);
-        }
+    if (!m_headerOption->text.isEmpty()) {
+        setText(m_headerOption->text);
     }
     updateSubElementList();
     layout();
@@ -31,7 +29,7 @@ HeaderElement::~HeaderElement()
 QIcon HeaderElement::sortIndicator()
 {
     QIcon sortIndicator;
-    if (m_headerOption && m_contentProperties) {
+    if (m_contentProperties) {
         switch (m_headerOption->sortIndicator) {
         case QStyleOptionHeader::None:
             break;
@@ -54,15 +52,15 @@ void HeaderElement::layout()
 {
     // Background and content is separate
     if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::HeaderViewDelegate});
+        m_backgroundElementList = prepareElements(m_headerOption, m_widget, {ElementString::HeaderViewDelegate});
     }
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
-        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_headerOption, m_subElementList);
     }
 
     if (m_contentElementList.isEmpty()) {
-        m_contentElementList = prepareElements(m_styleOption, m_widget, {ElementString::HeaderViewDelegate});
+        m_contentElementList = prepareElements(m_headerOption, m_widget, {ElementString::HeaderViewDelegate});
     }
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -87,11 +85,6 @@ void HeaderElement::draw(QPainter *painter) const
 void HeaderElement::updateSubElementList()
 {
     m_subElementList = {ElementString::Text, ElementString::Icon};
-}
-
-QSize HeaderElement::contentsSize(const QSize &contentsSizeFromStyle) const
-{
-    return applyPaddingToSize(contentsSizeFromStyle);
 }
 
 QRect HeaderElement::subElementRect(QStyle::SubElement element) const

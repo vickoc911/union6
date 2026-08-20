@@ -17,7 +17,7 @@ class ComboBoxElement : public AbstractElement
     Q_OBJECT
 
 public:
-    ComboBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ComboBoxElement(const QStyleOptionComboBox *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ComboBoxElement() override;
 
     void draw(QPainter *painter) const override;
@@ -25,13 +25,12 @@ public:
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionComboBox *m_comboBoxOption = nullptr;
-
     void updateSubElementList() override;
 
     bool isEditable() const;
 
 private:
+    const QStyleOptionComboBox *m_comboBoxOption = nullptr;
     qreal m_spacing;
     bool m_editable;
 };

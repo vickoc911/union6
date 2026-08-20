@@ -17,7 +17,7 @@ class ItemViewElement : public AbstractElement
     Q_OBJECT
 
 public:
-    ItemViewElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ItemViewElement(const QStyleOptionViewItem *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ItemViewElement() override;
 
     void draw(QPainter *painter) const override;
@@ -30,5 +30,6 @@ public:
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
 
+private:
     const QStyleOptionViewItem *m_viewItemOption = nullptr;
 };

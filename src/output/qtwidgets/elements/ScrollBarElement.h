@@ -17,7 +17,7 @@ class ScrollBarElement : public AbstractElement
     Q_OBJECT
 
 public:
-    ScrollBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ScrollBarElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ScrollBarElement() override;
 
     void draw(QPainter *painter) const override;
@@ -25,11 +25,10 @@ public:
     QRect subControlRect(QStyle::SubControl subControl) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionSlider *m_scrollBarOption = nullptr;
-
     void drawBackground(QPainter *painter) const override;
     void updateSubElementList() override;
 
 private:
+    const QStyleOptionSlider *m_scrollBarOption = nullptr;
     bool m_horizontal;
 };

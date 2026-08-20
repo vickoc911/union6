@@ -64,8 +64,7 @@ public:
      */
     virtual void layout();
     /*!
-     * \brief Return the contents size of the element. Depending on the element, this can apply
-     * padding.
+     * \brief Return the contents size of the element with padding applied by default.
      */
     virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
     /*!

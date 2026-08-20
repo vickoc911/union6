@@ -17,7 +17,7 @@ class TabElement : public AbstractElement
     Q_OBJECT
 
 public:
-    TabElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    TabElement(const QStyleOptionTab *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~TabElement() override;
 
     void draw(QPainter *painter) const override;
@@ -27,11 +27,10 @@ public:
     QRect subElementRect(QStyle::SubElement element) const override;
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
-    const QStyleOptionTab *m_tabOption = nullptr;
-
     bool isVertical() const;
 
 private:
+    const QStyleOptionTab *m_tabOption = nullptr;
     bool m_isVertical;
     bool m_isClosable;
     void tabLayout(QRect *textRect, QRect *iconRect) const;
