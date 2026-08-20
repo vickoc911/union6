@@ -456,7 +456,6 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         // Use the constrained look for now
         hints.append(up ? u"Increase"_s : u"Decrease"_s);
         element->setHints(hints);
-        element->setColorSet(colorsetFromOption(option));
         element->setAttributes(attributesFromOption(option));
         spinboxElements.append(element);
         auto props = queryProperties(spinboxElements);
