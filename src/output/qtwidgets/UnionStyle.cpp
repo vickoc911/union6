@@ -77,11 +77,10 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (controlElement) {
     case QStyle::CE_ComboBoxLabel:
-        if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-            auto ev = std::make_shared<ComboBoxElement>(comboBoxOption, this, widget);
+        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
             ev->drawIcon(painter);
             if (!ev->isEditable()) {
                 ev->drawText(painter);
@@ -89,14 +88,12 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
         return;
     case QStyle::CE_PushButtonBevel:
-        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<ButtonElement>(buttonOption, this, widget);
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
         return;
     case QStyle::CE_PushButtonLabel:
-        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<ButtonElement>(buttonOption, this, widget);
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
             ev->drawIcon(painter);
             ev->drawText(painter);
             ev->drawIndicator(painter);
@@ -108,58 +105,48 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     }
         return;
     case QStyle::CE_ToolButtonLabel:
-        if (const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            auto ev = std::make_shared<ToolButtonElement>(toolButtonOption, this, widget);
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
             ev->drawIcon(painter);
             ev->drawText(painter);
             ev->drawIndicator(painter);
         }
         return;
     case QStyle::CE_CheckBoxLabel:
-        if (const auto checkBoxOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, checkBoxOption, this, widget);
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
             ev->drawText(painter);
         }
         return;
     case QStyle::CE_CheckBox:
-        if (const auto checkBoxOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, checkBoxOption, this, widget);
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
             ev->drawBackground(painter);
             ev->drawIndicator(painter);
-            drawControl(CE_CheckBoxLabel, checkBoxOption, painter, widget);
+            drawControl(CE_CheckBoxLabel, option, painter, widget);
         }
         return;
     case QStyle::CE_RadioButtonLabel:
-        if (const auto radioButtonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, radioButtonOption, this, widget);
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
             ev->drawText(painter);
         }
         return;
     case QStyle::CE_RadioButton:
-        if (const auto radioButtonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, radioButtonOption, this, widget);
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
             ev->drawBackground(painter);
             ev->drawIndicator(painter);
-            drawControl(CE_RadioButtonLabel, radioButtonOption, painter, widget);
+            drawControl(CE_RadioButtonLabel, option, painter, widget);
         }
         return;
     case QStyle::CE_MenuItem:
-        if (const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
-            auto ev = std::make_shared<MenuItemElement>(menuItemOption, this, widget);
+        if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
-    case QStyle::CE_ToolBoxTabShape:
     case QStyle::CE_TabBarTabShape:
-        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
-            auto ev = std::make_shared<TabElement>(tabOption, this, widget);
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
         return;
-    case QStyle::CE_ToolBoxTabLabel:
     case QStyle::CE_TabBarTabLabel:
-        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
-            auto ev = std::make_shared<TabElement>(tabOption, this, widget);
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
             // TODO: handle vertical tabs
             if (ev->isVertical()) {
                 QCommonStyle::drawControl(controlElement, option, painter, widget);
@@ -169,37 +156,27 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             }
         }
         return;
-    case QStyle::CE_ToolBoxTab:
-        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
-            drawControl(CE_ToolBoxTabShape, tabOption, painter, widget);
-            drawControl(CE_ToolBoxTabLabel, tabOption, painter, widget);
-        }
-        return;
     case QStyle::CE_TabBarTab:
         drawControl(CE_TabBarTabShape, option, painter, widget);
         drawControl(CE_TabBarTabLabel, option, painter, widget);
         return;
     case QStyle::CE_ItemViewItem:
-        if (const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option)) {
-            auto ev = std::make_shared<ItemViewElement>(viewItemOption, this, widget);
+        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
     case QStyle::CE_ProgressBarGroove:
-        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-            auto ev = std::make_shared<ProgressBarElement>(progressBarOption, this, widget);
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
         return;
     case QStyle::CE_ProgressBarContents:
-        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-            auto ev = std::make_shared<ProgressBarElement>(progressBarOption, this, widget);
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
             ev->drawIndicator(painter);
         }
         return;
     case QStyle::CE_ProgressBarLabel:
-        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-            auto ev = std::make_shared<ProgressBarElement>(progressBarOption, this, widget);
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
             ev->drawText(painter);
         }
         return;
@@ -224,15 +201,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElementBackground(painter, option, widget, {ElementString::MenuItem});
         return;
     case QStyle::CE_HeaderLabel:
-        if (const auto headerOption = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto ev = std::make_shared<HeaderElement>(headerOption, this, widget);
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
             ev->drawIcon(painter);
             ev->drawText(painter);
         }
         return;
     case QStyle::CE_HeaderSection:
-        if (const auto headerOption = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto ev = std::make_shared<HeaderElement>(headerOption, this, widget);
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
         return;
@@ -268,6 +243,11 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ScrollBarFirst:
     case QStyle::CE_ScrollBarLast:
         return;
+    // TODO: Turn these into their own element
+    case QStyle::CE_ToolBoxTabShape:
+    case QStyle::CE_ToolBoxTabLabel:
+    case QStyle::CE_ToolBoxTab:
+        break;
     // Rely on QCommonStyle
     case QStyle::CE_MenuScroller:
     case QStyle::CE_MenuTearoff:
@@ -286,49 +266,42 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (control) {
     case QStyle::CC_ToolButton:
-        if (const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            auto ev = std::make_shared<ToolButtonElement>(toolButtonOption, this, widget);
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
     case QStyle::CC_GroupBox:
-        if (const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
-            auto ev = std::make_shared<GroupBoxElement>(groupBoxOption, this, widget);
+        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
     case QStyle::CC_ComboBox:
-        if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-            auto ev = std::make_shared<ComboBoxElement>(comboBoxOption, this, widget);
+        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
             ev->drawBackground(painter);
             // Do not draw the text and icon again, as its being handled by QStyle in CE_ComboBoxLabel
             ev->drawIndicator(painter);
         }
         return;
     case QStyle::CC_SpinBox:
-        if (const auto spinBoxOption = qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
-            auto ev = std::make_shared<SpinBoxElement>(spinBoxOption, this, widget);
+        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
     case QStyle::CC_ScrollBar:
-        if (const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            auto ev = std::make_shared<ScrollBarElement>(sliderOption, this, widget);
+        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
     case QStyle::CC_Slider:
-        if (const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            auto ev = std::make_shared<SliderElement>(sliderOption, this, widget);
+        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
     case QStyle::CC_TitleBar:
-        if (const auto titleBarOption = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
-            auto ev = std::make_shared<TitleBarElement>(titleBarOption, this, widget);
+        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
             ev->draw(painter);
         }
         return;
@@ -380,6 +353,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
 
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
@@ -456,7 +430,6 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         // Use the constrained look for now
         hints.append(up ? u"Increase"_s : u"Decrease"_s);
         element->setHints(hints);
-        element->setColorSet(colorsetFromOption(option));
         element->setAttributes(attributesFromOption(option));
         spinboxElements.append(element);
         auto props = queryProperties(spinboxElements);
@@ -514,8 +487,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
         return;
     case QStyle::PE_IndicatorHeaderArrow: {
-        if (const auto headerOption = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto ev = std::make_shared<HeaderElement>(headerOption, this, widget);
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
             ev->drawIcon(painter);
         } else {
             // Fallback
@@ -559,58 +531,51 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (contentsType) {
     case QStyle::CT_PushButton: {
-        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<ButtonElement>(buttonOption, this, widget);
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
     } break;
     case QStyle::CT_ToolButton:
-        if (const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            auto ev = std::make_shared<ToolButtonElement>(toolButtonOption, this, widget);
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
+            ;
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_MenuItem:
-        if (const auto menuItemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
-            auto ev = std::make_shared<MenuItemElement>(menuItemOption, this, widget);
+        if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_ComboBox:
-        if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-            auto ev = std::make_shared<ComboBoxElement>(comboBoxOption, this, widget);
+        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_TabBarTab:
-        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
-            auto ev = std::make_shared<TabElement>(tabOption, this, widget);
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_Slider:
-        if (const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            auto ev = std::make_shared<SliderElement>(sliderOption, this, widget);
+        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_ItemViewItem:
-        if (const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option)) {
-            auto ev = std::make_shared<ItemViewElement>(viewItemOption, this, widget);
+        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_SpinBox:
-        if (const auto spinBoxOption = qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
-            auto ev = std::make_shared<SpinBoxElement>(spinBoxOption, this, widget);
+        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
     case QStyle::CT_ScrollBar:
-        if (const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            auto ev = std::make_shared<ScrollBarElement>(sliderOption, this, widget);
+        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
             return ev->contentsSize(contentsSize);
         }
         break;
@@ -660,34 +625,32 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
     QRect rect;
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+
     switch (element) {
     case QStyle::SE_ItemViewItemText:
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator:
-        if (const auto viewItemOption = qstyleoption_cast<const QStyleOptionViewItem *>(option)) {
-            auto ev = std::make_shared<ItemViewElement>(viewItemOption, this, widget);
+        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
             return ev->subElementRect(element);
         }
         break;
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_RadioButtonIndicator:
-        if (const auto radioButtonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<CheckElement>(CheckElement::Type::RadioButton, radioButtonOption, this, widget);
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
             return ev->subElementRect(element);
         }
         break;
     case QStyle::SE_CheckBoxIndicator:
     case QStyle::SE_CheckBoxContents:
-        if (const auto checkBoxOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<CheckElement>(CheckElement::Type::CheckBox, checkBoxOption, this, widget);
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
             return ev->subElementRect(element);
         }
         break;
     case QStyle::SE_PushButtonFocusRect:
     case QStyle::SE_PushButtonContents:
     case QStyle::SE_PushButtonBevel: {
-        if (const auto buttonOption = qstyleoption_cast<const QStyleOptionButton *>(option)) {
-            auto ev = std::make_shared<ButtonElement>(buttonOption, this, widget);
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->subElementRect(element);
         }
     } break;
@@ -701,14 +664,12 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     } break;
     case QStyle::SE_HeaderArrow:
     case QStyle::SE_HeaderLabel:
-        if (const auto headerOption = qstyleoption_cast<const QStyleOptionHeader *>(option)) {
-            auto ev = std::make_shared<HeaderElement>(headerOption, this, widget);
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
             return ev->subElementRect(element);
         }
         break;
     case QStyle::SE_TabBarTabText:
-        if (const auto tabOption = qstyleoption_cast<const QStyleOptionTab *>(option)) {
-            auto ev = std::make_shared<TabElement>(tabOption, this, widget);
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
             // TODO: handle vertical tabs
             if (ev->isVertical()) {
                 return QCommonStyle::subElementRect(element, option, widget);
@@ -719,8 +680,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ProgressBarLabel:
     case QStyle::SE_ProgressBarContents:
     case QStyle::SE_ProgressBarGroove:
-        if (const auto progressBarOption = qstyleoption_cast<const QStyleOptionProgressBar *>(option)) {
-            auto ev = std::make_shared<ProgressBarElement>(progressBarOption, this, widget);
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
             return ev->subElementRect(element);
         }
         break;
@@ -804,46 +764,40 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (complexControl) {
     case QStyle::CC_ToolButton:
-        if (const auto toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(option)) {
-            auto ev = std::make_shared<ToolButtonElement>(toolButtonOption, this, widget);
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;
     case QStyle::CC_ComboBox:
-        if (const auto comboBoxOption = qstyleoption_cast<const QStyleOptionComboBox *>(option)) {
-            auto ev = std::make_shared<ComboBoxElement>(comboBoxOption, this, widget);
+        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;
     case QStyle::CC_SpinBox:
-        if (const auto spinBoxOption = qstyleoption_cast<const QStyleOptionSpinBox *>(option)) {
-            auto ev = std::make_shared<SpinBoxElement>(spinBoxOption, this, widget);
+        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;
     case QStyle::CC_ScrollBar:
-        if (const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            auto ev = std::make_shared<ScrollBarElement>(sliderOption, this, widget);
+        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;
     case QStyle::CC_Slider:
-        if (const auto sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option)) {
-            auto ev = std::make_shared<SliderElement>(sliderOption, this, widget);
+        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;
     case QStyle::CC_GroupBox:
-        if (const auto groupBoxOption = qstyleoption_cast<const QStyleOptionGroupBox *>(option)) {
-            auto ev = std::make_shared<GroupBoxElement>(groupBoxOption, this, widget);
+        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;
     case QStyle::CC_TitleBar:
-        if (const auto titleBarOption = qstyleoption_cast<const QStyleOptionTitleBar *>(option)) {
-            auto ev = std::make_shared<TitleBarElement>(titleBarOption, this, widget);
+        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
             return ev->subControlRect(subControl);
         }
         break;

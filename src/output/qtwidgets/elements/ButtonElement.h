@@ -20,6 +20,7 @@ public:
     ButtonElement(const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ButtonElement() override;
 
+    void update() override;
     void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;

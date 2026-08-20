@@ -18,28 +18,28 @@ TabElement::TabElement(const QStyleOptionTab *option, const UnionStyle *style, c
     , m_isVertical(false)
     , m_isClosable(false)
 {
+    update();
+}
+
+TabElement::~TabElement()
+{
+}
+
+void TabElement::update()
+{
     m_isVertical = m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::RoundedWest || m_tabOption->shape == QTabBar::TriangularEast
         || m_tabOption->shape == QTabBar::TriangularWest;
 
-    if (const auto tabbarwidget = qobject_cast<const QTabBar *>(widget)) {
+    if (const auto tabbarwidget = qobject_cast<const QTabBar *>(m_widget)) {
         if (tabbarwidget->tabsClosable()) {
             m_isClosable = true;
         }
     }
 
-    if (!m_tabOption->icon.isNull()) {
-        setIcon(m_tabOption->icon);
-    }
-    if (!m_tabOption->text.isEmpty()) {
-        setText(m_tabOption->text);
-    }
-
+    setIcon(m_tabOption->icon);
+    setText(m_tabOption->text);
     updateSubElementList();
     layout();
-}
-
-TabElement::~TabElement()
-{
 }
 
 void TabElement::draw(QPainter *painter) const
@@ -74,18 +74,16 @@ void TabElement::layout()
         return;
     }
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_tabOption, m_widget, {ElementString::Tab});
-    }
+    m_backgroundElementList = prepareElements(m_tabOption, m_widget, {ElementString::Tab});
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
 
-    if (m_contentElementList.isEmpty()) {
         QStringList elements = {ElementString::Tab};
         elements.append(m_subElementList);
         m_contentElementList = prepareElements(m_tabOption, m_widget, elements);
-    }
+
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
     }

@@ -20,32 +20,33 @@ MenuItemElement::MenuItemElement(const QStyleOptionMenuItem *option, const Union
     , m_hasRadioButton(false)
     , m_shortcutText(QString())
 {
+    update();
+}
+
+MenuItemElement::~MenuItemElement()
+{
+}
+
+void MenuItemElement::update()
+{
     m_isSeparator = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator);
     m_hasSubMenu = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu);
     m_hasCheckBox = (m_menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive);
     m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
-
+    setIndicator(QIcon());
     if (m_hasSubMenu) {
-        m_indicatorElementList = prepareElements(m_menuItemOption, widget, {ElementString::MenuItem});
+        m_indicatorElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem});
         m_indicatorProperties = queryProperties(m_indicatorElementList);
         if (m_indicatorProperties->layout() && m_indicatorProperties->icon()) {
             setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(u"arrow-right-symbolic"_s)));
         }
     }
 
-    if (!m_menuItemOption->icon.isNull()) {
-        setIcon(m_menuItemOption->icon);
-    }
-    if (!m_menuItemOption->text.isEmpty()) {
-        setText(m_menuItemOption->text);
-    }
+    setIcon(m_menuItemOption->icon);
+    setText(m_menuItemOption->text);
 
     updateSubElementList();
     layout();
-}
-
-MenuItemElement::~MenuItemElement()
-{
 }
 
 void MenuItemElement::draw(QPainter *painter) const
@@ -93,9 +94,8 @@ void MenuItemElement::updateSubElementList()
 void MenuItemElement::layout()
 {
     // Background and content is separate
-    if (m_backgroundElementList.isEmpty()) {
-        m_backgroundElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::Menu});
-    }
+    m_backgroundElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::Menu});
+
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
@@ -130,7 +130,11 @@ void MenuItemElement::layout()
                 subElements.append(ElementString::ShortcutText);
                 m_shortcutText = itemText.mid(tabPosition + 1);
                 m_text = itemText.left(tabPosition);
+            } else {
+                m_shortcutText = QString();
             }
+        } else {
+            m_shortcutText = QString();
         }
         if (hasIndicator()) {
             subElements.append(ElementString::Arrow);
