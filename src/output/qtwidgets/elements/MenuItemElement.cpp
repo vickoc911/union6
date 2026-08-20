@@ -54,10 +54,7 @@ void MenuItemElement::draw(QPainter *painter) const
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
+    AbstractElement::draw(painter);
     if (m_hasCheckBox || m_hasRadioButton) {
         QStyleOptionButton button;
         button.initFrom(m_widget);

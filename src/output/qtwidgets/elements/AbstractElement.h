@@ -90,9 +90,9 @@ protected:
     const QStyleOption *m_styleOption;
     const UnionStyle *m_style;
     const QWidget *m_widget;
-    QIcon m_icon;
-    QString m_text;
-    QIcon m_indicator;
+    QIcon m_icon = QIcon();
+    QString m_text = QString();
+    QIcon m_indicator = QIcon();
     Union::ElementList m_backgroundElementList;
     Union::ElementList m_contentElementList;
     Union::ElementList m_indicatorElementList;
@@ -115,5 +115,6 @@ protected:
     // Utilizes the background property to apply a padding to the given size.
     QSize applyPaddingToSize(QSize oldSize, PaddingDirection direction = PaddingDirection::Outward) const;
 
-    bool m_isValid;
+    // Used to check if we have all elements properly prepared
+    bool m_isValid = false;
 };

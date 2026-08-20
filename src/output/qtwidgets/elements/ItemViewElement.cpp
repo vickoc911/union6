@@ -63,17 +63,6 @@ void ItemViewElement::layout()
     }
 }
 
-void ItemViewElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
-}
-
 void ItemViewElement::drawIndicator(QPainter *painter) const
 {
     // Draw indicator
