@@ -11,6 +11,11 @@
 
 class UnionStyle;
 
+enum class PaddingDirection {
+    Inward,
+    Outward
+};
+
 class AbstractElement : public QObject
 {
     Q_OBJECT
@@ -103,7 +108,7 @@ protected:
     virtual void updateSubElementList();
 
     // Utilizes the background property to apply a padding to the given size.
-    QSize applyPaddingToSize(QSize oldSize, bool shrink = false) const;
+    QSize applyPaddingToSize(QSize oldSize, PaddingDirection direction = PaddingDirection::Outward) const;
 
     bool m_isValid;
 };
