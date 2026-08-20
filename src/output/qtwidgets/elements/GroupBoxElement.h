@@ -20,6 +20,7 @@ public:
     GroupBoxElement(const QStyleOptionGroupBox *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~GroupBoxElement() override;
 
+    void update() override;
     void layout() override;
     QRect subControlRect(QStyle::SubControl subControl) const override;
 
