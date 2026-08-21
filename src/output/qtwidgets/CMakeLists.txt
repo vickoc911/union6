@@ -20,6 +20,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/CheckElement.h
         elements/ComboBoxElement.cpp
         elements/ComboBoxElement.h
+        elements/FrameElement.cpp
+        elements/FrameElement.h
         elements/GroupBoxElement.cpp
         elements/GroupBoxElement.h
         elements/HeaderElement.cpp
