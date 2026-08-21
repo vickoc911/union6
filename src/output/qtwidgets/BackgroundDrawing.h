@@ -27,10 +27,19 @@ enum class PrimitiveType {
     Indicator,
 };
 
+enum class BackgroundParts {
+    All,
+    PanelOnly,
+    FrameOnly
+};
+
 /*!
  * \brief Draw a Union StylePropertyGroup, such as the center, border and corners.
  */
-void drawBackgroundRectangle(QPainter *painter, const QRectF &mainRect, const Union::Properties::StylePropertyGroup *style);
+void drawBackgroundRectangle(QPainter *painter,
+                             const QRectF &mainRect,
+                             const Union::Properties::StylePropertyGroup *style,
+                             BackgroundParts parts = BackgroundParts::All);
 
 /*!
  * \brief Generates a QPainterPath to use with outlines and rounded corners.

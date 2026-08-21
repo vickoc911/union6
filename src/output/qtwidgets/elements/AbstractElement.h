@@ -55,9 +55,17 @@ public:
      */
     virtual void drawIcon(QPainter *painter) const;
     /*!
-     * \brief Draw background of the element.
+     * \brief Draw whole background of the element.
      */
     virtual void drawBackground(QPainter *painter) const;
+    /*!
+     * \brief Draw only the background frame of the element.
+     */
+    virtual void drawFrame(QPainter *painter) const;
+    /*!
+     * \brief Draw only the background panel of the element.
+     */
+    virtual void drawPanel(QPainter *painter) const;
     /*!
      * \brief Draw the indicator of the element. This can vary from secondary icon, such as drop-down
      * arrow icon, to a checkbox, depending on the element.

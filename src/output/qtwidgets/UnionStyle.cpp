@@ -8,6 +8,7 @@
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
 #include "elements/ComboBoxElement.h"
+#include "elements/FrameElement.h"
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
@@ -449,21 +450,49 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_FrameLineEdit:
         if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
+    case QStyle::PE_FrameButtonBevel:
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
+    case QStyle::PE_PanelButtonCommand:
+    case QStyle::PE_PanelButtonBevel:
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
         return;
-    case QStyle::PE_Frame:
     case QStyle::PE_FrameDefaultButton:
-    case QStyle::PE_FrameDockWidget:
+        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
+    case QStyle::PE_FrameButtonTool:
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
+    case QStyle::PE_PanelButtonTool:
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
+        return;
     case QStyle::PE_FrameGroupBox:
+        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
+    case QStyle::PE_Frame:
+        if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
+    case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameTabWidget:
     case QStyle::PE_FrameWindow:
-    case QStyle::PE_FrameButtonBevel:
-    case QStyle::PE_FrameButtonTool:
     case QStyle::PE_FrameTabBarBase:
-    case QStyle::PE_PanelButtonCommand:
-    case QStyle::PE_PanelButtonBevel:
-    case QStyle::PE_PanelButtonTool:
     case QStyle::PE_PanelMenuBar:
     case QStyle::PE_PanelToolBar:
     case QStyle::PE_PanelStatusBar:
