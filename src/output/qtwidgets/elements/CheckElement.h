@@ -33,6 +33,8 @@ public:
     void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
 
+    int labelSpacing() const;
+
 private:
     const QStyleOptionButton *m_buttonOption = nullptr;
     Type m_type;
