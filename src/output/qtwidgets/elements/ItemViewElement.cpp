@@ -87,7 +87,7 @@ void ItemViewElement::drawIndicator(QPainter *painter) const
         }
         checkbox.rect = checkBoxRect;
         painter->save();
-        m_style->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &checkbox, painter, m_widget);
+        m_style->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &checkbox, painter);
         painter->restore();
     }
 }

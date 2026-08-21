@@ -41,6 +41,15 @@ void MenuItemElement::update()
             setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(u"arrow-right-symbolic"_s)));
         }
     }
+    if (m_hasCheckBox || m_hasRadioButton) {
+        QStyleOptionButton button;
+        button.initFrom(m_widget);
+        button.state = m_menuItemOption->state;
+        button.state.setFlag(QStyle::State_On, m_menuItemOption->checked);
+        m_checkElementList =
+            prepareElements(&button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator});
+        m_checkProperties = queryProperties(m_checkElementList);
+    }
 
     setIcon(m_menuItemOption->icon);
     setText(m_menuItemOption->text);
@@ -56,12 +65,7 @@ void MenuItemElement::draw(QPainter *painter) const
     }
     AbstractElement::draw(painter);
     if (m_hasCheckBox || m_hasRadioButton) {
-        QStyleOptionButton button;
-        button.initFrom(m_widget);
-        button.rect = m_layoutMap[ElementString::Indicator].rect.toRect();
-        button.state = m_menuItemOption->state;
-        button.state.setFlag(QStyle::State_On, m_menuItemOption->checked);
-        drawElementBackground(painter, &button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator});
+        drawBackgroundRectangle(painter, m_layoutMap[ElementString::Indicator].rect.toRect(), m_checkProperties);
     }
 }
 
@@ -99,7 +103,6 @@ void MenuItemElement::layout()
 
     if (m_isSeparator) {
         m_contentElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuSeparator});
-
     } else {
         m_contentElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem});
     }

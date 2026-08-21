@@ -127,6 +127,6 @@ void GroupBoxElement::drawIcon(QPainter *painter) const
         QStyleOptionButton checkbox;
         checkbox.rect = subControlRect(QStyle::SC_GroupBoxCheckBox);
         checkbox.state = m_groupBoxOption->state;
-        m_style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &checkbox, painter, m_widget);
+        m_style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &checkbox, painter);
     }
 }
