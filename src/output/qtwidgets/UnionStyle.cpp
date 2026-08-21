@@ -192,7 +192,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElementBackground(painter, option, widget, {ElementString::Handle});
         return;
     case QStyle::CE_ShapedFrame:
-        drawElementBackground(painter, option, widget, {ElementString::Frame});
+        if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::CE_FocusFrame:
         drawElementBackground(painter, option, widget, {ElementString::FocusFrame});
