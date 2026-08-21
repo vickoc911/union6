@@ -129,16 +129,16 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         subopt.rect = iconRect;
         switch (m_toolButtonOption->arrowType) {
         case Qt::LeftArrow:
-            m_style->drawPrimitive(QStyle::PE_IndicatorArrowLeft, &subopt, painter, m_widget);
+            m_style->drawPrimitive(QStyle::PE_IndicatorArrowLeft, &subopt, painter);
             break;
         case Qt::RightArrow:
-            m_style->drawPrimitive(QStyle::PE_IndicatorArrowRight, &subopt, painter, m_widget);
+            m_style->drawPrimitive(QStyle::PE_IndicatorArrowRight, &subopt, painter);
             break;
         case Qt::UpArrow:
-            m_style->drawPrimitive(QStyle::PE_IndicatorArrowUp, &subopt, painter, m_widget);
+            m_style->drawPrimitive(QStyle::PE_IndicatorArrowUp, &subopt, painter);
             break;
         case Qt::DownArrow:
-            m_style->drawPrimitive(QStyle::PE_IndicatorArrowDown, &subopt, painter, m_widget);
+            m_style->drawPrimitive(QStyle::PE_IndicatorArrowDown, &subopt, painter);
             break;
         default:
             break;
