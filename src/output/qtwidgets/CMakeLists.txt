@@ -22,6 +22,10 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ComboBoxElement.h
         elements/MenuElement.cpp
         elements/MenuElement.h
+        elements/MenuBarElement.cpp
+        elements/MenuBarElement.h
+        elements/MenuBarItemElement.cpp
+        elements/MenuBarItemElement.h
         elements/FrameElement.cpp
         elements/FrameElement.h
         elements/GroupBoxElement.cpp
