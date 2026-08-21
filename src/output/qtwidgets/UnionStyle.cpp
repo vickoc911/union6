@@ -380,7 +380,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_PanelItemViewItem:
-        drawElementBackground(painter, option, widget, {ElementString::ItemViewItem});
+        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::PE_PanelItemViewRow:
         drawElementBackground(painter, option, widget, {ElementString::ItemViewRow});
@@ -1017,13 +1019,28 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             }
         }
     } break;
-    // Apparently these are the Tab bar sizes
     case QStyle::PM_TabBarTabHSpace:
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
+            return ev->hSpace();
+        }
+        break;
     case QStyle::PM_TabBarTabVSpace:
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
+            return ev->vSpace();
+        }
+        break;
     // Currently we only have one spacing value
-    case QStyle::PM_ScrollView_ScrollBarSpacing:
     case QStyle::PM_CheckBoxLabelSpacing:
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+            return ev->labelSpacing();
+        }
+        break;
     case QStyle::PM_RadioButtonLabelSpacing:
+        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+            return ev->labelSpacing();
+        }
+        break;
+    case QStyle::PM_ScrollView_ScrollBarSpacing:
     case QStyle::PM_MenuBarItemSpacing:
     case QStyle::PM_ToolBarItemSpacing:
     case QStyle::PM_LayoutHorizontalSpacing:
