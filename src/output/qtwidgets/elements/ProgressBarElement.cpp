@@ -137,3 +137,17 @@ QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
     };
     return QRect();
 }
+
+void ProgressBarElement::drawChunk(QPainter *painter) const
+{
+    auto props = queryProperties(prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Chunk}));
+    drawBackgroundRectangle(painter, m_progressBarOption->rect, props);
+}
+int ProgressBarElement::chunkWidth() const
+{
+    auto props = queryProperties(prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Chunk}));
+    if (props->layout()) {
+        return props->layout()->width().value_or(0);
+    }
+    return 0;
+}
