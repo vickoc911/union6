@@ -30,6 +30,9 @@ public:
     void drawBackground(QPainter *painter) const override;
     void drawIndicator(QPainter *painter) const override;
 
+    void drawChunk(QPainter *painter) const;
+    int chunkWidth() const;
+
 private:
     const QStyleOptionProgressBar *m_progressBarOption = nullptr;
 };

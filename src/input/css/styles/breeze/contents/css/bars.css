@@ -65,17 +65,23 @@ progressbar
     border: 1px solid var(--bar-active-border-color);
     border-radius: var(--corner-radius);
 
-    & > track {
+    & > track,
+    & > chunk {
         background-color: var(--bar-track-active-background-color);
         border: 1px solid var(--bar-track-active-border-color);
         border-radius: var(--corner-radius);
+    }
+
+    & > chunk {
+        width: 32px;
     }
 
     &:disabled {
         background-color: var(--bar-disabled-background-color);
         border-color: var(--bar-disabled-border-color);
 
-        & > track {
+        & > track,
+        & > chunk {
             background-color: var(--bar-track-disabled-background-color);
             border-color: var(--bar-track-disabled-border-color);
         }
