@@ -194,11 +194,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
 
 void MenuItemElement::drawBackground(QPainter *painter) const
 {
-    if (m_isSeparator) {
-        drawElementBackground(painter, m_menuItemOption, m_widget, {ElementString::MenuSeparator});
-    } else {
-        drawElementBackground(painter, m_menuItemOption, m_widget, {ElementString::MenuItem});
-    }
+    drawBackgroundRectangle(painter, m_menuItemOption->rect, m_contentProperties);
 }
 
 void MenuItemElement::drawText(QPainter *painter) const
