@@ -13,6 +13,8 @@
 #include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/LineEditElement.h"
+#include "elements/MenuBarElement.h"
+#include "elements/MenuBarItemElement.h"
 #include "elements/MenuElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
@@ -203,7 +205,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawElementBackground(painter, option, widget);
         return;
     case QStyle::CE_MenuBarItem:
-        drawElementBackground(painter, option, widget, {ElementString::MenuItem});
+        if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            return ev->draw(painter);
+        }
         return;
     case QStyle::CE_HeaderLabel:
         if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
@@ -235,6 +239,11 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             drawText(textRect, dockOption, painter, dockOption->title, widget);
         }
         return;
+    case QStyle::CE_MenuBarEmptyArea:
+        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            return ev->drawBackground(painter);
+        }
+        break;
     // Ignored
     case QStyle::CE_MenuEmptyArea:
     case QStyle::CE_MenuVMargin:
@@ -257,7 +266,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_MenuScroller:
     case QStyle::CE_MenuTearoff:
     case QStyle::CE_HeaderEmptyArea:
-    case QStyle::CE_MenuBarEmptyArea:
     case QStyle::CE_ColumnViewGrip: // Undocumented??
     case QStyle::CE_CustomBase:
         break;
@@ -496,11 +504,15 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawFrame(painter);
         }
         return;
+    case QStyle::PE_PanelMenuBar:
+        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            return ev->drawBackground(painter);
+        }
+        break;
     case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameTabWidget:
     case QStyle::PE_FrameWindow:
     case QStyle::PE_FrameTabBarBase:
-    case QStyle::PE_PanelMenuBar:
     case QStyle::PE_PanelToolBar:
     case QStyle::PE_PanelStatusBar:
         drawElementBackground(painter, option, widget);
@@ -664,11 +676,19 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return ev->contentsSize(contentsSize);
         }
         break;
-    // Use defaults from qcommonstyle
     case QStyle::CT_MenuBar:
+        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_MenuBarItem:
+        if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
-    case QStyle::CT_MenuBarItem:
     case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
     case QStyle::CT_MdiControls:
