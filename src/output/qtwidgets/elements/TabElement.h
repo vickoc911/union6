@@ -29,6 +29,8 @@ public:
     QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
     bool isVertical() const;
+    int hSpace() const;
+    int vSpace() const;
 
 private:
     const QStyleOptionTab *m_tabOption = nullptr;
