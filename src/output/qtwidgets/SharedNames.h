@@ -77,6 +77,7 @@ static const QString ToolBox = u"ToolBox"_s;
 static const QString ToolButton = u"ToolButton"_s;
 static const QString ToolTip = u"ToolTip"_s;
 static const QString Track = u"Track"_s;
+static const QString Chunk = u"Chunk"_s;
 static const QString TreeViewDelegate = u"TreeViewDelegate"_s;
 static const QString Widget = u"Widget"_s;
 

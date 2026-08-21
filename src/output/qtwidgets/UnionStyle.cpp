@@ -509,7 +509,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     }
         return;
     case QStyle::PE_IndicatorProgressChunk:
-        drawElementBackground(painter, option, widget, {ElementString::IndicatorProgressChunk});
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
+            ev->drawChunk(painter);
+        }
         return;
     case QStyle::PE_IndicatorToolBarHandle:
         drawElementBackground(painter, option, widget, {ElementString::IndicatorToolBarHandle});
@@ -1049,7 +1051,10 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_HeaderDefaultSectionSizeVertical:
         return querySize(option, widget, {ElementString::HeaderDefaultSectionSize}).height();
     case QStyle::PM_ProgressBarChunkWidth:
-        return querySize(option, widget, {ElementString::ProgressBarChunkWidth}).width();
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
+            return ev->chunkWidth();
+        }
+        break;
     default:
         break;
     };
