@@ -13,6 +13,7 @@
 #include "elements/HeaderElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/LineEditElement.h"
+#include "elements/MenuElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
 #include "elements/ScrollBarElement.h"
@@ -362,7 +363,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawElementBackground(painter, option, widget, {ElementString::Item});
         return;
     case QStyle::PE_FrameMenu:
-        drawElementBackground(painter, option, widget, {ElementString::Menu});
+        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
         return;
     case QStyle::PE_Widget:
         // Relates to PE_Frame
@@ -498,8 +501,12 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_PanelMenuBar:
     case QStyle::PE_PanelToolBar:
     case QStyle::PE_PanelStatusBar:
-    case QStyle::PE_PanelMenu:
         drawElementBackground(painter, option, widget);
+        return;
+    case QStyle::PE_PanelMenu:
+        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::PE_IndicatorBranch: {
         auto defaultIconName = QString();
@@ -651,12 +658,16 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return ev->contentsSize(contentsSize);
         }
         break;
+    case QStyle::CT_Menu:
+        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
     // Use defaults from qcommonstyle
+    case QStyle::CT_MenuBar:
     case QStyle::CT_TabWidget:
     case QStyle::CT_Splitter:
-    case QStyle::CT_MenuBar:
     case QStyle::CT_MenuBarItem:
-    case QStyle::CT_Menu:
     case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
     case QStyle::CT_MdiControls:
@@ -857,6 +868,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
 
 int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
+    // We do not use elements here since *any* element can ask for these values.
     int defaultMetric = QCommonStyle::pixelMetric(metric, option, widget);
     auto elements = prepareElements(option, widget);
     if (elements.isEmpty()) {
@@ -1070,10 +1082,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_TabBarIconSize:
         return querySize(option, widget, {ElementString::TabBarIconSize}).width();
     case QStyle::PM_LineEditIconSize:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        break;
+        return querySize(option, widget, {ElementString::LineEditIconSize}).width();
     case QStyle::PM_ListViewIconSize:
         return querySize(option, widget, {ElementString::ListViewIconSize}).width();
     case QStyle::PM_ButtonIconSize:
