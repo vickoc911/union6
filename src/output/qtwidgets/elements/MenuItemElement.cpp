@@ -61,7 +61,9 @@ void MenuItemElement::draw(QPainter *painter) const
         button.rect = m_layoutMap[ElementString::Indicator].rect.toRect();
         button.state = m_menuItemOption->state;
         button.state.setFlag(QStyle::State_On, m_menuItemOption->checked);
-        drawElementBackground(painter, &button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator});
+        const auto indicator = queryProperties(
+            prepareElements(&button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator}));
+        drawBackgroundRectangle(painter, button.rect, indicator);
     }
 }
 
