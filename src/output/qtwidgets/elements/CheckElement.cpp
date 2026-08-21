@@ -89,3 +89,11 @@ void CheckElement::drawIndicator(QPainter *painter) const
         drawBackgroundRectangle(painter, subElementRect(QStyle::SE_RadioButtonIndicator), m_indicatorProperties);
     }
 }
+
+int CheckElement::labelSpacing() const
+{
+    if (m_isValid && m_backgroundProperties->layout()) {
+        return m_backgroundProperties->layout()->spacing().value_or(0);
+    }
+    return 0;
+}

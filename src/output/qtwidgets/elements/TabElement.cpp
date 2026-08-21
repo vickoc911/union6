@@ -129,3 +129,22 @@ bool TabElement::isVertical() const
 {
     return m_isVertical;
 }
+
+// Padding of the tab content and the edge, only one value is taken so take the largest one
+int TabElement::hSpace() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+        auto padding = m_backgroundProperties->layout()->padding()->toMargins();
+        return qMax(padding.left(), padding.right());
+    }
+    return 0;
+}
+
+int TabElement::vSpace() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+        auto padding = m_backgroundProperties->layout()->padding()->toMargins();
+        return qMax(padding.top(), padding.bottom());
+    }
+    return 0;
+}
