@@ -60,7 +60,7 @@ void ScrollBarElement::drawIndicator(QPainter *painter) const
             m_style->drawControl(QStyle::CE_ScrollBarSlider, &subopt, painter, m_widget);
 
             if (m_scrollBarOption->state & QStyle::State_HasFocus) {
-                m_style->drawPrimitive(QStyle::PE_FrameFocusRect, &subopt, painter, m_widget);
+                m_style->drawPrimitive(QStyle::PE_FrameFocusRect, &subopt, painter);
             }
         }
     }

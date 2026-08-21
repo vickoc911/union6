@@ -35,6 +35,8 @@ private:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
     Union::ElementList m_indicatorElementList;
     Union::Properties::StylePropertyGroup *m_indicatorProperties;
+    Union::ElementList m_checkElementList;
+    Union::Properties::StylePropertyGroup *m_checkProperties;
     bool m_isSeparator;
     bool m_hasSubMenu;
     bool m_hasCheckBox;

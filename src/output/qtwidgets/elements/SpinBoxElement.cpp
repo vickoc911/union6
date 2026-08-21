@@ -47,11 +47,11 @@ void SpinBoxElement::draw(QPainter *painter) const
         // Increase
         auto up = *m_spinBoxOption;
         up.rect = subControlRect(QStyle::SC_SpinBoxUp);
-        m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinUp : QStyle::PE_IndicatorSpinPlus, &up, painter, m_widget);
+        m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinUp : QStyle::PE_IndicatorSpinPlus, &up, painter);
         // Decrease
         auto down = *m_spinBoxOption;
         down.rect = subControlRect(QStyle::SC_SpinBoxDown);
-        m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinDown : QStyle::PE_IndicatorSpinMinus, &down, painter, m_widget);
+        m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinDown : QStyle::PE_IndicatorSpinMinus, &down, painter);
     }
 }
 
