@@ -173,6 +173,16 @@ void AbstractElement::drawBackground(QPainter *painter) const
     drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties);
 }
 
+void AbstractElement::drawFrame(QPainter *painter) const
+{
+    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
+}
+
+void AbstractElement::drawPanel(QPainter *painter) const
+{
+    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties, BackgroundParts::PanelOnly);
+}
+
 void AbstractElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {
