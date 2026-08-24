@@ -195,13 +195,11 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             ev->drawIndicator(painter);
         }
         return;
+    case QStyle::CE_FocusFrame:
     case QStyle::CE_ShapedFrame:
         if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
-        return;
-    case QStyle::CE_FocusFrame:
-        drawElementBackground(painter, option, widget, {ElementString::FocusFrame});
         return;
     case QStyle::CE_ToolBar:
         drawElementBackground(painter, option, widget);
