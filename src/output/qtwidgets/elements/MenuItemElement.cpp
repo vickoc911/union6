@@ -174,7 +174,7 @@ QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
             if (m_contentProperties->layout()) {
                 int width = m_contentProperties->layout()->width().value_or(1);
                 int height = m_contentProperties->layout()->height().value_or(1);
-                int spacing = m_backgroundProperties->layout()->spacing().value_or(0);
+                int spacing = m_contentProperties->layout()->spacing().value_or(0);
                 if (preferredSize.width() > width) {
                     width = preferredSize.width();
                 }
