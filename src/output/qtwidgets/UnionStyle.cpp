@@ -191,7 +191,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_ProgressBarLabel, option, painter, widget);
         return;
     case QStyle::CE_ScrollBarSlider:
-        drawElementBackground(painter, option, widget, {ElementString::Handle});
+        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
+            ev->drawIndicator(painter);
+        }
         return;
     case QStyle::CE_ShapedFrame:
         if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
