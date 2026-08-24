@@ -26,6 +26,7 @@
 #include "elements/ToolBarElement.h"
 #include "elements/ToolButtonElement.h"
 #include "elements/WidgetElement.h"
+#include "output/qtwidgets/elements/SplitterElement.h"
 
 #include <ElementQuery.h>
 #include <QApplication>
@@ -229,7 +230,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_HeaderLabel, option, painter, widget);
         return;
     case QStyle::CE_Splitter:
-        drawElementBackground(painter, option, widget, {ElementString::Splitter});
+        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::CE_RubberBand:
         drawElementBackground(painter, option, widget, {ElementString::RubberBand});
