@@ -27,7 +27,6 @@ void WidgetElement::update()
     setIndicator(QIcon());
     setIcon(QIcon());
     setText(QString());
-    updateSubElementList();
     layout();
 }
 

@@ -23,7 +23,7 @@ public:
     void update() override;
     void draw(QPainter *painter) const override;
 
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
     void updateSubElementList() override;
     void drawBackground(QPainter *painter) const override;

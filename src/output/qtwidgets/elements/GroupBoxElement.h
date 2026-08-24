@@ -22,7 +22,7 @@ public:
 
     void update() override;
     void layout() override;
-    QRect subControlRect(QStyle::SubControl subControl) const override;
+    QRectF subControlRect(QStyle::SubControl subControl) const override;
 
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;

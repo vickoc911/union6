@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -23,8 +22,8 @@ public:
     void update() override;
     void draw(QPainter *painter) const override;
 
-    QRect subControlRect(QStyle::SubControl subControl) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+    QRectF subControlRect(QStyle::SubControl subControl) const override;
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
     void layout() override;
 
