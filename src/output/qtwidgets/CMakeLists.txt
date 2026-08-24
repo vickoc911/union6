@@ -40,6 +40,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/MenuItemElement.h
         elements/ProgressBarElement.cpp
         elements/ProgressBarElement.h
+        elements/RubberBandElement.cpp
+        elements/RubberBandElement.h
         elements/ScrollBarElement.cpp
         elements/ScrollBarElement.h
         elements/SliderElement.cpp
