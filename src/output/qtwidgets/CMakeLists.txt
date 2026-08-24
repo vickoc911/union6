@@ -2,6 +2,15 @@
 # SPDX-FileCopyrightText: 2025 Joshua Goins <josh@redstrate.com>
 
 add_library(UnionWidgetsStyle MODULE)
+
+ecm_qt_declare_logging_category(UnionWidgetsStyle
+    HEADER qtwidgets_logging.h
+    IDENTIFIER UNION_QTWIDGETS
+    CATEGORY_NAME union.qtwidgets
+    DESCRIPTION "Union - QtWidgets Output Plugin"
+    EXPORT Union
+)
+
 target_sources(UnionWidgetsStyle PRIVATE
         BackgroundDrawing.cpp
         BackgroundDrawing.h

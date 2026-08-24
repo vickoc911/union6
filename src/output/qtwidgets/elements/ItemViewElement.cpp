@@ -59,7 +59,7 @@ void ItemViewElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 
@@ -120,7 +120,7 @@ QSize ItemViewElement::contentsSize(const QSize &contentsSizeFromStyle) const
 QRect ItemViewElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
-        qWarning() << "Subelementrect for " << element << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "Subelementrect for " << element << "is not valid";
         return QRect();
     }
 

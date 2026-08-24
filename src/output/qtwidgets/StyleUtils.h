@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "qtwidgets_logging.h"
 #include <Element.h>
 #include <properties/SizePropertyGroup.h>
 #include <properties/StylePropertyGroup.h>

@@ -5,6 +5,7 @@
 
 #include "BackgroundDrawing.h"
 #include "StyleUtils.h"
+#include "qtwidgets_logging.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>

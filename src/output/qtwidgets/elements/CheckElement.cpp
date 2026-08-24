@@ -52,7 +52,7 @@ QSize CheckElement::contentsSize(const QSize &contentsSizeFromStyle) const
 QRect CheckElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
-        qWarning() << "Subelementrect for " << element << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "Subelementrect for " << element << "is not valid";
         return QRect();
     }
 

@@ -70,7 +70,7 @@ void DockWidgetElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 

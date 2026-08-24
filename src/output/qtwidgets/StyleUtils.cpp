@@ -772,7 +772,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
         switch (item.horizontalAlignment) {
         case Union::Properties::Alignment::StackFill:
         case Union::Properties::Alignment::StackCenter:
-            qWarning() << "StackFill/StackCenter is not supported for horizontal alignment!";
+            qCWarning(UNION_QTWIDGETS) << "StackFill/StackCenter is not supported for horizontal alignment!";
         case Union::Properties::Alignment::Unspecified:
         case Union::Properties::Alignment::Start:
             item.rect.moveLeft(horizontalSpace.left());

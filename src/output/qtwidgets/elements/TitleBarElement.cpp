@@ -117,7 +117,7 @@ void TitleBarElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 
@@ -129,7 +129,7 @@ QSize TitleBarElement::contentsSize(const QSize &contentsSizeFromStyle) const
 QRect TitleBarElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
-        qWarning() << "subControlRect for " << subControl << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
 

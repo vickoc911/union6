@@ -54,7 +54,7 @@ void GroupBoxElement::layout()
 QRect GroupBoxElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
-        qWarning() << "subControlRect for " << subControl << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
 

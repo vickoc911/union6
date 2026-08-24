@@ -68,7 +68,7 @@ void HeaderElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 
@@ -90,7 +90,7 @@ void HeaderElement::updateSubElementList()
 QRect HeaderElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
-        qWarning() << "Subelementrect for " << element << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "Subelementrect for " << element << "is not valid";
         return QRect();
     }
     QRect rect;

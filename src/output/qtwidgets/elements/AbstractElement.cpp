@@ -99,7 +99,7 @@ void AbstractElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 
@@ -110,19 +110,19 @@ QSize AbstractElement::contentsSize(const QSize &contentsSizeFromStyle) const
 
 QRect AbstractElement::subElementRect(QStyle::SubElement element) const
 {
-    qWarning() << "subElementRect is unimplemented for " << element;
+    qCWarning(UNION_QTWIDGETS) << "subElementRect is unimplemented for " << element;
     return QRect();
 }
 
 QRect AbstractElement::subControlRect(QStyle::SubControl subControl) const
 {
-    qWarning() << "subControlRect is unimplemented for " << subControl;
+    qCWarning(UNION_QTWIDGETS) << "subControlRect is unimplemented for " << subControl;
     return QRect();
 }
 
 void AbstractElement::updateSubElementList()
 {
-    qWarning() << "updateSubElementList is unimplemented for" << m_widget;
+    qCWarning(UNION_QTWIDGETS) << "updateSubElementList is unimplemented for" << m_widget;
 }
 
 void AbstractElement::update()
