@@ -46,6 +46,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/SliderElement.h
         elements/SpinBoxElement.cpp
         elements/SpinBoxElement.h
+        elements/SplitterElement.cpp
+        elements/SplitterElement.h
         elements/TabElement.cpp
         elements/TabElement.h
         elements/TitleBarElement.cpp
