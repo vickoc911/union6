@@ -49,7 +49,7 @@ void MenuElement::updateSubElementList()
     m_subElementList.append(ElementString::Frame);
 }
 
-QSize MenuElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF MenuElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     return applyPaddingToSize(contentsSizeFromStyle);
 }

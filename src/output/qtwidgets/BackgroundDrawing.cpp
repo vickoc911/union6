@@ -30,7 +30,7 @@ void drawBackgroundRectangle(QPainter *painter, const QRectF &mainRect, const Un
         // Ensure we do not go out of bounds
         rect = rect.marginsRemoved(style->layout()->inset()->toMargins());
         if (rect.height() <= 0 || rect.width() <= 0) {
-            rect = centerRect(rect.toRect(), width, height).toRectF();
+            rect = centerRect(rect.toRect(), width, height);
         }
     }
     QRectF innerRect = rect;

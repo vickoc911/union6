@@ -24,7 +24,7 @@ public:
     void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;
-    QRect subElementRect(QStyle::SubElement element) const override;
+    QRectF subElementRect(QStyle::SubElement element) const override;
     void layout() override;
 
 private:
