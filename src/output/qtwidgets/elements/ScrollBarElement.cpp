@@ -3,6 +3,7 @@
 
 #include "ScrollBarElement.h"
 #include "SharedNames.h"
+#include "StyleUtils.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -28,6 +29,30 @@ void ScrollBarElement::update()
     m_horizontal = (m_scrollBarOption->state.testFlag(QStyle::State_Horizontal));
     updateSubElementList();
     layout();
+}
+
+void ScrollBarElement::layout()
+{
+    // Background and content is separate
+    m_backgroundElementList = prepareElements(m_scrollBarOption, m_widget);
+    if (!m_backgroundElementList.isEmpty()) {
+        m_backgroundProperties = queryProperties(m_backgroundElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_scrollBarOption, m_subElementList);
+    }
+
+    m_indicatorElementList = prepareElements(m_scrollBarOption, m_widget, {ElementString::Handle});
+    if (!m_indicatorElementList.empty()) {
+        m_indicatorProperties = queryProperties(m_indicatorElementList);
+    }
+
+    m_contentElementList = prepareElements(m_scrollBarOption, m_widget, m_subElementList);
+    if (!m_contentElementList.isEmpty()) {
+        m_contentProperties = queryProperties(m_contentElementList);
+        m_isValid = true;
+    } else {
+        m_isValid = false;
+        qWarning() << "Could not find elementlist for this element!";
+    }
 }
 
 void ScrollBarElement::draw(QPainter *painter) const
@@ -57,7 +82,7 @@ void ScrollBarElement::drawIndicator(QPainter *painter) const
             if (!(m_scrollBarOption->activeSubControls & QStyle::SC_ScrollBarSlider)) {
                 subopt.state &= ~(QStyle::State_Sunken | QStyle::State_MouseOver);
             }
-            m_style->drawControl(QStyle::CE_ScrollBarSlider, &subopt, painter, m_widget);
+            drawBackgroundRectangle(painter, subopt.rect, m_indicatorProperties);
 
             if (m_scrollBarOption->state & QStyle::State_HasFocus) {
                 m_style->drawPrimitive(QStyle::PE_FrameFocusRect, &subopt, painter);

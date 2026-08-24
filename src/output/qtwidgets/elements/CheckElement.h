@@ -32,8 +32,10 @@ public:
 
     void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
+    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
 
     int labelSpacing() const;
+    int indicatorWidth() const;
 
 private:
     const QStyleOptionButton *m_buttonOption = nullptr;
