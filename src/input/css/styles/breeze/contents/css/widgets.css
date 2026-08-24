@@ -6,6 +6,11 @@
 /* Holds data for basic primitives such as arrow indicators. These are only the names for them,
 and they're mapped to PE_IndicatorArrowLeft etc. */
 
+/* Plain widget element */
+widget {
+    background-color: var(--window-background-color);
+}
+
 /* Primitive Elements */
 
 indicatorarrowup {
