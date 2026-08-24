@@ -25,6 +25,7 @@
 #include "elements/TitleBarElement.h"
 #include "elements/ToolBarElement.h"
 #include "elements/ToolButtonElement.h"
+#include "elements/WidgetElement.h"
 
 #include <ElementQuery.h>
 #include <QApplication>
@@ -381,8 +382,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_Widget:
-        // Relates to PE_Frame
-        drawElementBackground(painter, option, widget, {ElementString::Panel});
+        if (auto ev = cachedElement<WidgetElement, QStyleOption>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
