@@ -54,6 +54,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ToolBarElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
+        elements/WidgetElement.cpp
+        elements/WidgetElement.h
 )
 target_link_libraries(UnionWidgetsStyle
         PUBLIC
