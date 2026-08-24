@@ -82,7 +82,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (controlElement) {
     case QStyle::CE_ComboBoxLabel:
         if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
@@ -279,7 +279,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (control) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
@@ -594,7 +594,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(contentsSize, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
