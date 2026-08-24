@@ -18,6 +18,12 @@ statusbar {
     }
 }
 
+toolbox {
+    tabbutton {
+        border-radius: var(--corner-radius);
+    }
+}
+
 /* Primitive Elements */
 
 indicatorarrowup {
