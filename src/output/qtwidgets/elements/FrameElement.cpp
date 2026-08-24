@@ -33,16 +33,6 @@ void FrameElement::update()
     layout();
 }
 
-void FrameElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_frameOption->rect, m_backgroundProperties);
-}
-
-void FrameElement::drawFrame(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_frameOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
-}
-
 void FrameElement::updateSubElementList()
 {
     m_subElementList.clear();

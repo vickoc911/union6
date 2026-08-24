@@ -74,11 +74,11 @@ void ProgressBarElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 
-QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
+QRectF ProgressBarElement::subElementRect(QStyle::SubElement element) const
 {
     if (element == QStyle::SE_ProgressBarLabel) {
         // Copied and repurposed from Breeze
@@ -92,7 +92,7 @@ QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
                              m_progressBarOption->fontMetrics.size(textFlags, u"100%"_s).width());
         auto rect = centerRect(m_progressBarOption->rect, textWidth, m_progressBarOption->rect.height());
         rect.setLeft(rect.right() - textWidth + 1);
-        rect = m_style->visualRect(m_progressBarOption->direction, m_progressBarOption->rect, rect);
+        rect = m_style->visualRect(m_progressBarOption->direction, m_progressBarOption->rect, rect.toRect());
         return rect;
     } else if (element == QStyle::SE_ProgressBarContents) {
         // Copied from Breeze
@@ -110,7 +110,7 @@ QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
         const int steps(qMax(m_progressBarOption->maximum - m_progressBarOption->minimum, 1));
         const qreal position = qreal(progress) / qreal(steps);
         const int indicatorSize(position * (horizontal ? rect.width() : rect.height()));
-        QRect indicatorRect;
+        QRectF indicatorRect;
         if (horizontal) {
             indicatorRect = QRect(rect.left() + (reverse ? rect.width() - indicatorSize : 0), rect.y(), indicatorSize, rect.height());
         } else {
@@ -129,9 +129,9 @@ QRect ProgressBarElement::subElementRect(QStyle::SubElement element) const
         rect.setHeight(height);
         rect.setWidth(width);
         if (m_progressBarOption->state.testFlag(QStyle::State_Horizontal)) {
-            rect = centerRect(m_progressBarOption->rect, width, height);
+            rect = centerRect(m_progressBarOption->rect, width, height).toRect();
         } else {
-            rect = centerRect(m_progressBarOption->rect, height, width);
+            rect = centerRect(m_progressBarOption->rect, height, width).toRect();
         }
         return m_style->visualRect(m_progressBarOption->direction, m_progressBarOption->rect, rect);
     };

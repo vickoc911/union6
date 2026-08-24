@@ -61,9 +61,9 @@ void ToolButtonElement::updateSubElementList()
     }
 }
 
-QSize ToolButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF ToolButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
-    QSize size = subControlRect(QStyle::SC_ToolButton).size().boundedTo(contentsSizeFromStyle);
+    QSizeF size = subControlRect(QStyle::SC_ToolButton).size().boundedTo(contentsSizeFromStyle);
     size = applyPaddingToSize(size);
 
     if (m_indicatorProperties && m_indicatorProperties->layout()) {
@@ -77,17 +77,17 @@ QSize ToolButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return size;
 }
 
-QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
+QRectF ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
-        qWarning() << "subControlRect for " << subControl << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
 
-    QRect backgroundRect = backgroundRectangle(m_toolButtonOption, m_backgroundProperties).toRect();
+    QRectF backgroundRect = backgroundRectangle(m_toolButtonOption, m_backgroundProperties).toRect();
     if (subControl == QStyle::SC_ToolButton) {
-        QRect rect = m_toolButtonOption->rect;
-        QRect unifiedRect;
+        QRectF rect = m_toolButtonOption->rect;
+        QRectF unifiedRect;
         for (const auto &m : m_layoutMap) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }
@@ -95,7 +95,7 @@ QRect ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
         return rect;
     }
     if (subControl == QStyle::SC_ToolButtonMenu) {
-        QRect menuRect = m_layoutMap[ElementString::Indicator].rect.toRect();
+        QRectF menuRect = m_layoutMap[ElementString::Indicator].rect;
         // Set the click area to full height/width, so that its easier to click
         if (m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
             menuRect.setTop(backgroundRect.top());
@@ -123,10 +123,10 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         return;
     }
 
-    QRect iconRect = m_layoutMap[ElementString::Icon].rect.toRect();
+    QRectF iconRect = m_layoutMap[ElementString::Icon].rect;
     if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow)) {
         auto subopt = *m_toolButtonOption;
-        subopt.rect = iconRect;
+        subopt.rect = iconRect.toRect();
         switch (m_toolButtonOption->arrowType) {
         case Qt::LeftArrow:
             m_style->drawPrimitive(QStyle::PE_IndicatorArrowLeft, &subopt, painter);
@@ -157,7 +157,7 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
                 iconSize = toolButtonOption->iconSize;
             }
         }
-        const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+        const QPixmap pixmap = m_icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_toolButtonOption->palette.text().color(); // Use text color as fallback
         if (m_contentProperties->icon() && m_contentProperties->icon()->color().has_value()) {
@@ -166,7 +166,7 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         }
         painter->save();
         painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        m_style->drawItemPixmap(painter, iconRect.toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }

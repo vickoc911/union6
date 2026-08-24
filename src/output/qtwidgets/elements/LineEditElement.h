@@ -4,7 +4,6 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "BackgroundDrawing.h"
 #include <QObject>
 #include <QStyleOption>
 
@@ -20,9 +19,8 @@ public:
 
     void update() override;
     void updateSubElementList() override;
-    void drawBackground(QPainter *painter) const override;
 
-    QSize iconSize();
+    QSizeF iconSize();
 
 private:
     const QStyleOptionFrame *m_frameOption = nullptr;

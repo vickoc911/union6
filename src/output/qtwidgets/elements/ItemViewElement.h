@@ -23,8 +23,8 @@ public:
     void update() override;
 
     void updateSubElementList() override;
-    QRect subElementRect(QStyle::SubElement element) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+    QRectF subElementRect(QStyle::SubElement element) const override;
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
     void layout() override;
     void drawIndicator(QPainter *painter) const override;
     void drawText(QPainter *painter) const override;

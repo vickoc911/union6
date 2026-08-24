@@ -20,8 +20,6 @@ public:
 
     void update() override;
     void updateSubElementList() override;
-    void drawBackground(QPainter *painter) const override;
-    void drawFrame(QPainter *painter) const override;
 
     void drawHandle(QPainter *painter) const;
     void drawSeparator(QPainter *painter) const;

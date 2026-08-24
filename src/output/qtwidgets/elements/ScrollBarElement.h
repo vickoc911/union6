@@ -24,8 +24,8 @@ public:
     void draw(QPainter *painter) const override;
 
     void layout() override;
-    QRect subControlRect(QStyle::SubControl subControl) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+    QRectF subControlRect(QStyle::SubControl subControl) const override;
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
     void drawBackground(QPainter *painter) const override;
     void drawIndicator(QPainter *painter) const override;

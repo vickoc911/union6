@@ -33,23 +33,13 @@ void MenuElement::update()
     layout();
 }
 
-void MenuElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_menuOption->rect, m_backgroundProperties);
-}
-
-void MenuElement::drawFrame(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_menuOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
-}
-
 void MenuElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::Frame);
 }
 
-QSize MenuElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF MenuElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     return applyPaddingToSize(contentsSizeFromStyle);
 }

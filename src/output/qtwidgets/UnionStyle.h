@@ -39,13 +39,13 @@ public:
     void polish(QApplication *application) override;
     void polish(QWidget *) override;
 
-    void drawIcon(const QRect &rect,
+    void drawIcon(const QRectF &rect,
                   const QStyleOption *option,
                   QPainter *painter,
                   const QIcon &icon,
                   const QWidget *widget = nullptr,
                   const QColor &overrideColor = QColor()) const;
-    void drawText(const QRect &rect,
+    void drawText(const QRectF &rect,
                   const QStyleOption *option,
                   QPainter *painter,
                   const QString &text,
