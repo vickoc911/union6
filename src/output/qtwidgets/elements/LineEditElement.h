@@ -22,7 +22,7 @@ public:
     void updateSubElementList() override;
     void drawBackground(QPainter *painter) const override;
 
-    QSize iconSize();
+    QSizeF iconSize();
 
 private:
     const QStyleOptionFrame *m_frameOption = nullptr;

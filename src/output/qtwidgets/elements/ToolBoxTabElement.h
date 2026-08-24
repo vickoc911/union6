@@ -25,7 +25,7 @@ public:
 
     void layout() override;
     void updateSubElementList() override;
-    QRect subElementRect(QStyle::SubElement element) const override;
+    QRectF subElementRect(QStyle::SubElement element) const override;
 
 private:
     const QStyleOptionToolBox *m_toolBoxOption = nullptr;

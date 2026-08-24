@@ -74,24 +74,24 @@ void DockWidgetElement::layout()
     }
 }
 
-QRect DockWidgetElement::subElementRect(QStyle::SubElement subElement) const
+QRectF DockWidgetElement::subElementRect(QStyle::SubElement subElement) const
 {
     if (!m_isValid) {
         return QRect();
     }
 
     if (subElement == QStyle::SE_DockWidgetTitleBarText) {
-        return m_layoutMap[ElementString::Text].rect.toRect();
+        return m_layoutMap[ElementString::Text].rect;
     }
     if (subElement == QStyle::SE_DockWidgetFloatButton) {
-        return m_layoutMap[ElementString::FloatButton].rect.toRect();
+        return m_layoutMap[ElementString::FloatButton].rect;
     }
     if (subElement == QStyle::SE_DockWidgetCloseButton) {
-        return m_layoutMap[ElementString::CloseButton].rect.toRect();
+        return m_layoutMap[ElementString::CloseButton].rect;
     }
     // The styleoption has no icon, yet there is whole thing for an icon? Wtf.
     if (subElement == QStyle::SE_DockWidgetIcon) {
-        return m_layoutMap[ElementString::Icon].rect.toRect();
+        return m_layoutMap[ElementString::Icon].rect;
     }
     return QRect();
 }

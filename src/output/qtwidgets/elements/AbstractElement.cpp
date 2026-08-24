@@ -103,18 +103,18 @@ void AbstractElement::layout()
     }
 }
 
-QSize AbstractElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF AbstractElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     return applyPaddingToSize(contentsSizeFromStyle);
 }
 
-QRect AbstractElement::subElementRect(QStyle::SubElement element) const
+QRectF AbstractElement::subElementRect(QStyle::SubElement element) const
 {
     qCWarning(UNION_QTWIDGETS) << "subElementRect is unimplemented for " << element;
     return QRect();
 }
 
-QRect AbstractElement::subControlRect(QStyle::SubControl subControl) const
+QRectF AbstractElement::subControlRect(QStyle::SubControl subControl) const
 {
     qCWarning(UNION_QTWIDGETS) << "subControlRect is unimplemented for " << subControl;
     return QRect();
@@ -129,7 +129,7 @@ void AbstractElement::update()
 {
 }
 
-QSize AbstractElement::applyPaddingToSize(QSize oldSize, PaddingDirection direction) const
+QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, PaddingDirection direction) const
 {
     if (!m_isValid) {
         return oldSize;
@@ -186,7 +186,7 @@ void AbstractElement::drawPanel(QPainter *painter) const
 void AbstractElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {
-        QRect textRect = m_layoutMap[ElementString::Text].rect.toRect();
+        QRectF textRect = m_layoutMap[ElementString::Text].rect;
         int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         QColor penColor = m_styleOption->palette.text().color();
@@ -202,7 +202,7 @@ void AbstractElement::drawText(QPainter *painter) const
             painter->setFont(m_contentProperties->text()->font().value());
         }
         painter->setPen(penColor);
-        m_style->drawItemText(painter, textRect, textFlags, m_styleOption->palette, enabled, m_text);
+        m_style->drawItemText(painter, textRect.toRect(), textFlags, m_styleOption->palette, enabled, m_text);
         painter->restore();
     }
 }
@@ -210,7 +210,7 @@ void AbstractElement::drawText(QPainter *painter) const
 void AbstractElement::drawIcon(QPainter *painter) const
 {
     if (hasIcon() && m_isValid) {
-        QRect iconRect = m_layoutMap[ElementString::Icon].rect.toRect();
+        QRectF iconRect = m_layoutMap[ElementString::Icon].rect;
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_styleOption->palette;
@@ -223,7 +223,7 @@ void AbstractElement::drawIcon(QPainter *painter) const
                 iconSize = toolButtonOption->iconSize;
             }
         }
-        const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+        const QPixmap pixmap = m_icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
         if (m_contentProperties->icon() && m_contentProperties->icon()->color().has_value()) {
@@ -233,7 +233,7 @@ void AbstractElement::drawIcon(QPainter *painter) const
 
         painter->save();
         painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
+        m_style->drawItemPixmap(painter, iconRect.toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }
@@ -241,14 +241,14 @@ void AbstractElement::drawIcon(QPainter *painter) const
 void AbstractElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator() && m_isValid) {
-        QRect indicatorRect = m_layoutMap[ElementString::Indicator].rect.toRect();
+        QRectF indicatorRect = m_layoutMap[ElementString::Indicator].rect;
         drawBackgroundRectangle(painter, indicatorRect, m_indicatorProperties);
         const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_styleOption->palette;
         const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
         auto iconSize = indicatorRect.size();
-        const QPixmap pixmap = m_indicator.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+        const QPixmap pixmap = m_indicator.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
         if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
@@ -258,7 +258,7 @@ void AbstractElement::drawIndicator(QPainter *painter) const
 
         painter->save();
         painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, indicatorRect, Qt::AlignCenter, pixmap);
+        m_style->drawItemPixmap(painter, indicatorRect.toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }

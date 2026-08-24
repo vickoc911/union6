@@ -46,11 +46,11 @@ void SpinBoxElement::draw(QPainter *painter) const
         bool arrows = (m_spinBoxOption->buttonSymbols == QAbstractSpinBox::UpDownArrows);
         // Increase
         auto up = *m_spinBoxOption;
-        up.rect = subControlRect(QStyle::SC_SpinBoxUp);
+        up.rect = subControlRect(QStyle::SC_SpinBoxUp).toRect();
         m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinUp : QStyle::PE_IndicatorSpinPlus, &up, painter);
         // Decrease
         auto down = *m_spinBoxOption;
-        down.rect = subControlRect(QStyle::SC_SpinBoxDown);
+        down.rect = subControlRect(QStyle::SC_SpinBoxDown).toRect();
         m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinDown : QStyle::PE_IndicatorSpinMinus, &down, painter);
     }
 }
@@ -61,7 +61,7 @@ void SpinBoxElement::updateSubElementList()
     m_subElementList.append(ElementString::Indicator);
 }
 
-QSize SpinBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF SpinBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     const int frameWidth = m_style->pixelMetric(QStyle::PM_SpinBoxFrameWidth, m_spinBoxOption, m_widget);
     auto size = contentsSizeFromStyle;
@@ -78,20 +78,20 @@ QSize SpinBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return size;
 }
 
-QRect SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
+QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
         qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
 
-    QRect rect;
+    QRectF rect;
     // Based on QCommonStyle. We only draw the "constrained" look for now.
-    const QRect buttonRect = m_layoutMap[ElementString::Indicator].rect.toRect();
-    QRect bgRect = m_spinBoxOption->rect;
+    const QRectF buttonRect = m_layoutMap[ElementString::Indicator].rect;
+    QRectF bgRect = m_spinBoxOption->rect;
     if (m_backgroundProperties->layout()) {
-        bgRect.setWidth(qMax(bgRect.width(), (int)m_backgroundProperties->layout()->width().value_or(0)));
-        bgRect.setHeight(qMax(bgRect.height(), (int)m_backgroundProperties->layout()->height().value_or(0)));
+        bgRect.setWidth(qMax(bgRect.width(), m_backgroundProperties->layout()->width().value_or(0)));
+        bgRect.setHeight(qMax(bgRect.height(), m_backgroundProperties->layout()->height().value_or(0)));
     }
     const bool noButtons = (m_spinBoxOption->buttonSymbols == QAbstractSpinBox::NoButtons);
     const int y = m_spinBoxOption->rect.y();
@@ -113,6 +113,6 @@ QRect SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     if (subControl == QStyle::SC_SpinBoxFrame) {
         rect = bgRect;
     }
-    rect = m_style->visualRect(m_spinBoxOption->direction, m_spinBoxOption->rect, rect);
+    rect = m_style->visualRect(m_spinBoxOption->direction, m_spinBoxOption->rect, rect.toRect());
     return rect;
 }

@@ -364,7 +364,7 @@ UnionStyle::hitTestComplexControl(ComplexControl control, const QStyleOptionComp
         auto grooveRect = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
         if (grooveRect.contains(point)) {
             const auto sliderRect = subControlRect(CC_ScrollBar, option, SC_ScrollBarSlider, widget);
-            const auto precedes = [](const QStyleOptionComplex *option, QPoint point, QRect rect) {
+            const auto precedes = [](const QStyleOptionComplex *option, QPoint point, QRectF rect) {
                 if (option->state & QStyle::State_Horizontal) {
                     if (option->direction == Qt::LeftToRight) {
                         return point.x() < rect.right();
@@ -642,102 +642,102 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
     } break;
     case QStyle::CT_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_MenuItem:
         if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_ComboBox:
         if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_TabBarTab:
         if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_Slider:
         if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_ItemViewItem:
         if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_SpinBox:
         if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_ScrollBar:
         if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_CheckBox:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_RadioButton:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_GroupBox:
         if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_ProgressBar:
         if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_HeaderSection:
         if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_LineEdit:
         if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_Menu:
         if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_MenuBar:
         if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_MenuBarItem:
         if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_SizeGrip:
         if (auto ev = cachedElement<RubberBandElement, QStyleOptionRubberBand>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_Splitter:
         if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize);
+            return ev->contentsSize(contentsSize).toSize();
         }
         break;
     // Use defaults from qcommonstyle
@@ -752,7 +752,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
 
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
-    QRect rect;
+    QRectF rect;
     const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
 
     switch (element) {
@@ -760,26 +760,26 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_ItemViewItemDecoration:
     case QStyle::SE_ItemViewItemCheckIndicator:
         if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_RadioButtonContents:
     case QStyle::SE_RadioButtonIndicator:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_CheckBoxIndicator:
     case QStyle::SE_CheckBoxContents:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_PushButtonFocusRect:
     case QStyle::SE_PushButtonContents:
     case QStyle::SE_PushButtonBevel: {
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
     } break;
     case QStyle::SE_LineEditContents:
@@ -793,7 +793,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_HeaderArrow:
     case QStyle::SE_HeaderLabel:
         if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_TabBarTabText:
@@ -802,26 +802,27 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             if (ev->isVertical()) {
                 return QCommonStyle::subElementRect(element, option, widget);
             }
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_ProgressBarLabel:
     case QStyle::SE_ProgressBarContents:
     case QStyle::SE_ProgressBarGroove:
         if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_DockWidgetTitleBarText:
     case QStyle::SE_DockWidgetCloseButton:
     case QStyle::SE_DockWidgetFloatButton:
+    case QStyle::SE_DockWidgetIcon:
         if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     case QStyle::SE_ToolBoxTabContents:
         if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
-            return ev->subElementRect(element);
+            return ev->subElementRect(element).toRect();
         }
         break;
     // Follow defaults
@@ -862,7 +863,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         return QCommonStyle::subElementRect(element, option, widget);
     }
 
-    return visualRect(option->direction, option->rect, rect);
+    return visualRect(option->direction, option->rect, rect.toRect());
 }
 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
@@ -871,37 +872,37 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
     switch (complexControl) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_ComboBox:
         if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_SpinBox:
         if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_ScrollBar:
         if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_Slider:
         if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_GroupBox:
         if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_TitleBar:
         if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            return ev->subControlRect(subControl);
+            return ev->subControlRect(subControl).toRect();
         }
         break;
     case QStyle::CC_Dial:
@@ -1022,7 +1023,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return defaultMetric;
         }
         if (scrollbaroption && properties->layout()) {
-            QSize size(properties->layout()->width().value_or(defaultMetric), properties->layout()->height().value_or(defaultMetric));
+            QSizeF size(properties->layout()->width().value_or(defaultMetric), properties->layout()->height().value_or(defaultMetric));
             if (properties->layout()->padding()) {
                 size = size.shrunkBy(properties->layout()->padding()->toMargins().toMargins());
             }
@@ -1327,7 +1328,7 @@ void UnionStyle::polish(QWidget *widget)
     QCommonStyle::polish(widget);
 }
 
-void UnionStyle::drawText(const QRect &rect,
+void UnionStyle::drawText(const QRectF &rect,
                           const QStyleOption *opt,
                           QPainter *painter,
                           const QString &text,
@@ -1359,7 +1360,7 @@ void UnionStyle::drawText(const QRect &rect,
 
     painter->save();
     painter->setPen(penColor);
-    drawItemText(painter, rect, textFlags, opt->palette, enabled, text);
+    drawItemText(painter, rect.toRect(), textFlags, opt->palette, enabled, text);
     painter->restore();
 }
 
@@ -1375,7 +1376,7 @@ void UnionStyle::drawItemText(QPainter *painter,
     QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
-void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget, const QColor &overrideColor)
+void UnionStyle::drawIcon(const QRectF &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget, const QColor &overrideColor)
     const
 {
     QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
@@ -1391,7 +1392,7 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
             iconSize = toolButtonOption->iconSize;
         }
     }
-    const QPixmap pixmap = icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+    const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
     QColor penColor = opt->palette.text().color(); // Use text color as fallback
     if (overrideColor.isValid()) {
@@ -1406,7 +1407,7 @@ void UnionStyle::drawIcon(const QRect &rect, const QStyleOption *opt, QPainter *
 
     painter->save();
     painter->setPen(penColor);
-    drawItemPixmap(painter, rect, Qt::AlignCenter, pixmap);
+    drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
     painter->restore();
 }
 

@@ -77,14 +77,14 @@ void ToolBoxTabElement::layout()
     m_isValid = true;
 }
 
-QRect ToolBoxTabElement::subElementRect(QStyle::SubElement element) const
+QRectF ToolBoxTabElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
         return QRect();
     }
 
     if (element == QStyle::SE_ToolBoxTabContents) {
-        QRect unifiedRect;
+        QRectF unifiedRect;
         for (const auto &m : m_layoutMap) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }

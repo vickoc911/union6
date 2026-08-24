@@ -87,16 +87,16 @@ void HeaderElement::updateSubElementList()
     m_subElementList = {ElementString::Text, ElementString::Icon};
 }
 
-QRect HeaderElement::subElementRect(QStyle::SubElement element) const
+QRectF HeaderElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
         qCWarning(UNION_QTWIDGETS) << "Subelementrect for " << element << "is not valid";
         return QRect();
     }
-    QRect rect;
+    QRectF rect;
     if (element == QStyle::SE_HeaderArrow || element == QStyle::SE_HeaderLabel) {
         auto mapItem = (element == QStyle::SE_HeaderLabel) ? ElementString::Text : ElementString::Icon;
-        rect = m_layoutMap[mapItem].rect.toRect();
+        rect = m_layoutMap[mapItem].rect;
     }
     return rect;
 }

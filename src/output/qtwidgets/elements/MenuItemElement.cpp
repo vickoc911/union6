@@ -65,7 +65,7 @@ void MenuItemElement::draw(QPainter *painter) const
     }
     AbstractElement::draw(painter);
     if (m_hasCheckBox || m_hasRadioButton) {
-        drawBackgroundRectangle(painter, m_layoutMap[ElementString::Indicator].rect.toRect(), m_checkProperties);
+        drawBackgroundRectangle(painter, m_layoutMap[ElementString::Indicator].rect, m_checkProperties);
     }
 }
 
@@ -150,9 +150,9 @@ void MenuItemElement::layout()
     m_isValid = true;
 }
 
-QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
-    QSize preferredSize = contentsSizeFromStyle;
+    QSizeF preferredSize = contentsSizeFromStyle;
     // Handle separator separately (pun not intended)
     if (m_menuItemOption) {
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
@@ -167,7 +167,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
                         height = preferredSize.height();
                     }
                 }
-                QSize separatorSize(width, height);
+                QSizeF separatorSize(width, height);
                 return applyPaddingToSize(separatorSize);
             }
         } else {
@@ -181,7 +181,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
                 if (preferredSize.height() > height) {
                     height = preferredSize.height();
                 }
-                QSize itemSize(width, height);
+                QSizeF itemSize(width, height);
                 itemSize.rwidth() += m_menuItemOption->maxIconWidth + spacing;
                 if (m_menuItemOption->menuHasCheckableItems) {
                     const bool exclusive = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
@@ -213,7 +213,7 @@ void MenuItemElement::drawText(QPainter *painter) const
         auto shortcutElements = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem, ElementString::ShortcutText});
         const auto properties = queryProperties(shortcutElements);
         auto map = layoutMap(m_contentElementList, m_menuItemOption, {ElementString::ShortcutText});
-        QRect textRect = map[ElementString::ShortcutText].rect.toRect();
+        QRectF textRect = map[ElementString::ShortcutText].rect;
         QColor shortcutColor = m_menuItemOption->palette.text().color();
         if (properties->text() && properties->text()->color().has_value()) {
             shortcutColor = properties->text()->color()->toQColor();
@@ -221,7 +221,7 @@ void MenuItemElement::drawText(QPainter *painter) const
         textFlags = textFlagsFromProperties(properties, true);
         painter->save();
         painter->setPen(shortcutColor);
-        m_style->drawItemText(painter, textRect, textFlags, m_menuItemOption->palette, enabled, m_shortcutText);
+        m_style->drawItemText(painter, textRect.toRect(), textFlags, m_menuItemOption->palette, enabled, m_shortcutText);
         painter->restore();
     }
 }
@@ -229,13 +229,13 @@ void MenuItemElement::drawText(QPainter *painter) const
 void MenuItemElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator()) {
-        QRect indicatorRect = m_layoutMap[ElementString::Arrow].rect.toRect();
+        QRectF indicatorRect = m_layoutMap[ElementString::Arrow].rect;
         const bool enabled = m_menuItemOption->state.testFlag(QStyle::State_Enabled);
 
         const QPalette activePalette = m_menuItemOption->palette;
         const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
         auto iconSize = indicatorRect.size();
-        const QPixmap pixmap = indicator().pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+        const QPixmap pixmap = indicator().pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_menuItemOption->palette.text().color(); // Use text color as fallback
         if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
@@ -245,7 +245,7 @@ void MenuItemElement::drawIndicator(QPainter *painter) const
 
         painter->save();
         painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, indicatorRect, Qt::AlignCenter, pixmap);
+        m_style->drawItemPixmap(painter, indicatorRect.toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }

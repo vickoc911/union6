@@ -660,7 +660,7 @@ QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QS
     auto properties = queryProperties(elements);
     QRectF availableSpace = backgroundRectangle(opt, properties);
     int globalSpacing = 0;
-    QMargins padding;
+    QMarginsF padding;
     if (properties->layout()->padding()) {
         padding = properties->layout()->padding()->toMargins().toMargins();
     }
@@ -945,7 +945,7 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
     return textFlags;
 }
 
-QRect centerRect(const QRect &rect, int width, int height)
+QRectF centerRect(const QRectF &rect, int width, int height)
 {
     return QRect(rect.left() + (rect.width() - width) / 2, rect.top() + (rect.height() - height) / 2, width, height);
 }
@@ -961,7 +961,7 @@ QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString
     return QIcon::fromTheme(name);
 }
 
-QSize querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)
+QSizeF querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)
 {
     auto elements = prepareElements(option, widget, targetHierarchy);
     if (elements.isEmpty()) {
