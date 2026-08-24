@@ -23,6 +23,7 @@
 #include "elements/SizeGripElement.h"
 #include "elements/SliderElement.h"
 #include "elements/SpinBoxElement.h"
+#include "elements/StatusBarElement.h"
 #include "elements/TabElement.h"
 #include "elements/TitleBarElement.h"
 #include "elements/ToolBarElement.h"
@@ -384,7 +385,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
-        drawElementBackground(painter, option, widget, {ElementString::Item});
+        if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
+            ev->drawItem(painter);
+        }
         return;
     case QStyle::PE_FrameMenu:
         if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
@@ -529,12 +532,15 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawBackground(painter);
         }
         return;
+    case QStyle::PE_PanelStatusBar:
+        if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
+        return;
     case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameTabWidget:
     case QStyle::PE_FrameWindow:
     case QStyle::PE_FrameTabBarBase:
-    case QStyle::PE_PanelStatusBar:
-        drawElementBackground(painter, option, widget);
         return;
     case QStyle::PE_PanelMenu:
         if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
