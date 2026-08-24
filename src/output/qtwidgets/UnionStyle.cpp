@@ -413,9 +413,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_FrameTabWidget:
     case QStyle::PE_FrameTabBarBase:
-        if (auto ev = cachedElement<WidgetElement, QStyleOption>(hash, option, widget)) {
-            ev->drawFrame(painter);
-        }
+        // TODO elements for both
         return;
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
