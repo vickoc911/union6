@@ -50,6 +50,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/TabElement.h
         elements/TitleBarElement.cpp
         elements/TitleBarElement.h
+        elements/ToolBarElement.cpp
+        elements/ToolBarElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
 )

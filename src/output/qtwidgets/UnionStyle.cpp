@@ -23,6 +23,7 @@
 #include "elements/SpinBoxElement.h"
 #include "elements/TabElement.h"
 #include "elements/TitleBarElement.h"
+#include "elements/ToolBarElement.h"
 #include "elements/ToolButtonElement.h"
 
 #include <ElementQuery.h>
@@ -202,7 +203,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
         return;
     case QStyle::CE_ToolBar:
-        drawElementBackground(painter, option, widget);
+        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::CE_MenuBarItem:
         if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
@@ -508,12 +511,16 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
             return ev->drawBackground(painter);
         }
-        break;
+        return;
+    case QStyle::PE_PanelToolBar:
+        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
+        return;
     case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameTabWidget:
     case QStyle::PE_FrameWindow:
     case QStyle::PE_FrameTabBarBase:
-    case QStyle::PE_PanelToolBar:
     case QStyle::PE_PanelStatusBar:
         drawElementBackground(painter, option, widget);
         return;
@@ -566,10 +573,14 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_IndicatorToolBarHandle:
-        drawElementBackground(painter, option, widget, {ElementString::IndicatorToolBarHandle});
+        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
+            ev->drawHandle(painter);
+        }
         return;
     case QStyle::PE_IndicatorToolBarSeparator:
-        drawElementBackground(painter, option, widget, {ElementString::IndicatorToolBarSeparator});
+        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
+            ev->drawSeparator(painter);
+        }
         return;
     case QStyle::PE_IndicatorColumnViewArrow:
         drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
