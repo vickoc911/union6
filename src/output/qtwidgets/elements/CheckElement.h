@@ -28,11 +28,11 @@ public:
 
     void update() override;
 
-    QRect subElementRect(QStyle::SubElement element) const override;
+    QRectF subElementRect(QStyle::SubElement element) const override;
 
     void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
     int labelSpacing() const;
     int indicatorWidth() const;

@@ -38,7 +38,7 @@ void LineEditElement::drawBackground(QPainter *painter) const
     drawBackgroundRectangle(painter, m_frameOption->rect, m_backgroundProperties);
 }
 
-QSize LineEditElement::iconSize()
+QSizeF LineEditElement::iconSize()
 {
     return querySize(m_frameOption, m_widget, {ElementString::LineEditIconSize});
 }
