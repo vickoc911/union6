@@ -41,7 +41,7 @@ void CheckElement::update()
     layout();
 }
 
-QSize CheckElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF CheckElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     auto size = applyPaddingToSize(contentsSizeFromStyle);
     // Ensure indicator size is taken into account with the label
@@ -49,25 +49,25 @@ QSize CheckElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return size;
 }
 
-QRect CheckElement::subElementRect(QStyle::SubElement element) const
+QRectF CheckElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
-        qWarning() << "Subelementrect for " << element << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "Subelementrect for " << element << "is not valid";
         return QRect();
     }
 
     if (element == QStyle::SE_CheckBoxIndicator || element == QStyle::SE_RadioButtonIndicator) {
         if (m_buttonOption->styleObject) {
             // The indicator is drawn as part of something
-            return m_layoutMap[ElementString::Indicator].rect.toRect();
+            return m_layoutMap[ElementString::Indicator].rect;
         } else {
             // The indicator is drawn standalone (PE_IndicatorCheckBox for example)
             return m_buttonOption->rect;
         }
     }
 
-    QRect rect = m_buttonOption->rect;
-    QRect unifiedRect;
+    QRectF rect = m_buttonOption->rect;
+    QRectF unifiedRect;
     for (const auto &m : m_layoutMap) {
         if (m.elementName != ElementString::Indicator) {
             unifiedRect = unifiedRect.united(m.rect.toRect());

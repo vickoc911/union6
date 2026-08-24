@@ -60,12 +60,6 @@ itemviewitem
         background-color: var(--view-background-alternate-color);
     }
 
-    &.last-in-list
-    {
-        padding-bottom: var(--delegate-total-padding);
-        inset-bottom: var(--delegate-spacing);
-    }
-
     &.inside-table,
     &.inside-list
     {
@@ -81,6 +75,12 @@ itemviewitem
                 inset-bottom: var(--delegate-spacing);
             }
         }
+    }
+
+    &.last-in-list
+    {
+        padding-bottom: var(--delegate-total-padding);
+        inset-bottom: var(--delegate-spacing);
     }
 
     &:hovered

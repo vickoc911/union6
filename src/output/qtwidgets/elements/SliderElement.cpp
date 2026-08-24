@@ -61,7 +61,7 @@ void SliderElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
 }
 
@@ -165,7 +165,7 @@ void SliderElement::updateSubElementList()
     m_subElementList.append(u"Fill"_s);
 }
 
-QSize SliderElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF SliderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     auto grooveRect = subControlRect(QStyle::SC_SliderGroove).size();
     auto tickRect = subControlRect(QStyle::SC_SliderTickmarks).size();
@@ -180,10 +180,10 @@ QSize SliderElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return contentsSizeFromStyle.expandedTo(applyPaddingToSize(combinedSize));
 }
 
-QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
+QRectF SliderElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
-        qWarning() << "subControlRect for " << subControl << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
 
@@ -202,7 +202,7 @@ QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
             handleWidth = m_indicatorProperties->layout()->width().value_or(6);
         }
 
-        QRect handleRect(centerRect(rect, handleWidth, handleHeight));
+        QRectF handleRect(centerRect(rect, handleWidth, handleHeight));
         const int sliderPos = m_style->sliderPositionFromValue(m_sliderOption->minimum,
                                                                m_sliderOption->maximum,
                                                                m_sliderOption->sliderPosition,
@@ -213,7 +213,7 @@ QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
         } else {
             handleRect.moveTop(rect.y() + sliderPos);
         }
-        handleRect = m_style->visualRect(m_sliderOption->direction, rect, handleRect);
+        handleRect = m_style->visualRect(m_sliderOption->direction, rect, handleRect.toRect());
         return handleRect;
     } else if (subControl == QStyle::SC_SliderGroove) {
         int grooveHeight = 1;
@@ -223,7 +223,7 @@ QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
             grooveWidth = m_backgroundProperties->layout()->width().value_or(6);
         }
 
-        auto grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
+        QRectF grooveRect = rect.adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
 
         // centering
         if (m_isHorizontal) {
@@ -231,7 +231,7 @@ QRect SliderElement::subControlRect(QStyle::SubControl subControl) const
         } else {
             grooveRect = centerRect(rect, grooveWidth, grooveRect.height());
         }
-        return m_style->visualRect(m_sliderOption->direction, rect, grooveRect);
+        return m_style->visualRect(m_sliderOption->direction, rect, grooveRect.toRect());
     } else if (subControl == QStyle::SC_SliderTickmarks && m_sliderOption->tickPosition != QSlider::NoTicks) {
         QRegion r;
         r.setRects(tickLines());
@@ -255,8 +255,8 @@ QList<QRect> SliderElement::tickLines() const
         interval = m_sliderOption->pageStep;
     }
     if (interval >= 1) {
-        const QSize tickSize(tickMarkProps->layout()->width().value_or(0), tickMarkProps->layout()->height().value_or(0));
-        const QMargins tickMargins = tickMarkProps->layout()->margins()->toMargins().toMargins();
+        const QSizeF tickSize(tickMarkProps->layout()->width().value_or(0), tickMarkProps->layout()->height().value_or(0));
+        const QMarginsF tickMargins = tickMarkProps->layout()->margins()->toMargins().toMargins();
         const auto tickMarginsWidth = tickMargins.left() + tickMargins.right();
         const auto tickMarginsHeight = tickMargins.top() + tickMargins.bottom();
 
