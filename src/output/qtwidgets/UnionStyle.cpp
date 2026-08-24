@@ -529,6 +529,8 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawFrame(painter);
         }
         return;
+    case QStyle::PE_FrameDockWidget:
+    case QStyle::PE_FrameWindow:
     case QStyle::PE_Frame:
         if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
             ev->drawFrame(painter);
@@ -549,9 +551,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawBackground(painter);
         }
         return;
-    case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameTabWidget:
-    case QStyle::PE_FrameWindow:
     case QStyle::PE_FrameTabBarBase:
         return;
     case QStyle::PE_PanelMenu:
