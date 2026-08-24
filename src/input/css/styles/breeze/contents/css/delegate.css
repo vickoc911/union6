@@ -22,7 +22,7 @@ swipedelegate,
 itemviewitem
 {
     /*
-     We want to have some separation between delegates in a list, but we cannot
+     W e* want to have some separation between delegates in a list, but we cannot
      control list spacing, nor do we want to use that since the list spacing is
      not considered to be part of any delegate so ends up as "dead space". So we
      use insets to "fake" the spacing. Ideally, the inset would be
@@ -60,12 +60,6 @@ itemviewitem
         background-color: var(--view-background-alternate-color);
     }
 
-    &.last-in-list
-    {
-        padding-bottom: var(--delegate-total-padding);
-        inset-bottom: var(--delegate-spacing);
-    }
-
     &.inside-table,
     &.inside-list
     {
@@ -81,6 +75,12 @@ itemviewitem
                 inset-bottom: var(--delegate-spacing);
             }
         }
+    }
+
+    &.last-in-list
+    {
+        padding-bottom: var(--delegate-total-padding);
+        inset-bottom: var(--delegate-spacing);
     }
 
     &:hovered
@@ -126,22 +126,6 @@ itemviewitem
     }
 }
 
-itemdelegate,
-checkdelegate,
-radiodelegate,
-switchdelegate,
-swipedelegate {
-    &.inside-table,
-    &.inside-list
-    {
-        inset: 0px;
-        border-radius: 0px;
-        &.hover-enabled {
-            inset: var(--small-spacing);
-            border-radius: var(--corner-radius);
-        }
-    }
-}
 
 itemviewitem {
     inset: 2px;
