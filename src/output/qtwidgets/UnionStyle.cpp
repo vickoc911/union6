@@ -411,6 +411,12 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawBackground(painter);
         }
         return;
+    case QStyle::PE_FrameTabWidget:
+    case QStyle::PE_FrameTabBarBase:
+        if (auto ev = cachedElement<WidgetElement, QStyleOption>(hash, option, widget)) {
+            ev->drawFrame(painter);
+        }
+        return;
         // Standalone elements
     case QStyle::PE_PanelLineEdit:
         // For spinboxes and comboboxes, we do not want to draw this element
@@ -550,9 +556,6 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
             ev->drawBackground(painter);
         }
-        return;
-    case QStyle::PE_FrameTabWidget:
-    case QStyle::PE_FrameTabBarBase:
         return;
     case QStyle::PE_PanelMenu:
         if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
