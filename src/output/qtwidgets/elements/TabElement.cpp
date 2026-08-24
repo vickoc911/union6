@@ -92,11 +92,11 @@ void TabElement::layout()
     m_isValid = true;
 }
 
-QSize TabElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     const auto frameSize = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_tabOption, m_widget);
     const auto size = applyPaddingToSize(contentsSizeFromStyle);
-    QMargins frameMargins;
+    QMarginsF frameMargins;
     if (m_isVertical) {
         frameMargins = QMargins(frameSize, 0, frameSize, 0);
     } else {
@@ -106,14 +106,14 @@ QSize TabElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return size.grownBy(frameMargins);
 }
 
-QRect TabElement::subElementRect(QStyle::SubElement element) const
+QRectF TabElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
         return QRect();
     }
 
     if (element == QStyle::SE_TabBarTabText) {
-        QRect unifiedRect;
+        QRectF unifiedRect;
         for (const auto &m : m_layoutMap) {
             unifiedRect = unifiedRect.united(m.rect.toRect());
         }
@@ -133,7 +133,7 @@ bool TabElement::isVertical() const
 // Padding of the tab content and the edge, only one value is taken so take the largest one
 int TabElement::hSpace() const
 {
-    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout() && m_backgroundProperties->layout()->padding()) {
         auto padding = m_backgroundProperties->layout()->padding()->toMargins();
         return qMax(padding.left(), padding.right());
     }
@@ -142,7 +142,7 @@ int TabElement::hSpace() const
 
 int TabElement::vSpace() const
 {
-    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout() && m_backgroundProperties->layout()->padding()) {
         auto padding = m_backgroundProperties->layout()->padding()->toMargins();
         return qMax(padding.top(), padding.bottom());
     }

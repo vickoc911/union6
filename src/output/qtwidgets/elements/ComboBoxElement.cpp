@@ -78,9 +78,9 @@ void ComboBoxElement::updateSubElementList()
     }
 }
 
-QSize ComboBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF ComboBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
-    QRect unifiedRect;
+    QRectF unifiedRect;
     for (const auto &m : m_layoutMap) {
         unifiedRect = unifiedRect.united(m.rect.toRect().normalized());
     }
@@ -93,10 +93,10 @@ QSize ComboBoxElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return size;
 }
 
-QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
+QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
 {
     if (!m_isValid) {
-        qWarning() << "subControlRect for " << subControl << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
 
@@ -114,7 +114,7 @@ QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
     }
 
     case QStyle::SC_ComboBoxEditField: {
-        QRect labelRect;
+        QRectF labelRect;
         auto rect = m_comboBoxOption->rect;
         auto indicatorRect = subControlRect(QStyle::SC_ComboBoxArrow);
         labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
@@ -123,7 +123,7 @@ QRect ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
             auto spacing = m_backgroundProperties->layout()->spacing().value_or(5);
             labelRect.adjust(spacing, 0, spacing, 0);
         }
-        return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, labelRect);
+        return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, labelRect.toRect());
     }
 
     default:

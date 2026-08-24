@@ -69,10 +69,10 @@ void ButtonElement::updateSubElementList()
     }
 }
 
-QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
+QSizeF ButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     Q_UNUSED(contentsSizeFromStyle);
-    QSize size = subElementRect(QStyle::SE_PushButtonContents).size();
+    QSizeF size = subElementRect(QStyle::SE_PushButtonContents).size();
     size = applyPaddingToSize(size);
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background
     // to get the proper contentSize
@@ -86,10 +86,10 @@ QSize ButtonElement::contentsSize(const QSize &contentsSizeFromStyle) const
     return size;
 }
 
-QRect ButtonElement::subElementRect(QStyle::SubElement element) const
+QRectF ButtonElement::subElementRect(QStyle::SubElement element) const
 {
     if (!m_isValid) {
-        qWarning() << "Subelementrect for " << element << "is not valid";
+        qCWarning(UNION_QTWIDGETS) << "Subelementrect for " << element << "is not valid";
         return QRect();
     }
 
@@ -97,8 +97,8 @@ QRect ButtonElement::subElementRect(QStyle::SubElement element) const
         return backgroundRectangle(m_styleOption, m_backgroundProperties).toRect();
     }
 
-    QRect rect = m_styleOption->rect;
-    QRect unifiedRect;
+    QRectF rect = m_styleOption->rect;
+    QRectF unifiedRect;
     for (const auto &m : m_layoutMap) {
         unifiedRect = unifiedRect.united(m.rect.toRect());
     }

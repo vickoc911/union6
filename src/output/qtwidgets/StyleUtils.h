@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "qtwidgets_logging.h"
 #include <Element.h>
 #include <properties/SizePropertyGroup.h>
 #include <properties/StylePropertyGroup.h>
@@ -80,7 +81,7 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
 /*!
  * \brief Centers a rectangle depending on width and height. Copied from Breeze.
  */
-QRect centerRect(const QRect &rect, int width, int height);
+QRectF centerRect(const QRectF &rect, int width, int height);
 
 /*!
  * \brief Helper function for getting correct icon from properties.
@@ -91,7 +92,7 @@ QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString
 /*!
  * \brief Helper function to query the size of the element from properties.
  */
-QSize querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy = {});
+QSizeF querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy = {});
 
 /*!
  * \brief Tries to match styleOption type to a potential element.

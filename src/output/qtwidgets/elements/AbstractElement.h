@@ -5,6 +5,7 @@
 
 #include "BackgroundDrawing.h"
 #include "StyleUtils.h"
+#include "qtwidgets_logging.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -79,15 +80,15 @@ public:
     /*!
      * \brief Return the contents size of the element with padding applied by default.
      */
-    virtual QSize contentsSize(const QSize &contentsSizeFromStyle) const;
+    virtual QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const;
     /*!
      * \brief Return a subelement rectangle. If not found, empty QRect() is returned instead.
      */
-    virtual QRect subElementRect(QStyle::SubElement element) const;
+    virtual QRectF subElementRect(QStyle::SubElement element) const;
     /*!
      * \brief Return a subcontrol rectangle. If not found, empty QRect() is returned instead.
      */
-    virtual QRect subControlRect(QStyle::SubControl subControl) const;
+    virtual QRectF subControlRect(QStyle::SubControl subControl) const;
 
     /*!
      * \brief Updates the properties of the element, such as text and layouting
@@ -121,7 +122,7 @@ protected:
     virtual void updateSubElementList();
 
     // Utilizes the background property to apply a padding to the given size.
-    QSize applyPaddingToSize(QSize oldSize, PaddingDirection direction = PaddingDirection::Outward) const;
+    QSizeF applyPaddingToSize(QSizeF oldSize, PaddingDirection direction = PaddingDirection::Outward) const;
 
     // Used to check if we have all elements properly prepared
     bool m_isValid = false;
