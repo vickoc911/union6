@@ -11,6 +11,13 @@ widget {
     background-color: var(--window-background-color);
 }
 
+statusbar {
+    background-color: var(--window-background-color);
+    item {
+        border: var(--button-border);
+    }
+}
+
 /* Primitive Elements */
 
 indicatorarrowup {
