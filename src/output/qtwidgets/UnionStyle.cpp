@@ -8,6 +8,7 @@
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
 #include "elements/ComboBoxElement.h"
+#include "elements/DockWidgetElement.h"
 #include "elements/FrameElement.h"
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
@@ -251,9 +252,8 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
         return;
     case QStyle::CE_DockWidgetTitle:
-        if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
-            auto textRect = subElementRect(SE_DockWidgetTitleBarText, option, widget);
-            drawText(textRect, dockOption, painter, dockOption->title, widget);
+        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
+            ev->drawText(painter);
         }
         return;
     case QStyle::CE_MenuBarEmptyArea:
@@ -812,45 +812,15 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
     case QStyle::SE_DockWidgetTitleBarText:
     case QStyle::SE_DockWidgetCloseButton:
     case QStyle::SE_DockWidgetFloatButton:
-    case QStyle::SE_DockWidgetIcon: {
-        if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
-            QStringList childelements;
-            if (dockOption->closable) {
-                childelements.append(ElementString::CloseButton);
-            }
-            if (dockOption->floatable) {
-                childelements.append(ElementString::FloatButton);
-            }
-            if (!dockOption->title.isEmpty()) {
-                childelements.append(ElementString::Text);
-            }
-            if (childelements.isEmpty()) {
-                return QRect();
-            }
-            auto elements = prepareElements(option, widget, {ElementString::DockWidget});
-            auto map = layoutMap(elements, option, childelements);
-
-            if (element == SE_DockWidgetTitleBarText) {
-                rect = map[ElementString::Text].rect.toRect();
-            }
-            if (element == SE_DockWidgetFloatButton) {
-                rect = map[ElementString::FloatButton].rect.toRect();
-            }
-            if (element == SE_DockWidgetCloseButton) {
-                rect = map[ElementString::CloseButton].rect.toRect();
-            }
-            // The styleoption has no icon, yet there is whole thing for an icon? Wtf.
-            if (element == SE_DockWidgetIcon) {
-                rect = map[ElementString::Icon].rect.toRect();
-            }
+        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
+            return ev->subElementRect(element);
         }
-    } break;
-    case QStyle::SE_ToolBoxTabContents: {
+        break;
+    case QStyle::SE_ToolBoxTabContents:
         if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
             return ev->subElementRect(element);
         }
         break;
-    }
     // Follow defaults
     case QStyle::SE_TreeViewDisclosureItem:
     case QStyle::SE_TabWidgetTabContents:
