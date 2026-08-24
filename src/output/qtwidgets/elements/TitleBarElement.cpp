@@ -37,7 +37,6 @@ void TitleBarElement::draw(QPainter *painter) const
     }
 
     drawBackground(painter);
-    drawElementBackground(painter, m_titleBarOption, m_widget, {ElementString::TitleBar});
     if (!m_titleBarOption->text.isEmpty()
         && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
         m_style->drawText(m_layoutMap[ElementString::Text].rect.toRect(), m_titleBarOption, painter, m_titleBarOption->text, m_widget);
