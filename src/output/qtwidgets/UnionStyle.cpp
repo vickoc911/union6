@@ -27,6 +27,7 @@
 #include "elements/TabElement.h"
 #include "elements/TitleBarElement.h"
 #include "elements/ToolBarElement.h"
+#include "elements/ToolBoxTabElement.h"
 #include "elements/ToolButtonElement.h"
 #include "elements/WidgetElement.h"
 #include "output/qtwidgets/elements/SplitterElement.h"
@@ -74,6 +75,7 @@
 #include <QTreeView>
 #include <QWidget>
 #include <QWidgetAction>
+#include <qstyle.h>
 
 using namespace Qt::StringLiterals;
 
@@ -256,7 +258,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_MenuBarEmptyArea:
         if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->drawBackground(painter);
+            ev->drawBackground(painter);
         }
         break;
     // Ignored
@@ -272,10 +274,20 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     case QStyle::CE_ScrollBarFirst:
     case QStyle::CE_ScrollBarLast:
         return;
-    // TODO: Turn these into their own element
     case QStyle::CE_ToolBoxTabShape:
+        if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
+        return;
     case QStyle::CE_ToolBoxTabLabel:
+        if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
+            ev->drawIcon(painter);
+            ev->drawText(painter);
+        }
+        return;
     case QStyle::CE_ToolBoxTab:
+        drawControl(CE_ToolBoxTabShape, option, painter, widget);
+        drawControl(CE_ToolBoxTabLabel, option, painter, widget);
         break;
     // Rely on QCommonStyle
     case QStyle::CE_MenuScroller:
@@ -833,10 +845,15 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
             }
         }
     } break;
+    case QStyle::SE_ToolBoxTabContents: {
+        if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
+            return ev->subElementRect(element);
+        }
+        break;
+    }
     // Follow defaults
     case QStyle::SE_TreeViewDisclosureItem:
     case QStyle::SE_TabWidgetTabContents:
-    case QStyle::SE_ToolBoxTabContents:
     case QStyle::SE_TabBarTabLeftButton:
     case QStyle::SE_TabBarTabRightButton:
     case QStyle::SE_ToolBarHandle:
