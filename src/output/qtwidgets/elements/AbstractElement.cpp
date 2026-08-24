@@ -134,13 +134,13 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, PaddingDirection direct
     if (!m_isValid) {
         return oldSize;
     }
-    QSizeF minimumSize = oldSize;
-    QSizeF size = minimumSize;
+    QSizeF preferredSize = oldSize;
+    QSizeF size = preferredSize;
     QMarginsF padding;
     if (m_backgroundProperties->layout()) {
         auto width = m_backgroundProperties->layout()->width().value_or(1);
         auto height = m_backgroundProperties->layout()->height().value_or(1);
-        minimumSize = QSize(width, height);
+        preferredSize = QSize(width, height);
         if (m_backgroundProperties->layout()->padding()) {
             padding = m_backgroundProperties->layout()->padding()->toMargins().toMargins();
         }
@@ -158,11 +158,11 @@ QSize AbstractElement::applyPaddingToSize(QSize oldSize, PaddingDirection direct
         }
     } else {
         size = size.grownBy(padding);
-        if (size.width() < minimumSize.width()) {
-            size.setWidth(minimumSize.width());
+        if (size.width() < preferredSize.width()) {
+            size.setWidth(preferredSize.width());
         }
-        if (size.height() < minimumSize.height()) {
-            size.setHeight(minimumSize.height());
+        if (size.height() < preferredSize.height()) {
+            size.setHeight(preferredSize.height());
         }
     }
     return size.toSize();

@@ -152,7 +152,7 @@ void MenuItemElement::layout()
 
 QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
 {
-    QSize minimumSize = contentsSizeFromStyle;
+    QSize preferredSize = contentsSizeFromStyle;
     // Handle separator separately (pun not intended)
     if (m_menuItemOption) {
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
@@ -160,11 +160,11 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
                 int width = m_contentProperties->layout()->width().value_or(1);
                 int height = m_contentProperties->layout()->height().value_or(1);
                 if (hasText()) {
-                    if (minimumSize.width() > width) {
-                        width = minimumSize.width();
+                    if (preferredSize.width() > width) {
+                        width = preferredSize.width();
                     }
-                    if (minimumSize.height() > height) {
-                        height = minimumSize.height();
+                    if (preferredSize.height() > height) {
+                        height = preferredSize.height();
                     }
                 }
                 QSize separatorSize(width, height);
@@ -175,11 +175,11 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
                 int width = m_contentProperties->layout()->width().value_or(1);
                 int height = m_contentProperties->layout()->height().value_or(1);
                 int spacing = m_backgroundProperties->layout()->spacing().value_or(0);
-                if (minimumSize.width() > width) {
-                    width = minimumSize.width();
+                if (preferredSize.width() > width) {
+                    width = preferredSize.width();
                 }
-                if (minimumSize.height() > height) {
-                    height = minimumSize.height();
+                if (preferredSize.height() > height) {
+                    height = preferredSize.height();
                 }
                 QSize itemSize(width, height);
                 itemSize.rwidth() += m_menuItemOption->maxIconWidth + spacing;
@@ -192,7 +192,7 @@ QSize MenuItemElement::contentsSize(const QSize &contentsSizeFromStyle) const
             }
         }
     }
-    return minimumSize;
+    return preferredSize;
 }
 
 void MenuItemElement::drawBackground(QPainter *painter) const
