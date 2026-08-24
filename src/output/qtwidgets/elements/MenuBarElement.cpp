@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "MenuBarElement.h"
-#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -28,11 +27,4 @@ void MenuBarElement::update()
     setIcon(QIcon());
     setText(QString());
     layout();
-}
-
-void MenuBarElement::drawBackground(QPainter *painter) const
-{
-    if (isValid()) {
-        drawBackgroundRectangle(painter, m_menuItemOption->rect, m_backgroundProperties);
-    }
 }

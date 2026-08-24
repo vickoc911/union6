@@ -52,13 +52,8 @@ void StatusBarElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
-}
-
-void StatusBarElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_statusBarOption->rect, m_backgroundProperties);
 }
 
 void StatusBarElement::drawItem(QPainter *painter) const

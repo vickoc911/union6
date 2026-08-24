@@ -9,23 +9,26 @@
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
+#include <qstyleoption.h>
 
 class UnionStyle;
 
-class ButtonElement : public AbstractElement
+class DockWidgetElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    ButtonElement(const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
-    ~ButtonElement() override;
+    DockWidgetElement(const QStyleOptionDockWidget *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ~DockWidgetElement() override;
 
     void update() override;
     void draw(QPainter *painter) const override;
 
-    void updateSubElementList() override;
-    QRectF subElementRect(QStyle::SubElement element) const override;
-    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    QRectF subElementRect(QStyle::SubElement subElement) const override;
 
-    const QStyleOptionButton *m_buttonOption = nullptr;
+    void updateSubElementList() override;
+    void layout() override;
+
+private:
+    const QStyleOptionDockWidget *m_dockWidgetOption = nullptr;
 };

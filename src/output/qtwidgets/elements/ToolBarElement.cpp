@@ -59,18 +59,8 @@ void ToolBarElement::layout()
         m_isValid = true;
     } else {
         m_isValid = false;
-        qWarning() << "Could not find elementlist for this element!";
+        qCWarning(UNION_QTWIDGETS) << "Could not find elementlist for this element!";
     }
-}
-
-void ToolBarElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_toolBarOption->rect, m_backgroundProperties);
-}
-
-void ToolBarElement::drawFrame(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_toolBarOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
 }
 
 void ToolBarElement::drawHandle(QPainter *painter) const

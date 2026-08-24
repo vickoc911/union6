@@ -27,16 +27,5 @@ void WidgetElement::update()
     setIndicator(QIcon());
     setIcon(QIcon());
     setText(QString());
-    updateSubElementList();
     layout();
-}
-
-void WidgetElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_widgetOption->rect, m_backgroundProperties);
-}
-
-void WidgetElement::drawFrame(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_widgetOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
 }

@@ -25,8 +25,8 @@ public:
 
     void layout() override;
     void updateSubElementList() override;
-    QRect subElementRect(QStyle::SubElement element) const override;
-    QSize contentsSize(const QSize &contentsSizeFromStyle) const override;
+    QRectF subElementRect(QStyle::SubElement element) const override;
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
     bool isVertical() const;
     int hSpace() const;
@@ -36,5 +36,5 @@ private:
     const QStyleOptionTab *m_tabOption = nullptr;
     bool m_isVertical;
     bool m_isClosable;
-    void tabLayout(QRect *textRect, QRect *iconRect) const;
+    void tabLayout(QRectF *textRect, QRectF *iconRect) const;
 };
