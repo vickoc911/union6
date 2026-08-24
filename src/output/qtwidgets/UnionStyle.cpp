@@ -20,6 +20,7 @@
 #include "elements/ProgressBarElement.h"
 #include "elements/RubberBandElement.h"
 #include "elements/ScrollBarElement.h"
+#include "elements/SizeGripElement.h"
 #include "elements/SliderElement.h"
 #include "elements/SpinBoxElement.h"
 #include "elements/TabElement.h"
@@ -242,7 +243,9 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         }
         return;
     case QStyle::CE_SizeGrip:
-        drawElementBackground(painter, option, widget, {ElementString::SizeGrip});
+        if (auto ev = cachedElement<SizeGripElement, QStyleOptionSizeGrip>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::CE_DockWidgetTitle:
         if (const auto dockOption = qstyleoption_cast<const QStyleOptionDockWidget *>(option)) {
@@ -706,10 +709,18 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return ev->contentsSize(contentsSize);
         }
         break;
+    case QStyle::CT_SizeGrip:
+        if (auto ev = cachedElement<RubberBandElement, QStyleOptionRubberBand>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
+    case QStyle::CT_Splitter:
+        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize);
+        }
+        break;
     // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
-    case QStyle::CT_Splitter:
-    case QStyle::CT_SizeGrip:
     case QStyle::CT_DialogButtons:
     case QStyle::CT_MdiControls:
     case QStyle::CT_CustomBase:
