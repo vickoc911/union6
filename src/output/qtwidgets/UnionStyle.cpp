@@ -13,6 +13,7 @@
 #include "elements/FrameElement.h"
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
+#include "elements/IndicatorElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/LineEditElement.h"
 #include "elements/MenuBarElement.h"
@@ -471,26 +472,26 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawIndicator(painter);
         }
         return;
-    case QStyle::PE_IndicatorArrowLeft: {
-        const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowLeft:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowLeft(painter);
+        }
         return;
-    }
-    case QStyle::PE_IndicatorArrowUp: {
-        const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowUp:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowUp(painter);
+        }
         return;
-    }
-    case QStyle::PE_IndicatorArrowRight: {
-        const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowRight:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowRight(painter);
+        }
         return;
-    }
-    case QStyle::PE_IndicatorArrowDown: {
-        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowDown:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowDown(painter);
+        }
         return;
-    }
     case QStyle::PE_IndicatorSpinPlus:
     case QStyle::PE_IndicatorSpinMinus:
     case QStyle::PE_IndicatorSpinUp:
