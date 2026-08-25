@@ -25,6 +25,7 @@
 #include "elements/SliderElement.h"
 #include "elements/SpinBoxElement.h"
 #include "elements/StatusBarElement.h"
+#include "elements/TabBarElement.h"
 #include "elements/TabElement.h"
 #include "elements/TabWidgetElement.h"
 #include "elements/TitleBarElement.h"
@@ -93,7 +94,8 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed())
+        + qHash(controlElement, QHashSeed::globalSeed());
     switch (controlElement) {
     case QStyle::CE_ComboBoxLabel:
         if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
@@ -307,7 +309,8 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed())
+        + qHash(control, QHashSeed::globalSeed());
     switch (control) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
@@ -394,7 +397,8 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + +qHash(painter, QHashSeed::globalSeed())
+        + qHash(element, QHashSeed::globalSeed());
 
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
@@ -418,9 +422,10 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_FrameTabBarBase:
-        // TODO elements for both
+        if (auto ev = cachedElement<TabBarElement, QStyleOptionTabBarBase>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
-        // Standalone elements
     case QStyle::PE_PanelLineEdit:
         // For spinboxes and comboboxes, we do not want to draw this element
         // TODO: maybe this should be handleable by the CSS
@@ -641,7 +646,8 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
-    const auto hash = qHash(contentsSize, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(contentsSize, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed())
+        + qHash(contentsType, QHashSeed::globalSeed());
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
@@ -743,8 +749,11 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
             return ev->contentsSize(contentsSize).toSize();
         }
         break;
-    // Use defaults from qcommonstyle
     case QStyle::CT_TabWidget:
+        if (auto ev = cachedElement<TabWidgetElement, QStyleOptionTabWidgetFrame>(hash, option, widget)) {
+            return ev->contentsSize(contentsSize).toSize();
+        }
+        break;
     case QStyle::CT_DialogButtons:
     case QStyle::CT_MdiControls:
     case QStyle::CT_CustomBase:
@@ -756,7 +765,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
     QRectF rect;
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + qHash(element, QHashSeed::globalSeed());
 
     switch (element) {
     case QStyle::SE_ItemViewItemText:
@@ -871,7 +880,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + qHash(complexControl, QHashSeed::globalSeed())
+        + qHash(subControl, QHashSeed::globalSeed());
     switch (complexControl) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
@@ -930,7 +940,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     if (!properties) {
         return defaultMetric;
     }
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed());
+    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + qHash(metric, QHashSeed::globalSeed());
 
     switch (metric) {
     // Don't shift button text when sunken
