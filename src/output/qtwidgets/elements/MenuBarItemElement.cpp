@@ -56,3 +56,20 @@ void MenuBarItemElement::layout()
     m_layoutMap = layoutMap(m_contentElementList, m_menuItemOption, m_subElementList);
     m_isValid = true;
 }
+
+QVariantMap MenuBarItemElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList MenuBarItemElement::elementHints() const
+{
+    QStringList hints;
+    if (m_menuItemOption->checked) {
+        hints.append(u"with-submenu"_s);
+    }
+    if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator && !m_menuItemOption->text.isEmpty()) {
+        hints.append(u"with-title"_s);
+    }
+    return hints;
+}

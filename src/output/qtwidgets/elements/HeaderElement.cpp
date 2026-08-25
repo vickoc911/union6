@@ -142,3 +142,24 @@ QSizeF HeaderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     const QSizeF size(contentsSizeFromStyle.expandedTo(QSize(contentsWidth, contentsHeight)));
     return applyPaddingToSize(size);
 }
+
+QVariantMap HeaderElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList HeaderElement::elementHints() const
+{
+    QStringList hints;
+    switch (m_headerOption->sortIndicator) {
+    case QStyleOptionHeader::None:
+        return hints;
+    case QStyleOptionHeader::SortUp:
+        hints.append(u"sort-ascending"_s);
+        break;
+    case QStyleOptionHeader::SortDown:
+        hints.append(u"sort-descending"_s);
+        break;
+    }
+    return hints;
+}

@@ -131,3 +131,20 @@ QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
     }
     return QRect();
 }
+
+QVariantMap ComboBoxElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList ComboBoxElement::elementHints() const
+{
+    QStringList hints;
+    if (!m_comboBoxOption->frame) {
+        hints.append(u"flat"_s);
+    }
+    if (m_comboBoxOption->editable) {
+        hints.append(u"editable"_s);
+    }
+    return hints;
+}

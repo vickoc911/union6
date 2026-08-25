@@ -42,3 +42,31 @@ qreal TabBarElement::scrollButtonWidth() const
 {
     return querySize({ElementString::TabScrollButton}).width();
 }
+
+QVariantMap TabBarElement::elementAttributes() const
+{
+    QVariantMap map;
+    const bool top = m_tabBarOption->shape == QTabBar::RoundedNorth || m_tabBarOption->shape == QTabBar::TriangularNorth;
+    const bool bottom = m_tabBarOption->shape == QTabBar::RoundedSouth || m_tabBarOption->shape == QTabBar::TriangularSouth;
+    const bool left = m_tabBarOption->shape == QTabBar::RoundedWest || m_tabBarOption->shape == QTabBar::TriangularWest;
+    const bool right = m_tabBarOption->shape == QTabBar::RoundedEast || m_tabBarOption->shape == QTabBar::TriangularEast;
+
+    if (top) {
+        map[u"direction"_s] = QVariant(u"top"_s);
+    }
+    if (bottom) {
+        map[u"direction"_s] = QVariant(u"bottom"_s);
+    }
+    if (left) {
+        map[u"direction"_s] = QVariant(u"left"_s);
+    }
+    if (right) {
+        map[u"direction"_s] = QVariant(u"right"_s);
+    }
+    return map;
+}
+
+QStringList TabBarElement::elementHints() const
+{
+    return QStringList();
+}

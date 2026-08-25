@@ -24,6 +24,9 @@ public:
     void updateSubElementList() override;
     void layout() override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
 };

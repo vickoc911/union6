@@ -40,3 +40,17 @@ void FocusElement::layout()
         m_backgroundProperties = queryProperties(m_backgroundElementList);
     }
 }
+
+QVariantMap FocusElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList FocusElement::elementHints() const
+{
+    QStringList hints;
+    if (m_focusOption->state.testFlag(QStyle::State_FocusAtBorder)) {
+        hints.append(u"focus-at-border"_s);
+    }
+    return hints;
+}

@@ -170,3 +170,40 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         painter->restore();
     }
 }
+
+QVariantMap ToolButtonElement::elementAttributes() const
+{
+    QVariantMap map;
+    switch (m_toolButtonOption->toolButtonStyle) {
+    case Qt::ToolButtonIconOnly:
+        map[u"display"_s] = QVariant(u"icon-only"_s);
+        break;
+    case Qt::ToolButtonTextOnly:
+        map[u"display"_s] = QVariant(u"text-only"_s);
+        break;
+    case Qt::ToolButtonTextBesideIcon:
+        map[u"display"_s] = QVariant(u"text-beside-icon"_s);
+        break;
+    case Qt::ToolButtonTextUnderIcon:
+        map[u"display"_s] = QVariant(u"text-under-icon"_s);
+        break;
+    default:
+        return map;
+    }
+    return map;
+}
+
+QStringList ToolButtonElement::elementHints() const
+{
+    QStringList hints;
+    if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::None)) {
+        return hints;
+    }
+    if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::Menu)) {
+        hints.append(u"with-menu"_s);
+    }
+    if (!m_toolButtonOption->state.testFlag(QStyle::State_AutoRaise)) {
+        hints.append(u"raised"_s);
+    }
+    return hints;
+}

@@ -97,3 +97,35 @@ void CheckElement::drawIndicator(QPainter *painter) const
         drawBackgroundRectangle(painter, subElementRect(QStyle::SE_RadioButtonIndicator), m_indicatorProperties);
     }
 }
+
+QVariantMap CheckElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList CheckElement::elementHints() const
+{
+    QStringList hints;
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::Flat)) {
+        hints.append(u"flat"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::HasMenu)) {
+        hints.append(u"with-menu"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::DefaultButton)) {
+        hints.append(u"default-button"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::AutoDefaultButton)) {
+        hints.append(u"auto-default-button"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::CommandLinkButton)) {
+        hints.append(u"command-link-button"_s);
+    }
+    if (!m_buttonOption->state.testFlag(QStyle::State_AutoRaise)) {
+        hints.append(u"raised"_s);
+    }
+    if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
+        hints.append(u"no-change"_s);
+    }
+    return hints;
+}

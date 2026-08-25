@@ -30,6 +30,9 @@ public:
 
     bool isEditable() const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionComboBox *m_comboBoxOption = nullptr;
     qreal m_spacing;

@@ -31,6 +31,9 @@ public:
     void drawIndicator(QPainter *painter) const override;
     void layout() override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
     Union::ElementList m_indicatorElementList;

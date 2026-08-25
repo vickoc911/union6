@@ -155,3 +155,16 @@ void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::Primitiv
     m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
     painter->restore();
 }
+
+QVariantMap SpinBoxElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList SpinBoxElement::elementHints() const
+{
+    QStringList hints;
+    // Force the constrained look, as no other spinbox look will work due to QStyle expectations.
+    hints.append(u"constrained"_s);
+    return hints;
+}

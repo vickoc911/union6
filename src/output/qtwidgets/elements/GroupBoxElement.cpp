@@ -130,3 +130,20 @@ void GroupBoxElement::drawIcon(QPainter *painter) const
         m_style->drawPrimitive(QStyle::PE_IndicatorCheckBox, &checkbox, painter);
     }
 }
+
+QVariantMap GroupBoxElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList GroupBoxElement::elementHints() const
+{
+    QStringList hints;
+    if (m_groupBoxOption->features.testFlag(QStyleOptionFrame::Flat)) {
+        hints.append(u"flat"_s);
+    }
+    if (m_groupBoxOption->features.testFlag(QStyleOptionFrame::Rounded)) {
+        hints.append(u"rounded"_s);
+    }
+    return hints;
+}

@@ -24,6 +24,9 @@ public:
     QMarginsF iconPadding() const;
     QRectF subElementRect(QStyle::SubElement element) const override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionFrame *m_frameOption = nullptr;
 };

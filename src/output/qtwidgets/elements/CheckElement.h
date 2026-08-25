@@ -34,6 +34,9 @@ public:
     void drawIndicator(QPainter *painter) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionButton *m_buttonOption = nullptr;
     Type m_type;
