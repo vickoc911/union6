@@ -170,3 +170,36 @@ QRectF ScrollBarElement::subControlRect(QStyle::SubControl subControl) const
         return QRect();
     }
 }
+
+qreal ScrollBarElement::extent() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+        if (m_scrollBarOption->orientation == Qt::Horizontal) {
+            return m_backgroundProperties->layout()->height().value_or(0);
+        } else {
+            return m_backgroundProperties->layout()->width().value_or(0);
+        }
+    }
+    return 0;
+}
+
+qreal ScrollBarElement::controlThickness() const
+{
+    if (m_isValid && m_indicatorProperties && m_indicatorProperties->layout()) {
+        QSizeF size(m_indicatorProperties->layout()->width().value_or(1), m_indicatorProperties->layout()->height().value_or(1));
+        if (m_indicatorProperties->layout()->padding()) {
+            size = size.shrunkBy(m_indicatorProperties->layout()->padding()->toMargins().toMargins());
+        }
+        if (m_scrollBarOption->orientation == Qt::Horizontal) {
+            return size.height();
+        } else {
+            return size.width();
+        }
+    }
+    return 0;
+}
+
+qreal ScrollBarElement::minimumSize() const
+{
+    return extent() * 2;
+}

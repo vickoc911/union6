@@ -260,6 +260,7 @@ titlebar {
     background-color: var(--header-background-color);
     icon-alignment: content center fill 0;
     text-alignment: content center fill 1;
+    icon-size: var(--icon-size-small);
 
     systemmenu,
     minimizebutton,
