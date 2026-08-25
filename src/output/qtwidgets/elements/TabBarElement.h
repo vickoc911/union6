@@ -22,6 +22,9 @@ public:
 
     qreal scrollButtonWidth() const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionTabBarBase *m_tabBarOption = nullptr;
 };

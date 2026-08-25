@@ -304,3 +304,19 @@ qreal SliderElement::controlThickness() const
     }
     return 0;
 }
+
+QVariantMap SliderElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList SliderElement::elementHints() const
+{
+    QStringList hints;
+    if (m_sliderOption->orientation == Qt::Horizontal) {
+        hints.append(u"horizontal"_s);
+    } else {
+        hints.append(u"vertical"_s);
+    }
+    return hints;
+}

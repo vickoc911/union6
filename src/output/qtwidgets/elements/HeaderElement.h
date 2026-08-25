@@ -29,6 +29,9 @@ public:
 
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionHeader *m_headerOption = nullptr;
     QIcon sortIndicator();

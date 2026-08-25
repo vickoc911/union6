@@ -6,8 +6,11 @@
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
+#include <QListView>
 #include <QPainter>
 #include <QStyle>
+#include <QTableView>
+#include <QTreeView>
 
 using namespace Qt::StringLiterals;
 
@@ -189,4 +192,66 @@ void ItemViewElement::drawIcon(QPainter *painter) const
         m_style->drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
         painter->restore();
     }
+}
+QVariantMap ItemViewElement::elementAttributes() const
+{
+    QVariantMap map;
+    if (m_viewItemOption->decorationPosition == QStyleOptionViewItem::Top) {
+        map[u"display"_s] = QVariant(u"text-under-icon"_s);
+    }
+    if (m_viewItemOption->decorationPosition == QStyleOptionViewItem::Bottom) {
+        map[u"display"_s] = QVariant(u"text-below-icon"_s);
+    }
+    if (m_viewItemOption->decorationPosition == QStyleOptionViewItem::Left) {
+        map[u"display"_s] = QVariant(u"text-after-icon"_s);
+    }
+    if (m_viewItemOption->decorationPosition == QStyleOptionViewItem::Right) {
+        map[u"display"_s] = QVariant(u"text-before-icon"_s);
+    }
+    return map;
+}
+
+QStringList ItemViewElement::elementHints() const
+{
+    QStringList hints;
+    auto viewItemPosition = m_viewItemOption->viewItemPosition;
+    const auto table = qobject_cast<const QTableView *>(m_viewItemOption->widget);
+    const auto tree = qobject_cast<const QTreeView *>(m_viewItemOption->widget);
+    const auto list = qobject_cast<const QListView *>(m_viewItemOption->widget);
+    // For tables and such, we just want to select one item.
+    if (table) {
+        hints.append(u"inside-table"_s);
+    }
+    if (tree) {
+        hints.append(u"inside-tree"_s);
+    }
+    if (list) {
+        hints.append(u"inside-list"_s);
+    }
+
+    // These always have hover effect, i think
+    hints.append(u"hover-enabled"_s);
+
+    switch (viewItemPosition) {
+    case QStyleOptionViewItem::Invalid:
+        hints.append(u"position-invalid"_s);
+        break;
+    case QStyleOptionViewItem::Beginning:
+        hints.append(u"position-beginning"_s);
+        break;
+    case QStyleOptionViewItem::Middle:
+        hints.append(u"position-middle"_s);
+        break;
+    case QStyleOptionViewItem::End:
+        hints.append(u"position-end"_s);
+        break;
+    case QStyleOptionViewItem::OnlyOne:
+        hints.append(u"position-onlyone"_s);
+        break;
+    }
+
+    if (m_viewItemOption->state.testFlag(QStyle::State_Open)) {
+        hints.append(u"expanded"_s);
+    }
+    return hints;
 }

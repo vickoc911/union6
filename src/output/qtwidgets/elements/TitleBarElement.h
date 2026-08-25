@@ -32,6 +32,9 @@ public:
     qreal buttonWidth() const;
     void drawButton(QPainter *painter, const QRectF &rect, const QIcon &icon) const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionTitleBar *m_titleBarOption = nullptr;
 

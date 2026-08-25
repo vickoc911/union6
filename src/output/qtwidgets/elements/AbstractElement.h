@@ -113,38 +113,35 @@ public:
     virtual void update();
 
 protected:
-    const QStyleOption *m_styleOption;
-    const UnionStyle *m_style;
-    const QWidget *m_widget;
-    QIcon m_icon = QIcon();
-    QString m_text = QString();
-    QIcon m_indicator = QIcon();
-    Union::ElementList m_backgroundElementList;
-    Union::ElementList m_contentElementList;
-    Union::ElementList m_indicatorElementList;
-    // Holds the properties for the background: This is the top-level properties of the item
-    // by default.
-    Union::Properties::StylePropertyGroup *m_backgroundProperties;
-    // Holds the properties for any contents, such as text and icon.
-    // This can vary a lot depending on the element.
-    Union::Properties::StylePropertyGroup *m_contentProperties;
-    // Holds the properties for any indicators, such as dropdown arrows.
-    // This can vary a lot depending on the element.
-    Union::Properties::StylePropertyGroup *m_indicatorProperties;
-    QMap<QString, LayoutItem> m_layoutMap;
-    QStringList m_subElementList;
+    /*!
+     * \brief Translate styleoption values into attributes for this element.
+     */
+    virtual QVariantMap elementAttributes() const;
 
-    // Updates the m_subElementList with any values that are used when fetching a layout, so
-    // that the element gets a proper hierarchy.
+    /*!
+     * \brief Translate styleoption values into attributes for this element.
+     */
+    virtual QStringList elementHints() const;
+
+    /*!
+     * \brief Translate states of styleoption into Union states.
+     */
+    virtual Union::Element::States elementStates() const;
+
+    /*!
+     * \brief Updates the m_subElementList with any values that are used when fetching a layout, so
+     * that the element gets a proper hierarchy.
+     */
     virtual void updateSubElementList();
 
-    // Utilizes the background property to apply a padding to the given size.
+    /*!
+     * \brief Utilizes the background property to apply a padding to the given size.
+     */
     QSizeF applyPaddingToSize(QSizeF oldSize, PaddingDirection direction = PaddingDirection::Outward) const;
 
-    // Used to check if we have all elements properly prepared
-    bool m_isValid = false;
-
-    // Query the size of an element based on its hierarchy. Useful for one-off calculations.
+    /*!
+     * \brief Query the size of an element based on its hierarchy. Useful for one-off calculations.
+     */
     virtual QSizeF querySize(QStringList targetHierarchy) const;
 
     /*!
@@ -167,4 +164,30 @@ protected:
      * Currently only one container is used, which is the rectangle of the parent of the subElements.
      */
     virtual QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements) const;
+
+    const QStyleOption *m_styleOption;
+    const UnionStyle *m_style;
+    const QWidget *m_widget;
+    QIcon m_icon = QIcon();
+    QString m_text = QString();
+    QIcon m_indicator = QIcon();
+    Union::ElementList m_backgroundElementList;
+    Union::ElementList m_contentElementList;
+    Union::ElementList m_indicatorElementList;
+    // Holds the properties for the background:
+    // This is the top-level properties of the item by default.
+    Union::Properties::StylePropertyGroup *m_backgroundProperties;
+    // Holds the properties for any contents, such as text and icon.
+    // This can vary a lot depending on the element.
+    Union::Properties::StylePropertyGroup *m_contentProperties;
+    // Holds the properties for any indicators, such as dropdown arrows.
+    // This can vary a lot depending on the element.
+    Union::Properties::StylePropertyGroup *m_indicatorProperties;
+    QMap<QString, LayoutItem> m_layoutMap;
+    QStringList m_subElementList;
+    // Used to check if we have all elements properly prepared
+    bool m_isValid = false;
+
+private:
+    Union::Element::Ptr createElement(const QString &name) const;
 };

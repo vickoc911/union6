@@ -23,13 +23,6 @@ struct LayoutItem {
 
 const char property_union_member_list[] = "_union_member_list";
 
-/*!
- * \brief Translate the state from QStyleOption to Union::Element states.
- */
-Union::Element::States statesFromOption(const QStyleOption *option);
-QStringList hintsFromOption(const QStyleOption *option);
-QVariantMap attributesFromOption(const QStyleOption *option);
-
 Qt::Alignment toQtAlignment(Union::Properties::AlignmentPropertyGroup *alignmentGroup);
 Qt::TextElideMode toQtElideMode(Union::Properties::TextElide elideMode);
 Qt::TextFlag toQtWrapMode(Union::Properties::TextWrapMode wrapMode);

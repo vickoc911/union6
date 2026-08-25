@@ -94,14 +94,46 @@ QRectF ButtonElement::subElementRect(QStyle::SubElement element) const
     }
 
     if (element == QStyle::SE_PushButtonBevel || element == QStyle::SE_PushButtonFocusRect) {
-        return backgroundRectangle(m_styleOption, m_backgroundProperties).toRect();
+        return backgroundRectangle(m_buttonOption, m_backgroundProperties).toRect();
     }
 
-    QRectF rect = m_styleOption->rect;
+    QRectF rect = m_buttonOption->rect;
     QRectF unifiedRect;
     for (const auto &m : m_layoutMap) {
         unifiedRect = unifiedRect.united(m.rect.toRect());
     }
     rect = unifiedRect;
     return rect;
+}
+
+QVariantMap ButtonElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList ButtonElement::elementHints() const
+{
+    QStringList hints;
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::Flat)) {
+        hints.append(u"flat"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::HasMenu)) {
+        hints.append(u"with-menu"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::DefaultButton)) {
+        hints.append(u"default-button"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::AutoDefaultButton)) {
+        hints.append(u"auto-default-button"_s);
+    }
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::CommandLinkButton)) {
+        hints.append(u"command-link-button"_s);
+    }
+    if (!m_buttonOption->state.testFlag(QStyle::State_AutoRaise)) {
+        hints.append(u"raised"_s);
+    }
+    if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
+        hints.append(u"no-change"_s);
+    }
+    return hints;
 }

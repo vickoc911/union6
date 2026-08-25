@@ -112,23 +112,66 @@ QSizeF AbstractElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 
 QRectF AbstractElement::subElementRect(QStyle::SubElement element) const
 {
-    qCWarning(UNION_QTWIDGETS) << "subElementRect is unimplemented for " << element;
+    Q_UNUSED(element);
     return QRect();
 }
 
 QRectF AbstractElement::subControlRect(QStyle::SubControl subControl) const
 {
-    qCWarning(UNION_QTWIDGETS) << "subControlRect is unimplemented for " << subControl;
+    Q_UNUSED(subControl);
     return QRect();
 }
 
 void AbstractElement::updateSubElementList()
 {
-    qCWarning(UNION_QTWIDGETS) << "updateSubElementList is unimplemented for" << m_widget;
 }
 
 void AbstractElement::update()
 {
+}
+
+QVariantMap AbstractElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList AbstractElement::elementHints() const
+{
+    return QStringList();
+}
+
+Union::Element::States AbstractElement::elementStates() const
+{
+    Union::Element::States states;
+    if (!m_styleOption) {
+        return states;
+    }
+    if (m_styleOption->state.testFlag(QStyle::State_None)) {
+        return states;
+    }
+
+    states.setFlag(Union::Element::State::Hovered, m_styleOption->state.testFlag(QStyle::State_MouseOver));
+    states.setFlag(Union::Element::State::ActiveFocus, m_styleOption->state.testFlag(QStyle::State_HasFocus));
+    states.setFlag(Union::Element::State::VisualFocus,
+                   m_styleOption->state.testFlag(QStyle::State_KeyboardFocusChange) && m_styleOption->state.testFlag(QStyle::State_HasFocus));
+    states.setFlag(Union::Element::State::Disabled, !m_styleOption->state.testFlag(QStyle::State_Enabled));
+    states.setFlag(Union::Element::State::Highlighted, m_styleOption->state.testFlag(QStyle::State_Selected));
+
+    if (m_styleOption->state.testFlag(QStyle::State_On)) {
+        states.setFlag(Union::Element::State::Checked);
+    }
+    if (m_styleOption->state.testFlag(QStyle::State_Off)) {
+        states.setFlag(Union::Element::State::Checked, false);
+    }
+
+    if (m_styleOption->state.testFlag(QStyle::State_Sunken)) {
+        states.setFlag(Union::Element::State::Pressed);
+    }
+    if (m_styleOption->state.testFlag(QStyle::State_Raised)) {
+        states.setFlag(Union::Element::State::Pressed, false);
+    }
+
+    return states;
 }
 
 QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, PaddingDirection direction) const
@@ -218,13 +261,6 @@ void AbstractElement::drawIcon(QPainter *painter) const
         const QPalette activePalette = m_styleOption->palette;
         const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
         auto iconSize = iconRect.size();
-        // Toolbutton can override the regular icon size
-        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(m_styleOption)) {
-            // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
-            if (toolButtonOption->icon.name() == m_icon.name()) {
-                iconSize = toolButtonOption->iconSize;
-            }
-        }
         const QPixmap pixmap = m_icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
         QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
@@ -382,12 +418,7 @@ Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, con
     }
 
     for (const auto &elementType : elementTypes) {
-        auto unionElement = Union::Element::create();
-        unionElement->setType(elementType);
-        unionElement->setStates(statesFromOption(opt));
-        unionElement->setHints(hintsFromOption(opt));
-        unionElement->setAttributes(attributesFromOption(opt));
-        elements.append(unionElement);
+        elements.append(createElement(elementType));
     }
     return elements;
 }
@@ -438,12 +469,7 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
         if (subElement != ElementString::Icon && subElement != ElementString::Text) {
-            auto unionElement = Union::Element::create();
-            unionElement->setType(subElement);
-            unionElement->setStates(statesFromOption(opt));
-            unionElement->setHints(hintsFromOption(opt));
-            unionElement->setAttributes(attributesFromOption(opt));
-            currentHierarchy.append(unionElement);
+            currentHierarchy.append(createElement(subElement));
         }
         properties = queryProperties(currentHierarchy);
         Union::Properties::Alignment horizontalAlignment;
@@ -627,4 +653,14 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
     }
 
     return map;
+}
+
+Union::Element::Ptr AbstractElement::createElement(const QString &name) const
+{
+    auto unionElement = Union::Element::create();
+    unionElement->setType(name);
+    unionElement->setStates(elementStates());
+    unionElement->setHints(elementHints());
+    unionElement->setAttributes(elementAttributes());
+    return unionElement;
 }

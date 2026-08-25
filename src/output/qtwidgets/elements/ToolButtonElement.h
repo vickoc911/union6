@@ -29,6 +29,9 @@ public:
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionToolButton *m_toolButtonOption = nullptr;
     bool m_hasIndicator;

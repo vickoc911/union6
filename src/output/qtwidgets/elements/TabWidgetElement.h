@@ -19,6 +19,9 @@ public:
 
     void update() override;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionTabWidgetFrame *m_tabFrameOption = nullptr;
 };

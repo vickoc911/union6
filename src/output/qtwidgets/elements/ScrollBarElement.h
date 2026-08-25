@@ -35,6 +35,9 @@ public:
     qreal controlThickness() const;
     qreal minimumSize() const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionSlider *m_scrollBarOption = nullptr;
     bool m_horizontal;

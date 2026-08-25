@@ -32,6 +32,9 @@ public:
     int hSpace() const;
     int vSpace() const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionTab *m_tabOption = nullptr;
     bool m_isVertical;

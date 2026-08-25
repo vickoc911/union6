@@ -193,3 +193,20 @@ QIcon TitleBarElement::queryIcon(const QString &defaultIconName, const QStringLi
     }
     return QIcon::fromTheme(name);
 }
+
+QVariantMap TitleBarElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList TitleBarElement::elementHints() const
+{
+    QStringList hints;
+    if (m_titleBarOption->titleBarState & Qt::WindowMaximized) {
+        hints.append(u"maximized"_s);
+    }
+    if (m_titleBarOption->titleBarState & Qt::WindowMinimized) {
+        hints.append(u"minimized"_s);
+    }
+    return hints;
+}

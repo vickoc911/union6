@@ -29,3 +29,31 @@ void TabWidgetElement::update()
     setText(QString());
     layout();
 }
+
+QVariantMap TabWidgetElement::elementAttributes() const
+{
+    QVariantMap map;
+    const bool top = m_tabFrameOption->shape == QTabBar::RoundedNorth || m_tabFrameOption->shape == QTabBar::TriangularNorth;
+    const bool bottom = m_tabFrameOption->shape == QTabBar::RoundedSouth || m_tabFrameOption->shape == QTabBar::TriangularSouth;
+    const bool left = m_tabFrameOption->shape == QTabBar::RoundedWest || m_tabFrameOption->shape == QTabBar::TriangularWest;
+    const bool right = m_tabFrameOption->shape == QTabBar::RoundedEast || m_tabFrameOption->shape == QTabBar::TriangularEast;
+
+    if (top) {
+        map[u"direction"_s] = QVariant(u"top"_s);
+    }
+    if (bottom) {
+        map[u"direction"_s] = QVariant(u"bottom"_s);
+    }
+    if (left) {
+        map[u"direction"_s] = QVariant(u"left"_s);
+    }
+    if (right) {
+        map[u"direction"_s] = QVariant(u"right"_s);
+    }
+    return map;
+}
+
+QStringList TabWidgetElement::elementHints() const
+{
+    return QStringList();
+}

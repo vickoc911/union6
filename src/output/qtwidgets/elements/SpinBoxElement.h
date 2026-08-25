@@ -30,6 +30,9 @@ public:
 
     void drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive, const QRectF &rect) const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionSpinBox *m_spinBoxOption = nullptr;
     bool m_hasButtons;

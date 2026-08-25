@@ -148,3 +148,31 @@ int TabElement::vSpace() const
     }
     return 0;
 }
+
+QVariantMap TabElement::elementAttributes() const
+{
+    QVariantMap map;
+    const bool top = m_tabOption->shape == QTabBar::RoundedNorth || m_tabOption->shape == QTabBar::TriangularNorth;
+    const bool bottom = m_tabOption->shape == QTabBar::RoundedSouth || m_tabOption->shape == QTabBar::TriangularSouth;
+    const bool left = m_tabOption->shape == QTabBar::RoundedWest || m_tabOption->shape == QTabBar::TriangularWest;
+    const bool right = m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::TriangularEast;
+
+    if (top) {
+        map[u"direction"_s] = QVariant(u"top"_s);
+    }
+    if (bottom) {
+        map[u"direction"_s] = QVariant(u"bottom"_s);
+    }
+    if (left) {
+        map[u"direction"_s] = QVariant(u"left"_s);
+    }
+    if (right) {
+        map[u"direction"_s] = QVariant(u"right"_s);
+    }
+    return map;
+}
+
+QStringList TabElement::elementHints() const
+{
+    return QStringList();
+}

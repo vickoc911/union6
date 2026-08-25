@@ -32,6 +32,9 @@ public:
 
     qreal controlThickness() const;
 
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+
 private:
     const QStyleOptionSlider *m_sliderOption = nullptr;
     bool m_isHorizontal;
