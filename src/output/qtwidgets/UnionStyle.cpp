@@ -29,6 +29,7 @@
 #include "elements/SplitterElement.h"
 #include "elements/StatusBarElement.h"
 #include "elements/TabBarElement.h"
+#include "elements/TabCloseButtonElement.h"
 #include "elements/TabElement.h"
 #include "elements/TabWidgetElement.h"
 #include "elements/TitleBarElement.h"
@@ -632,11 +633,10 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorColumnViewArrow:
         drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
         return;
-    case QStyle::PE_IndicatorTabClose: {
-        drawElementBackground(painter, option, widget, {ElementString::Tab, ElementString::CloseButton});
-        const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {ElementString::IndicatorTabClose});
-        drawIcon(option->rect, option, painter, icon, widget);
-    }
+    case QStyle::PE_IndicatorTabClose:
+        if (auto ev = cachedElement<TabCloseButtonElement, QStyleOption>(hash, option, widget)) {
+            ev->drawIcon(painter);
+        }
         return;
     // Handle with QCommonStyle for now
     case QStyle::PE_PanelItemViewRow:
