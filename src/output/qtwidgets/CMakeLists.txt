@@ -57,6 +57,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/RubberBandElement.h
         elements/ScrollBarElement.cpp
         elements/ScrollBarElement.h
+        elements/ScrollAreaCornerElement.cpp
+        elements/ScrollAreaCornerElement.h
         elements/SliderElement.cpp
         elements/SliderElement.h
         elements/SizeGripElement.cpp

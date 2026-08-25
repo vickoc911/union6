@@ -21,6 +21,7 @@
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
 #include "elements/RubberBandElement.h"
+#include "elements/ScrollAreaCornerElement.h"
 #include "elements/ScrollBarElement.h"
 #include "elements/SizeGripElement.h"
 #include "elements/SliderElement.h"
@@ -443,7 +444,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_PanelScrollAreaCorner:
-        drawElementBackground(painter, option, widget, {ElementString::ScrollAreaCorner});
+        if (auto ev = cachedElement<ScrollAreaCornerElement, QStyleOption>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::PE_PanelTipLabel:
         drawElementBackground(painter, option, widget, {ElementString::ToolTip});
