@@ -4,6 +4,7 @@
 #include "AbstractElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "qtwidgets_logging.h"
 #include <ElementQuery.h>
 #include <QApplication>
 #include <QDebug>
@@ -442,7 +443,7 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
     // If subelement list is empty, just use default widget item.
     // This ensures any custom components get layouted too.
     if (subElements.empty()) {
-        qDebug() << "No sublements given, using Widget placeholder for" << elements << opt->type << opt->styleObject;
+        qCDebug(UNION_QTWIDGETS) << "No sublements given, using Widget placeholder for" << elements << opt->type << opt->styleObject;
         subElements = {ElementString::Widget};
     }
 
