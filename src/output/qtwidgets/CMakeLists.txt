@@ -67,6 +67,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/StatusBarElement.h
         elements/TabElement.cpp
         elements/TabElement.h
+        elements/TabWidgetElement.cpp
+        elements/TabWidgetElement.h
         elements/TitleBarElement.cpp
         elements/TitleBarElement.h
         elements/ToolBarElement.cpp

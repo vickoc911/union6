@@ -26,6 +26,7 @@
 #include "elements/SpinBoxElement.h"
 #include "elements/StatusBarElement.h"
 #include "elements/TabElement.h"
+#include "elements/TabWidgetElement.h"
 #include "elements/TitleBarElement.h"
 #include "elements/ToolBarElement.h"
 #include "elements/ToolBoxTabElement.h"
@@ -412,6 +413,10 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_FrameTabWidget:
+        if (auto ev = cachedElement<TabWidgetElement, QStyleOptionTabWidgetFrame>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
+        return;
     case QStyle::PE_FrameTabBarBase:
         // TODO elements for both
         return;
