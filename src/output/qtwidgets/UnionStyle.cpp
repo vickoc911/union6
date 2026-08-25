@@ -473,22 +473,22 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_IndicatorArrowLeft: {
         const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorArrowUp: {
         const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorArrowRight: {
         const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorArrowDown: {
         const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorSpinPlus:
@@ -510,7 +510,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawBackgroundRectangle(painter, option->rect, props);
         if (props->icon()) {
             auto icon = QIcon::fromTheme(props->icon()->name().value_or(up ? u"arrow-up-symbolic"_s : u"arrow-down-symbolic"_s));
-            drawIcon(option->rect, option, painter, icon, widget);
+            drawIcon(option->rect, option, painter, icon);
         }
     }
         return;
@@ -590,12 +590,12 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         const auto icon = queryIcon(option, widget, defaultIconName, {ElementString::IndicatorBranch});
         auto size = querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indicator});
         auto rect = centerRect(option->rect, size.width(), size.height());
-        drawIcon(rect, option, painter, icon, widget);
+        drawIcon(rect, option, painter, icon);
     }
         return;
     case QStyle::PE_IndicatorButtonDropDown: {
         const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
     }
         return;
     case QStyle::PE_IndicatorMenuCheckMark:
@@ -1480,42 +1480,6 @@ void UnionStyle::polish(QWidget *widget)
     QCommonStyle::polish(widget);
 }
 
-void UnionStyle::drawText(const QRectF &rect,
-                          const QStyleOption *opt,
-                          QPainter *painter,
-                          const QString &text,
-                          const QWidget *widget,
-                          const QColor &overrideColor) const
-{
-    if (text.isEmpty()) {
-        return;
-    }
-
-    int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
-    const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
-    QColor penColor;
-    if (overrideColor.isValid()) {
-        penColor = overrideColor;
-    } else {
-        // TODO: hide mnemonics if requested
-        if (!elements.isEmpty()) {
-            auto properties = queryProperties(elements);
-            auto textColor = properties->text()->color();
-            penColor = opt->palette.text().color();
-            if (textColor) {
-                penColor = textColor->toQColor();
-            }
-            textFlags = textFlagsFromProperties(properties, true);
-        }
-    }
-
-    painter->save();
-    painter->setPen(penColor);
-    drawItemText(painter, rect.toRect(), textFlags, opt->palette, enabled, text);
-    painter->restore();
-}
-
 void UnionStyle::drawItemText(QPainter *painter,
                               const QRect &rect,
                               int flags,
@@ -1528,35 +1492,19 @@ void UnionStyle::drawItemText(QPainter *painter,
     QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
-void UnionStyle::drawIcon(const QRectF &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget, const QColor &overrideColor)
-    const
+void UnionStyle::drawIcon(const QRectF &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QColor &overrideColor) const
 {
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
 
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
     auto iconSize = rect.size();
-    // Toolbutton can override the regular icon size
-    if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
-        // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
-        if (toolButtonOption->icon.name() == icon.name()) {
-            iconSize = toolButtonOption->iconSize;
-        }
-    }
     const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
     QColor penColor = opt->palette.text().color(); // Use text color as fallback
     if (overrideColor.isValid()) {
         penColor = overrideColor;
-    } else if (!elements.isEmpty()) {
-        auto properties = queryProperties(elements);
-        if (properties->icon() && properties->icon()->color().has_value()) {
-            auto iconColor = properties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
     }
-
     painter->save();
     painter->setPen(penColor);
     drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
