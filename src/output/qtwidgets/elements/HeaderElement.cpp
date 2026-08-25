@@ -14,6 +14,7 @@ using namespace Qt::StringLiterals;
 HeaderElement::HeaderElement(const QStyleOptionHeader *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_headerOption(option)
+    , m_isHorizontal(false)
 {
     update();
 }
@@ -24,6 +25,7 @@ HeaderElement::~HeaderElement()
 
 void HeaderElement::update()
 {
+    m_isHorizontal = (m_headerOption->orientation == Qt::Horizontal);
     setText(m_headerOption->text);
     updateSubElementList();
     layout();
@@ -99,4 +101,44 @@ QRectF HeaderElement::subElementRect(QStyle::SubElement element) const
         rect = m_layoutMap[mapItem].rect;
     }
     return rect;
+}
+
+QSizeF HeaderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+{
+    if (!m_isValid) {
+        return QSizeF();
+    }
+    // Copied from Breeze
+    const qreal arrowWidth = subElementRect(QStyle::SE_HeaderArrow).width();
+    const qreal space = spacing();
+
+    const QSizeF textSize(hasText() ? m_headerOption->fontMetrics.size(0, m_headerOption->text) : QSize());
+
+    // contents width
+    qreal contentsWidth(0);
+    if (hasText()) {
+        contentsWidth += textSize.width();
+    }
+    if (hasIcon()) {
+        contentsWidth += iconSize().width();
+        if (hasText()) {
+            contentsWidth += space;
+        }
+    }
+
+    // contents height
+    qreal contentsHeight(hasText() ? textSize.height() : m_headerOption->fontMetrics.height());
+    if (hasIcon()) {
+        contentsHeight = qMax(contentsHeight, iconSize().height());
+    }
+
+    if (m_isHorizontal && m_headerOption->sortIndicator != QStyleOptionHeader::None) {
+        // also add space for sort indicator
+        contentsWidth += arrowWidth + space;
+        contentsHeight = qMax(contentsHeight, arrowWidth);
+    }
+
+    // update contents size, add margins and return
+    const QSizeF size(contentsSizeFromStyle.expandedTo(QSize(contentsWidth, contentsHeight)));
+    return applyPaddingToSize(size);
 }

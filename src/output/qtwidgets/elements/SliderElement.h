@@ -30,6 +30,8 @@ public:
     void drawBackground(QPainter *painter) const override;
     void updateSubElementList() override;
 
+    qreal controlThickness() const;
+
 private:
     const QStyleOptionSlider *m_sliderOption = nullptr;
     bool m_isHorizontal;

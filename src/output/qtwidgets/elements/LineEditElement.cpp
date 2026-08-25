@@ -33,7 +33,7 @@ void LineEditElement::update()
     layout();
 }
 
-QSizeF LineEditElement::iconSize()
+QSizeF LineEditElement::iconSize() const
 {
     return querySize(m_frameOption, m_widget, {ElementString::LineEditIconSize});
 }
@@ -42,4 +42,12 @@ void LineEditElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::TextField);
+}
+
+QMarginsF LineEditElement::iconPadding() const
+{
+    if (m_isValid && m_contentProperties->layout() && m_contentProperties->layout()->padding()) {
+        return m_contentProperties->layout()->padding()->toMargins();
+    }
+    return QMarginsF();
 }

@@ -25,6 +25,10 @@ public:
     void drawSeparator(QPainter *painter) const;
     void layout() override;
 
+    qreal separatorExtent() const;
+    qreal handleExtent() const;
+    qreal extensionExtent() const;
+
 private:
     const QStyleOptionToolBar *m_toolBarOption = nullptr;
 
@@ -32,4 +36,6 @@ private:
     Union::Properties::StylePropertyGroup *m_handleProperties;
     Union::ElementList m_separatorElementList;
     Union::Properties::StylePropertyGroup *m_separatorProperties;
+    Union::ElementList m_extensionElementList;
+    Union::Properties::StylePropertyGroup *m_extensionProperties;
 };

@@ -34,9 +34,6 @@ public:
     void drawIndicator(QPainter *painter) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    int labelSpacing() const;
-    int indicatorWidth() const;
-
 private:
     const QStyleOptionButton *m_buttonOption = nullptr;
     Type m_type;
