@@ -4,8 +4,6 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,7 +19,6 @@ public:
     ~MenuBarElement() override;
 
     void update() override;
-    void drawBackground(QPainter *painter) const override;
 
 private:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;

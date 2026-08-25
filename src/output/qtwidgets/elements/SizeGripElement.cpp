@@ -41,8 +41,3 @@ void SizeGripElement::layout()
         m_isValid = true;
     }
 }
-
-void SizeGripElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_sizeGripOption->rect, m_backgroundProperties);
-}

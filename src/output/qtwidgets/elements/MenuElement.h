@@ -4,7 +4,6 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "BackgroundDrawing.h"
 #include <QObject>
 #include <QStyleOption>
 
@@ -20,8 +19,6 @@ public:
 
     void update() override;
     void updateSubElementList() override;
-    void drawBackground(QPainter *painter) const override;
-    void drawFrame(QPainter *painter) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
 private:

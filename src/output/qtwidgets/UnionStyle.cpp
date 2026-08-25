@@ -261,19 +261,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
             ev->drawBackground(painter);
         }
         break;
-    // Ignored
-    case QStyle::CE_MenuEmptyArea:
-    case QStyle::CE_MenuVMargin:
-    case QStyle::CE_MenuHMargin:
-        return;
-    // Scrollbar buttons are also ignored for now since they do not exist in qtquick
-    case QStyle::CE_ScrollBarAddLine:
-    case QStyle::CE_ScrollBarSubLine:
-    case QStyle::CE_ScrollBarAddPage:
-    case QStyle::CE_ScrollBarSubPage:
-    case QStyle::CE_ScrollBarFirst:
-    case QStyle::CE_ScrollBarLast:
-        return;
     case QStyle::CE_ToolBoxTabShape:
         if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
             ev->drawBackground(painter);
@@ -289,6 +276,19 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         drawControl(CE_ToolBoxTabShape, option, painter, widget);
         drawControl(CE_ToolBoxTabLabel, option, painter, widget);
         break;
+    // Ignored
+    case QStyle::CE_MenuEmptyArea:
+    case QStyle::CE_MenuVMargin:
+    case QStyle::CE_MenuHMargin:
+        return;
+    // Scrollbar buttons are also ignored for now since they do not exist in qtquick
+    case QStyle::CE_ScrollBarAddLine:
+    case QStyle::CE_ScrollBarSubLine:
+    case QStyle::CE_ScrollBarAddPage:
+    case QStyle::CE_ScrollBarSubPage:
+    case QStyle::CE_ScrollBarFirst:
+    case QStyle::CE_ScrollBarLast:
+        return;
     // Rely on QCommonStyle
     case QStyle::CE_MenuScroller:
     case QStyle::CE_MenuTearoff:

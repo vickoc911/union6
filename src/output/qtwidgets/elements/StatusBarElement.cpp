@@ -56,11 +56,6 @@ void StatusBarElement::layout()
     }
 }
 
-void StatusBarElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_statusBarOption->rect, m_backgroundProperties);
-}
-
 void StatusBarElement::drawItem(QPainter *painter) const
 {
     drawBackgroundRectangle(painter, m_statusBarOption->rect, m_contentProperties);

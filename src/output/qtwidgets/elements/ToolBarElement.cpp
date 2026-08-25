@@ -63,16 +63,6 @@ void ToolBarElement::layout()
     }
 }
 
-void ToolBarElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_toolBarOption->rect, m_backgroundProperties);
-}
-
-void ToolBarElement::drawFrame(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_toolBarOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
-}
-
 void ToolBarElement::drawHandle(QPainter *painter) const
 {
     if (m_handleProperties && m_handleProperties->layout()) {

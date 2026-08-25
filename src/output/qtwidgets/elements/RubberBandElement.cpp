@@ -40,8 +40,3 @@ void RubberBandElement::layout()
         m_isValid = true;
     }
 }
-
-void RubberBandElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_rubberBandOption->rect, m_backgroundProperties);
-}
