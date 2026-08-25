@@ -9,6 +9,7 @@
 #include "elements/CheckElement.h"
 #include "elements/ComboBoxElement.h"
 #include "elements/DockWidgetElement.h"
+#include "elements/FocusElement.h"
 #include "elements/FrameElement.h"
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
@@ -24,6 +25,7 @@
 #include "elements/SizeGripElement.h"
 #include "elements/SliderElement.h"
 #include "elements/SpinBoxElement.h"
+#include "elements/SplitterElement.h"
 #include "elements/StatusBarElement.h"
 #include "elements/TabBarElement.h"
 #include "elements/TabElement.h"
@@ -33,7 +35,6 @@
 #include "elements/ToolBoxTabElement.h"
 #include "elements/ToolButtonElement.h"
 #include "elements/WidgetElement.h"
-#include "output/qtwidgets/elements/SplitterElement.h"
 
 #include <ElementQuery.h>
 #include <QApplication>
@@ -451,9 +452,10 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         drawElementBackground(painter, option, widget, {ElementString::ToolTip});
         return;
     case QStyle::PE_FrameFocusRect:
-        drawElementBackground(painter, option, widget, {ElementString::FocusFrame});
+        if (auto ev = cachedElement<FocusElement, QStyleOptionFocusRect>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
-        // Indicators
     case QStyle::PE_IndicatorCheckBox:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
             ev->drawIndicator(painter);
