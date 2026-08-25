@@ -409,9 +409,3 @@ void drawCornerProperty(QPainter *painter,
     painter->drawPath(path);
     painter->restore();
 }
-
-void drawElementBackground(QPainter *painter, const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)
-{
-    const auto properties = queryProperties(prepareElements(option, widget, targetHierarchy));
-    drawBackgroundRectangle(painter, option->rect, properties);
-}

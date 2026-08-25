@@ -39,35 +39,55 @@ void TitleBarElement::draw(QPainter *painter) const
     drawBackground(painter);
     if (!m_titleBarOption->text.isEmpty()
         && (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowTitleHint) || m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint))) {
-        m_style->drawText(m_layoutMap[ElementString::Text].rect, m_titleBarOption, painter, m_titleBarOption->text, m_widget);
+        drawText(painter);
     }
     if (!m_titleBarOption->icon.isNull()) {
-        m_style->drawIcon(m_layoutMap[ElementString::Icon].rect, m_titleBarOption, painter, m_titleBarOption->icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::Icon].rect, m_titleBarOption->icon);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
         const auto icon = queryIcon(m_titleBarOption, m_widget, u"help-contextual-symbolic"_s, {ElementString::TitleBar, ElementString::HelpButton});
-        m_style->drawIcon(m_layoutMap[ElementString::HelpButton].rect, m_titleBarOption, painter, icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::HelpButton].rect, icon);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
         const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-minimize-symbolic"_s, {ElementString::TitleBar, ElementString::MinimizeButton});
-        m_style->drawIcon(m_layoutMap[ElementString::MinimizeButton].rect, m_titleBarOption, painter, icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::MinimizeButton].rect, icon);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
         const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-maximize-symbolic"_s, {ElementString::TitleBar, ElementString::MaximizeButton});
-        m_style->drawIcon(m_layoutMap[ElementString::MaximizeButton].rect, m_titleBarOption, painter, icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::MaximizeButton].rect, icon);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
         const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-close-symbolic"_s, {ElementString::TitleBar, ElementString::CloseButton});
-        m_style->drawIcon(m_layoutMap[ElementString::CloseButton].rect, m_titleBarOption, painter, icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::CloseButton].rect, icon);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
         const auto icon = queryIcon(m_titleBarOption, m_widget, u"application-menu-symbolic"_s, {ElementString::TitleBar, ElementString::SystemMenu});
-        m_style->drawIcon(m_layoutMap[ElementString::SystemMenu].rect, m_titleBarOption, painter, icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::SystemMenu].rect, icon);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
         const auto icon = queryIcon(m_titleBarOption, m_widget, u"window-shade-symbolic"_s, {ElementString::TitleBar, ElementString::ShadeButton});
-        m_style->drawIcon(m_layoutMap[ElementString::ShadeButton].rect, m_titleBarOption, painter, icon, m_widget);
+        drawButton(painter, m_layoutMap[ElementString::ShadeButton].rect, icon);
     }
+}
+
+void TitleBarElement::drawButton(QPainter *painter, const QRectF &rect, const QIcon &icon) const
+{
+    const bool enabled = m_titleBarOption->state.testFlag(QStyle::State_Enabled);
+
+    const QPalette activePalette = m_titleBarOption->palette;
+    const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
+    auto iconSize = rect.size();
+    const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+
+    QColor penColor = m_titleBarOption->palette.text().color(); // Use text color as fallback
+    if (m_contentProperties && m_contentProperties->icon() && m_contentProperties->icon()->color()) {
+        penColor = m_contentProperties->icon()->color()->toQColor();
+    }
+
+    painter->save();
+    painter->setPen(penColor);
+    m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
+    painter->restore();
 }
 
 void TitleBarElement::updateSubElementList()
@@ -110,7 +130,7 @@ void TitleBarElement::layout()
         m_layoutMap = layoutMap(m_backgroundElementList, m_titleBarOption, m_subElementList);
     }
 
-        m_contentElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
+    m_contentElementList = prepareElements(m_titleBarOption, m_widget, {ElementString::TitleBar});
 
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);

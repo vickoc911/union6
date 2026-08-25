@@ -116,3 +116,42 @@ QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     rect = m_style->visualRect(m_spinBoxOption->direction, m_spinBoxOption->rect, rect.toRect());
     return rect;
 }
+
+void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive, const QRectF &rect) const
+{
+    if (!m_isValid && !m_backgroundProperties && !m_backgroundProperties->icon()) {
+        return;
+    }
+
+    QIcon indicatorIcon;
+    switch (primitive) {
+    case QStyle::PE_IndicatorSpinPlus:
+        indicatorIcon = QIcon::fromTheme(m_backgroundProperties->icon()->name().value_or(u"spinbox-increase"_s));
+        break;
+    case QStyle::PE_IndicatorSpinMinus:
+        indicatorIcon = QIcon::fromTheme(m_backgroundProperties->icon()->name().value_or(u"spinbox-decrease"_s));
+        break;
+    case QStyle::PE_IndicatorSpinUp:
+        indicatorIcon = QIcon::fromTheme(m_backgroundProperties->icon()->name().value_or(u"arrow-up-symbolic"_s));
+        break;
+    case QStyle::PE_IndicatorSpinDown:
+        indicatorIcon = QIcon::fromTheme(m_backgroundProperties->icon()->name().value_or(u"arrow-down-symbolic"_s));
+        break;
+    default:
+        return;
+    }
+
+    const bool enabled = m_spinBoxOption->state.testFlag(QStyle::State_Enabled);
+    const QPalette activePalette = m_spinBoxOption->palette;
+    const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
+    auto iconSize = rect.size();
+    const QPixmap pixmap = indicatorIcon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+    QColor penColor = m_spinBoxOption->palette.text().color(); // Use text color as fallback
+    if (m_backgroundProperties->icon()->color()) {
+        penColor = m_backgroundProperties->icon()->color()->toQColor();
+    }
+    painter->save();
+    painter->setPen(penColor);
+    m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
+    painter->restore();
+}
