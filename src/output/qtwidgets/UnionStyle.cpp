@@ -802,13 +802,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
     } break;
     case QStyle::SE_LineEditContents:
-    case QStyle::SE_ShapedFrameContents:
-    case QStyle::SE_FrameContents: {
-        auto frameElements = prepareElements(option, widget);
-        auto props = queryProperties(frameElements);
-        int frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
-        rect = backgroundRectangle(option, props).toRect().adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
-    } break;
+        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            return ev->subElementRect(element).toRect();
+        }
+        break;
     case QStyle::SE_HeaderArrow:
     case QStyle::SE_HeaderLabel:
         if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
@@ -845,6 +842,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         break;
     // Follow defaults
+    case QStyle::SE_ShapedFrameContents:
+    case QStyle::SE_FrameContents:
     case QStyle::SE_TreeViewDisclosureItem:
     case QStyle::SE_TabWidgetTabContents:
     case QStyle::SE_TabBarTabLeftButton:

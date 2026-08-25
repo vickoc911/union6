@@ -22,6 +22,7 @@ public:
 
     QSizeF iconSize() const override;
     QMarginsF iconPadding() const;
+    QRectF subElementRect(QStyle::SubElement element) const override;
 
 private:
     const QStyleOptionFrame *m_frameOption = nullptr;

@@ -2,12 +2,14 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "LineEditElement.h"
+#include "StyleUtils.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
 #include <QLineEdit>
 #include <QPainter>
 #include <QStyle>
+#include <qstyle.h>
 
 #include "SharedNames.h"
 
@@ -50,4 +52,13 @@ QMarginsF LineEditElement::iconPadding() const
         return m_contentProperties->layout()->padding()->toMargins();
     }
     return QMarginsF();
+}
+
+QRectF LineEditElement::subElementRect(QStyle::SubElement element) const
+{
+    if (m_isValid && element == QStyle::SE_LineEditContents && m_backgroundProperties && m_backgroundProperties->layout()) {
+        int frameWidth = m_style->pixelMetric(QStyle::PM_DefaultFrameWidth, m_frameOption, m_widget);
+        return backgroundRectangle(m_frameOption, m_backgroundProperties).toRect().adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
+    }
+    return QRectF();
 }
