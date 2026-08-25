@@ -31,6 +31,10 @@ public:
     void drawIndicator(QPainter *painter) const override;
     void updateSubElementList() override;
 
+    qreal extent() const;
+    qreal controlThickness() const;
+    qreal minimumSize() const;
+
 private:
     const QStyleOptionSlider *m_scrollBarOption = nullptr;
     bool m_horizontal;

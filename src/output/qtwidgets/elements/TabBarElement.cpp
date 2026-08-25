@@ -3,6 +3,7 @@
 
 #include "TabBarElement.h"
 #include "BackgroundDrawing.h"
+#include "SharedNames.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -35,4 +36,9 @@ void TabBarElement::drawBackground(QPainter *painter) const
                             m_tabBarOption->rect,
                             m_backgroundProperties,
                             m_tabBarOption->documentMode ? BackgroundParts::PanelOnly : BackgroundParts::All);
+}
+
+qreal TabBarElement::scrollButtonWidth() const
+{
+    return querySize(m_tabBarOption, m_widget, {ElementString::TabScrollButton}).width();
 }

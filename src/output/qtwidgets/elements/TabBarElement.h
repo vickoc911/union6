@@ -20,6 +20,8 @@ public:
     void update() override;
     void drawBackground(QPainter *painter) const override;
 
+    qreal scrollButtonWidth() const;
+
 private:
     const QStyleOptionTabBarBase *m_tabBarOption = nullptr;
 };

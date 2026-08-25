@@ -262,3 +262,81 @@ void AbstractElement::drawIndicator(QPainter *painter) const
         painter->restore();
     }
 }
+
+QMarginsF AbstractElement::padding() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout() && m_backgroundProperties->layout()->padding()) {
+        return m_backgroundProperties->layout()->padding()->toMargins();
+    }
+    return QMarginsF();
+}
+
+QMarginsF AbstractElement::borderSize() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->border()) {
+        return m_backgroundProperties->border()->sizes();
+    }
+    return QMarginsF();
+}
+
+qreal AbstractElement::height() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+        return m_backgroundProperties->layout()->height().value_or(1);
+    }
+    return m_styleOption->rect.height();
+}
+
+qreal AbstractElement::width() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+        return m_backgroundProperties->layout()->width().value_or(1);
+    }
+    return m_styleOption->rect.width();
+}
+
+qreal AbstractElement::spacing() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout()) {
+        return m_backgroundProperties->layout()->spacing().value_or(1);
+    }
+    return 0;
+}
+
+QSizeF AbstractElement::indicatorSize() const
+{
+    if (m_isValid && m_indicatorProperties && m_indicatorProperties->layout()) {
+        auto width = m_indicatorProperties->layout()->width().value_or(0);
+        auto height = m_indicatorProperties->layout()->height().value_or(0);
+        return QSizeF(width, height);
+    }
+    return QSizeF();
+}
+
+QSizeF AbstractElement::iconSize() const
+{
+    if (m_isValid && m_backgroundProperties && m_backgroundProperties->icon()) {
+        auto width = m_backgroundProperties->icon()->width().value_or(1);
+        auto height = m_backgroundProperties->icon()->height().value_or(1);
+        return QSizeF(width, height);
+    }
+    return QSizeF();
+}
+
+qreal AbstractElement::averagePadding() const
+{
+    auto margins = padding();
+    if (margins.isNull()) {
+        return 0;
+    }
+    return (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
+}
+
+qreal AbstractElement::averageBorderSize() const
+{
+    auto margins = borderSize();
+    if (margins.isNull()) {
+        return 0;
+    }
+    return (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
+}

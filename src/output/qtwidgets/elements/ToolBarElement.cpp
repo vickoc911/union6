@@ -52,6 +52,10 @@ void ToolBarElement::layout()
     if (!m_separatorElementList.isEmpty()) {
         m_separatorProperties = queryProperties(m_handleElementList);
     }
+    m_extensionElementList = prepareElements(m_toolBarOption, m_widget, {ElementString::Extension});
+    if (!m_extensionElementList.isEmpty()) {
+        m_extensionProperties = queryProperties(m_extensionElementList);
+    }
 
     m_contentElementList = prepareElements(m_toolBarOption, m_widget, m_subElementList);
     if (!m_contentElementList.isEmpty()) {
@@ -81,4 +85,58 @@ void ToolBarElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::Frame);
+}
+
+qreal ToolBarElement::separatorExtent() const
+{
+    if (m_isValid && m_separatorProperties && m_separatorProperties->layout()) {
+        switch (m_toolBarOption->toolBarArea) {
+        case Qt::LeftToolBarArea:
+        case Qt::RightToolBarArea:
+            return m_separatorProperties->layout()->width().value_or(0);
+        case Qt::TopToolBarArea:
+        case Qt::BottomToolBarArea:
+            return m_separatorProperties->layout()->height().value_or(0);
+        default:
+            return 0;
+            break;
+        }
+    }
+    return 0;
+}
+
+qreal ToolBarElement::handleExtent() const
+{
+    if (m_isValid && m_handleProperties && m_handleProperties->layout()) {
+        switch (m_toolBarOption->toolBarArea) {
+        case Qt::LeftToolBarArea:
+        case Qt::RightToolBarArea:
+            return m_handleProperties->layout()->width().value_or(0);
+        case Qt::TopToolBarArea:
+        case Qt::BottomToolBarArea:
+            return m_handleProperties->layout()->height().value_or(0);
+        default:
+            return 0;
+            break;
+        }
+    }
+    return 0;
+}
+
+qreal ToolBarElement::extensionExtent() const
+{
+    if (m_isValid && m_extensionProperties && m_extensionProperties->layout()) {
+        switch (m_toolBarOption->toolBarArea) {
+        case Qt::LeftToolBarArea:
+        case Qt::RightToolBarArea:
+            return m_extensionProperties->layout()->width().value_or(0);
+        case Qt::TopToolBarArea:
+        case Qt::BottomToolBarArea:
+            return m_extensionProperties->layout()->height().value_or(0);
+        default:
+            return 0;
+            break;
+        }
+    }
+    return 0;
 }

@@ -29,6 +29,8 @@ public:
     void updateSubElementList() override;
     void layout() override;
 
+    qreal buttonWidth() const;
+
 private:
     const QStyleOptionTitleBar *m_titleBarOption = nullptr;
 };
