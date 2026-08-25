@@ -69,8 +69,3 @@ void drawCornerProperty(QPainter *painter,
                         SubNodeIndex subNodeIndex,
                         const Union::Properties::BorderPropertyGroup *border,
                         const Union::Properties::CornerPropertyGroup *corner);
-
-/*!
- * \brief A wrapper for getting the properties of an element and then drawing its background
- */
-void drawElementBackground(QPainter *painter, const QStyleOption *option, const QWidget *widget = nullptr, const QStringList &targetHierarchy = {});
