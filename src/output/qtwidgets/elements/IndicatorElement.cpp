@@ -24,24 +24,52 @@ IndicatorElement::~IndicatorElement()
 
 void IndicatorElement::drawArrowLeft(QPainter *painter) const
 {
-    const auto icon = queryIcon(m_indicatorOption, m_widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
-    m_style->drawIcon(m_indicatorOption->rect, m_indicatorOption, painter, icon);
+    drawElement(painter, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
 }
 
 void IndicatorElement::drawArrowRight(QPainter *painter) const
 {
-    const auto icon = queryIcon(m_indicatorOption, m_widget, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
-    m_style->drawIcon(m_indicatorOption->rect, m_indicatorOption, painter, icon);
+    drawElement(painter, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
 }
 
 void IndicatorElement::drawArrowDown(QPainter *painter) const
 {
-    const auto icon = queryIcon(m_indicatorOption, m_widget, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
-    m_style->drawIcon(m_indicatorOption->rect, m_indicatorOption, painter, icon);
+    drawElement(painter, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
 }
 
 void IndicatorElement::drawArrowUp(QPainter *painter) const
 {
-    const auto icon = queryIcon(m_indicatorOption, m_widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
-    m_style->drawIcon(m_indicatorOption->rect, m_indicatorOption, painter, icon);
+    drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
+}
+
+void IndicatorElement::drawDropDown(QPainter *painter) const
+{
+    drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
+}
+
+void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const
+{
+    auto elements = prepareElements(m_indicatorOption, m_widget, targetHierarchy);
+    auto properties = queryProperties(elements);
+    auto name = defaultIconName;
+    if (properties && properties->icon()) {
+        name = properties->icon()->name().value_or(name);
+    }
+    auto icon = QIcon::fromTheme(name);
+
+    const bool enabled = m_indicatorOption->state.testFlag(QStyle::State_Enabled);
+
+    const QPalette activePalette = m_indicatorOption->palette;
+    const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
+    auto iconSize = m_indicatorOption->rect.size();
+    const QPixmap pixmap = icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+
+    QColor penColor = m_indicatorOption->palette.text().color(); // Use text color as fallback
+    if (properties && properties->icon() && properties->icon()->color()) {
+        penColor = properties->icon()->color()->toQColor();
+    }
+    painter->save();
+    painter->setPen(penColor);
+    m_style->drawItemPixmap(painter, m_indicatorOption->rect, Qt::AlignCenter, pixmap);
+    painter->restore();
 }

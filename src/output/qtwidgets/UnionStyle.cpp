@@ -38,6 +38,7 @@
 #include "elements/ToolBoxTabElement.h"
 #include "elements/ToolButtonElement.h"
 #include "elements/ToolTipElement.h"
+#include "elements/TreeViewElement.h"
 #include "elements/WidgetElement.h"
 
 #include <ElementQuery.h>
@@ -563,26 +564,15 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawBackground(painter);
         }
         return;
-    case QStyle::PE_IndicatorBranch: {
-        auto defaultIconName = QString();
-        if (option->state.testFlag(State_Children)) {
-            if (option->state.testFlag(QStyle::State_Item)) {
-                defaultIconName = u"arrow-right-symbolic"_s;
-            }
-            if (option->state.testFlag(QStyle::State_Open)) {
-                defaultIconName = u"arrow-down-symbolic"_s;
-            }
+    case QStyle::PE_IndicatorBranch:
+        if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
+            ev->drawIndicatorBranch(painter);
         }
-        const auto icon = queryIcon(option, widget, defaultIconName, {ElementString::IndicatorBranch});
-        auto size = querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indicator});
-        auto rect = centerRect(option->rect, size.width(), size.height());
-        drawIcon(rect, option, painter, icon);
-    }
         return;
-    case QStyle::PE_IndicatorButtonDropDown: {
-        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
-        drawIcon(option->rect, option, painter, icon);
-    }
+    case QStyle::PE_IndicatorButtonDropDown:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawDropDown(painter);
+        }
         return;
     case QStyle::PE_IndicatorMenuCheckMark:
     case QStyle::PE_IndicatorItemViewItemCheck:
@@ -1260,9 +1250,11 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return ev->indicatorSize().width();
         }
         break;
-        // Get the value directly here, as there is no styleoption for treeviews
     case QStyle::PM_TreeViewIndentation:
-        return querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indentation}).width();
+        if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
+            return ev->indentation();
+        }
+        break;
     case QStyle::PM_ListViewIconSize:
         return querySize(option, widget, {ElementString::ListViewIconSize}).width();
     case QStyle::PM_SmallIconSize:

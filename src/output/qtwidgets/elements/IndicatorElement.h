@@ -23,7 +23,10 @@ public:
     void drawArrowRight(QPainter *painter) const;
     void drawArrowDown(QPainter *painter) const;
     void drawArrowUp(QPainter *painter) const;
+    void drawDropDown(QPainter *painter) const;
 
 private:
     const QStyleOption *m_indicatorOption = nullptr;
+
+    void drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const;
 };

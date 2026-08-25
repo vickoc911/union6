@@ -91,6 +91,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/WidgetElement.h
         elements/IndicatorElement.cpp
         elements/IndicatorElement.h
+        elements/TreeViewElement.cpp
+        elements/TreeViewElement.h
 )
 target_link_libraries(UnionWidgetsStyle
         PUBLIC
