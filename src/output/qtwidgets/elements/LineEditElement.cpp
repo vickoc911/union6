@@ -37,7 +37,7 @@ void LineEditElement::update()
 
 QSizeF LineEditElement::iconSize() const
 {
-    return querySize(m_frameOption, m_widget, {ElementString::LineEditIconSize});
+    return querySize({ElementString::LineEditIconSize});
 }
 
 void LineEditElement::updateSubElementList()

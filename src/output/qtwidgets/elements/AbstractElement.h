@@ -143,4 +143,28 @@ protected:
 
     // Used to check if we have all elements properly prepared
     bool m_isValid = false;
+
+    // Query the size of an element based on its hierarchy. Useful for one-off calculations.
+    virtual QSizeF querySize(QStringList targetHierarchy) const;
+
+    /*!
+     * \brief Prepares elements for a widget. Sometimes we cannot decipher the specific item from widget alone, such as itemviews.
+     * In those cases you may need to manually choose a target hierarchy, such as {"ItemViewItem"}
+     */
+    virtual Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy = {}) const;
+
+    /*!
+     * \brief Queries the properties from list of elements. The properties match to the last element in the list,
+     * inheriting anything it needs from its parents.
+     */
+    virtual Union::Properties::StylePropertyGroup *queryProperties(const Union::ElementList &elements) const;
+
+    /*!
+     * \brief Layouts list of elements, then returns a map of LayoutItems that contain information such as rectangles.
+     * It will take list of elements, such as Button and any potential parents it has.
+     * Then it uses the subElements stringlist to construct a layout: For example button is the container, then
+     * Text, Icon and Indicator are the items to be layouted within the button container.
+     * Currently only one container is used, which is the rectangle of the parent of the subElements.
+     */
+    virtual QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements) const;
 };

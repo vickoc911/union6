@@ -13,6 +13,7 @@
 #include "elements/FrameElement.h"
 #include "elements/GroupBoxElement.h"
 #include "elements/HeaderElement.h"
+#include "elements/IndicatorElement.h"
 #include "elements/ItemViewElement.h"
 #include "elements/LineEditElement.h"
 #include "elements/MenuBarElement.h"
@@ -37,6 +38,7 @@
 #include "elements/ToolBoxTabElement.h"
 #include "elements/ToolButtonElement.h"
 #include "elements/ToolTipElement.h"
+#include "elements/TreeViewElement.h"
 #include "elements/WidgetElement.h"
 
 #include <ElementQuery.h>
@@ -471,26 +473,26 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawIndicator(painter);
         }
         return;
-    case QStyle::PE_IndicatorArrowLeft: {
-        const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowLeft:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowLeft(painter);
+        }
         return;
-    }
-    case QStyle::PE_IndicatorArrowUp: {
-        const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowUp:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowUp(painter);
+        }
         return;
-    }
-    case QStyle::PE_IndicatorArrowRight: {
-        const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowRight:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowRight(painter);
+        }
         return;
-    }
-    case QStyle::PE_IndicatorArrowDown: {
-        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
-        drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorArrowDown:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawArrowDown(painter);
+        }
         return;
-    }
     case QStyle::PE_IndicatorSpinPlus:
     case QStyle::PE_IndicatorSpinMinus:
     case QStyle::PE_IndicatorSpinUp:
@@ -562,26 +564,15 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawBackground(painter);
         }
         return;
-    case QStyle::PE_IndicatorBranch: {
-        auto defaultIconName = QString();
-        if (option->state.testFlag(State_Children)) {
-            if (option->state.testFlag(QStyle::State_Item)) {
-                defaultIconName = u"arrow-right-symbolic"_s;
-            }
-            if (option->state.testFlag(QStyle::State_Open)) {
-                defaultIconName = u"arrow-down-symbolic"_s;
-            }
+    case QStyle::PE_IndicatorBranch:
+        if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
+            ev->drawIndicatorBranch(painter);
         }
-        const auto icon = queryIcon(option, widget, defaultIconName, {ElementString::IndicatorBranch});
-        auto size = querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indicator});
-        auto rect = centerRect(option->rect, size.width(), size.height());
-        drawIcon(rect, option, painter, icon);
-    }
         return;
-    case QStyle::PE_IndicatorButtonDropDown: {
-        const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
-        drawIcon(option->rect, option, painter, icon);
-    }
+    case QStyle::PE_IndicatorButtonDropDown:
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            ev->drawDropDown(painter);
+        }
         return;
     case QStyle::PE_IndicatorMenuCheckMark:
     case QStyle::PE_IndicatorItemViewItemCheck:
@@ -1259,21 +1250,41 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
             return ev->indicatorSize().width();
         }
         break;
-        // Get the value directly here, as there is no styleoption for treeviews
     case QStyle::PM_TreeViewIndentation:
-        return querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indentation}).width();
+        if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
+            return ev->indentation();
+        }
+        break;
     case QStyle::PM_ListViewIconSize:
-        return querySize(option, widget, {ElementString::ListViewIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->listViewIconSize();
+        }
+        break;
     case QStyle::PM_SmallIconSize:
-        return querySize(option, widget, {ElementString::SmallIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->smallIconSize();
+        }
+        break;
     case QStyle::PM_IconViewIconSize:
-        return querySize(option, widget, {ElementString::IconViewIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->iconViewIconSize();
+        }
+        break;
     case QStyle::PM_LargeIconSize:
-        return querySize(option, widget, {ElementString::LargeIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->largeIconSize();
+        }
+        break;
     case QStyle::PM_MessageBoxIconSize:
-        return querySize(option, widget, {ElementString::MessageBoxIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->messageBoxIconSize();
+        }
+        break;
     case QStyle::PM_TextCursorWidth:
-        return querySize(option, widget, {ElementString::TextCursorWidth}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->textCursorWidth();
+        }
+        break;
     // Unimplemented, use QCommonStyle for now
     case QStyle::PM_MenuScrollerHeight:
     case QStyle::PM_SpinBoxSliderHeight:

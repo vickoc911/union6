@@ -25,7 +25,6 @@ TabCloseButtonElement::~TabCloseButtonElement()
 
 void TabCloseButtonElement::update()
 {
-    setIcon(queryIcon(m_widgetOption, m_widget, u"tab-close-symbolic"_s, {ElementString::Tab, ElementString::CloseButton}));
     layout();
 }
 
@@ -35,6 +34,11 @@ void TabCloseButtonElement::layout()
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
         m_layoutMap[ElementString::Icon].rect = m_widgetOption->rect;
+        if (m_contentProperties->icon()) {
+            setIcon(QIcon::fromTheme(m_contentProperties->icon()->name().value_or(u"tab-close-symbolic"_s)));
+        } else {
+            setIcon(QIcon::fromTheme(u"tab-close-symbolic"_s));
+        }
         m_isValid = true;
     }
 }

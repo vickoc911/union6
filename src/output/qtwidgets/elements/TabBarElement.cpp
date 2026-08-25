@@ -40,5 +40,5 @@ void TabBarElement::drawBackground(QPainter *painter) const
 
 qreal TabBarElement::scrollButtonWidth() const
 {
-    return querySize(m_tabBarOption, m_widget, {ElementString::TabScrollButton}).width();
+    return querySize({ElementString::TabScrollButton}).width();
 }

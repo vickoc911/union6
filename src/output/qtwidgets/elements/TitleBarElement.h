@@ -34,4 +34,6 @@ public:
 
 private:
     const QStyleOptionTitleBar *m_titleBarOption = nullptr;
+
+    QIcon queryIcon(const QString &defaultIconName, const QStringList &targetHierarchy) const;
 };
