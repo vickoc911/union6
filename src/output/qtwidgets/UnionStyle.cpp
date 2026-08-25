@@ -494,25 +494,10 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorSpinPlus:
     case QStyle::PE_IndicatorSpinMinus:
     case QStyle::PE_IndicatorSpinUp:
-    case QStyle::PE_IndicatorSpinDown: {
-        auto up = (element == PE_IndicatorSpinUp);
-        auto spinboxElements = prepareElements(option, widget);
-        auto element = Union::Element::create();
-        element->setType(ElementString::Indicator);
-        element->setStates(statesFromOption(option));
-        auto hints = hintsFromOption(option);
-        // Use the constrained look for now
-        hints.append(up ? u"Increase"_s : u"Decrease"_s);
-        element->setHints(hints);
-        element->setAttributes(attributesFromOption(option));
-        spinboxElements.append(element);
-        auto props = queryProperties(spinboxElements);
-        drawBackgroundRectangle(painter, option->rect, props);
-        if (props->icon()) {
-            auto icon = QIcon::fromTheme(props->icon()->name().value_or(up ? u"arrow-up-symbolic"_s : u"arrow-down-symbolic"_s));
-            drawIcon(option->rect, option, painter, icon);
+    case QStyle::PE_IndicatorSpinDown:
+        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
+            ev->drawSpinIndicator(painter, element, option->rect);
         }
-    }
         return;
     case QStyle::PE_FrameLineEdit:
         if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
