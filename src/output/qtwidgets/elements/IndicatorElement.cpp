@@ -73,3 +73,28 @@ void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIcon
     m_style->drawItemPixmap(painter, m_indicatorOption->rect, Qt::AlignCenter, pixmap);
     painter->restore();
 }
+
+qreal IndicatorElement::listViewIconSize() const
+{
+    return querySize({ElementString::ListViewIconSize}).width();
+}
+qreal IndicatorElement::smallIconSize() const
+{
+    return querySize({ElementString::SmallIconSize}).width();
+}
+qreal IndicatorElement::iconViewIconSize() const
+{
+    return querySize({ElementString::IconViewIconSize}).width();
+}
+qreal IndicatorElement::largeIconSize() const
+{
+    return querySize({ElementString::LargeIconSize}).width();
+}
+qreal IndicatorElement::messageBoxIconSize() const
+{
+    return querySize({ElementString::MessageBoxIconSize}).width();
+}
+qreal IndicatorElement::textCursorWidth() const
+{
+    return querySize({ElementString::TextCursorWidth}).width();
+}

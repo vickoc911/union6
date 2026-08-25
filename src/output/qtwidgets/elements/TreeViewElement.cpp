@@ -73,13 +73,5 @@ void TreeViewElement::drawIndicatorBranch(QPainter *painter) const
 
 qreal TreeViewElement::indentation() const
 {
-    auto elements = prepareElements(m_styleOption, m_widget, {ElementString::TreeViewDelegate, ElementString::Indentation});
-    if (elements.isEmpty()) {
-        return 0;
-    }
-    auto properties = queryProperties(elements);
-    if (properties && properties->layout()) {
-        return properties->layout()->width().value_or(0);
-    }
-    return 0;
+    return querySize({ElementString::TreeViewDelegate, ElementString::Indentation}).width();
 }

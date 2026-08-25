@@ -84,11 +84,6 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
 QRectF centerRect(const QRectF &rect, int width, int height);
 
 /*!
- * \brief Helper function to query the size of the element from properties.
- */
-QSizeF querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy = {});
-
-/*!
  * \brief Tries to match styleOption type to a potential element.
  * Used when widget is null.
  */

@@ -1256,17 +1256,35 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
         break;
     case QStyle::PM_ListViewIconSize:
-        return querySize(option, widget, {ElementString::ListViewIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->listViewIconSize();
+        }
+        break;
     case QStyle::PM_SmallIconSize:
-        return querySize(option, widget, {ElementString::SmallIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->smallIconSize();
+        }
+        break;
     case QStyle::PM_IconViewIconSize:
-        return querySize(option, widget, {ElementString::IconViewIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->iconViewIconSize();
+        }
+        break;
     case QStyle::PM_LargeIconSize:
-        return querySize(option, widget, {ElementString::LargeIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->largeIconSize();
+        }
+        break;
     case QStyle::PM_MessageBoxIconSize:
-        return querySize(option, widget, {ElementString::MessageBoxIconSize}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->messageBoxIconSize();
+        }
+        break;
     case QStyle::PM_TextCursorWidth:
-        return querySize(option, widget, {ElementString::TextCursorWidth}).width();
+        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
+            return ev->textCursorWidth();
+        }
+        break;
     // Unimplemented, use QCommonStyle for now
     case QStyle::PM_MenuScrollerHeight:
     case QStyle::PM_SpinBoxSliderHeight:

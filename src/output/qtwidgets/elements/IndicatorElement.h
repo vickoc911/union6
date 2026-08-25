@@ -25,6 +25,13 @@ public:
     void drawArrowUp(QPainter *painter) const;
     void drawDropDown(QPainter *painter) const;
 
+    qreal listViewIconSize() const;
+    qreal smallIconSize() const;
+    qreal iconViewIconSize() const;
+    qreal largeIconSize() const;
+    qreal messageBoxIconSize() const;
+    qreal textCursorWidth() const;
+
 private:
     const QStyleOption *m_indicatorOption = nullptr;
 

@@ -340,3 +340,16 @@ qreal AbstractElement::averageBorderSize() const
     }
     return (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
 }
+
+QSizeF AbstractElement::querySize(QStringList targetHierarchy) const
+{
+    auto elements = prepareElements(m_styleOption, m_widget, targetHierarchy);
+    if (elements.isEmpty()) {
+        return QSize(0, 0);
+    }
+    auto properties = queryProperties(elements);
+    if (properties && properties->layout()) {
+        return QSize(properties->layout()->width().value_or(0), properties->layout()->height().value_or(0));
+    }
+    return QSize(0, 0);
+}

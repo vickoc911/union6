@@ -954,17 +954,3 @@ QRectF centerRect(const QRectF &rect, int width, int height)
 {
     return QRect(rect.left() + (rect.width() - width) / 2, rect.top() + (rect.height() - height) / 2, width, height);
 }
-
-QSizeF querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)
-{
-    auto elements = prepareElements(option, widget, targetHierarchy);
-    if (elements.isEmpty()) {
-        return QSize(0, 0);
-    }
-    auto properties = queryProperties(elements);
-    if (!properties) {
-        return QSize(0, 0);
-    }
-
-    return QSize(properties->layout()->width().value_or(0), properties->layout()->height().value_or(0));
-}

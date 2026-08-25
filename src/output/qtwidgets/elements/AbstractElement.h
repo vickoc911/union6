@@ -143,4 +143,7 @@ protected:
 
     // Used to check if we have all elements properly prepared
     bool m_isValid = false;
+
+    // Query the size of an element based on its hierarchy. Useful for one-off calculations.
+    virtual QSizeF querySize(QStringList targetHierarchy) const;
 };
