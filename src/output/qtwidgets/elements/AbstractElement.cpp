@@ -131,6 +131,16 @@ void AbstractElement::update()
 {
 }
 
+QVariantMap AbstractElement::elementAttributes() const
+{
+    return QVariantMap();
+}
+
+QStringList AbstractElement::elementHints() const
+{
+    return QStringList();
+}
+
 QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, PaddingDirection direction) const
 {
     if (!m_isValid) {
