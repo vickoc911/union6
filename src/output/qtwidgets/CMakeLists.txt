@@ -39,6 +39,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/MenuBarItemElement.h
         elements/FrameElement.cpp
         elements/FrameElement.h
+        elements/FocusElement.cpp
+        elements/FocusElement.h
         elements/GroupBoxElement.cpp
         elements/GroupBoxElement.h
         elements/HeaderElement.cpp
