@@ -35,6 +35,7 @@
 #include "elements/ToolBarElement.h"
 #include "elements/ToolBoxTabElement.h"
 #include "elements/ToolButtonElement.h"
+#include "elements/ToolTipElement.h"
 #include "elements/WidgetElement.h"
 
 #include <ElementQuery.h>
@@ -449,7 +450,9 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_PanelTipLabel:
-        drawElementBackground(painter, option, widget, {ElementString::ToolTip});
+        if (auto ev = cachedElement<ToolTipElement, QStyleOptionFrame>(hash, option, widget)) {
+            ev->drawBackground(painter);
+        }
         return;
     case QStyle::PE_FrameFocusRect:
         if (auto ev = cachedElement<FocusElement, QStyleOptionFocusRect>(hash, option, widget)) {
