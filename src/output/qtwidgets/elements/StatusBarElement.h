@@ -19,7 +19,6 @@ public:
     ~StatusBarElement() override;
 
     void update() override;
-    void drawBackground(QPainter *painter) const override;
     void drawItem(QPainter *painter) const;
 
     void layout() override;

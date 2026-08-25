@@ -4,7 +4,6 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "BackgroundDrawing.h"
 #include <QObject>
 #include <QStyleOption>
 
@@ -19,7 +18,6 @@ public:
     ~SplitterElement() override;
 
     void update() override;
-    void drawBackground(QPainter *painter) const override;
 
     void layout() override;
 

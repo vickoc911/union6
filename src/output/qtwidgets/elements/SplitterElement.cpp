@@ -41,8 +41,3 @@ void SplitterElement::layout()
         m_isValid = true;
     }
 }
-
-void SplitterElement::drawBackground(QPainter *painter) const
-{
-    drawBackgroundRectangle(painter, m_splitterOption->rect, m_backgroundProperties);
-}
