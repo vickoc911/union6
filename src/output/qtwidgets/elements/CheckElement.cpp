@@ -45,7 +45,7 @@ QSizeF CheckElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     auto size = applyPaddingToSize(contentsSizeFromStyle);
     // Ensure indicator size is taken into account with the label
-    size.rwidth() += labelSpacing() + indicatorWidth();
+    size.rwidth() += spacing() + indicatorSize().width();
     return size;
 }
 
@@ -96,20 +96,4 @@ void CheckElement::drawIndicator(QPainter *painter) const
     } else {
         drawBackgroundRectangle(painter, subElementRect(QStyle::SE_RadioButtonIndicator), m_indicatorProperties);
     }
-}
-
-int CheckElement::labelSpacing() const
-{
-    if (m_isValid && m_backgroundProperties->layout()) {
-        return m_backgroundProperties->layout()->spacing().value_or(0);
-    }
-    return 0;
-}
-
-int CheckElement::indicatorWidth() const
-{
-    if (m_isValid && m_indicatorProperties->layout()) {
-        return m_indicatorProperties->layout()->width().value_or(0);
-    }
-    return 0;
 }

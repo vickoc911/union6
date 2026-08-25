@@ -90,6 +90,21 @@ public:
      */
     virtual QRectF subControlRect(QStyle::SubControl subControl) const;
 
+    virtual QMarginsF padding() const;
+
+    virtual QMarginsF borderSize() const;
+
+    virtual qreal height() const;
+
+    virtual qreal width() const;
+
+    virtual qreal spacing() const;
+
+    virtual QSizeF indicatorSize() const;
+
+    qreal averagePadding() const;
+
+    qreal averageBorderSize() const;
     /*!
      * \brief Updates the properties of the element, such as text and layouting
      */

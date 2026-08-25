@@ -20,7 +20,8 @@ public:
     void update() override;
     void updateSubElementList() override;
 
-    QSizeF iconSize();
+    QSizeF iconSize() const;
+    QMarginsF iconPadding() const;
 
 private:
     const QStyleOptionFrame *m_frameOption = nullptr;
