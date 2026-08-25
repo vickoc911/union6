@@ -157,3 +157,8 @@ QRectF TitleBarElement::subControlRect(QStyle::SubControl subControl) const
     }
     return QRect();
 }
+
+qreal TitleBarElement::buttonWidth() const
+{
+    return querySize(m_titleBarOption, m_widget, {ElementString::TitleBar, ElementString::NormalButton}).width();
+}

@@ -288,3 +288,19 @@ QList<QRect> SliderElement::tickLines() const
     }
     return tickLines;
 }
+
+qreal SliderElement::controlThickness() const
+{
+    if (m_isValid && m_indicatorProperties && m_indicatorProperties->layout()) {
+        QSizeF size(m_indicatorProperties->layout()->width().value_or(1), m_indicatorProperties->layout()->height().value_or(1));
+        if (m_indicatorProperties->layout()->padding()) {
+            size = size.shrunkBy(m_indicatorProperties->layout()->padding()->toMargins().toMargins());
+        }
+        if (m_sliderOption->orientation == Qt::Horizontal) {
+            return size.height();
+        } else {
+            return size.width();
+        }
+    }
+    return 0;
+}
