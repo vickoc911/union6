@@ -1078,7 +1078,7 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         break;
     case QStyle::PM_SliderThickness:
         if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->width();
+            return ev->controlThickness();
         }
         break;
     case QStyle::PM_SliderControlThickness:
