@@ -71,6 +71,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/StatusBarElement.h
         elements/TabElement.cpp
         elements/TabElement.h
+        elements/TabCloseButtonElement.cpp
+        elements/TabCloseButtonElement.h
         elements/TabBarElement.cpp
         elements/TabBarElement.h
         elements/TabWidgetElement.cpp

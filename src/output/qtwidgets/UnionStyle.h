@@ -39,18 +39,7 @@ public:
     void polish(QApplication *application) override;
     void polish(QWidget *) override;
 
-    void drawIcon(const QRectF &rect,
-                  const QStyleOption *option,
-                  QPainter *painter,
-                  const QIcon &icon,
-                  const QWidget *widget = nullptr,
-                  const QColor &overrideColor = QColor()) const;
-    void drawText(const QRectF &rect,
-                  const QStyleOption *option,
-                  QPainter *painter,
-                  const QString &text,
-                  const QWidget *widget = nullptr,
-                  const QColor &overrideColor = QColor()) const;
+    void drawIcon(const QRectF &rect, const QStyleOption *option, QPainter *painter, const QIcon &icon, const QColor &overrideColor = QColor()) const;
 
     bool eventFilter(QObject *object, QEvent *event) override;
 

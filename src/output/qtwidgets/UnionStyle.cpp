@@ -29,6 +29,7 @@
 #include "elements/SplitterElement.h"
 #include "elements/StatusBarElement.h"
 #include "elements/TabBarElement.h"
+#include "elements/TabCloseButtonElement.h"
 #include "elements/TabElement.h"
 #include "elements/TabWidgetElement.h"
 #include "elements/TitleBarElement.h"
@@ -472,46 +473,31 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_IndicatorArrowLeft: {
         const auto icon = queryIcon(option, widget, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorArrowUp: {
         const auto icon = queryIcon(option, widget, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorArrowRight: {
         const auto icon = queryIcon(option, widget, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorArrowDown: {
         const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
         return;
     }
     case QStyle::PE_IndicatorSpinPlus:
     case QStyle::PE_IndicatorSpinMinus:
     case QStyle::PE_IndicatorSpinUp:
-    case QStyle::PE_IndicatorSpinDown: {
-        auto up = (element == PE_IndicatorSpinUp);
-        auto spinboxElements = prepareElements(option, widget);
-        auto element = Union::Element::create();
-        element->setType(ElementString::Indicator);
-        element->setStates(statesFromOption(option));
-        auto hints = hintsFromOption(option);
-        // Use the constrained look for now
-        hints.append(up ? u"Increase"_s : u"Decrease"_s);
-        element->setHints(hints);
-        element->setAttributes(attributesFromOption(option));
-        spinboxElements.append(element);
-        auto props = queryProperties(spinboxElements);
-        drawBackgroundRectangle(painter, option->rect, props);
-        if (props->icon()) {
-            auto icon = QIcon::fromTheme(props->icon()->name().value_or(up ? u"arrow-up-symbolic"_s : u"arrow-down-symbolic"_s));
-            drawIcon(option->rect, option, painter, icon, widget);
+    case QStyle::PE_IndicatorSpinDown:
+        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
+            ev->drawSpinIndicator(painter, element, option->rect);
         }
-    }
         return;
     case QStyle::PE_FrameLineEdit:
         if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
@@ -589,12 +575,12 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         const auto icon = queryIcon(option, widget, defaultIconName, {ElementString::IndicatorBranch});
         auto size = querySize(option, widget, {ElementString::TreeViewDelegate, ElementString::Indicator});
         auto rect = centerRect(option->rect, size.width(), size.height());
-        drawIcon(rect, option, painter, icon, widget);
+        drawIcon(rect, option, painter, icon);
     }
         return;
     case QStyle::PE_IndicatorButtonDropDown: {
         const auto icon = queryIcon(option, widget, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
-        drawIcon(option->rect, option, painter, icon, widget);
+        drawIcon(option->rect, option, painter, icon);
     }
         return;
     case QStyle::PE_IndicatorMenuCheckMark:
@@ -632,11 +618,10 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorColumnViewArrow:
         drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
         return;
-    case QStyle::PE_IndicatorTabClose: {
-        drawElementBackground(painter, option, widget, {ElementString::Tab, ElementString::CloseButton});
-        const auto icon = queryIcon(option, widget, u"tab-close-symbolic"_s, {ElementString::IndicatorTabClose});
-        drawIcon(option->rect, option, painter, icon, widget);
-    }
+    case QStyle::PE_IndicatorTabClose:
+        if (auto ev = cachedElement<TabCloseButtonElement, QStyleOption>(hash, option, widget)) {
+            ev->drawIcon(painter);
+        }
         return;
     // Handle with QCommonStyle for now
     case QStyle::PE_PanelItemViewRow:
@@ -802,13 +787,10 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
     } break;
     case QStyle::SE_LineEditContents:
-    case QStyle::SE_ShapedFrameContents:
-    case QStyle::SE_FrameContents: {
-        auto frameElements = prepareElements(option, widget);
-        auto props = queryProperties(frameElements);
-        int frameWidth = pixelMetric(PM_DefaultFrameWidth, option, widget);
-        rect = backgroundRectangle(option, props).toRect().adjusted(frameWidth, frameWidth, -frameWidth, -frameWidth);
-    } break;
+        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
+            return ev->subElementRect(element).toRect();
+        }
+        break;
     case QStyle::SE_HeaderArrow:
     case QStyle::SE_HeaderLabel:
         if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
@@ -845,6 +827,8 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
         }
         break;
     // Follow defaults
+    case QStyle::SE_ShapedFrameContents:
+    case QStyle::SE_FrameContents:
     case QStyle::SE_TreeViewDisclosureItem:
     case QStyle::SE_TabWidgetTabContents:
     case QStyle::SE_TabBarTabLeftButton:
@@ -1480,42 +1464,6 @@ void UnionStyle::polish(QWidget *widget)
     QCommonStyle::polish(widget);
 }
 
-void UnionStyle::drawText(const QRectF &rect,
-                          const QStyleOption *opt,
-                          QPainter *painter,
-                          const QString &text,
-                          const QWidget *widget,
-                          const QColor &overrideColor) const
-{
-    if (text.isEmpty()) {
-        return;
-    }
-
-    int textFlags = Qt::AlignLeading | Qt::AlignVCenter;
-    const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
-    QColor penColor;
-    if (overrideColor.isValid()) {
-        penColor = overrideColor;
-    } else {
-        // TODO: hide mnemonics if requested
-        if (!elements.isEmpty()) {
-            auto properties = queryProperties(elements);
-            auto textColor = properties->text()->color();
-            penColor = opt->palette.text().color();
-            if (textColor) {
-                penColor = textColor->toQColor();
-            }
-            textFlags = textFlagsFromProperties(properties, true);
-        }
-    }
-
-    painter->save();
-    painter->setPen(penColor);
-    drawItemText(painter, rect.toRect(), textFlags, opt->palette, enabled, text);
-    painter->restore();
-}
-
 void UnionStyle::drawItemText(QPainter *painter,
                               const QRect &rect,
                               int flags,
@@ -1528,35 +1476,19 @@ void UnionStyle::drawItemText(QPainter *painter,
     QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
-void UnionStyle::drawIcon(const QRectF &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QWidget *widget, const QColor &overrideColor)
-    const
+void UnionStyle::drawIcon(const QRectF &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QColor &overrideColor) const
 {
-    QList<Union::Element::Ptr> elements = prepareElements(opt, widget);
     const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
 
     const QPalette activePalette = opt->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
     auto iconSize = rect.size();
-    // Toolbutton can override the regular icon size
-    if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(opt)) {
-        // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
-        if (toolButtonOption->icon.name() == icon.name()) {
-            iconSize = toolButtonOption->iconSize;
-        }
-    }
     const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
     QColor penColor = opt->palette.text().color(); // Use text color as fallback
     if (overrideColor.isValid()) {
         penColor = overrideColor;
-    } else if (!elements.isEmpty()) {
-        auto properties = queryProperties(elements);
-        if (properties->icon() && properties->icon()->color().has_value()) {
-            auto iconColor = properties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
     }
-
     painter->save();
     painter->setPen(penColor);
     drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);

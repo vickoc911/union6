@@ -28,6 +28,8 @@ public:
 
     void updateSubElementList() override;
 
+    void drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive, const QRectF &rect) const;
+
 private:
     const QStyleOptionSpinBox *m_spinBoxOption = nullptr;
     bool m_hasButtons;
