@@ -442,9 +442,6 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
             ev->drawBackground(painter);
         }
         return;
-    case QStyle::PE_PanelItemViewRow:
-        drawElementBackground(painter, option, widget, {ElementString::ItemViewRow});
-        return;
     case QStyle::PE_PanelScrollAreaCorner:
         drawElementBackground(painter, option, widget, {ElementString::ScrollAreaCorner});
         return;
@@ -635,6 +632,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     }
         return;
     // Handle with QCommonStyle for now
+    case QStyle::PE_PanelItemViewRow:
     case QStyle::PE_IndicatorTabTear:
     case QStyle::PE_IndicatorTabTearRight:
     case QStyle::PE_IndicatorItemViewItemDrop:
