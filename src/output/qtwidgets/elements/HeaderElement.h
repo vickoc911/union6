@@ -27,7 +27,10 @@ public:
     QRectF subElementRect(QStyle::SubElement element) const override;
     void layout() override;
 
+    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+
 private:
     const QStyleOptionHeader *m_headerOption = nullptr;
     QIcon sortIndicator();
+    bool m_isHorizontal;
 };
