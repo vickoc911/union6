@@ -9,19 +9,16 @@
 
 class UnionStyle;
 
-class LineEditElement : public AbstractElement
+class ToolTipElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    LineEditElement(const QStyleOptionFrame *option, const UnionStyle *style, const QWidget *widget = nullptr);
-    ~LineEditElement() override;
+    ToolTipElement(const QStyleOptionFrame *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ~ToolTipElement() override;
 
     void update() override;
-    void updateSubElementList() override;
-
-    QSizeF iconSize() const override;
-    QMarginsF iconPadding() const;
+    void layout() override;
 
 private:
     const QStyleOptionFrame *m_frameOption = nullptr;
