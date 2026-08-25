@@ -83,6 +83,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/ToolBoxTabElement.h
         elements/ToolButtonElement.cpp
         elements/ToolButtonElement.h
+        elements/ToolTipElement.cpp
+        elements/ToolTipElement.h
         elements/WidgetElement.cpp
         elements/WidgetElement.h
 )
