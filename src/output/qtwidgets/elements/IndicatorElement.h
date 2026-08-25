@@ -26,4 +26,6 @@ public:
 
 private:
     const QStyleOption *m_indicatorOption = nullptr;
+
+    void drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const;
 };

@@ -15,6 +15,7 @@
 #include <QTableView>
 #include <QTextOption>
 #include <QTreeView>
+#include <qstyleoption.h>
 
 using namespace Qt::StringLiterals;
 
@@ -127,6 +128,10 @@ QStringList hintsFromOption(const QStyleOption *option)
             case QStyleOptionViewItem::OnlyOne:
                 hints.append(u"position-onlyone"_s);
                 break;
+            }
+
+            if (optionViewItem->state.testFlag(QStyle::State_Open)) {
+                hints.append(u"expanded"_s);
             }
         }
     } break;
@@ -326,11 +331,11 @@ QVariantMap attributesFromOption(const QStyleOption *option)
             return map;
         }
     }
+    case QStyleOption::SO_MenuItem:
     case QStyleOption::SO_TabBarBase:
     case QStyleOption::SO_Default:
     case QStyleOption::SO_FocusRect:
     case QStyleOption::SO_Button:
-    case QStyleOption::SO_MenuItem:
     case QStyleOption::SO_Frame:
     case QStyleOption::SO_ProgressBar:
     case QStyleOption::SO_ToolBox:
@@ -948,17 +953,6 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
 QRectF centerRect(const QRectF &rect, int width, int height)
 {
     return QRect(rect.left() + (rect.width() - width) / 2, rect.top() + (rect.height() - height) / 2, width, height);
-}
-
-QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString &defaultIconName, const QStringList &targetHierarchy)
-{
-    auto name = defaultIconName;
-    auto elements = prepareElements(option, widget, targetHierarchy);
-    auto props = queryProperties(elements);
-    if (props && props->icon()) {
-        name = props->icon()->name().value_or(name);
-    }
-    return QIcon::fromTheme(name);
 }
 
 QSizeF querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy)

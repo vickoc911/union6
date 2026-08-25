@@ -84,12 +84,6 @@ int textFlagsFromProperties(Union::Properties::StylePropertyGroup *properties, b
 QRectF centerRect(const QRectF &rect, int width, int height);
 
 /*!
- * \brief Helper function for getting correct icon from properties.
- */
-
-QIcon queryIcon(const QStyleOption *option, const QWidget *widget, const QString &defaultIconName, const QStringList &targetHierarchy = {});
-
-/*!
  * \brief Helper function to query the size of the element from properties.
  */
 QSizeF querySize(const QStyleOption *option, const QWidget *widget, const QStringList &targetHierarchy = {});
