@@ -10,6 +10,7 @@
 
 #include <QMargins>
 #include <QPainterPath>
+#include <QStyleOption>
 
 class QStyleOption;
 
@@ -61,4 +62,8 @@ QRectF centerRect(const QRectF &rect, int width, int height);
  */
 QString styleOptionToElementName(const QStyleOption *option);
 
+// Calculates the bounding box rectangle from items inside layoutMap
 QRectF unifiedRect(QMap<QString, LayoutItem> layoutMap);
+
+// Shared hints for frameOptions
+QStringList frameHints(const QStyleOptionFrame *frameOption);

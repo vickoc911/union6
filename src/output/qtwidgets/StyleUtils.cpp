@@ -386,3 +386,29 @@ QRectF unifiedRect(QMap<QString, LayoutItem> layoutMap)
     }
     return rect;
 }
+
+QStringList frameHints(const QStyleOptionFrame *frameOption)
+{
+    QStringList hints;
+    if (frameOption->features.testFlag(QStyleOptionFrame::Flat)) {
+        hints.append(u"flat"_s);
+    }
+    if (frameOption->features.testFlag(QStyleOptionFrame::Rounded)) {
+        hints.append(u"rounded"_s);
+    }
+    switch (frameOption->frameShape) {
+    case QFrame::NoFrame: {
+        if (!hints.contains(u"flat"_s)) {
+            hints.append(u"flat"_s);
+        }
+    }
+    case QFrame::Box:
+    case QFrame::Panel:
+    case QFrame::WinPanel:
+    case QFrame::HLine:
+    case QFrame::VLine:
+    case QFrame::StyledPanel:
+        break;
+    }
+    return hints;
+}

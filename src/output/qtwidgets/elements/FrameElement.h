@@ -20,7 +20,6 @@ public:
     void update() override;
     void updateSubElementList() override;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:
