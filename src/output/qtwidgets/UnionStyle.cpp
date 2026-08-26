@@ -88,6 +88,8 @@
 #include <qstyle.h>
 #include <qstyleoption.h>
 
+#include "ElementCache.h"
+
 using namespace Qt::StringLiterals;
 
 UnionStyle::UnionStyle()
@@ -624,117 +626,37 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
 
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
-    QRectF rect;
     const auto hash = qHashMulti(QHashSeed::globalSeed(), element, option, widget);
 
-    switch (element) {
-    case QStyle::SE_ItemViewItemText:
-    case QStyle::SE_ItemViewItemDecoration:
-    case QStyle::SE_ItemViewItemCheckIndicator:
-        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_RadioButtonContents:
-    case QStyle::SE_RadioButtonIndicator:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_CheckBoxIndicator:
-    case QStyle::SE_CheckBoxContents:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_PushButtonFocusRect:
-    case QStyle::SE_PushButtonContents:
-    case QStyle::SE_PushButtonBevel: {
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-    } break;
-    case QStyle::SE_LineEditContents:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_HeaderArrow:
-    case QStyle::SE_HeaderLabel:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_TabBarTabText:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            // TODO: handle vertical tabs
-            if (ev->isVertical()) {
-                return QCommonStyle::subElementRect(element, option, widget);
-            }
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_ProgressBarLabel:
-    case QStyle::SE_ProgressBarContents:
-    case QStyle::SE_ProgressBarGroove:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_DockWidgetTitleBarText:
-    case QStyle::SE_DockWidgetCloseButton:
-    case QStyle::SE_DockWidgetFloatButton:
-    case QStyle::SE_DockWidgetIcon:
-        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    case QStyle::SE_ToolBoxTabContents:
-        if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
-            return ev->subElementRect(element).toRect();
-        }
-        break;
-    // Follow defaults
-    case QStyle::SE_ShapedFrameContents:
-    case QStyle::SE_FrameContents:
-    case QStyle::SE_TreeViewDisclosureItem:
-    case QStyle::SE_TabWidgetTabContents:
-    case QStyle::SE_TabBarTabLeftButton:
-    case QStyle::SE_TabBarTabRightButton:
-    case QStyle::SE_ToolBarHandle:
-    case QStyle::SE_TabWidgetLeftCorner:
-    case QStyle::SE_TabWidgetRightCorner:
-    case QStyle::SE_TabWidgetTabBar:
-    case QStyle::SE_TabWidgetTabPane:
-    case QStyle::SE_TabBarTearIndicator:
-    case QStyle::SE_TabBarTearIndicatorRight:
-    case QStyle::SE_TabBarScrollRightButton:
-    case QStyle::SE_TabBarScrollLeftButton:
-    case QStyle::SE_CustomBase:
-    case QStyle::SE_CheckBoxClickRect:
-    case QStyle::SE_CheckBoxFocusRect:
-    case QStyle::SE_RadioButtonFocusRect:
-    case QStyle::SE_RadioButtonClickRect:
-    case QStyle::SE_ComboBoxFocusRect:
-    case QStyle::SE_SliderFocusRect:
-    case QStyle::SE_ItemViewItemFocusRect:
-    case QStyle::SE_PushButtonLayoutItem:
-    case QStyle::SE_CheckBoxLayoutItem:
-    case QStyle::SE_ComboBoxLayoutItem:
-    case QStyle::SE_DateTimeEditLayoutItem:
-    case QStyle::SE_FrameLayoutItem:
-    case QStyle::SE_GroupBoxLayoutItem:
-    case QStyle::SE_LabelLayoutItem:
-    case QStyle::SE_SpinBoxLayoutItem:
-    case QStyle::SE_SliderLayoutItem:
-    case QStyle::SE_ProgressBarLayoutItem:
-    case QStyle::SE_RadioButtonLayoutItem:
-    case QStyle::SE_TabWidgetLayoutItem:
-    case QStyle::SE_ToolButtonLayoutItem:
-        return QCommonStyle::subElementRect(element, option, widget);
+    auto cached = ElementCache::element<QStyle::SubElement,
+                                        QStyle::SE_ItemViewItemText,
+                                        QStyle::SE_ItemViewItemDecoration,
+                                        QStyle::SE_ItemViewItemCheckIndicator,
+                                        // QStyle::SE_RadioButtonContents,
+                                        // QStyle::SE_RadioButtonIndicator,
+                                        // QStyle::SE_CheckBoxIndicator,
+                                        // QStyle::SE_CheckBoxContents,
+                                        QStyle::SE_PushButtonFocusRect,
+                                        QStyle::SE_PushButtonContents,
+                                        QStyle::SE_PushButtonBevel,
+                                        QStyle::SE_LineEditContents,
+                                        QStyle::SE_HeaderArrow,
+                                        QStyle::SE_HeaderLabel //,
+                                        // QStyle::SE_TabBarTabText,
+                                        // QStyle::SE_ProgressBarLabel,
+                                        // QStyle::SE_ProgressBarContents,
+                                        // QStyle::SE_ProgressBarGroove,
+                                        // QStyle::SE_DockWidgetTitleBarText,
+                                        // QStyle::SE_DockWidgetCloseButton,
+                                        // QStyle::SE_DockWidgetFloatButton,
+                                        // QStyle::SE_DockWidgetIcon,
+                                        // QStyle::SE_ToolBoxTabContents
+                                        >(element, hash, this, option, widget);
+    if (cached) {
+        return cached->subElementRect(element).toRect();
     }
 
-    return visualRect(option->direction, option->rect, rect.toRect());
+    return QCommonStyle::subElementRect(element, option, widget);
 }
 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
