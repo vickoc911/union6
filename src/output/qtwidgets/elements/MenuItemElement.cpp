@@ -37,9 +37,7 @@ void MenuItemElement::update()
     if (m_hasSubMenu) {
         m_indicatorElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem});
         m_indicatorProperties = queryProperties(m_indicatorElementList);
-        if (m_indicatorProperties->layout() && m_indicatorProperties->icon()) {
-            setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(u"arrow-right-symbolic"_s)));
-        }
+        setIndicator(m_style->unionIcon(m_indicatorProperties, u"arrow-right-symbolic"_s));
     }
     if (m_hasCheckBox || m_hasRadioButton) {
         QStyleOptionButton button;
@@ -230,23 +228,7 @@ void MenuItemElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator()) {
         QRectF indicatorRect = m_layoutMap[ElementString::Arrow].rect;
-        const bool enabled = m_menuItemOption->state.testFlag(QStyle::State_Enabled);
-
-        const QPalette activePalette = m_menuItemOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = indicatorRect.size();
-        const QPixmap pixmap = indicator().pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_menuItemOption->palette.text().color(); // Use text color as fallback
-        if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
-            auto iconColor = m_indicatorProperties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
-
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, indicatorRect.toRect(), Qt::AlignCenter, pixmap);
-        painter->restore();
+        drawIconAtRect(painter, m_indicator, indicatorRect);
     }
 }
 

@@ -51,27 +51,8 @@ void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIcon
 {
     auto elements = prepareElements(m_indicatorOption, m_widget, targetHierarchy);
     auto properties = queryProperties(elements);
-    auto name = defaultIconName;
-    if (properties && properties->icon()) {
-        name = properties->icon()->name().value_or(name);
-    }
-    auto icon = QIcon::fromTheme(name);
-
-    const bool enabled = m_indicatorOption->state.testFlag(QStyle::State_Enabled);
-
-    const QPalette activePalette = m_indicatorOption->palette;
-    const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-    auto iconSize = m_indicatorOption->rect.size();
-    const QPixmap pixmap = icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-    QColor penColor = m_indicatorOption->palette.text().color(); // Use text color as fallback
-    if (properties && properties->icon() && properties->icon()->color()) {
-        penColor = properties->icon()->color()->toQColor();
-    }
-    painter->save();
-    painter->setPen(penColor);
-    m_style->drawItemPixmap(painter, m_indicatorOption->rect, Qt::AlignCenter, pixmap);
-    painter->restore();
+    auto icon = m_style->unionIcon(properties, defaultIconName);
+    drawIconAtRect(painter, icon, m_indicatorOption->rect);
 }
 
 qreal IndicatorElement::listViewIconSize() const

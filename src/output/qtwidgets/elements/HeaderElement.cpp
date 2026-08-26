@@ -40,12 +40,12 @@ QIcon HeaderElement::sortIndicator()
             break;
         case QStyleOptionHeader::SortUp:
             if (m_contentProperties->icon()) {
-                sortIndicator = QIcon::fromTheme(m_contentProperties->icon()->name().value_or(u"arrow-up-symbolic"_s));
+                sortIndicator = m_style->unionIcon(m_contentProperties, u"arrow-up-symbolic"_s);
             }
             break;
         case QStyleOptionHeader::SortDown:
             if (m_contentProperties->icon()) {
-                sortIndicator = QIcon::fromTheme(m_contentProperties->icon()->name().value_or(u"arrow-down-symbolic"_s));
+                sortIndicator = m_style->unionIcon(m_contentProperties, u"arrow-down-symbolic"_s);
             }
             break;
         }
