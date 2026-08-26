@@ -66,15 +66,7 @@ QRectF CheckElement::subElementRect(QStyle::SubElement element) const
         }
     }
 
-    QRectF rect = m_buttonOption->rect;
-    QRectF unifiedRect;
-    for (const auto &m : m_layoutMap) {
-        if (m.elementName != ElementString::Indicator) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
-        }
-    }
-    rect = unifiedRect;
-    return rect;
+    return unifiedRect(m_layoutMap);
 }
 
 void CheckElement::updateSubElementList()
@@ -98,34 +90,11 @@ void CheckElement::drawIndicator(QPainter *painter) const
     }
 }
 
-QVariantMap CheckElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList CheckElement::elementHints() const
 {
     QStringList hints;
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::Flat)) {
-        hints.append(u"flat"_s);
-    }
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::HasMenu)) {
-        hints.append(u"with-menu"_s);
-    }
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::DefaultButton)) {
-        hints.append(u"default-button"_s);
-    }
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::AutoDefaultButton)) {
-        hints.append(u"auto-default-button"_s);
-    }
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::CommandLinkButton)) {
-        hints.append(u"command-link-button"_s);
-    }
-    if (!m_buttonOption->state.testFlag(QStyle::State_AutoRaise)) {
-        hints.append(u"raised"_s);
-    }
-    if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
-        hints.append(u"no-change"_s);
+    if (!m_buttonOption->icon.isNull()) {
+        hints.append(u"with-icon"_s);
     }
     return hints;
 }
