@@ -533,6 +533,7 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
     // Sort the list according to order. Set any filled items as last
     std::sort(items.begin(), items.end(), [](const LayoutItem &lhs, const LayoutItem &rhs) {
         if (lhs.horizontalAlignment == rhs.horizontalAlignment || lhs.verticalAlignment == rhs.verticalAlignment) {
+            // We reverse the order here to make sure the layouter reads this in correct order (0 1 2 instead of 2 1 0)
             if (lhs.horizontalAlignment == Union::Properties::Alignment::End || lhs.verticalAlignment == Union::Properties::Alignment::End) {
                 return lhs.order > rhs.order;
             } else {
