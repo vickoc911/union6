@@ -29,17 +29,17 @@ void IndicatorElement::drawArrowLeft(QPainter *painter) const
 
 void IndicatorElement::drawArrowRight(QPainter *painter) const
 {
-    drawElement(painter, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
+    drawElement(painter, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
 }
 
 void IndicatorElement::drawArrowDown(QPainter *painter) const
 {
-    drawElement(painter, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
+    drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
 }
 
 void IndicatorElement::drawArrowUp(QPainter *painter) const
 {
-    drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
+    drawElement(painter, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
 }
 
 void IndicatorElement::drawDropDown(QPainter *painter) const
