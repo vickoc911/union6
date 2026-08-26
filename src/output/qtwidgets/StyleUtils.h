@@ -60,3 +60,5 @@ QRectF centerRect(const QRectF &rect, int width, int height);
  * Used when widget is null.
  */
 QString styleOptionToElementName(const QStyleOption *option);
+
+QRectF unifiedRect(QMap<QString, LayoutItem> layoutMap);

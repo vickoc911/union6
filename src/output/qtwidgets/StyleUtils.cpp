@@ -375,3 +375,14 @@ QRectF centerRect(const QRectF &rect, int width, int height)
 {
     return QRect(rect.left() + (rect.width() - width) / 2, rect.top() + (rect.height() - height) / 2, width, height);
 }
+
+QRectF unifiedRect(QMap<QString, LayoutItem> layoutMap)
+{
+    QRectF rect;
+    for (const auto &m : layoutMap) {
+        if (m.elementName != ElementString::Indicator) {
+            rect = rect.united(m.rect.toRect());
+        }
+    }
+    return rect;
+}
