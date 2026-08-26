@@ -5,11 +5,25 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
+#include "ElementCache.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
 
 class UnionStyle;
+
+class HeaderElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_HeaderArrow> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_HeaderLabel> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+/* clang-format on */
+}
+}
 
 class HeaderElement : public AbstractElement
 {

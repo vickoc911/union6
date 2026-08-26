@@ -4,10 +4,23 @@
 #pragma once
 
 #include "AbstractElement.h"
+#include "ElementCache.h"
 #include <QObject>
 #include <QStyleOption>
 
 class UnionStyle;
+
+class LineEditElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_LineEditContents> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
+/* clang-format on */
+}
+}
 
 class LineEditElement : public AbstractElement
 {

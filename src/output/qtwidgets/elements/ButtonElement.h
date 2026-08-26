@@ -8,7 +8,23 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+
+class ButtonElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_PushButtonFocusRect> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_PushButtonContents> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_PushButtonBevel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+/* clang-format on */
+}
+}
 
 class ButtonElement : public AbstractElement
 {

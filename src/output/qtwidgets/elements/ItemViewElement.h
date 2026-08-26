@@ -9,7 +9,23 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "../ElementCache.h"
+
 class UnionStyle;
+
+class ItemViewElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ItemViewItemText> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ItemViewItemDecoration> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ItemViewItemCheckIndicator> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
+/* clang-format on */
+}
+}
 
 class ItemViewElement : public AbstractElement
 {

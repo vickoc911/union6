@@ -5,11 +5,27 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
+#include "ElementCache.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
 
 class UnionStyle;
+
+class CheckElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_RadioButtonContents> : public TypeHelper<CheckElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_RadioButtonIndicator> : public TypeHelper<CheckElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_CheckBoxIndicator> : public TypeHelper<CheckElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_CheckBoxContents> : public TypeHelper<CheckElement, QStyleOptionButton>{};
+/* clang-format on */
+}
+}
 
 class CheckElement : public AbstractElement
 {
