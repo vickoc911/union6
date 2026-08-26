@@ -21,7 +21,7 @@ public:
     ~ComboBoxElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
+    void drawText(QPainter *painter) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
@@ -30,7 +30,6 @@ public:
 
     bool isEditable() const;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:

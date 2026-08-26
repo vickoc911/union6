@@ -52,20 +52,6 @@ bool ComboBoxElement::isEditable() const
     return m_editable;
 }
 
-void ComboBoxElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-
-    drawBackground(painter);
-    drawIcon(painter);
-    if (!m_editable) {
-        drawText(painter);
-    }
-    drawIndicator(painter);
-}
-
 void ComboBoxElement::updateSubElementList()
 {
     m_subElementList.clear();
@@ -132,11 +118,6 @@ QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
     return QRect();
 }
 
-QVariantMap ComboBoxElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList ComboBoxElement::elementHints() const
 {
     QStringList hints;
@@ -147,4 +128,12 @@ QStringList ComboBoxElement::elementHints() const
         hints.append(u"editable"_s);
     }
     return hints;
+}
+
+void ComboBoxElement::drawText(QPainter *painter) const
+{
+    if (m_editable) {
+        return;
+    }
+    AbstractElement::drawText(painter);
 }
