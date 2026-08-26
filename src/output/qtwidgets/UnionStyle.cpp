@@ -101,8 +101,7 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed())
-        + qHash(controlElement, QHashSeed::globalSeed());
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), controlElement, option, widget);
     switch (controlElement) {
     case QStyle::CE_ComboBoxLabel:
         if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
@@ -316,8 +315,7 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(painter, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed())
-        + qHash(control, QHashSeed::globalSeed());
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), control, option, widget);
     switch (control) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
@@ -404,9 +402,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 {
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + +qHash(painter, QHashSeed::globalSeed())
-        + qHash(element, QHashSeed::globalSeed());
-
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), element, option, widget);
     switch (element) {
     case QStyle::PE_FrameStatusBarItem:
         if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
@@ -629,8 +625,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
-    const auto hash = qHash(contentsSize, QHashSeed::globalSeed()) + qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed())
-        + qHash(contentsType, QHashSeed::globalSeed());
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), contentsType, option, contentsSize, widget);
     switch (contentsType) {
     case QStyle::CT_PushButton: {
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
@@ -748,7 +743,7 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
     QRectF rect;
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + qHash(element, QHashSeed::globalSeed());
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), element, option, widget);
 
     switch (element) {
     case QStyle::SE_ItemViewItemText:
@@ -862,8 +857,7 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + qHash(complexControl, QHashSeed::globalSeed())
-        + qHash(subControl, QHashSeed::globalSeed());
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), complexControl, option, subControl, widget);
     switch (complexControl) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
@@ -912,7 +906,7 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
 
 int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
-    const auto hash = qHash(option, QHashSeed::globalSeed()) + qHash(widget, QHashSeed::globalSeed()) + qHash(metric, QHashSeed::globalSeed());
+    const auto hash = qHashMulti(QHashSeed::globalSeed(), metric, option, widget);
     switch (metric) {
     // Don't shift button text when sunken
     case QStyle::PM_TabBarTabShiftHorizontal:
