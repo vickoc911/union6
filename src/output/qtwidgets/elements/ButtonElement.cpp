@@ -3,6 +3,7 @@
 
 #include "ButtonElement.h"
 #include "SharedNames.h"
+#include "StyleUtils.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -86,13 +87,7 @@ QRectF ButtonElement::subElementRect(QStyle::SubElement element) const
         return backgroundRectangle(m_buttonOption, m_backgroundProperties).toRect();
     }
 
-    QRectF rect = m_buttonOption->rect;
-    QRectF unifiedRect;
-    for (const auto &m : m_layoutMap) {
-        unifiedRect = unifiedRect.united(m.rect.toRect());
-    }
-    rect = unifiedRect;
-    return rect;
+    return unifiedRect(m_layoutMap);
 }
 
 Union::Element::States ButtonElement::elementStates() const

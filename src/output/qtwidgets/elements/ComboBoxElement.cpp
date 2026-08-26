@@ -3,6 +3,7 @@
 
 #include "ComboBoxElement.h"
 #include "SharedNames.h"
+#include "StyleUtils.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -52,20 +53,6 @@ bool ComboBoxElement::isEditable() const
     return m_editable;
 }
 
-void ComboBoxElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-
-    drawBackground(painter);
-    drawIcon(painter);
-    if (!m_editable) {
-        drawText(painter);
-    }
-    drawIndicator(painter);
-}
-
 void ComboBoxElement::updateSubElementList()
 {
     m_subElementList.clear();
@@ -80,13 +67,10 @@ void ComboBoxElement::updateSubElementList()
 
 QSizeF ComboBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
-    QRectF unifiedRect;
-    for (const auto &m : m_layoutMap) {
-        unifiedRect = unifiedRect.united(m.rect.toRect().normalized());
-    }
+    QRectF rect = unifiedRect(m_layoutMap);
     // Follow the contents width
-    unifiedRect.setWidth(contentsSizeFromStyle.width());
-    auto size = applyPaddingToSize(unifiedRect.size());
+    rect.setWidth(contentsSizeFromStyle.width());
+    auto size = applyPaddingToSize(rect.size());
     if (m_indicatorProperties && m_indicatorProperties->layout()) {
         size.rwidth() += m_indicatorProperties->layout()->spacing().value_or(20);
     }
@@ -132,11 +116,6 @@ QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
     return QRect();
 }
 
-QVariantMap ComboBoxElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList ComboBoxElement::elementHints() const
 {
     QStringList hints;
@@ -147,4 +126,12 @@ QStringList ComboBoxElement::elementHints() const
         hints.append(u"editable"_s);
     }
     return hints;
+}
+
+void ComboBoxElement::drawText(QPainter *painter) const
+{
+    if (m_editable) {
+        return;
+    }
+    AbstractElement::drawText(painter);
 }
