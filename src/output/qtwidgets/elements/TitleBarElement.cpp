@@ -42,52 +42,32 @@ void TitleBarElement::draw(QPainter *painter) const
         drawText(painter);
     }
     if (!m_titleBarOption->icon.isNull()) {
-        drawButton(painter, m_layoutMap[ElementString::Icon].rect, m_titleBarOption->icon);
+        drawIconAtRect(painter, m_titleBarOption->icon, m_layoutMap[ElementString::Icon].rect);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowContextHelpButtonHint)) {
         const auto icon = queryIcon(u"help-contextual-symbolic"_s, {ElementString::TitleBar, ElementString::HelpButton});
-        drawButton(painter, m_layoutMap[ElementString::HelpButton].rect, icon);
+        drawIconAtRect(painter, icon, m_layoutMap[ElementString::HelpButton].rect);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMinimizeButtonHint)) {
         const auto icon = queryIcon(u"window-minimize-symbolic"_s, {ElementString::TitleBar, ElementString::MinimizeButton});
-        drawButton(painter, m_layoutMap[ElementString::MinimizeButton].rect, icon);
+        drawIconAtRect(painter, icon, m_layoutMap[ElementString::MinimizeButton].rect);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowMaximizeButtonHint)) {
         const auto icon = queryIcon(u"window-maximize-symbolic"_s, {ElementString::TitleBar, ElementString::MaximizeButton});
-        drawButton(painter, m_layoutMap[ElementString::MaximizeButton].rect, icon);
+        drawIconAtRect(painter, icon, m_layoutMap[ElementString::MaximizeButton].rect);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowCloseButtonHint)) {
         const auto icon = queryIcon(u"window-close-symbolic"_s, {ElementString::TitleBar, ElementString::CloseButton});
-        drawButton(painter, m_layoutMap[ElementString::CloseButton].rect, icon);
+        drawIconAtRect(painter, icon, m_layoutMap[ElementString::CloseButton].rect);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowSystemMenuHint)) {
         const auto icon = queryIcon(u"application-menu-symbolic"_s, {ElementString::TitleBar, ElementString::SystemMenu});
-        drawButton(painter, m_layoutMap[ElementString::SystemMenu].rect, icon);
+        drawIconAtRect(painter, icon, m_layoutMap[ElementString::SystemMenu].rect);
     }
     if (m_titleBarOption->titleBarFlags.testFlag(Qt::WindowShadeButtonHint)) {
         const auto icon = queryIcon(u"window-shade-symbolic"_s, {ElementString::TitleBar, ElementString::ShadeButton});
-        drawButton(painter, m_layoutMap[ElementString::ShadeButton].rect, icon);
+        drawIconAtRect(painter, icon, m_layoutMap[ElementString::ShadeButton].rect);
     }
-}
-
-void TitleBarElement::drawButton(QPainter *painter, const QRectF &rect, const QIcon &icon) const
-{
-    const bool enabled = m_titleBarOption->state.testFlag(QStyle::State_Enabled);
-
-    const QPalette activePalette = m_titleBarOption->palette;
-    const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-    auto iconSize = rect.size();
-    const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-    QColor penColor = m_titleBarOption->palette.text().color(); // Use text color as fallback
-    if (m_contentProperties && m_contentProperties->icon() && m_contentProperties->icon()->color()) {
-        penColor = m_contentProperties->icon()->color()->toQColor();
-    }
-
-    painter->save();
-    painter->setPen(penColor);
-    m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
-    painter->restore();
 }
 
 void TitleBarElement::updateSubElementList()
@@ -185,13 +165,8 @@ qreal TitleBarElement::buttonWidth() const
 
 QIcon TitleBarElement::queryIcon(const QString &defaultIconName, const QStringList &targetHierarchy) const
 {
-    auto name = defaultIconName;
-    auto elements = prepareElements(m_titleBarOption, m_widget, targetHierarchy);
-    auto props = queryProperties(elements);
-    if (props && props->icon()) {
-        name = props->icon()->name().value_or(name);
-    }
-    return QIcon::fromTheme(name);
+    auto props = queryProperties(prepareElements(m_titleBarOption, m_widget, targetHierarchy));
+    return m_style->unionIcon(props, defaultIconName);
 }
 
 QStringList TitleBarElement::elementHints() const

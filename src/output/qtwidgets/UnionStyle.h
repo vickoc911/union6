@@ -39,8 +39,6 @@ public:
     void polish(QApplication *application) override;
     void polish(QWidget *) override;
 
-    void drawIcon(const QRectF &rect, const QStyleOption *option, QPainter *painter, const QIcon &icon, const QColor &overrideColor = QColor()) const;
-
     bool eventFilter(QObject *object, QEvent *event) override;
 
     void drawItemText(QPainter *painter,
@@ -50,6 +48,8 @@ public:
                       bool enabled,
                       const QString &text,
                       QPalette::ColorRole textRole = QPalette::NoRole) const override;
+
+    QIcon unionIcon(Union::Properties::StylePropertyGroup *properties, const QString &defaultName) const;
 
 private:
     bool m_showMnemonics;

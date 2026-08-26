@@ -256,48 +256,29 @@ void AbstractElement::drawText(QPainter *painter) const
 void AbstractElement::drawIcon(QPainter *painter) const
 {
     if (hasIcon() && m_isValid) {
-        QRectF iconRect = m_layoutMap[ElementString::Icon].rect;
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
-
-        const QPalette activePalette = m_styleOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = iconRect.size();
-        const QPixmap pixmap = m_icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
-        if (m_contentProperties->icon() && m_contentProperties->icon()->color().has_value()) {
-            auto iconColor = m_contentProperties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
-
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, iconRect.toRect(), Qt::AlignCenter, pixmap);
-        painter->restore();
+        drawIconAtRect(painter, m_icon, m_layoutMap[ElementString::Icon].rect);
     }
 }
 
 void AbstractElement::drawIndicator(QPainter *painter) const
 {
     if (hasIndicator() && m_isValid) {
-        QRectF indicatorRect = m_layoutMap[ElementString::Indicator].rect;
-        drawBackgroundRectangle(painter, indicatorRect, m_indicatorProperties);
-        const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+        drawIconAtRect(painter, m_indicator, m_layoutMap[ElementString::Indicator].rect);
+    }
+}
 
-        const QPalette activePalette = m_styleOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = indicatorRect.size();
-        const QPixmap pixmap = m_indicator.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
-        if (m_indicatorProperties->icon() && m_indicatorProperties->icon()->color().has_value()) {
-            auto iconColor = m_indicatorProperties->icon()->color();
-            penColor = iconColor->toQColor();
+void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect) const
+{
+    if (m_isValid) {
+        bool enabled = true;
+        if (m_styleOption) {
+            enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
         }
-
+        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
+        auto iconSize = rect.size();
+        const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
         painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, indicatorRect.toRect(), Qt::AlignCenter, pixmap);
+        m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }

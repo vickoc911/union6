@@ -42,17 +42,10 @@ void TreeViewElement::drawIndicatorBranch(QPainter *painter) const
     QSizeF size(1, 1);
     auto elements = prepareElements(m_treeViewOption, m_widget, {ElementString::TreeViewDelegate, ElementString::Indicator});
     auto properties = queryProperties(elements);
-    auto name = defaultIconName;
-    if (properties) {
-        if (properties->icon()) {
-            name = properties->icon()->name().value_or(name);
-        }
-        if (properties->layout()) {
-            size = QSizeF(properties->layout()->width().value_or(0), properties->layout()->height().value_or(0));
-        }
+    if (properties && properties->layout()) {
+        size = QSizeF(properties->layout()->width().value_or(0), properties->layout()->height().value_or(0));
     }
-
-    auto icon = QIcon::fromTheme(name);
+    auto icon = m_style->unionIcon(properties, defaultIconName);
     const bool enabled = m_treeViewOption->state.testFlag(QStyle::State_Enabled);
 
     const QPalette activePalette = m_treeViewOption->palette;
@@ -60,12 +53,7 @@ void TreeViewElement::drawIndicatorBranch(QPainter *painter) const
     auto iconSize = m_treeViewOption->rect.size();
     const QPixmap pixmap = icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
 
-    QColor penColor = m_treeViewOption->palette.text().color(); // Use text color as fallback
-    if (properties && properties->icon() && properties->icon()->color()) {
-        penColor = properties->icon()->color()->toQColor();
-    }
     painter->save();
-    painter->setPen(penColor);
     auto rect = centerRect(m_treeViewOption->rect, size.width(), size.height());
     m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
     painter->restore();

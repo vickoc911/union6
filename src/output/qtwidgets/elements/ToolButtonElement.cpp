@@ -37,9 +37,7 @@ void ToolButtonElement::update()
     setIndicator(QIcon());
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
-        if (m_indicatorProperties->icon()) {
-            setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
-        }
+        setIndicator(m_style->unionIcon(m_indicatorProperties, QString()));
     }
     setIcon(m_toolButtonOption->icon);
     setText(m_toolButtonOption->text);
@@ -145,29 +143,7 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
         }
         return;
     } else if (hasIcon()) {
-        const bool enabled = m_toolButtonOption->state.testFlag(QStyle::State_Enabled);
-        const QPalette activePalette = m_toolButtonOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = iconRect.size();
-
-        // Toolbutton can override the regular icon size
-        if (const auto *toolButtonOption = qstyleoption_cast<const QStyleOptionToolButton *>(m_toolButtonOption)) {
-            // However avoid resizing any icon (like indicators) inside toolbutton, only the main icon
-            if (toolButtonOption->icon.name() == m_icon.name()) {
-                iconSize = toolButtonOption->iconSize;
-            }
-        }
-        const QPixmap pixmap = m_icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_toolButtonOption->palette.text().color(); // Use text color as fallback
-        if (m_contentProperties->icon() && m_contentProperties->icon()->color().has_value()) {
-            auto iconColor = m_contentProperties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, iconRect.toRect(), Qt::AlignCenter, pixmap);
-        painter->restore();
+        drawIconAtRect(painter, m_icon, iconRect);
     }
 }
 

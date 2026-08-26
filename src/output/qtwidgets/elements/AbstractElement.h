@@ -165,6 +165,8 @@ protected:
      */
     virtual QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements) const;
 
+    void drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect) const;
+
     const QStyleOption *m_styleOption;
     const UnionStyle *m_style;
     const QWidget *m_widget;

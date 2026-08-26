@@ -31,7 +31,7 @@ void ComboBoxElement::update()
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
         if (m_indicatorProperties->icon()) {
-            setIndicator(QIcon::fromTheme(m_indicatorProperties->icon()->name().value_or(QString())));
+            setIndicator(m_style->unionIcon(m_indicatorProperties, QString()));
         }
         if (m_indicatorProperties->layout()) {
             m_spacing = m_indicatorProperties->layout()->spacing().value_or(1);

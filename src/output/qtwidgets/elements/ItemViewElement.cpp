@@ -174,23 +174,7 @@ void ItemViewElement::drawIcon(QPainter *painter) const
 {
     if (hasIcon() && m_isValid) {
         QRect iconRect = m_style->subElementRect(QStyle::SE_ItemViewItemDecoration, m_viewItemOption, m_widget);
-        const bool enabled = m_viewItemOption->state.testFlag(QStyle::State_Enabled);
-
-        const QPalette activePalette = m_viewItemOption->palette;
-        const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-        auto iconSize = iconRect.size();
-        const QPixmap pixmap = m_icon.pixmap(iconSize, dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-        QColor penColor = m_styleOption->palette.text().color(); // Use text color as fallback
-        if (m_backgroundProperties->icon() && m_backgroundProperties->icon()->color().has_value()) {
-            auto iconColor = m_backgroundProperties->icon()->color();
-            penColor = iconColor->toQColor();
-        }
-
-        painter->save();
-        painter->setPen(penColor);
-        m_style->drawItemPixmap(painter, iconRect, Qt::AlignCenter, pixmap);
-        painter->restore();
+        drawIconAtRect(painter, m_icon, iconRect);
     }
 }
 QVariantMap ItemViewElement::elementAttributes() const

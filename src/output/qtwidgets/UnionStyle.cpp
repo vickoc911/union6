@@ -1481,25 +1481,6 @@ void UnionStyle::drawItemText(QPainter *painter,
     QCommonStyle::drawItemText(painter, rect, flags, pal, enabled, text, textRole);
 }
 
-void UnionStyle::drawIcon(const QRectF &rect, const QStyleOption *opt, QPainter *painter, const QIcon &icon, const QColor &overrideColor) const
-{
-    const bool enabled = opt->state.testFlag(QStyle::State_Enabled);
-
-    const QPalette activePalette = opt->palette;
-    const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
-    auto iconSize = rect.size();
-    const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
-
-    QColor penColor = opt->palette.text().color(); // Use text color as fallback
-    if (overrideColor.isValid()) {
-        penColor = overrideColor;
-    }
-    painter->save();
-    painter->setPen(penColor);
-    drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
-    painter->restore();
-}
-
 void UnionStyle::setMnemonics(bool enabled)
 {
     if (m_showMnemonics != enabled) {
@@ -1534,4 +1515,19 @@ bool UnionStyle::eventFilter(QObject *object, QEvent *event)
         break;
     }
     return QCommonStyle::eventFilter(object, event);
+}
+
+QIcon UnionStyle::unionIcon(Union::Properties::StylePropertyGroup *properties, const QString &defaultName) const
+{
+    if (properties && properties->icon()) {
+        auto name = properties->icon()->name().value_or(defaultName);
+        if (!name.isEmpty()) {
+            QColor color = standardPalette().text().color();
+            if (properties->icon()->color()) {
+                color = properties->icon()->color()->toQColor();
+            }
+            return Union::StyleRegistry::instance()->platform()->platformIcon(name, color);
+        }
+    }
+    return QIcon::fromTheme(defaultName);
 }
