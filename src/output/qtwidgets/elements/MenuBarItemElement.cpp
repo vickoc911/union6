@@ -57,11 +57,6 @@ void MenuBarItemElement::layout()
     m_isValid = true;
 }
 
-QVariantMap MenuBarItemElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList MenuBarItemElement::elementHints() const
 {
     QStringList hints;

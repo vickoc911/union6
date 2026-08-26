@@ -204,11 +204,6 @@ qreal ScrollBarElement::minimumSize() const
     return extent() * 2;
 }
 
-QVariantMap ScrollBarElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList ScrollBarElement::elementHints() const
 {
     QStringList hints;

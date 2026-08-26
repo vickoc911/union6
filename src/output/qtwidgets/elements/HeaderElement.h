@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -29,7 +28,6 @@ public:
 
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:

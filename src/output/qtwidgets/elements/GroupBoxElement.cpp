@@ -131,11 +131,6 @@ void GroupBoxElement::drawIcon(QPainter *painter) const
     }
 }
 
-QVariantMap GroupBoxElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList GroupBoxElement::elementHints() const
 {
     QStringList hints;

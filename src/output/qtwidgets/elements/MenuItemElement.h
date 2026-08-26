@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -31,7 +30,6 @@ public:
     void drawIndicator(QPainter *painter) const override;
     void layout() override;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:

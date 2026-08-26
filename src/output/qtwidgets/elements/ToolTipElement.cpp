@@ -41,11 +41,6 @@ void ToolTipElement::layout()
     }
 }
 
-QVariantMap ToolTipElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList ToolTipElement::elementHints() const
 {
     return frameHints(m_frameOption);

@@ -250,11 +250,6 @@ void MenuItemElement::drawIndicator(QPainter *painter) const
     }
 }
 
-QVariantMap MenuItemElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList MenuItemElement::elementHints() const
 {
     QStringList hints;

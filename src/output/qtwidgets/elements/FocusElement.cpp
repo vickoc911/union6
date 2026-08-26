@@ -41,11 +41,6 @@ void FocusElement::layout()
     }
 }
 
-QVariantMap FocusElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList FocusElement::elementHints() const
 {
     QStringList hints;

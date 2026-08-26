@@ -63,11 +63,6 @@ QRectF LineEditElement::subElementRect(QStyle::SubElement element) const
     return QRectF();
 }
 
-QVariantMap LineEditElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList LineEditElement::elementHints() const
 {
     return frameHints(m_frameOption);

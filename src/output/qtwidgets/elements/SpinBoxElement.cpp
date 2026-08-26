@@ -156,11 +156,6 @@ void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::Primitiv
     painter->restore();
 }
 
-QVariantMap SpinBoxElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList SpinBoxElement::elementHints() const
 {
     QStringList hints;

@@ -32,7 +32,6 @@ public:
 
     qreal controlThickness() const;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:

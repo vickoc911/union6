@@ -29,11 +29,6 @@ void MenuBarElement::update()
     layout();
 }
 
-QVariantMap MenuBarElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList MenuBarElement::elementHints() const
 {
     QStringList hints;

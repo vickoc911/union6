@@ -194,11 +194,6 @@ QIcon TitleBarElement::queryIcon(const QString &defaultIconName, const QStringLi
     return QIcon::fromTheme(name);
 }
 
-QVariantMap TitleBarElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList TitleBarElement::elementHints() const
 {
     QStringList hints;

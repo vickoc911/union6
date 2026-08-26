@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -35,7 +34,6 @@ public:
     qreal controlThickness() const;
     qreal minimumSize() const;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:

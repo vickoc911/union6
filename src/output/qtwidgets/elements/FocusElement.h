@@ -20,7 +20,6 @@ public:
     void update() override;
     void layout() override;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
 
 private:

@@ -143,11 +143,6 @@ QSizeF HeaderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     return applyPaddingToSize(size);
 }
 
-QVariantMap HeaderElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList HeaderElement::elementHints() const
 {
     QStringList hints;

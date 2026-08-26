@@ -305,11 +305,6 @@ qreal SliderElement::controlThickness() const
     return 0;
 }
 
-QVariantMap SliderElement::elementAttributes() const
-{
-    return QVariantMap();
-}
-
 QStringList SliderElement::elementHints() const
 {
     QStringList hints;
