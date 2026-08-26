@@ -55,7 +55,7 @@ void ItemViewElement::layout()
         m_layoutMap = layoutMap(m_backgroundElementList, m_viewItemOption, m_subElementList);
     }
 
-        m_contentElementList = prepareElements(m_viewItemOption, m_widget, m_subElementList);
+    m_contentElementList = prepareElements(m_viewItemOption, m_widget, m_subElementList);
 
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);
@@ -197,7 +197,7 @@ QVariantMap ItemViewElement::elementAttributes() const
 {
     QVariantMap map;
     if (m_viewItemOption->decorationPosition == QStyleOptionViewItem::Top) {
-        map[u"display"_s] = QVariant(u"text-under-icon"_s);
+        map[u"display"_s] = QVariant(u"text-above-icon"_s);
     }
     if (m_viewItemOption->decorationPosition == QStyleOptionViewItem::Bottom) {
         map[u"display"_s] = QVariant(u"text-below-icon"_s);
