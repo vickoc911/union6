@@ -95,9 +95,14 @@ QRectF ButtonElement::subElementRect(QStyle::SubElement element) const
     return rect;
 }
 
-QVariantMap ButtonElement::elementAttributes() const
+Union::Element::States ButtonElement::elementStates() const
 {
-    return QVariantMap();
+    auto states = AbstractElement::elementStates();
+    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::DefaultButton)
+        || m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::AutoDefaultButton)) {
+        states.setFlag(Union::Element::State::Highlighted, true);
+    }
+    return states;
 }
 
 QStringList ButtonElement::elementHints() const
@@ -109,20 +114,8 @@ QStringList ButtonElement::elementHints() const
     if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::HasMenu)) {
         hints.append(u"with-menu"_s);
     }
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::DefaultButton)) {
-        hints.append(u"default-button"_s);
-    }
-    if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::AutoDefaultButton)) {
-        hints.append(u"auto-default-button"_s);
-    }
     if (m_buttonOption->features.testFlag(QStyleOptionButton::ButtonFeature::CommandLinkButton)) {
         hints.append(u"command-link-button"_s);
-    }
-    if (!m_buttonOption->state.testFlag(QStyle::State_AutoRaise)) {
-        hints.append(u"raised"_s);
-    }
-    if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
-        hints.append(u"no-change"_s);
     }
     return hints;
 }

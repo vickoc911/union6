@@ -24,8 +24,8 @@ public:
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
+    Union::Element::States elementStates() const override;
 
     const QStyleOptionButton *m_buttonOption = nullptr;
 };
