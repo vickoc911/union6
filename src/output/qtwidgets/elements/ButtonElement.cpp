@@ -43,6 +43,38 @@ void ButtonElement::update()
     layout();
 }
 
+void ButtonElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.ControlElement) {
+    case QStyle::CE_PushButtonBevel:
+        drawBackground(painter);
+        break;
+    case QStyle::CE_PushButtonLabel:
+        drawIcon(painter);
+        drawText(painter);
+        break;
+    case QStyle::CE_PushButton:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameButtonBevel:
+    case QStyle::PE_FrameDefaultButton:
+        drawFrame(painter);
+        break;
+    case QStyle::PE_PanelButtonCommand:
+    case QStyle::PE_PanelButtonBevel:
+        drawBackground(painter);
+        break;
+    }
+}
+
 void ButtonElement::updateSubElementList()
 {
     m_subElementList.clear();

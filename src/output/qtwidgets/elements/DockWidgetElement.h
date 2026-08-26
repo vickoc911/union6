@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -22,13 +21,11 @@ public:
     ~DockWidgetElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
-
+    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
     QRectF subElementRect(QStyle::SubElement subElement) const override;
 
-    void updateSubElementList() override;
-    void layout() override;
-
 private:
+    void updateSubElementList() override;
     const QStyleOptionDockWidget *m_dockWidgetOption = nullptr;
 };

@@ -17,6 +17,12 @@ enum class PaddingDirection {
     Outward
 };
 
+struct DrawEnums {
+    int ControlElement = -1;
+    int ComplexControl = -1;
+    int PrimitiveElement = -1;
+};
+
 class AbstractElement : public QObject
 {
     Q_OBJECT
@@ -46,32 +52,7 @@ public:
     /*!
      * \brief Draw the whole element, including text, icon, background and indicator.
      */
-    virtual void draw(QPainter *painter) const;
-    /*!
-     * \brief Draw text of the element.
-     */
-    virtual void drawText(QPainter *painter) const;
-    /*!
-     * \brief Draw icon of the element.
-     */
-    virtual void drawIcon(QPainter *painter) const;
-    /*!
-     * \brief Draw whole background of the element.
-     */
-    virtual void drawBackground(QPainter *painter) const;
-    /*!
-     * \brief Draw only the background frame of the element.
-     */
-    virtual void drawFrame(QPainter *painter) const;
-    /*!
-     * \brief Draw only the background panel of the element.
-     */
-    virtual void drawPanel(QPainter *painter) const;
-    /*!
-     * \brief Draw the indicator of the element. This can vary from secondary icon, such as drop-down
-     * arrow icon, to a checkbox, depending on the element.
-     */
-    virtual void drawIndicator(QPainter *painter) const;
+    virtual void draw(QPainter *painter, DrawEnums enums) const;
     /*!
      * \brief Prepare the layoutMap of the element, and create the required properties.
      * By default this creates proeprties for background and content.
@@ -113,6 +94,32 @@ public:
     virtual void update();
 
 protected:
+    /*!
+     * \brief Draw text of the element.
+     */
+    virtual void drawText(QPainter *painter) const;
+    /*!
+     * \brief Draw icon of the element.
+     */
+    virtual void drawIcon(QPainter *painter) const;
+    /*!
+     * \brief Draw whole background of the element.
+     */
+    virtual void drawBackground(QPainter *painter) const;
+    /*!
+     * \brief Draw only the background frame of the element.
+     */
+    virtual void drawFrame(QPainter *painter) const;
+    /*!
+     * \brief Draw only the background panel of the element.
+     */
+    virtual void drawPanel(QPainter *painter) const;
+    /*!
+     * \brief Draw the indicator of the element. This can vary from secondary icon, such as drop-down
+     * arrow icon, to a checkbox, depending on the element.
+     */
+    virtual void drawIndicator(QPainter *painter) const;
+
     /*!
      * \brief Translate styleoption values into attributes for this element.
      */

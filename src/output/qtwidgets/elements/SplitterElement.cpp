@@ -26,11 +26,19 @@ SplitterElement::~SplitterElement()
 
 void SplitterElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
-    updateSubElementList();
     layout();
+}
+
+void SplitterElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.ControlElement) {
+    case QStyle::CE_Splitter:
+        drawBackground(painter);
+        break;
+    }
 }
 
 void SplitterElement::layout()

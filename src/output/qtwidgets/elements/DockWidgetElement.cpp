@@ -4,6 +4,7 @@
 #include "DockWidgetElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -30,14 +31,18 @@ void DockWidgetElement::update()
     layout();
 }
 
-void DockWidgetElement::draw(QPainter *painter) const
+void DockWidgetElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
 
-    drawBackground(painter);
-    drawText(painter);
+    switch (enums.ControlElement) {
+    case QStyle::CE_DockWidgetTitle:
+        drawBackground(painter);
+        drawText(painter);
+        break;
+    }
 }
 
 void DockWidgetElement::updateSubElementList()

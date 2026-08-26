@@ -18,14 +18,14 @@ public:
     ~LineEditElement() override;
 
     void update() override;
-    void updateSubElementList() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QSizeF iconSize() const override;
     QMarginsF iconPadding() const;
     QRectF subElementRect(QStyle::SubElement element) const override;
 
-    QStringList elementHints() const override;
-
 private:
+    void updateSubElementList() override;
+    QStringList elementHints() const override;
     const QStyleOptionFrame *m_frameOption = nullptr;
 };

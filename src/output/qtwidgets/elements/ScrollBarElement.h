@@ -20,23 +20,21 @@ public:
     ~ScrollBarElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
-
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
+
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
-
-    void drawBackground(QPainter *painter) const override;
-    void drawIndicator(QPainter *painter) const override;
-    void updateSubElementList() override;
 
     qreal extent() const;
     qreal controlThickness() const;
     qreal minimumSize() const;
 
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    void drawBackground(QPainter *painter) const override;
+    void drawIndicator(QPainter *painter) const override;
+    void updateSubElementList() override;
     const QStyleOptionSlider *m_scrollBarOption = nullptr;
     bool m_horizontal;
 };

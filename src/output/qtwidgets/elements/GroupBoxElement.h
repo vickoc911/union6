@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,15 +20,14 @@ public:
     ~GroupBoxElement() override;
 
     void update() override;
-    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
     QRectF subControlRect(QStyle::SubControl subControl) const override;
 
+private:
+    QStringList elementHints() const override;
+    void layout() override;
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
-
-    QStringList elementHints() const override;
-
-private:
     const QStyleOptionGroupBox *m_groupBoxOption = nullptr;
     bool m_isCheckable;
 };

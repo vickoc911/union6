@@ -18,10 +18,10 @@ public:
     ~FrameElement() override;
 
     void update() override;
-    void updateSubElementList() override;
-
-    QStringList elementHints() const override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
     const QStyleOptionFrame *m_frameOption = nullptr;
 };

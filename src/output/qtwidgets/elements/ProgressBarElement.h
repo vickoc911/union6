@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,18 +20,16 @@ public:
     ~ProgressBarElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
-
-    void updateSubElementList() override;
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
+
     QRectF subElementRect(QStyle::SubElement element) const override;
-
-    void drawBackground(QPainter *painter) const override;
-    void drawIndicator(QPainter *painter) const override;
-
-    void drawChunk(QPainter *painter) const;
     int chunkWidth() const;
 
 private:
+    void updateSubElementList() override;
+    void drawBackground(QPainter *painter) const override;
+    void drawIndicator(QPainter *painter) const override;
+    void drawChunk(QPainter *painter) const;
     const QStyleOptionProgressBar *m_progressBarOption = nullptr;
 };

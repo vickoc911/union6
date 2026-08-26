@@ -25,11 +25,23 @@ StatusBarElement::~StatusBarElement()
 
 void StatusBarElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     updateSubElementList();
     layout();
+}
+
+void StatusBarElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelStatusBar:
+        drawBackground(painter);
+        break;
+    case QStyle::PE_FrameStatusBarItem:
+        drawItem(painter);
+        break;
+    }
 }
 
 void StatusBarElement::updateSubElementList()

@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,10 +20,9 @@ public:
     ~TabElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
-
     void layout() override;
-    void updateSubElementList() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
+
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
@@ -32,10 +30,10 @@ public:
     int hSpace() const;
     int vSpace() const;
 
+private:
     QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
-
-private:
+    void updateSubElementList() override;
     const QStyleOptionTab *m_tabOption = nullptr;
     bool m_isVertical;
     bool m_isClosable;

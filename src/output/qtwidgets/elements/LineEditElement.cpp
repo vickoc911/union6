@@ -28,11 +28,29 @@ LineEditElement::~LineEditElement()
 
 void LineEditElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     updateSubElementList();
     layout();
+}
+
+void LineEditElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    // For spinboxes and comboboxes, we do not want to draw this element
+    // TODO: maybe this should be handleable by the CSS
+    if (!m_widget || m_widget->parentWidget()->inherits("QComboBox") || m_widget->parentWidget()->inherits("QAbstractSpinBox")) {
+        return;
+    }
+    drawBackground(painter);
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelLineEdit:
+        drawBackground(painter);
+        break;
+    case QStyle::PE_FrameLineEdit:
+        drawFrame(painter);
+        break;
+    }
 }
 
 QSizeF LineEditElement::iconSize() const

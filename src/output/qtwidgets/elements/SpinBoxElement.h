@@ -20,18 +20,15 @@ public:
     ~SpinBoxElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    void updateSubElementList() override;
-
-    void drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive, const QRectF &rect) const;
-
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
+    void drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive) const;
     const QStyleOptionSpinBox *m_spinBoxOption = nullptr;
     bool m_hasButtons;
 };

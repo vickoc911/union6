@@ -19,9 +19,10 @@ public:
     TreeViewElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~TreeViewElement() override;
 
-    void drawIndicatorBranch(QPainter *painter) const;
+    void draw(QPainter *painter, DrawEnums enums) const override;
     qreal indentation() const;
 
 private:
+    void drawIndicator(QPainter *painter) const override;
     const QStyleOption *m_treeViewOption = nullptr;
 };

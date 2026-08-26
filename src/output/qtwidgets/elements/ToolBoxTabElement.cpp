@@ -4,6 +4,7 @@
 #include "ToolBoxTabElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -31,14 +32,26 @@ void ToolBoxTabElement::update()
     layout();
 }
 
-void ToolBoxTabElement::draw(QPainter *painter) const
+void ToolBoxTabElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_ToolBoxTabShape:
+        drawBackground(painter);
+        break;
+    case QStyle::CE_ToolBoxTabLabel:
+        drawIcon(painter);
+        drawText(painter);
+        break;
+    case QStyle::CE_ToolBoxTab:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        break;
+    }
 }
 
 void ToolBoxTabElement::updateSubElementList()

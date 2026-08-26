@@ -25,11 +25,21 @@ SizeGripElement::~SizeGripElement()
 {
 }
 
+void SizeGripElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_SizeGrip:
+        drawBackground(painter);
+        break;
+    }
+}
+
 void SizeGripElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
 }
 

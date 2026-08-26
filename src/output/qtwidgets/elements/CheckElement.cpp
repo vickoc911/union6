@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QStyle>
+#include <qstyle.h>
 
 #include "SharedNames.h"
 
@@ -39,6 +40,33 @@ void CheckElement::update()
     setText(m_buttonOption->text);
     updateSubElementList();
     layout();
+}
+
+void CheckElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_RadioButton:
+    case QStyle::CE_CheckBox:
+        drawBackground(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    case QStyle::CE_RadioButtonLabel:
+    case QStyle::CE_CheckBoxLabel:
+        drawText(painter);
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorRadioButton:
+    case QStyle::PE_IndicatorCheckBox:
+        drawIndicator(painter);
+        break;
+    }
 }
 
 QSizeF CheckElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
@@ -95,6 +123,10 @@ QStringList CheckElement::elementHints() const
     QStringList hints;
     if (!m_buttonOption->icon.isNull()) {
         hints.append(u"with-icon"_s);
+    }
+    // Used for "partial" checkbox
+    if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
+        hints.append(u"no-change"_s);
     }
     return hints;
 }

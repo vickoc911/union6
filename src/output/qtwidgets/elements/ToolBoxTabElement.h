@@ -21,12 +21,12 @@ public:
     ~ToolBoxTabElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
-
     void layout() override;
-    void updateSubElementList() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
+
     QRectF subElementRect(QStyle::SubElement element) const override;
 
 private:
+    void updateSubElementList() override;
     const QStyleOptionToolBox *m_toolBoxOption = nullptr;
 };

@@ -24,10 +24,19 @@ TabWidgetElement::~TabWidgetElement()
 
 void TabWidgetElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void TabWidgetElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameTabWidget:
+        drawBackground(painter);
+        break;
+    }
 }
 
 QVariantMap TabWidgetElement::elementAttributes() const

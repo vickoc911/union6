@@ -26,10 +26,19 @@ ScrollAreaCornerElement::~ScrollAreaCornerElement()
 
 void ScrollAreaCornerElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void ScrollAreaCornerElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelScrollAreaCorner:
+        drawBackground(painter);
+        break;
+    }
 }
 
 void ScrollAreaCornerElement::layout()

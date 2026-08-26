@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,18 +20,17 @@ public:
     ~ToolButtonElement() override;
 
     void update() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
+private:
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
     void updateSubElementList() override;
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
-
-    QVariantMap elementAttributes() const override;
-    QStringList elementHints() const override;
-
-private:
     const QStyleOptionToolButton *m_toolButtonOption = nullptr;
     bool m_hasIndicator;
     bool m_hasArrows;

@@ -24,8 +24,17 @@ WidgetElement::~WidgetElement()
 
 void WidgetElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void WidgetElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_Widget:
+        drawBackground(painter);
+        break;
+    }
 }

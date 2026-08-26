@@ -19,11 +19,11 @@ public:
     ~StatusBarElement() override;
 
     void update() override;
-    void drawItem(QPainter *painter) const;
-
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
+    void drawItem(QPainter *painter) const;
     const QStyleOption *m_statusBarOption = nullptr;
     void updateSubElementList() override;
 };

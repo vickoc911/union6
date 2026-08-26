@@ -42,15 +42,27 @@ void TabElement::update()
     layout();
 }
 
-void TabElement::draw(QPainter *painter) const
+void TabElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_TabBarTab:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    case QStyle::CE_TabBarTabShape:
+        drawBackground(painter);
+        break;
+    case QStyle::CE_TabBarTabLabel:
+        drawIcon(painter);
+        drawText(painter);
+        break;
+    }
 }
 
 void TabElement::updateSubElementList()

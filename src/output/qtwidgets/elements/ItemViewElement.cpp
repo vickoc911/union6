@@ -146,6 +146,28 @@ QRectF ItemViewElement::subElementRect(QStyle::SubElement element) const
     return rect;
 }
 
+void ItemViewElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_ItemViewItem:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelItemViewItem:
+        drawBackground(painter);
+        break;
+    }
+}
+
 void ItemViewElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {

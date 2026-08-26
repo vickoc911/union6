@@ -18,10 +18,10 @@ public:
     ~TabWidgetElement() override;
 
     void update() override;
-
-    QVariantMap elementAttributes() const override;
-    QStringList elementHints() const override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
     const QStyleOptionTabWidgetFrame *m_tabFrameOption = nullptr;
 };

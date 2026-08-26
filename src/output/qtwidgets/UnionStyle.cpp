@@ -5,6 +5,7 @@
 #include "BackgroundDrawing.h"
 #include "SharedNames.h"
 #include "StyleUtils.h"
+#include "elements/AbstractElement.h"
 #include "elements/ButtonElement.h"
 #include "elements/CheckElement.h"
 #include "elements/ComboBoxElement.h"
@@ -102,207 +103,138 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
     const auto hash = qHashMulti(QHashSeed::globalSeed(), controlElement, option, widget);
+    auto drawEnums = DrawEnums();
+    drawEnums.ControlElement = controlElement;
+
     switch (controlElement) {
-    case QStyle::CE_ComboBoxLabel:
-        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            ev->drawIcon(painter);
-            if (!ev->isEditable()) {
-                ev->drawText(painter);
-            }
-        }
-        return;
+    case QStyle::CE_PushButton:
     case QStyle::CE_PushButtonBevel:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
     case QStyle::CE_PushButtonLabel:
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->drawIcon(painter);
-            ev->drawText(painter);
-            ev->drawIndicator(painter);
-        }
-        return;
-    case QStyle::CE_PushButton: {
-        drawControl(CE_PushButtonBevel, option, painter, widget);
-        drawControl(CE_PushButtonLabel, option, painter, widget);
-    }
-        return;
-    case QStyle::CE_ToolButtonLabel:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->drawIcon(painter);
-            ev->drawText(painter);
-            ev->drawIndicator(painter);
-        }
-        return;
-    case QStyle::CE_CheckBoxLabel:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
-            ev->drawText(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CE_CheckBox:
+    case QStyle::CE_CheckBoxLabel:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
-            ev->drawBackground(painter);
-            ev->drawIndicator(painter);
-            drawControl(CE_CheckBoxLabel, option, painter, widget);
-        }
-        return;
-    case QStyle::CE_RadioButtonLabel:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
-            ev->drawText(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CE_RadioButton:
+    case QStyle::CE_RadioButtonLabel:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
-            ev->drawBackground(painter);
-            ev->drawIndicator(painter);
-            drawControl(CE_RadioButtonLabel, option, painter, widget);
+            ev->draw(painter, drawEnums);
+        }
+        return;
+    case QStyle::CE_TabBarTab:
+    case QStyle::CE_TabBarTabShape:
+    case QStyle::CE_TabBarTabLabel:
+        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
+        }
+        return;
+    case QStyle::CE_ProgressBar:
+    case QStyle::CE_ProgressBarGroove:
+    case QStyle::CE_ProgressBarContents:
+    case QStyle::CE_ProgressBarLabel:
+        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CE_MenuItem:
         if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_TabBarTabShape:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            ev->drawBackground(painter);
+    case QStyle::CE_MenuBarEmptyArea:
+        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_TabBarTabLabel:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            // TODO: handle vertical tabs
-            if (ev->isVertical()) {
-                QCommonStyle::drawControl(controlElement, option, painter, widget);
-            } else {
-                ev->drawIcon(painter);
-                ev->drawText(painter);
-            }
+    case QStyle::CE_MenuBarItem:
+        if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_TabBarTab:
-        drawControl(CE_TabBarTabShape, option, painter, widget);
-        drawControl(CE_TabBarTabLabel, option, painter, widget);
-        return;
-    case QStyle::CE_ItemViewItem:
-        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            ev->draw(painter);
+    case QStyle::CE_ToolButtonLabel:
+        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_ProgressBarGroove:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            ev->drawBackground(painter);
+    case QStyle::CE_Header:
+    case QStyle::CE_HeaderSection:
+    case QStyle::CE_HeaderLabel:
+    case QStyle::CE_HeaderEmptyArea:
+        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_ProgressBarContents:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            ev->drawIndicator(painter);
+    case QStyle::CE_SizeGrip:
+        if (auto ev = cachedElement<SizeGripElement, QStyleOptionSizeGrip>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_ProgressBarLabel:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            ev->drawText(painter);
+    case QStyle::CE_Splitter:
+        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_ProgressBar:
-        drawControl(CE_ProgressBarGroove, option, painter, widget);
-        drawControl(CE_ProgressBarContents, option, painter, widget);
-        drawControl(CE_ProgressBarLabel, option, painter, widget);
+    case QStyle::CE_RubberBand:
+        if (auto ev = cachedElement<RubberBandElement, QStyleOptionRubberBand>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
+        }
         return;
+    case QStyle::CE_DockWidgetTitle:
+        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
+        }
+        return;
+    case QStyle::CE_ScrollBarAddLine:
+    case QStyle::CE_ScrollBarSubLine:
+    case QStyle::CE_ScrollBarAddPage:
+    case QStyle::CE_ScrollBarSubPage:
     case QStyle::CE_ScrollBarSlider:
+    case QStyle::CE_ScrollBarFirst:
+    case QStyle::CE_ScrollBarLast:
         if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            ev->drawIndicator(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CE_FocusFrame:
     case QStyle::CE_ShapedFrame:
         if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
+        }
+        return;
+    case QStyle::CE_ComboBoxLabel:
+        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CE_ToolBar:
         if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_MenuBarItem:
-        if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->draw(painter);
-        }
-        return;
-    case QStyle::CE_HeaderLabel:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            ev->drawIcon(painter);
-            ev->drawText(painter);
-        }
-        return;
-    case QStyle::CE_HeaderSection:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
-    case QStyle::CE_Header:
-        drawControl(CE_HeaderSection, option, painter, widget);
-        drawControl(CE_HeaderLabel, option, painter, widget);
-        return;
-    case QStyle::CE_Splitter:
-        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
-    case QStyle::CE_RubberBand:
-        if (auto ev = cachedElement<RubberBandElement, QStyleOptionRubberBand>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
-    case QStyle::CE_SizeGrip:
-        if (auto ev = cachedElement<SizeGripElement, QStyleOptionSizeGrip>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
-    case QStyle::CE_DockWidgetTitle:
-        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
-            ev->drawText(painter);
-        }
-        return;
-    case QStyle::CE_MenuBarEmptyArea:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        break;
     case QStyle::CE_ToolBoxTabShape:
-        if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
     case QStyle::CE_ToolBoxTabLabel:
+    case QStyle::CE_ToolBoxTab:
         if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
-            ev->drawIcon(painter);
-            ev->drawText(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
-    case QStyle::CE_ToolBoxTab:
-        drawControl(CE_ToolBoxTabShape, option, painter, widget);
-        drawControl(CE_ToolBoxTabLabel, option, painter, widget);
-        break;
-    // Ignored
-    case QStyle::CE_MenuEmptyArea:
-    case QStyle::CE_MenuVMargin:
-    case QStyle::CE_MenuHMargin:
-        return;
-    // Scrollbar buttons are also ignored for now since they do not exist in qtquick
-    case QStyle::CE_ScrollBarAddLine:
-    case QStyle::CE_ScrollBarSubLine:
-    case QStyle::CE_ScrollBarAddPage:
-    case QStyle::CE_ScrollBarSubPage:
-    case QStyle::CE_ScrollBarFirst:
-    case QStyle::CE_ScrollBarLast:
+    case QStyle::CE_ItemViewItem:
+        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
+            ev->draw(painter, drawEnums);
+        }
         return;
     // Rely on QCommonStyle
     case QStyle::CE_MenuScroller:
+    case QStyle::CE_MenuVMargin:
+    case QStyle::CE_MenuHMargin:
     case QStyle::CE_MenuTearoff:
-    case QStyle::CE_HeaderEmptyArea:
-    case QStyle::CE_ColumnViewGrip: // Undocumented??
+    case QStyle::CE_MenuEmptyArea:
+    case QStyle::CE_ColumnViewGrip: // undocumented
     case QStyle::CE_CustomBase:
         break;
     }
@@ -316,42 +248,42 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
     const auto hash = qHashMulti(QHashSeed::globalSeed(), control, option, widget);
+    auto drawEnums = DrawEnums();
+    drawEnums.ComplexControl = control;
     switch (control) {
     case QStyle::CC_ToolButton:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CC_GroupBox:
         if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CC_ComboBox:
         if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            ev->drawBackground(painter);
-            // Do not draw the text and icon again, as its being handled by QStyle in CE_ComboBoxLabel
-            ev->drawIndicator(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CC_SpinBox:
         if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CC_ScrollBar:
         if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CC_Slider:
         if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CC_TitleBar:
         if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            ev->draw(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     // Rely on QCommonStyle
@@ -403,90 +335,80 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     // Make lines not look completely terrible on fractional scales
     painter->setRenderHint(QPainter::Antialiasing, true);
     const auto hash = qHashMulti(QHashSeed::globalSeed(), element, option, widget);
+    auto drawEnums = DrawEnums();
+    drawEnums.PrimitiveElement = element;
     switch (element) {
+    case QStyle::PE_PanelStatusBar:
     case QStyle::PE_FrameStatusBarItem:
         if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
-            ev->drawItem(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
+    case QStyle::PE_PanelMenu:
     case QStyle::PE_FrameMenu:
         if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            ev->drawFrame(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_Widget:
         if (auto ev = cachedElement<WidgetElement, QStyleOption>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameTabWidget:
         if (auto ev = cachedElement<TabWidgetElement, QStyleOptionTabWidgetFrame>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameTabBarBase:
         if (auto ev = cachedElement<TabBarElement, QStyleOptionTabBarBase>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
+    case QStyle::PE_FrameLineEdit:
     case QStyle::PE_PanelLineEdit:
-        // For spinboxes and comboboxes, we do not want to draw this element
-        // TODO: maybe this should be handleable by the CSS
-        if (!widget || widget->parentWidget()->inherits("QComboBox") || widget->parentWidget()->inherits("QAbstractSpinBox")) {
-            return;
-        }
         if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_PanelItemViewItem:
         if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_PanelScrollAreaCorner:
         if (auto ev = cachedElement<ScrollAreaCornerElement, QStyleOption>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_PanelTipLabel:
         if (auto ev = cachedElement<ToolTipElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameFocusRect:
         if (auto ev = cachedElement<FocusElement, QStyleOptionFocusRect>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
+            ;
         }
         return;
     case QStyle::PE_IndicatorCheckBox:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
-            ev->drawIndicator(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorRadioButton:
         if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
-            ev->drawIndicator(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorArrowLeft:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            ev->drawArrowLeft(painter);
-        }
-        return;
     case QStyle::PE_IndicatorArrowUp:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            ev->drawArrowUp(painter);
-        }
-        return;
     case QStyle::PE_IndicatorArrowRight:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            ev->drawArrowRight(painter);
-        }
-        return;
     case QStyle::PE_IndicatorArrowDown:
+    case QStyle::PE_IndicatorButtonDropDown:
         if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            ev->drawArrowDown(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorSpinPlus:
@@ -494,80 +416,50 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     case QStyle::PE_IndicatorSpinUp:
     case QStyle::PE_IndicatorSpinDown:
         if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            ev->drawSpinIndicator(painter, element, option->rect);
-        }
-        return;
-    case QStyle::PE_FrameLineEdit:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->drawFrame(painter);
-        }
-        return;
-    case QStyle::PE_FrameButtonBevel:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->drawFrame(painter);
-        }
-        return;
-    case QStyle::PE_PanelButtonCommand:
-    case QStyle::PE_PanelButtonBevel:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameDefaultButton:
+    case QStyle::PE_FrameButtonBevel:
+    case QStyle::PE_PanelButtonCommand:
+    case QStyle::PE_PanelButtonBevel:
         if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->drawFrame(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameButtonTool:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->drawFrame(painter);
-        }
-        return;
     case QStyle::PE_PanelButtonTool:
         if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameGroupBox:
         if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            ev->drawFrame(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameWindow:
     case QStyle::PE_Frame:
         if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->drawFrame(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_PanelMenuBar:
         if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
+    case QStyle::PE_IndicatorToolBarHandle:
+    case QStyle::PE_IndicatorToolBarSeparator:
     case QStyle::PE_PanelToolBar:
         if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
-    case QStyle::PE_PanelStatusBar:
-        if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
-            ev->drawBackground(painter);
-        }
-        return;
-    case QStyle::PE_PanelMenu:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            ev->drawBackground(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorBranch:
         if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
-            ev->drawIndicatorBranch(painter);
-        }
-        return;
-    case QStyle::PE_IndicatorButtonDropDown:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            ev->drawDropDown(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorMenuCheckMark:
@@ -576,7 +468,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_IndicatorHeaderArrow: {
         if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            ev->drawIcon(painter);
+            ev->draw(painter, drawEnums);
         } else {
             // Fallback
             if (option->state.testFlags(State_UpArrow)) {
@@ -589,17 +481,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_IndicatorProgressChunk:
         if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            ev->drawChunk(painter);
-        }
-        return;
-    case QStyle::PE_IndicatorToolBarHandle:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            ev->drawHandle(painter);
-        }
-        return;
-    case QStyle::PE_IndicatorToolBarSeparator:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            ev->drawSeparator(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorColumnViewArrow:
@@ -607,7 +489,7 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         return;
     case QStyle::PE_IndicatorTabClose:
         if (auto ev = cachedElement<TabCloseButtonElement, QStyleOption>(hash, option, widget)) {
-            ev->drawIcon(painter);
+            ev->draw(painter, drawEnums);
         }
         return;
     // Handle with QCommonStyle for now

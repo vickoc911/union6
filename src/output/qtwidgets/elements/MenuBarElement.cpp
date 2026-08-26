@@ -23,8 +23,24 @@ MenuBarElement::~MenuBarElement()
 
 void MenuBarElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void MenuBarElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_MenuBarEmptyArea:
+        drawBackground(painter);
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelMenuBar:
+        drawBackground(painter);
+        break;
+    }
 }

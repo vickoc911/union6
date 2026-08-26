@@ -25,11 +25,28 @@ FrameElement::~FrameElement()
 
 void FrameElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     updateSubElementList();
     layout();
+}
+
+void FrameElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.ControlElement) {
+    case QStyle::CE_FocusFrame:
+    case QStyle::CE_ShapedFrame:
+        drawBackground(painter);
+        break;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameDockWidget:
+    case QStyle::PE_FrameWindow:
+    case QStyle::PE_Frame:
+        drawFrame(painter);
+        break;
+    }
 }
 
 void FrameElement::updateSubElementList()

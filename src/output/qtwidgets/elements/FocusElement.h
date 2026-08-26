@@ -19,9 +19,9 @@ public:
 
     void update() override;
     void layout() override;
-
-    QStringList elementHints() const override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
+    QStringList elementHints() const override;
     const QStyleOptionFocusRect *m_focusOption = nullptr;
 };

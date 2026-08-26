@@ -18,9 +18,10 @@ public:
     ~MenuElement() override;
 
     void update() override;
-    void updateSubElementList() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
 private:
+    void updateSubElementList() override;
     const QStyleOption *m_menuOption = nullptr;
 };

@@ -5,6 +5,7 @@
 #include "SharedNames.h"
 #include "StyleUtils.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -55,14 +56,31 @@ void ScrollBarElement::layout()
     }
 }
 
-void ScrollBarElement::draw(QPainter *painter) const
+void ScrollBarElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
 
-    drawBackground(painter);
-    drawIndicator(painter);
+    switch (enums.ControlElement) {
+    case QStyle::CE_ScrollBarSlider:
+        drawIndicator(painter);
+        break;
+    case QStyle::CE_ScrollBarAddLine:
+    case QStyle::CE_ScrollBarSubLine:
+    case QStyle::CE_ScrollBarAddPage:
+    case QStyle::CE_ScrollBarSubPage:
+    case QStyle::CE_ScrollBarFirst:
+    case QStyle::CE_ScrollBarLast:
+        break;
+    }
+
+    switch (enums.ComplexControl) {
+    case QStyle::CC_ScrollBar:
+        drawBackground(painter);
+        drawIndicator(painter);
+        break;
+    }
 }
 
 void ScrollBarElement::drawBackground(QPainter *painter) const

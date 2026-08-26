@@ -107,6 +107,37 @@ QRectF ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
     return QRect();
 }
 
+void ToolButtonElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_ToolButtonLabel:
+        drawText(painter);
+        break;
+    }
+
+    switch (enums.ComplexControl) {
+    case QStyle::CC_ToolButton:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameButtonTool:
+        drawFrame(painter);
+        break;
+    case QStyle::PE_PanelButtonTool:
+        drawBackground(painter);
+        break;
+    }
+}
+
 void ToolButtonElement::drawText(QPainter *painter) const
 {
     if (m_toolButtonOption->toolButtonStyle == Qt::ToolButtonIconOnly) {

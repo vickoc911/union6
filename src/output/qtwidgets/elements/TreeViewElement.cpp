@@ -16,13 +16,26 @@ TreeViewElement::TreeViewElement(const QStyleOption *option, const UnionStyle *s
     : AbstractElement(option, style, widget)
     , m_treeViewOption(option)
 {
+    update();
 }
 
 TreeViewElement::~TreeViewElement()
 {
 }
 
-void TreeViewElement::drawIndicatorBranch(QPainter *painter) const
+void TreeViewElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorBranch:
+        drawIndicator(painter);
+        break;
+    }
+}
+
+void TreeViewElement::drawIndicator(QPainter *painter) const
 {
     // For some reason treeview related items can have null styleoption :(
     if (!m_treeViewOption) {

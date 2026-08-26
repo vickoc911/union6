@@ -74,14 +74,33 @@ void HeaderElement::layout()
     }
 }
 
-void HeaderElement::draw(QPainter *painter) const
+void HeaderElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_Header:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        break;
+    case QStyle::CE_HeaderSection:
+        drawBackground(painter);
+        break;
+    case QStyle::CE_HeaderLabel:
+        drawText(painter);
+        break;
+    case QStyle::CE_HeaderEmptyArea:
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorHeaderArrow:
+        drawIcon(painter);
+        break;
+    }
 }
 
 void HeaderElement::updateSubElementList()

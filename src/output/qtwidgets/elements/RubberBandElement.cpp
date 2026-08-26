@@ -25,10 +25,20 @@ RubberBandElement::~RubberBandElement()
 
 void RubberBandElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void RubberBandElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_RubberBand:
+        drawBackground(painter);
+        break;
+    }
 }
 
 void RubberBandElement::layout()

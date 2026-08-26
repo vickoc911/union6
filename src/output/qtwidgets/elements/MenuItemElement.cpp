@@ -4,6 +4,7 @@
 #include "MenuItemElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -56,14 +57,22 @@ void MenuItemElement::update()
     layout();
 }
 
-void MenuItemElement::draw(QPainter *painter) const
+void MenuItemElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
-    AbstractElement::draw(painter);
-    if (m_hasCheckBox || m_hasRadioButton) {
-        drawBackgroundRectangle(painter, m_layoutMap[ElementString::Indicator].rect, m_checkProperties);
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_MenuItem:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        if (m_hasCheckBox || m_hasRadioButton) {
+            drawBackgroundRectangle(painter, m_layoutMap[ElementString::Indicator].rect, m_checkProperties);
+        }
+        break;
     }
 }
 

@@ -76,17 +76,6 @@ bool AbstractElement::isValid() const
     return m_isValid;
 }
 
-void AbstractElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
-}
-
 void AbstractElement::layout()
 {
     // Background and content is separate
@@ -129,6 +118,12 @@ void AbstractElement::updateSubElementList()
 
 void AbstractElement::update()
 {
+}
+
+void AbstractElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    Q_UNUSED(painter);
+    qCWarning(UNION_QTWIDGETS) << "Drawing not implemented for " << enums.ComplexControl << enums.ControlElement << enums.PrimitiveElement;
 }
 
 QVariantMap AbstractElement::elementAttributes() const

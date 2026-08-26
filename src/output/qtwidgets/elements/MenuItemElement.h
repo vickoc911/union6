@@ -20,19 +20,17 @@ public:
     ~MenuItemElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
+    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    void updateSubElementList() override;
-    void drawBackground(QPainter *painter) const override;
-    void drawText(QPainter *painter) const override;
-    void drawIndicator(QPainter *painter) const override;
-    void layout() override;
-
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    void drawBackground(QPainter *painter) const override;
+    void drawIndicator(QPainter *painter) const override;
+    void drawText(QPainter *painter) const override;
+    void updateSubElementList() override;
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
     Union::ElementList m_indicatorElementList;
     Union::Properties::StylePropertyGroup *m_indicatorProperties;

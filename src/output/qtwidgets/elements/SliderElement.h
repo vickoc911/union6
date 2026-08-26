@@ -20,21 +20,17 @@ public:
     ~SliderElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
+    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
-
-    void layout() override;
-
-    void drawBackground(QPainter *painter) const override;
-    void updateSubElementList() override;
-
     qreal controlThickness() const;
 
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
+    void drawBackground(QPainter *painter) const override;
     const QStyleOptionSlider *m_sliderOption = nullptr;
     bool m_isHorizontal;
     bool m_isInverted;

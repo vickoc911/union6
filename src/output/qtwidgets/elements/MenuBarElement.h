@@ -19,6 +19,7 @@ public:
     ~MenuBarElement() override;
 
     void update() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;

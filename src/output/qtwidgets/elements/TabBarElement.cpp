@@ -30,6 +30,18 @@ void TabBarElement::update()
     layout();
 }
 
+void TabBarElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameTabBarBase:
+        drawBackground(painter);
+        break;
+    }
+}
+
 void TabBarElement::drawBackground(QPainter *painter) const
 {
     drawBackgroundRectangle(painter,

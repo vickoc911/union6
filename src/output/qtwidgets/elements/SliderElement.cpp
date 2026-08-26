@@ -4,6 +4,7 @@
 #include "SliderElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -65,8 +66,9 @@ void SliderElement::layout()
     }
 }
 
-void SliderElement::draw(QPainter *painter) const
+void SliderElement::draw(QPainter *painter, DrawEnums enums) const
 {
+    Q_UNUSED(enums);
     if (!m_isValid) {
         return;
     }

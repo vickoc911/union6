@@ -31,6 +31,24 @@ void MenuBarItemElement::update()
     layout();
 }
 
+void MenuBarItemElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_MenuBarItem:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    case QStyle::CE_MenuBarEmptyArea:
+        break;
+    }
+}
+
 void MenuBarItemElement::updateSubElementList()
 {
     m_subElementList.clear();

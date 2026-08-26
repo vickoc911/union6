@@ -34,24 +34,37 @@ void SpinBoxElement::update()
     layout();
 }
 
-void SpinBoxElement::draw(QPainter *painter) const
+void SpinBoxElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
 
-    drawBackground(painter);
-    // For spinbox we need to manually create the indicator buttons
-    if (m_spinBoxOption->buttonSymbols != QAbstractSpinBox::NoButtons) {
-        bool arrows = (m_spinBoxOption->buttonSymbols == QAbstractSpinBox::UpDownArrows);
-        // Increase
-        auto up = *m_spinBoxOption;
-        up.rect = subControlRect(QStyle::SC_SpinBoxUp).toRect();
-        m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinUp : QStyle::PE_IndicatorSpinPlus, &up, painter);
-        // Decrease
-        auto down = *m_spinBoxOption;
-        down.rect = subControlRect(QStyle::SC_SpinBoxDown).toRect();
-        m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinDown : QStyle::PE_IndicatorSpinMinus, &down, painter);
+    switch (enums.ComplexControl) {
+    case QStyle::CC_SpinBox:
+        drawBackground(painter);
+        // For spinbox we need to manually create the indicator buttons
+        if (m_spinBoxOption->buttonSymbols != QAbstractSpinBox::NoButtons) {
+            bool arrows = (m_spinBoxOption->buttonSymbols == QAbstractSpinBox::UpDownArrows);
+            // Increase
+            auto up = *m_spinBoxOption;
+            up.rect = subControlRect(QStyle::SC_SpinBoxUp).toRect();
+            m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinUp : QStyle::PE_IndicatorSpinPlus, &up, painter);
+            // Decrease
+            auto down = *m_spinBoxOption;
+            down.rect = subControlRect(QStyle::SC_SpinBoxDown).toRect();
+            m_style->drawPrimitive(arrows ? QStyle::PE_IndicatorSpinDown : QStyle::PE_IndicatorSpinMinus, &down, painter);
+        }
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorSpinPlus:
+    case QStyle::PE_IndicatorSpinMinus:
+    case QStyle::PE_IndicatorSpinUp:
+    case QStyle::PE_IndicatorSpinDown:
+        drawSpinIndicator(painter, (QStyle::PrimitiveElement)enums.PrimitiveElement);
+        break;
     }
 }
 
@@ -117,7 +130,7 @@ QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     return rect;
 }
 
-void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive, const QRectF &rect) const
+void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive) const
 {
     if (!m_isValid && !m_backgroundProperties && !m_backgroundProperties->icon()) {
         return;
@@ -140,7 +153,7 @@ void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::Primitiv
     default:
         return;
     }
-    drawIconAtRect(painter, indicatorIcon, rect);
+    drawIconAtRect(painter, indicatorIcon, m_styleOption->rect);
 }
 
 QStringList SpinBoxElement::elementHints() const

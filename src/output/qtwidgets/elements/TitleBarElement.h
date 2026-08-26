@@ -20,20 +20,17 @@ public:
     ~TitleBarElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
+    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    void updateSubElementList() override;
-    void layout() override;
-
     qreal buttonWidth() const;
 
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
     const QStyleOptionTitleBar *m_titleBarOption = nullptr;
-
     QIcon queryIcon(const QString &defaultIconName, const QStringList &targetHierarchy) const;
 };

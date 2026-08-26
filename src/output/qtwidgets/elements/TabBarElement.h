@@ -18,13 +18,13 @@ public:
     ~TabBarElement() override;
 
     void update() override;
-    void drawBackground(QPainter *painter) const override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     qreal scrollButtonWidth() const;
 
-    QVariantMap elementAttributes() const override;
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    QVariantMap elementAttributes() const override;
+    void drawBackground(QPainter *painter) const override;
     const QStyleOptionTabBarBase *m_tabBarOption = nullptr;
 };

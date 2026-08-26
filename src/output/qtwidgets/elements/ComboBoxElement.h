@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,18 +20,16 @@ public:
     ~ComboBoxElement() override;
 
     void update() override;
-    void drawText(QPainter *painter) const override;
 
+    void draw(QPainter *painter, DrawEnums enums) const override;
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    void updateSubElementList() override;
-
-    bool isEditable() const;
-
-    QStringList elementHints() const override;
-
 private:
+    bool isEditable() const;
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
+    void drawText(QPainter *painter) const override;
     const QStyleOptionComboBox *m_comboBoxOption = nullptr;
     qreal m_spacing;
     bool m_editable;

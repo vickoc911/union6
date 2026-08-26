@@ -20,6 +20,7 @@ public:
 
     void update() override;
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
     const QStyleOptionRubberBand *m_rubberBandOption = nullptr;

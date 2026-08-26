@@ -38,3 +38,16 @@ void TabCloseButtonElement::layout()
         m_isValid = true;
     }
 }
+
+void TabCloseButtonElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorTabClose:
+        drawIcon(painter);
+        break;
+    }
+}

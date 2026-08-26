@@ -48,6 +48,33 @@ ComboBoxElement::~ComboBoxElement()
 {
 }
 
+void ComboBoxElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_ComboBoxLabel:
+        drawIcon(painter);
+        if (!isEditable()) {
+            drawText(painter);
+        }
+        break;
+    }
+
+    switch (enums.ComplexControl) {
+    case QStyle::CC_ComboBox:
+        drawBackground(painter);
+        drawIcon(painter);
+        if (!isEditable()) {
+            drawText(painter);
+        }
+        drawIndicator(painter);
+        break;
+    }
+}
+
 bool ComboBoxElement::isEditable() const
 {
     return m_editable;

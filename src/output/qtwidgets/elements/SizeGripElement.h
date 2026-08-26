@@ -19,8 +19,8 @@ public:
     ~SizeGripElement() override;
 
     void update() override;
-
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
     const QStyleOptionSizeGrip *m_sizeGripOption = nullptr;

@@ -4,6 +4,7 @@
 #include "TitleBarElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -30,8 +31,9 @@ void TitleBarElement::update()
     layout();
 }
 
-void TitleBarElement::draw(QPainter *painter) const
+void TitleBarElement::draw(QPainter *painter, DrawEnums enums) const
 {
+    Q_UNUSED(enums);
     if (!m_isValid) {
         return;
     }

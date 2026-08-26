@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,11 +20,12 @@ public:
     ~MenuBarItemElement() override;
 
     void update() override;
-    void updateSubElementList() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
     void layout() override;
 
     QStringList elementHints() const override;
 
 private:
+    void updateSubElementList() override;
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
 };

@@ -19,11 +19,7 @@ public:
     IndicatorElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~IndicatorElement() override;
 
-    void drawArrowLeft(QPainter *painter) const;
-    void drawArrowRight(QPainter *painter) const;
-    void drawArrowDown(QPainter *painter) const;
-    void drawArrowUp(QPainter *painter) const;
-    void drawDropDown(QPainter *painter) const;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     qreal listViewIconSize() const;
     qreal smallIconSize() const;

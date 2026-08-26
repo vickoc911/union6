@@ -26,15 +26,23 @@ ToolTipElement::~ToolTipElement()
 
 void ToolTipElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void ToolTipElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelTipLabel:
+        drawBackground(painter);
+        break;
+    }
 }
 
 void ToolTipElement::layout()
 {
-    // Background and content is separate
     m_backgroundElementList = prepareElements(m_frameOption, m_widget, {ElementString::ToolTip});
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);

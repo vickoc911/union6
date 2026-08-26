@@ -18,6 +18,7 @@ public:
     ~WidgetElement() override;
 
     void update() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
     const QStyleOption *m_widgetOption = nullptr;

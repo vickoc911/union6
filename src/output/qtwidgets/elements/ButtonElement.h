@@ -19,11 +19,13 @@ public:
     ~ButtonElement() override;
 
     void update() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
-    void updateSubElementList() override;
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
+private:
+    void updateSubElementList() override;
     QStringList elementHints() const override;
     Union::Element::States elementStates() const override;
 

@@ -26,15 +26,23 @@ FocusElement::~FocusElement()
 
 void FocusElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     layout();
+}
+
+void FocusElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameFocusRect:
+        drawBackground(painter);
+        break;
+    }
 }
 
 void FocusElement::layout()
 {
-    // Background and content is separate
     m_backgroundElementList = prepareElements(m_styleOption, m_widget, {ElementString::FocusFrame});
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);

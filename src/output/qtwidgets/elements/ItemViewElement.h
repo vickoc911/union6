@@ -5,7 +5,6 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,18 +20,18 @@ public:
     ~ItemViewElement() override;
 
     void update() override;
+    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
-    void updateSubElementList() override;
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
-    void layout() override;
+
+private:
+    QVariantMap elementAttributes() const override;
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
     void drawIndicator(QPainter *painter) const override;
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
-
-    QVariantMap elementAttributes() const override;
-    QStringList elementHints() const override;
-
-private:
     const QStyleOptionViewItem *m_viewItemOption = nullptr;
 };

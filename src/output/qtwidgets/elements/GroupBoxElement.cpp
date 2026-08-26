@@ -38,6 +38,28 @@ void GroupBoxElement::update()
     layout();
 }
 
+void GroupBoxElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_FrameGroupBox:
+        drawFrame(painter);
+        break;
+    }
+
+    switch (enums.ComplexControl) {
+    case QStyle::CC_GroupBox:
+        drawBackground(painter);
+        drawIcon(painter);
+        drawText(painter);
+        drawIndicator(painter);
+        break;
+    }
+}
+
 void GroupBoxElement::layout()
 {
     // We only layout by background, m_contentElementList etc are ignored

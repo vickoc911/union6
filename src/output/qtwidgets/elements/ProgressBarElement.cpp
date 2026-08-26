@@ -4,6 +4,7 @@
 #include "ProgressBarElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include "elements/AbstractElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
@@ -29,14 +30,34 @@ void ProgressBarElement::update()
     layout();
 }
 
-void ProgressBarElement::draw(QPainter *painter) const
+void ProgressBarElement::draw(QPainter *painter, DrawEnums enums) const
 {
     if (!m_isValid) {
         return;
     }
-    drawBackground(painter);
-    drawIndicator(painter);
-    drawText(painter);
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_ProgressBar:
+        drawBackground(painter);
+        drawIndicator(painter);
+        drawText(painter);
+        break;
+    case QStyle::CE_ProgressBarGroove:
+        drawBackground(painter);
+        break;
+    case QStyle::CE_ProgressBarContents:
+        drawIndicator(painter);
+        break;
+    case QStyle::CE_ProgressBarLabel:
+        drawText(painter);
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorProgressChunk:
+        drawChunk(painter);
+        break;
+    }
 }
 
 void ProgressBarElement::drawBackground(QPainter *painter) const
@@ -67,7 +88,7 @@ void ProgressBarElement::layout()
         m_layoutMap = layoutMap(m_backgroundElementList, m_progressBarOption, m_subElementList);
     }
 
-        m_contentElementList = prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Track});
+    m_contentElementList = prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Track});
 
     if (!m_contentElementList.isEmpty()) {
         m_contentProperties = queryProperties(m_contentElementList);

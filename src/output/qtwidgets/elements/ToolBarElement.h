@@ -19,17 +19,17 @@ public:
     ~ToolBarElement() override;
 
     void update() override;
-    void updateSubElementList() override;
-
-    void drawHandle(QPainter *painter) const;
-    void drawSeparator(QPainter *painter) const;
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     qreal separatorExtent() const;
     qreal handleExtent() const;
     qreal extensionExtent() const;
 
 private:
+    void updateSubElementList() override;
+    void drawHandle(QPainter *painter) const;
+    void drawSeparator(QPainter *painter) const;
     const QStyleOptionToolBar *m_toolBarOption = nullptr;
 
     Union::ElementList m_handleElementList;

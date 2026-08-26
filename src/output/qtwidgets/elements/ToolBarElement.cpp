@@ -28,11 +28,33 @@ ToolBarElement::~ToolBarElement()
 
 void ToolBarElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     updateSubElementList();
     layout();
+}
+
+void ToolBarElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+
+    switch (enums.ControlElement) {
+    case QStyle::CE_ToolBar:
+        drawBackground(painter);
+        break;
+    }
+
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelToolBar:
+        drawBackground(painter);
+        break;
+    case QStyle::PE_IndicatorToolBarHandle:
+        drawHandle(painter);
+        break;
+    case QStyle::PE_IndicatorToolBarSeparator:
+        drawSeparator(painter);
+        break;
+    }
 }
 
 void ToolBarElement::layout()

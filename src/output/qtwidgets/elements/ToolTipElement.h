@@ -18,10 +18,11 @@ public:
     ~ToolTipElement() override;
 
     void update() override;
-    void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
     QStringList elementHints() const override;
 
 private:
+    void layout() override;
     const QStyleOptionFrame *m_frameOption = nullptr;
 };

@@ -23,29 +23,29 @@ IndicatorElement::~IndicatorElement()
 {
 }
 
-void IndicatorElement::drawArrowLeft(QPainter *painter) const
+void IndicatorElement::draw(QPainter *painter, DrawEnums enums) const
 {
-    drawElement(painter, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
-}
+    if (!m_isValid) {
+        return;
+    }
 
-void IndicatorElement::drawArrowRight(QPainter *painter) const
-{
-    drawElement(painter, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
-}
-
-void IndicatorElement::drawArrowDown(QPainter *painter) const
-{
-    drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
-}
-
-void IndicatorElement::drawArrowUp(QPainter *painter) const
-{
-    drawElement(painter, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
-}
-
-void IndicatorElement::drawDropDown(QPainter *painter) const
-{
-    drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_IndicatorArrowLeft:
+        drawElement(painter, u"arrow-left-symbolic"_s, {ElementString::IndicatorArrowLeft});
+        return;
+    case QStyle::PE_IndicatorArrowUp:
+        drawElement(painter, u"arrow-up-symbolic"_s, {ElementString::IndicatorArrowUp});
+        return;
+    case QStyle::PE_IndicatorArrowRight:
+        drawElement(painter, u"arrow-right-symbolic"_s, {ElementString::IndicatorArrowRight});
+        return;
+    case QStyle::PE_IndicatorArrowDown:
+        drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorArrowDown});
+        return;
+    case QStyle::PE_IndicatorButtonDropDown:
+        drawElement(painter, u"arrow-down-symbolic"_s, {ElementString::IndicatorButtonDropDown});
+        return;
+    }
 }
 
 void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const

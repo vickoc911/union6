@@ -20,17 +20,15 @@ public:
     ~HeaderElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
-
-    void updateSubElementList() override;
-    QRectF subElementRect(QStyle::SubElement element) const override;
     void layout() override;
+    void draw(QPainter *painter, DrawEnums enums) const override;
 
+    QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
+    void updateSubElementList() override;
     const QStyleOptionHeader *m_headerOption = nullptr;
     QIcon sortIndicator();
     bool m_isHorizontal;

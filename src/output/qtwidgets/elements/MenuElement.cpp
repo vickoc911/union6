@@ -26,11 +26,23 @@ MenuElement::~MenuElement()
 
 void MenuElement::update()
 {
-    setIndicator(QIcon());
-    setIcon(QIcon());
-    setText(QString());
     updateSubElementList();
     layout();
+}
+
+void MenuElement::draw(QPainter *painter, DrawEnums enums) const
+{
+    if (!m_isValid) {
+        return;
+    }
+    switch (enums.PrimitiveElement) {
+    case QStyle::PE_PanelMenu:
+        drawBackground(painter);
+        break;
+    case QStyle::PE_FrameMenu:
+        drawFrame(painter);
+        break;
+    }
 }
 
 void MenuElement::updateSubElementList()
