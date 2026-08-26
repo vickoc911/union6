@@ -28,15 +28,3 @@ void MenuBarElement::update()
     setText(QString());
     layout();
 }
-
-QStringList MenuBarElement::elementHints() const
-{
-    QStringList hints;
-    if (m_menuItemOption->checked) {
-        hints.append(u"with-submenu"_s);
-    }
-    if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator && !m_menuItemOption->text.isEmpty()) {
-        hints.append(u"with-title"_s);
-    }
-    return hints;
-}
