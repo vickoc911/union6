@@ -4,8 +4,6 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "BackgroundDrawing.h"
-#include "StyleUtils.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
@@ -21,7 +19,6 @@ public:
     ~ButtonElement() override;
 
     void update() override;
-    void draw(QPainter *painter) const override;
 
     void updateSubElementList() override;
     QRectF subElementRect(QStyle::SubElement element) const override;

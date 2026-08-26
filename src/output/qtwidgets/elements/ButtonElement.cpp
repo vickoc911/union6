@@ -42,17 +42,6 @@ void ButtonElement::update()
     layout();
 }
 
-void ButtonElement::draw(QPainter *painter) const
-{
-    if (!m_isValid) {
-        return;
-    }
-    drawBackground(painter);
-    drawIcon(painter);
-    drawText(painter);
-    drawIndicator(painter);
-}
-
 void ButtonElement::updateSubElementList()
 {
     m_subElementList.clear();
