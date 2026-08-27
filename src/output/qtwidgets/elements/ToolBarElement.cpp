@@ -91,14 +91,14 @@ void ToolBarElement::layout()
 
 void ToolBarElement::drawHandle(QPainter *painter) const
 {
-    if (m_handleProperties && m_handleProperties->layout()) {
+    if (m_isValid && m_toolBarOption && m_handleProperties && m_handleProperties->layout()) {
         drawBackgroundRectangle(painter, m_toolBarOption->rect, m_handleProperties);
     }
 }
 
 void ToolBarElement::drawSeparator(QPainter *painter) const
 {
-    if (m_separatorProperties && m_separatorProperties->layout()) {
+    if (m_isValid && m_toolBarOption && m_separatorProperties && m_separatorProperties->layout()) {
         drawBackgroundRectangle(painter, m_toolBarOption->rect, m_separatorProperties);
     }
 }
