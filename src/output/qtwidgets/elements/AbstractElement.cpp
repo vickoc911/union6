@@ -211,17 +211,23 @@ QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, PaddingDirection dire
 
 void AbstractElement::drawBackground(QPainter *painter) const
 {
-    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties);
+    if (m_isValid && m_styleOption) {
+        drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties);
+    }
 }
 
 void AbstractElement::drawFrame(QPainter *painter) const
 {
-    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
+    if (m_isValid && m_styleOption) {
+        drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties, BackgroundParts::FrameOnly);
+    }
 }
 
 void AbstractElement::drawPanel(QPainter *painter) const
 {
-    drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties, BackgroundParts::PanelOnly);
+    if (m_isValid && m_styleOption) {
+        drawBackgroundRectangle(painter, m_styleOption->rect, m_backgroundProperties, BackgroundParts::PanelOnly);
+    }
 }
 
 void AbstractElement::drawText(QPainter *painter) const

@@ -25,6 +25,10 @@ HeaderElement::~HeaderElement()
 
 void HeaderElement::update()
 {
+    if (!m_headerOption) {
+        m_isValid = false;
+        return;
+    }
     m_isHorizontal = (m_headerOption->orientation == Qt::Horizontal);
     setText(m_headerOption->text);
     updateSubElementList();
