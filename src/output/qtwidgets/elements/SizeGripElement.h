@@ -6,9 +6,21 @@
 #include "AbstractElement.h"
 #include <QObject>
 #include <QStyleOption>
-#include <qstyleoption.h>
+
+#include "ElementCache.h"
 
 class UnionStyle;
+class SizeGripElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_SizeGrip> : public TypeHelper<SizeGripElement, QStyleOptionSizeGrip>{};
+/* clang-format on */
+}
+}
 
 class SizeGripElement : public AbstractElement
 {

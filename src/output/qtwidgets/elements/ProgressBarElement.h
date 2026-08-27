@@ -22,6 +22,10 @@ namespace detail
         template<> struct EnumToType<QStyle::SubElement,QStyle::SE_ProgressBarLabel> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
         template<> struct EnumToType<QStyle::SubElement,QStyle::SE_ProgressBarContents> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
         template<> struct EnumToType<QStyle::SubElement,QStyle::SE_ProgressBarGroove> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ProgressBar> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ProgressBarGroove> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ProgressBarContents> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ProgressBarLabel> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
 /* clang-format on */
 }
 }

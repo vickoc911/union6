@@ -9,7 +9,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class MenuItemElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ControlElement ,QStyle::CE_MenuItem> : public TypeHelper<MenuItemElement, QStyleOptionMenuItem>{};
+/* clang-format on */
+}
+}
 
 class MenuItemElement : public AbstractElement
 {

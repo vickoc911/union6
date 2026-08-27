@@ -21,6 +21,11 @@ namespace detail
 /* clang-format off */
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_HeaderArrow> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_HeaderLabel> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_Header> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_HeaderSection> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_HeaderLabel> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_HeaderEmptyArea> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+
 /* clang-format on */
 }
 }

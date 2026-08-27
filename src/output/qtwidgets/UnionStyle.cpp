@@ -108,141 +108,53 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     const auto hash = qHashMulti(QHashSeed::globalSeed(), controlElement, option, widget);
     auto drawEnums = DrawEnums();
     drawEnums.ControlElement = controlElement;
-
-    switch (controlElement) {
-    case QStyle::CE_PushButton:
-    case QStyle::CE_PushButtonBevel:
-    case QStyle::CE_PushButtonLabel:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_CheckBox:
-    case QStyle::CE_CheckBoxLabel:
-        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_RadioButton:
-    case QStyle::CE_RadioButtonLabel:
-        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_TabBarTab:
-    case QStyle::CE_TabBarTabShape:
-    case QStyle::CE_TabBarTabLabel:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ProgressBar:
-    case QStyle::CE_ProgressBarGroove:
-    case QStyle::CE_ProgressBarContents:
-    case QStyle::CE_ProgressBarLabel:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_MenuItem:
-        if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_MenuBarEmptyArea:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_MenuBarItem:
-        if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ToolButtonLabel:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_Header:
-    case QStyle::CE_HeaderSection:
-    case QStyle::CE_HeaderLabel:
-    case QStyle::CE_HeaderEmptyArea:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_SizeGrip:
-        if (auto ev = cachedElement<SizeGripElement, QStyleOptionSizeGrip>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_Splitter:
-        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_RubberBand:
-        if (auto ev = cachedElement<RubberBandElement, QStyleOptionRubberBand>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_DockWidgetTitle:
-        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ScrollBarAddLine:
-    case QStyle::CE_ScrollBarSubLine:
-    case QStyle::CE_ScrollBarAddPage:
-    case QStyle::CE_ScrollBarSubPage:
-    case QStyle::CE_ScrollBarSlider:
-    case QStyle::CE_ScrollBarFirst:
-    case QStyle::CE_ScrollBarLast:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_FocusFrame:
-    case QStyle::CE_ShapedFrame:
-        if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ComboBoxLabel:
-        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ToolBar:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ToolBoxTabShape:
-    case QStyle::CE_ToolBoxTabLabel:
-    case QStyle::CE_ToolBoxTab:
-        if (auto ev = cachedElement<ToolBoxTabElement, QStyleOptionToolBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CE_ItemViewItem:
-        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    // Rely on QCommonStyle
-    case QStyle::CE_MenuScroller:
-    case QStyle::CE_MenuVMargin:
-    case QStyle::CE_MenuHMargin:
-    case QStyle::CE_MenuTearoff:
-    case QStyle::CE_MenuEmptyArea:
-    case QStyle::CE_ColumnViewGrip: // undocumented
-    case QStyle::CE_CustomBase:
-        break;
+    auto cached = ElementCache::element<QStyle::ControlElement,
+                                        QStyle::CE_PushButton,
+                                        QStyle::CE_PushButtonBevel,
+                                        QStyle::CE_PushButtonLabel,
+                                        QStyle::CE_CheckBox,
+                                        QStyle::CE_CheckBoxLabel,
+                                        QStyle::CE_RadioButton,
+                                        QStyle::CE_RadioButtonLabel,
+                                        QStyle::CE_TabBarTab,
+                                        QStyle::CE_TabBarTabShape,
+                                        QStyle::CE_TabBarTabLabel,
+                                        QStyle::CE_ProgressBar,
+                                        QStyle::CE_ProgressBarGroove,
+                                        QStyle::CE_ProgressBarContents,
+                                        QStyle::CE_ProgressBarLabel,
+                                        QStyle::CE_MenuItem,
+                                        QStyle::CE_MenuBarItem,
+                                        QStyle::CE_MenuBarEmptyArea,
+                                        QStyle::CE_ToolButtonLabel,
+                                        QStyle::CE_Header,
+                                        QStyle::CE_HeaderSection,
+                                        QStyle::CE_HeaderLabel,
+                                        QStyle::CE_ToolBoxTab,
+                                        QStyle::CE_SizeGrip,
+                                        QStyle::CE_Splitter,
+                                        QStyle::CE_RubberBand,
+                                        QStyle::CE_DockWidgetTitle,
+                                        QStyle::CE_ScrollBarAddLine,
+                                        QStyle::CE_ScrollBarSubLine,
+                                        QStyle::CE_ScrollBarAddPage,
+                                        QStyle::CE_ScrollBarSubPage,
+                                        QStyle::CE_ScrollBarSlider,
+                                        QStyle::CE_ScrollBarFirst,
+                                        QStyle::CE_ScrollBarLast,
+                                        QStyle::CE_FocusFrame,
+                                        QStyle::CE_ComboBoxLabel,
+                                        QStyle::CE_ToolBar,
+                                        QStyle::CE_ToolBoxTabShape,
+                                        QStyle::CE_ToolBoxTabLabel,
+                                        QStyle::CE_HeaderEmptyArea,
+                                        QStyle::CE_ItemViewItem,
+                                        QStyle::CE_ShapedFrame>(controlElement, hash, this, option, widget);
+    if (cached) {
+        cached->draw(painter, drawEnums);
+    } else {
+        QCommonStyle::drawControl(controlElement, option, painter, widget);
     }
-
-    QCommonStyle::drawControl(controlElement, option, painter, widget);
 }
 
 void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const

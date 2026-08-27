@@ -19,6 +19,9 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::SubElement, QStyle::SE_TabBarTabText> : public TypeHelper<TabElement, QStyleOptionTab>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_TabBarTab> : public TypeHelper<TabElement, QStyleOptionTab>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_TabBarTabLabel> : public TypeHelper<TabElement, QStyleOptionTab>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_TabBarTabShape> : public TypeHelper<TabElement, QStyleOptionTab>{};
 /* clang-format on */
 }
 }

@@ -20,6 +20,14 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_ScrollBar> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarAddLine> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarSubLine> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarAddPage> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarSubPage> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarSlider> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarFirst> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarLast> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+
 /* clang-format on */
 }
 }

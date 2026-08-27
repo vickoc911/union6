@@ -7,7 +7,21 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class FrameElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_FocusFrame> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ShapedFrame> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
+/* clang-format on */
+}
+}
 
 class FrameElement : public AbstractElement
 {

@@ -21,6 +21,8 @@ namespace detail
 /* clang-format off */
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_CheckBoxIndicator> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_CheckBoxContents> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_CheckBox> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_CheckBoxLabel> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }

@@ -6,9 +6,21 @@
 #include "AbstractElement.h"
 #include <QObject>
 #include <QStyleOption>
-#include <qstyleoption.h>
+
+#include "ElementCache.h"
 
 class UnionStyle;
+class RubberBandElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_RubberBand> : public TypeHelper<RubberBandElement, QStyleOptionRubberBand>{};
+/* clang-format on */
+}
+}
 
 class RubberBandElement : public AbstractElement
 {

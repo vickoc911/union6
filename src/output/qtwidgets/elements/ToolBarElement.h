@@ -8,7 +8,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class ToolBarElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ToolBar> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+/* clang-format on */
+}
+}
 
 class ToolBarElement : public AbstractElement
 {

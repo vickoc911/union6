@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class SplitterElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_Splitter> : public TypeHelper<SplitterElement, QStyleOption>{};
+/* clang-format on */
+}
+}
 
 class SplitterElement : public AbstractElement
 {

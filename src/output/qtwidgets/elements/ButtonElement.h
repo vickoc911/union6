@@ -22,6 +22,9 @@ namespace detail
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_PushButtonFocusRect> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_PushButtonContents> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_PushButtonBevel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_PushButton> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_PushButtonBevel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_PushButtonLabel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }

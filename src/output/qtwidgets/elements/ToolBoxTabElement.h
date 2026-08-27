@@ -19,6 +19,9 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ToolBoxTabContents> : public TypeHelper<ToolBoxTabElement, QStyleOptionToolBox>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ToolBoxTabShape> : public TypeHelper<ToolBoxTabElement, QStyleOptionToolBox>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ToolBoxTabLabel> : public TypeHelper<ToolBoxTabElement, QStyleOptionToolBox>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ToolBoxTab> : public TypeHelper<ToolBoxTabElement, QStyleOptionToolBox>{};
 /* clang-format on */
 }
 }

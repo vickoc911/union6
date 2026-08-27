@@ -24,6 +24,7 @@ namespace detail
         template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetCloseButton> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
         template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetFloatButton> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
         template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetIcon> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
+        template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_DockWidgetTitle> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
 /* clang-format on */
 }
 }
