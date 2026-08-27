@@ -232,3 +232,18 @@ QStringList ScrollBarElement::elementHints() const
     }
     return hints;
 }
+
+qreal ScrollBarElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ScrollBarExtent:
+        return extent();
+    case QStyle::PM_SliderControlThickness:
+        return controlThickness();
+    case QStyle::PM_ScrollBarSliderMin:
+        return minimumSize();
+    default:
+        break;
+    }
+    return 0;
+}

@@ -30,6 +30,9 @@ namespace detail
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelButtonCommand> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelButtonBevel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_PushButton> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ButtonMargin> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ButtonDefaultIndicator> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ButtonIconSize> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }
@@ -47,6 +50,7 @@ public:
 
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     void updateSubElementList() override;

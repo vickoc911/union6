@@ -21,6 +21,10 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_MenuBarEmptyArea> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelMenuBar> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_MenuBar> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_MenuBarVMargin> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_MenuBarHMargin> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_MenuBarPanelWidth> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_MenuBarItemSpacing> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
 /* clang-format on */
 }
 }
@@ -35,6 +39,8 @@ public:
 
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;

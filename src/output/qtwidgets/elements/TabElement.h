@@ -23,6 +23,12 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_TabBarTabLabel> : public TypeHelper<TabElement, QStyleOptionTab>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_TabBarTabShape> : public TypeHelper<TabElement, QStyleOptionTab>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_TabBarTab> : public TypeHelper<TabElement, QStyleOptionTab>{};
+
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabCloseIndicatorWidth> : public TypeHelper<TabElement, QStyleOptionTab>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabCloseIndicatorHeight> : public TypeHelper<TabElement, QStyleOptionTab>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabBarTabHSpace> : public TypeHelper<TabElement, QStyleOptionTab>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabBarTabVSpace> : public TypeHelper<TabElement, QStyleOptionTab>{};
+
 /* clang-format on */
 }
 }
@@ -41,10 +47,7 @@ public:
 
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
-
-    bool isVertical() const;
-    int hSpace() const;
-    int vSpace() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QVariantMap elementAttributes() const override;
@@ -54,4 +57,7 @@ private:
     bool m_isVertical;
     bool m_isClosable;
     void tabLayout(QRectF *textRect, QRectF *iconRect) const;
+    bool isVertical() const;
+    int hSpace() const;
+    int vSpace() const;
 };

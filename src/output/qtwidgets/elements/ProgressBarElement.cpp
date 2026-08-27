@@ -164,11 +164,23 @@ void ProgressBarElement::drawChunk(QPainter *painter) const
     auto props = queryProperties(prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Chunk}));
     drawBackgroundRectangle(painter, m_progressBarOption->rect, props);
 }
+
 int ProgressBarElement::chunkWidth() const
 {
     auto props = queryProperties(prepareElements(m_progressBarOption, m_widget, {ElementString::ProgressBar, ElementString::Chunk}));
     if (props->layout()) {
         return props->layout()->width().value_or(0);
+    }
+    return 0;
+}
+
+qreal ProgressBarElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ProgressBarChunkWidth:
+        return chunkWidth();
+    default:
+        break;
     }
     return 0;
 }

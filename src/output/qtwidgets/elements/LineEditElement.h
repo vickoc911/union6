@@ -21,6 +21,8 @@ namespace detail
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameLineEdit> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelLineEdit> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
     template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_LineEdit> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_LineEditIconMargin> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_LineEditIconSize> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
 /* clang-format on */
 }
 }
@@ -35,6 +37,7 @@ public:
 
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
     QSizeF iconSize() const override;
     QMarginsF iconPadding() const;

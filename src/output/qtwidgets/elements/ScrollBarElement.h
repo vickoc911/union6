@@ -28,6 +28,8 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarFirst> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarLast> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_ScrollBar> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ScrollBarExtent> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ScrollBarSliderMin> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
 /* clang-format on */
 }
 }
@@ -46,10 +48,7 @@ public:
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
-
-    qreal extent() const;
-    qreal controlThickness() const;
-    qreal minimumSize() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QStringList elementHints() const override;
@@ -58,4 +57,7 @@ private:
     void updateSubElementList() override;
     const QStyleOptionSlider *m_scrollBarOption = nullptr;
     bool m_horizontal;
+    qreal extent() const;
+    qreal controlThickness() const;
+    qreal minimumSize() const;
 };

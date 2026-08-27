@@ -24,6 +24,7 @@ namespace detail
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinUp> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinDown> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_SpinBox> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SpinBoxFrameWidth> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
 /* clang-format on */
 }
 }
@@ -38,6 +39,7 @@ public:
 
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
