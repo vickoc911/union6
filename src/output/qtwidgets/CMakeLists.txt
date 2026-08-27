@@ -25,8 +25,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/AbstractElement.h
         elements/ButtonElement.cpp
         elements/ButtonElement.h
-        elements/CheckElement.cpp
-        elements/CheckElement.h
+        elements/CheckBoxElement.cpp
+        elements/CheckBoxElement.h
         elements/ComboBoxElement.cpp
         elements/ComboBoxElement.h
         elements/DockWidgetElement.cpp
@@ -53,6 +53,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         elements/MenuItemElement.h
         elements/ProgressBarElement.cpp
         elements/ProgressBarElement.h
+        elements/RadioButtonElement.cpp
+        elements/RadioButtonElement.h
         elements/RubberBandElement.cpp
         elements/RubberBandElement.h
         elements/ScrollBarElement.cpp

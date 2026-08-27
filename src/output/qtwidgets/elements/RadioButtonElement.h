@@ -12,34 +12,26 @@
 
 class UnionStyle;
 
-class CheckElement;
+class RadioButtonElement;
 
 namespace ElementCache
 {
 namespace detail
 {
 /* clang-format off */
-    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_RadioButtonContents> : public TypeHelper<CheckElement, QStyleOptionButton>{};
-    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_RadioButtonIndicator> : public TypeHelper<CheckElement, QStyleOptionButton>{};
-    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_CheckBoxIndicator> : public TypeHelper<CheckElement, QStyleOptionButton>{};
-    template<> struct EnumToType<QStyle::SubElement, QStyle::SE_CheckBoxContents> : public TypeHelper<CheckElement, QStyleOptionButton>{};
+		template<> struct EnumToType<QStyle::SubElement, QStyle::SE_RadioButtonContents> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
+		template<> struct EnumToType<QStyle::SubElement, QStyle::SE_RadioButtonIndicator> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }
 
-class CheckElement : public AbstractElement
+class RadioButtonElement : public AbstractElement
 {
     Q_OBJECT
 
 public:
-    enum class Type {
-        CheckBox,
-        RadioButton
-    };
-    Q_ENUM(Type)
-
-    CheckElement(Type type, const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
-    ~CheckElement() override;
+    RadioButtonElement(const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ~RadioButtonElement() override;
 
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
@@ -51,5 +43,4 @@ private:
     void drawIndicator(QPainter *painter) const override;
     QStringList elementHints() const override;
     const QStyleOptionButton *m_buttonOption = nullptr;
-    Type m_type;
 };

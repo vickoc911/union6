@@ -8,7 +8,7 @@
 #include <Style.h>
 
 #include "elements/AbstractElement.h"
-#include "elements/CheckElement.h"
+#include "elements/CheckBoxElement.h"
 #include <QCommonStyle>
 
 /*!
@@ -66,23 +66,6 @@ private:
                 element->update();
             } else {
                 element = std::make_shared<ElementType>(opt, this, widget);
-                m_elementCache.insert(hash, element);
-            }
-            return element;
-        }
-        return nullptr;
-    }
-
-    template<typename ElementType = CheckElement, typename StyleOptionType = QStyleOptionButton>
-    std::shared_ptr<ElementType> cachedCheckElement(size_t hash, const QStyleOption *option, const QWidget *widget, CheckElement::Type type) const
-    {
-        if (const auto opt = qstyleoption_cast<const StyleOptionType *>(option)) {
-            std::shared_ptr<ElementType> element;
-            if (m_elementCache.contains(hash)) {
-                element = std::static_pointer_cast<ElementType>(m_elementCache.value(hash).value());
-                element->update();
-            } else {
-                element = std::make_shared<ElementType>(type, opt, this, widget);
                 m_elementCache.insert(hash, element);
             }
             return element;

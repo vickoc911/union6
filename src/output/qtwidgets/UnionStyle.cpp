@@ -7,7 +7,7 @@
 #include "StyleUtils.h"
 #include "elements/AbstractElement.h"
 #include "elements/ButtonElement.h"
-#include "elements/CheckElement.h"
+#include "elements/CheckBoxElement.h"
 #include "elements/ComboBoxElement.h"
 #include "elements/DockWidgetElement.h"
 #include "elements/FocusElement.h"
@@ -22,6 +22,7 @@
 #include "elements/MenuElement.h"
 #include "elements/MenuItemElement.h"
 #include "elements/ProgressBarElement.h"
+#include "elements/RadioButtonElement.h"
 #include "elements/RubberBandElement.h"
 #include "elements/ScrollAreaCornerElement.h"
 #include "elements/ScrollBarElement.h"
@@ -118,13 +119,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
         return;
     case QStyle::CE_CheckBox:
     case QStyle::CE_CheckBoxLabel:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
             ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::CE_RadioButton:
     case QStyle::CE_RadioButtonLabel:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
             ev->draw(painter, drawEnums);
         }
         return;
@@ -395,12 +396,12 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
         }
         return;
     case QStyle::PE_IndicatorCheckBox:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
             ev->draw(painter, drawEnums);
         }
         return;
     case QStyle::PE_IndicatorRadioButton:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
             ev->draw(painter, drawEnums);
         }
         return;
@@ -557,12 +558,12 @@ QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QSty
         }
         break;
     case QStyle::CT_CheckBox:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->contentsSize(contentsSize).toSize();
         }
         break;
     case QStyle::CT_RadioButton:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->contentsSize(contentsSize).toSize();
         }
         break;
@@ -830,22 +831,22 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         }
         break;
     case QStyle::PM_IndicatorWidth:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->indicatorSize().width();
         }
         break;
     case QStyle::PM_IndicatorHeight:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->indicatorSize().height();
         }
         break;
     case QStyle::PM_ExclusiveIndicatorWidth:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->indicatorSize().width();
         }
         break;
     case QStyle::PM_ExclusiveIndicatorHeight:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->indicatorSize().height();
         }
         break;
@@ -936,12 +937,12 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
         break;
     // Currently we only have one spacing value
     case QStyle::PM_CheckBoxLabelSpacing:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::CheckBox)) {
+        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->spacing();
         }
         break;
     case QStyle::PM_RadioButtonLabelSpacing:
-        if (auto ev = cachedCheckElement(hash, option, widget, CheckElement::Type::RadioButton)) {
+        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
             return ev->spacing();
         }
         break;
