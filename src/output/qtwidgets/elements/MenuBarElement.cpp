@@ -44,3 +44,20 @@ void MenuBarElement::draw(QPainter *painter, DrawEnums enums) const
         break;
     }
 }
+
+qreal MenuBarElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_MenuBarVMargin:
+        return averageVPadding();
+    case QStyle::PM_MenuBarHMargin:
+        return averageHPadding();
+    case QStyle::PM_MenuBarPanelWidth:
+        return width();
+    case QStyle::PM_MenuBarItemSpacing:
+        return spacing();
+    default:
+        break;
+    }
+    return 0;
+}

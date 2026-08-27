@@ -55,27 +55,23 @@ void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIcon
     drawIconAtRect(painter, icon, m_indicatorOption->rect);
 }
 
-qreal IndicatorElement::listViewIconSize() const
+qreal IndicatorElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
 {
-    return querySize({ElementString::ListViewIconSize}).width();
-}
-qreal IndicatorElement::smallIconSize() const
-{
-    return querySize({ElementString::SmallIconSize}).width();
-}
-qreal IndicatorElement::iconViewIconSize() const
-{
-    return querySize({ElementString::IconViewIconSize}).width();
-}
-qreal IndicatorElement::largeIconSize() const
-{
-    return querySize({ElementString::LargeIconSize}).width();
-}
-qreal IndicatorElement::messageBoxIconSize() const
-{
-    return querySize({ElementString::MessageBoxIconSize}).width();
-}
-qreal IndicatorElement::textCursorWidth() const
-{
-    return querySize({ElementString::TextCursorWidth}).width();
+    switch (pixelMetric) {
+    case QStyle::PM_ListViewIconSize:
+        return querySize({ElementString::ListViewIconSize}).width();
+    case QStyle::PM_SmallIconSize:
+        return querySize({ElementString::SmallIconSize}).width();
+    case QStyle::PM_IconViewIconSize:
+        return querySize({ElementString::IconViewIconSize}).width();
+    case QStyle::PM_LargeIconSize:
+        return querySize({ElementString::LargeIconSize}).width();
+    case QStyle::PM_MessageBoxIconSize:
+        return querySize({ElementString::MessageBoxIconSize}).width();
+    case QStyle::PM_TextCursorWidth:
+        return querySize({ElementString::TextCursorWidth}).width();
+    default:
+        break;
+    }
+    return 0;
 }

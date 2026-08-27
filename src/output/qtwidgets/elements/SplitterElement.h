@@ -19,6 +19,7 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_Splitter> : public TypeHelper<SplitterElement, QStyleOption>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_Splitter> : public TypeHelper<SplitterElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SplitterWidth> : public TypeHelper<SplitterElement, QStyleOption>{};
 /* clang-format on */
 }
 }
@@ -34,6 +35,7 @@ public:
     void update() override;
     void layout() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     const QStyleOption *m_splitterOption = nullptr;

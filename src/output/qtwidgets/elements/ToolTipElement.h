@@ -18,6 +18,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelTipLabel> : public TypeHelper<ToolTipElement, QStyleOptionFrame>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolTipLabelFrameWidth> : public TypeHelper<ToolTipElement, QStyleOptionFrame>{};
 /* clang-format on */
 }
 }
@@ -32,10 +33,10 @@ public:
 
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
-
-    QStringList elementHints() const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
+    QStringList elementHints() const override;
     void layout() override;
     const QStyleOptionFrame *m_frameOption = nullptr;
 };

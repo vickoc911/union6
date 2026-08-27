@@ -51,3 +51,14 @@ void SizeGripElement::layout()
         m_isValid = true;
     }
 }
+
+qreal SizeGripElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_SizeGripSize:
+        return width();
+    default:
+        break;
+    }
+    return 0;
+}

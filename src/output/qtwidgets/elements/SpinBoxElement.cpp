@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QStyle>
+#include <qstyle.h>
 
 using namespace Qt::StringLiterals;
 
@@ -162,4 +163,15 @@ QStringList SpinBoxElement::elementHints() const
     // Force the constrained look, as no other spinbox look will work due to QStyle expectations.
     hints.append(u"constrained"_s);
     return hints;
+}
+
+qreal SpinBoxElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_SpinBoxFrameWidth:
+        return averageBorderSize();
+    default:
+        break;
+    }
+    return 0;
 }

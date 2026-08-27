@@ -20,6 +20,9 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_Slider> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_Slider> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SliderLength> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SliderThickness> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SliderControlThickness> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
 /* clang-format on */
 }
 }
@@ -38,7 +41,7 @@ public:
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
-    qreal controlThickness() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QStringList elementHints() const override;
@@ -49,4 +52,5 @@ private:
     bool m_isInverted;
     bool m_isReverse;
     QList<QRect> tickLines() const;
+    qreal controlThickness() const;
 };
