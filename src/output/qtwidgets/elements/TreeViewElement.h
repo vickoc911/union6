@@ -18,6 +18,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorBranch> : public TypeHelper<TreeViewElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TreeViewIndentation> : public TypeHelper<TreeViewElement, QStyleOption>{};
 /* clang-format on */
 }
 }
@@ -33,9 +34,10 @@ public:
     ~TreeViewElement() override;
 
     void draw(QPainter *painter, DrawEnums enums) const override;
-    qreal indentation() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     void drawIndicator(QPainter *painter) const override;
     const QStyleOption *m_treeViewOption = nullptr;
+    qreal indentation() const;
 };

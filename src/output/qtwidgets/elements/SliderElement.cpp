@@ -317,3 +317,17 @@ QStringList SliderElement::elementHints() const
     }
     return hints;
 }
+
+qreal SliderElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_SliderLength:
+        return height();
+    case QStyle::PM_SliderThickness:
+    case QStyle::PM_SliderControlThickness:
+        return controlThickness();
+    default:
+        break;
+    }
+    return 0;
+}

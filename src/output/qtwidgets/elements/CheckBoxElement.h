@@ -25,6 +25,9 @@ namespace detail
     template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_CheckBoxLabel> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorCheckBox> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_CheckBox> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_IndicatorWidth> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_IndicatorHeight> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_CheckBoxLabelSpacing> : public TypeHelper<CheckBoxElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }
@@ -41,6 +44,7 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     void updateSubElementList() override;

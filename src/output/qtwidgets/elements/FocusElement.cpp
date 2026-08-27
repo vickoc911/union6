@@ -57,3 +57,16 @@ QStringList FocusElement::elementHints() const
     }
     return hints;
 }
+
+qreal FocusElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_FocusFrameVMargin:
+        return averageVPadding();
+    case QStyle::PM_FocusFrameHMargin:
+        return averageHPadding();
+    default:
+        break;
+    }
+    return 0;
+}

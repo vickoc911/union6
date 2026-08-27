@@ -28,6 +28,8 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ProgressBarLabel> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorProgressChunk> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_ProgressBar> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ProgressBarChunkWidth> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+
 /* clang-format on */
 }
 }
@@ -45,7 +47,7 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
 
     QRectF subElementRect(QStyle::SubElement element) const override;
-    int chunkWidth() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     void updateSubElementList() override;
@@ -53,4 +55,5 @@ private:
     void drawIndicator(QPainter *painter) const override;
     void drawChunk(QPainter *painter) const;
     const QStyleOptionProgressBar *m_progressBarOption = nullptr;
+    int chunkWidth() const;
 };

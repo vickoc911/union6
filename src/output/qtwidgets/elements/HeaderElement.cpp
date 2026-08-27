@@ -181,3 +181,20 @@ QStringList HeaderElement::elementHints() const
     }
     return hints;
 }
+
+qreal HeaderElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_HeaderMargin:
+        return spacing();
+    case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
+        return width();
+    case QStyle::PM_HeaderDefaultSectionSizeVertical:
+        return height();
+    case QStyle::PM_HeaderMarkSize:
+        return indicatorSize().width();
+    default:
+        break;
+    }
+    return 0;
+}

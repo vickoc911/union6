@@ -162,3 +162,26 @@ qreal ToolBarElement::extensionExtent() const
     }
     return 0;
 }
+
+qreal ToolBarElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ToolBarSeparatorExtent:
+        return separatorExtent();
+    case QStyle::PM_ToolBarFrameWidth:
+        return averageBorderSize();
+    case QStyle::PM_ToolBarHandleExtent:
+        return handleExtent();
+    case QStyle::PM_ToolBarExtensionExtent:
+        return extensionExtent();
+    case QStyle::PM_ToolBarItemSpacing:
+        return spacing();
+    case QStyle::PM_ToolBarItemMargin:
+        return averagePadding();
+    case QStyle::PM_ToolBarIconSize:
+        return iconSize().width();
+    default:
+        break;
+    }
+    return 0;
+}

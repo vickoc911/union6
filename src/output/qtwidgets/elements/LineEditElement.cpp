@@ -85,3 +85,18 @@ QStringList LineEditElement::elementHints() const
 {
     return frameHints(m_frameOption);
 }
+
+qreal LineEditElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_LineEditIconMargin: {
+        const auto margins = iconPadding();
+        return (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
+    }
+    case QStyle::PM_LineEditIconSize:
+        return iconSize().width();
+    default:
+        break;
+    }
+    return 0;
+}

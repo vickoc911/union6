@@ -53,3 +53,14 @@ QStringList ToolTipElement::elementHints() const
 {
     return frameHints(m_frameOption);
 }
+
+qreal ToolTipElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ToolTipLabelFrameWidth:
+        return averageBorderSize();
+    default:
+        break;
+    }
+    return 0;
+}
