@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class TabCloseButtonElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorTabClose> : public TypeHelper<TabCloseButtonElement, QStyleOption>{};
+/* clang-format on */
+}
+}
 
 class TabCloseButtonElement : public AbstractElement
 {

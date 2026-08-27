@@ -21,6 +21,8 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_ToolButton> : public TypeHelper<ToolButtonElement, QStyleOptionToolButton>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ToolButtonLabel> : public TypeHelper<ToolButtonElement, QStyleOptionToolButton>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameButtonTool> : public TypeHelper<ToolButtonElement, QStyleOptionToolButton>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelButtonTool> : public TypeHelper<ToolButtonElement, QStyleOptionToolButton>{};
 /* clang-format on */
 }
 }

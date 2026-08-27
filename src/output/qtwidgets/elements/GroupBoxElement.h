@@ -19,6 +19,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_GroupBox> : public TypeHelper<GroupBoxElement, QStyleOptionGroupBox>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameGroupBox> : public TypeHelper<GroupBoxElement, QStyleOptionGroupBox>{};
 /* clang-format on */
 }
 }

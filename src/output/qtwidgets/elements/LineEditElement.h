@@ -18,6 +18,8 @@ namespace detail
 {
 /* clang-format off */
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_LineEditContents> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
+    template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameLineEdit> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
+    template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelLineEdit> : public TypeHelper<LineEditElement, QStyleOptionFrame>{};
 /* clang-format on */
 }
 }

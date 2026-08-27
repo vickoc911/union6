@@ -24,6 +24,7 @@ namespace detail
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ItemViewItemDecoration> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
     template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ItemViewItemCheckIndicator> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
     template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ItemViewItem> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
+    template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelItemViewItem> : public TypeHelper<ItemViewElement, QStyleOptionViewItem>{};
 /* clang-format on */
 }
 }

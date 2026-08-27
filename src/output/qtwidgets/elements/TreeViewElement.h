@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class TreeViewElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorBranch> : public TypeHelper<TreeViewElement, QStyleOption>{};
+/* clang-format on */
+}
+}
 
 // This is a kitchen-sink element class to draw any various indicators
 

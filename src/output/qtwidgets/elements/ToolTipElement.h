@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class ToolTipElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelTipLabel> : public TypeHelper<ToolTipElement, QStyleOptionFrame>{};
+/* clang-format on */
+}
+}
 
 class ToolTipElement : public AbstractElement
 {

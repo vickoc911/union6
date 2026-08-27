@@ -19,6 +19,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_MenuBarEmptyArea> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelMenuBar> : public TypeHelper<MenuBarElement, QStyleOptionMenuItem>{};
 /* clang-format on */
 }
 }

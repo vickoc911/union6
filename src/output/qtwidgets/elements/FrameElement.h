@@ -19,6 +19,9 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_FocusFrame> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ShapedFrame> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameDockWidget> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameWindow> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_Frame> : public TypeHelper<FrameElement, QStyleOptionFrame>{};
 /* clang-format on */
 }
 }

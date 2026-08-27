@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class FocusElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameFocusRect> : public TypeHelper<FocusElement, QStyleOptionFocusRect>{};
+/* clang-format on */
+}
+}
 
 class FocusElement : public AbstractElement
 {

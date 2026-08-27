@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class ScrollAreaCornerElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelScrollAreaCorner> : public TypeHelper<ScrollAreaCornerElement, QStyleOption>{};
+/* clang-format on */
+}
+}
 
 class ScrollAreaCornerElement : public AbstractElement
 {

@@ -222,172 +222,81 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
     const auto hash = qHashMulti(QHashSeed::globalSeed(), element, option, widget);
     auto drawEnums = DrawEnums();
     drawEnums.PrimitiveElement = element;
-    switch (element) {
-    case QStyle::PE_PanelStatusBar:
-    case QStyle::PE_FrameStatusBarItem:
-        if (auto ev = cachedElement<StatusBarElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_PanelMenu:
-    case QStyle::PE_FrameMenu:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_Widget:
-        if (auto ev = cachedElement<WidgetElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameTabWidget:
-        if (auto ev = cachedElement<TabWidgetElement, QStyleOptionTabWidgetFrame>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameTabBarBase:
-        if (auto ev = cachedElement<TabBarElement, QStyleOptionTabBarBase>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameLineEdit:
-    case QStyle::PE_PanelLineEdit:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_PanelItemViewItem:
-        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_PanelScrollAreaCorner:
-        if (auto ev = cachedElement<ScrollAreaCornerElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_PanelTipLabel:
-        if (auto ev = cachedElement<ToolTipElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameFocusRect:
-        if (auto ev = cachedElement<FocusElement, QStyleOptionFocusRect>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-            ;
-        }
-        return;
-    case QStyle::PE_IndicatorCheckBox:
-        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorRadioButton:
-        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorArrowLeft:
-    case QStyle::PE_IndicatorArrowUp:
-    case QStyle::PE_IndicatorArrowRight:
-    case QStyle::PE_IndicatorArrowDown:
-    case QStyle::PE_IndicatorButtonDropDown:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorSpinPlus:
-    case QStyle::PE_IndicatorSpinMinus:
-    case QStyle::PE_IndicatorSpinUp:
-    case QStyle::PE_IndicatorSpinDown:
-        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameDefaultButton:
-    case QStyle::PE_FrameButtonBevel:
-    case QStyle::PE_PanelButtonCommand:
-    case QStyle::PE_PanelButtonBevel:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameButtonTool:
-    case QStyle::PE_PanelButtonTool:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameGroupBox:
-        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_FrameDockWidget:
-    case QStyle::PE_FrameWindow:
-    case QStyle::PE_Frame:
-        if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_PanelMenuBar:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorToolBarHandle:
-    case QStyle::PE_IndicatorToolBarSeparator:
-    case QStyle::PE_PanelToolBar:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorBranch:
-        if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorMenuCheckMark:
-    case QStyle::PE_IndicatorItemViewItemCheck:
-        drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
-        return;
-    case QStyle::PE_IndicatorHeaderArrow: {
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        } else {
+    auto cached = ElementCache::element<QStyle::PrimitiveElement,
+                                        QStyle::PE_Frame,
+                                        QStyle::PE_FrameDefaultButton,
+                                        QStyle::PE_FrameDockWidget,
+                                        QStyle::PE_FrameFocusRect,
+                                        QStyle::PE_FrameGroupBox,
+                                        QStyle::PE_FrameLineEdit,
+                                        QStyle::PE_FrameMenu,
+                                        QStyle::PE_FrameStatusBarItem,
+                                        QStyle::PE_FrameTabWidget,
+                                        QStyle::PE_FrameWindow,
+                                        QStyle::PE_FrameButtonBevel,
+                                        QStyle::PE_FrameButtonTool,
+                                        QStyle::PE_FrameTabBarBase,
+                                        QStyle::PE_PanelButtonCommand,
+                                        QStyle::PE_PanelButtonBevel,
+                                        QStyle::PE_PanelButtonTool,
+                                        QStyle::PE_PanelMenuBar,
+                                        QStyle::PE_PanelToolBar,
+                                        QStyle::PE_PanelLineEdit,
+                                        QStyle::PE_IndicatorArrowDown,
+                                        QStyle::PE_IndicatorArrowLeft,
+                                        QStyle::PE_IndicatorArrowRight,
+                                        QStyle::PE_IndicatorArrowUp,
+                                        QStyle::PE_IndicatorBranch,
+                                        QStyle::PE_IndicatorButtonDropDown,
+                                        QStyle::PE_IndicatorCheckBox,
+                                        QStyle::PE_IndicatorHeaderArrow,
+                                        QStyle::PE_IndicatorProgressChunk,
+                                        QStyle::PE_IndicatorRadioButton,
+                                        QStyle::PE_IndicatorSpinDown,
+                                        QStyle::PE_IndicatorSpinMinus,
+                                        QStyle::PE_IndicatorSpinPlus,
+                                        QStyle::PE_IndicatorSpinUp,
+                                        QStyle::PE_IndicatorToolBarHandle,
+                                        QStyle::PE_IndicatorToolBarSeparator,
+                                        QStyle::PE_PanelTipLabel,
+                                        QStyle::PE_PanelScrollAreaCorner,
+                                        QStyle::PE_Widget,
+                                        QStyle::PE_PanelItemViewItem,
+                                        QStyle::PE_PanelStatusBar,
+                                        QStyle::PE_IndicatorTabClose,
+                                        QStyle::PE_PanelMenu>(element, hash, this, option, widget);
+    if (cached) {
+        cached->draw(painter, drawEnums);
+    } else {
+        // Handle some items that are just duplicates of the above, or need fallback
+        switch (element) {
+        case QStyle::PE_IndicatorMenuCheckMark:
+        case QStyle::PE_IndicatorItemViewItemCheck:
+            drawPrimitive(PE_IndicatorCheckBox, option, painter, widget);
+            return;
+        case QStyle::PE_IndicatorHeaderArrow:
             // Fallback
             if (option->state.testFlags(State_UpArrow)) {
                 drawPrimitive(PE_IndicatorArrowUp, option, painter, widget);
             } else if (option->state.testFlags(State_DownArrow)) {
                 drawPrimitive(PE_IndicatorArrowDown, option, painter, widget);
             }
+            return;
+        case QStyle::PE_IndicatorColumnViewArrow:
+            drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
+            return;
+        default:
+            break;
+            // Unhandled:
+            // QStyle::PE_PanelItemViewRow
+            // QStyle::PE_IndicatorTabTear
+            // QStyle::PE_IndicatorTabTearRight
+            // QStyle::PE_IndicatorItemViewItemDrop
+            // QStyle::PE_IndicatorDockWidgetResizeHandle
+            // QStyle::PE_CustomBase
         }
+        QCommonStyle::drawPrimitive(element, option, painter, widget);
     }
-        return;
-    case QStyle::PE_IndicatorProgressChunk:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::PE_IndicatorColumnViewArrow:
-        drawPrimitive(PE_IndicatorArrowRight, option, painter, widget);
-        return;
-    case QStyle::PE_IndicatorTabClose:
-        if (auto ev = cachedElement<TabCloseButtonElement, QStyleOption>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    // Handle with QCommonStyle for now
-    case QStyle::PE_PanelItemViewRow:
-    case QStyle::PE_IndicatorTabTear:
-    case QStyle::PE_IndicatorTabTearRight:
-    case QStyle::PE_IndicatorItemViewItemDrop:
-    case QStyle::PE_IndicatorDockWidgetResizeHandle:
-    case QStyle::PE_CustomBase:
-        break;
-    }
-
-    QCommonStyle::drawPrimitive(element, option, painter, widget);
 }
 
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const

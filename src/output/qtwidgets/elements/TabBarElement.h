@@ -7,7 +7,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class TabBarElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameTabBarBase> : public TypeHelper<TabBarElement, QStyleOptionTabBarBase>{};
+/* clang-format on */
+}
+}
 
 class TabBarElement : public AbstractElement
 {

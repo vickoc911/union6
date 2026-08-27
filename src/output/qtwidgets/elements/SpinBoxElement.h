@@ -19,6 +19,10 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_SpinBox> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinPlus> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinMinus> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinUp> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinDown> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
 /* clang-format on */
 }
 }
