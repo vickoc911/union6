@@ -18,6 +18,9 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameTabBarBase> : public TypeHelper<TabBarElement, QStyleOptionTabBarBase>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabBarScrollButtonWidth> : public TypeHelper<TabBarElement, QStyleOptionTabBarBase>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabBarBaseHeight> : public TypeHelper<TabBarElement, QStyleOptionTabBarBase>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TabBarIconSize> : public TypeHelper<TabBarElement, QStyleOptionTabBarBase>{};
 /* clang-format on */
 }
 }
@@ -33,11 +36,11 @@ public:
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
 
-    qreal scrollButtonWidth() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
-    QStringList elementHints() const override;
     QVariantMap elementAttributes() const override;
     void drawBackground(QPainter *painter) const override;
     const QStyleOptionTabBarBase *m_tabBarOption = nullptr;
+    qreal scrollButtonWidth() const;
 };

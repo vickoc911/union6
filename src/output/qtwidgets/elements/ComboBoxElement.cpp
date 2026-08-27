@@ -162,3 +162,14 @@ void ComboBoxElement::drawText(QPainter *painter) const
     }
     AbstractElement::drawText(painter);
 }
+
+qreal ComboBoxElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ComboBoxFrameWidth:
+        return averageBorderSize();
+    default:
+        break;
+    }
+    return 0;
+}

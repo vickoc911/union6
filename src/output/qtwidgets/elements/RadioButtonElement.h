@@ -25,6 +25,9 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_RadioButtonLabel> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorRadioButton> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_RadioButton> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ExclusiveIndicatorWidth> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ExclusiveIndicatorHeight> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_RadioButtonLabelSpacing> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }
@@ -41,6 +44,7 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     void updateSubElementList() override;

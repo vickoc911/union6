@@ -19,6 +19,7 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_SizeGrip> : public TypeHelper<SizeGripElement, QStyleOptionSizeGrip>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_SizeGrip> : public TypeHelper<SizeGripElement, QStyleOptionSizeGrip>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SizeGripSize> : public TypeHelper<SizeGripElement, QStyleOptionSizeGrip>{};
 /* clang-format on */
 }
 }
@@ -33,6 +34,7 @@ public:
 
     void update() override;
     void layout() override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
     void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:

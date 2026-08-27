@@ -59,3 +59,14 @@ QStringList FrameElement::elementHints() const
 {
     return frameHints(m_frameOption);
 }
+
+qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_DefaultFrameWidth:
+        return averageBorderSize();
+    default:
+        break;
+    }
+    return 0;
+}

@@ -55,3 +55,20 @@ QSizeF MenuElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     return applyPaddingToSize(contentsSizeFromStyle);
 }
+
+qreal MenuElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_MenuVMargin:
+        return averageVPadding();
+    case QStyle::PM_MenuHMargin:
+        return averageHPadding();
+    case QStyle::PM_MenuPanelWidth:
+        return width();
+    case QStyle::PM_MenuDesktopFrameWidth:
+        return averageBorderSize();
+    default:
+        break;
+    }
+    return 0;
+}

@@ -153,6 +153,13 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     if (cached) {
         cached->draw(painter, drawEnums);
     } else {
+        // Unimplemented
+        // CE_MenuScroller
+        // CE_MenuTearoff
+        // CE_MenuEmptyArea
+        // CE_MenuVMargin
+        // CE_MenuHMargin
+        // CE_ColumnViewGrip
         QCommonStyle::drawControl(controlElement, option, painter, widget);
     }
 }
@@ -391,6 +398,102 @@ QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOpti
 int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const
 {
     const auto hash = qHashMulti(QHashSeed::globalSeed(), metric, option, widget);
+    auto cached = ElementCache::element<QStyle::PixelMetric,
+                                        QStyle::PM_ButtonMargin,
+                                        QStyle::PM_ButtonDefaultIndicator,
+                                        QStyle::PM_MenuButtonIndicator,
+                                        QStyle::PM_DefaultFrameWidth,
+                                        QStyle::PM_SpinBoxFrameWidth,
+                                        QStyle::PM_ComboBoxFrameWidth,
+                                        QStyle::PM_ScrollBarExtent,
+                                        QStyle::PM_ScrollBarSliderMin,
+                                        QStyle::PM_SliderThickness,
+                                        QStyle::PM_SliderControlThickness,
+                                        QStyle::PM_SliderLength,
+                                        QStyle::PM_DockWidgetFrameWidth,
+                                        QStyle::PM_TabBarTabHSpace,
+                                        QStyle::PM_TabBarTabVSpace,
+                                        QStyle::PM_TabBarBaseHeight,
+                                        QStyle::PM_ProgressBarChunkWidth,
+                                        QStyle::PM_SplitterWidth,
+                                        QStyle::PM_TitleBarHeight,
+                                        QStyle::PM_MenuHMargin,
+                                        QStyle::PM_MenuVMargin,
+                                        QStyle::PM_MenuPanelWidth,
+                                        QStyle::PM_MenuDesktopFrameWidth,
+                                        QStyle::PM_MenuBarPanelWidth,
+                                        QStyle::PM_MenuBarItemSpacing,
+                                        QStyle::PM_MenuBarVMargin,
+                                        QStyle::PM_MenuBarHMargin,
+                                        QStyle::PM_IndicatorWidth,
+                                        QStyle::PM_IndicatorHeight,
+                                        QStyle::PM_ExclusiveIndicatorWidth,
+                                        QStyle::PM_ExclusiveIndicatorHeight,
+                                        QStyle::PM_HeaderMargin,
+                                        QStyle::PM_HeaderMarkSize,
+                                        QStyle::PM_TabBarScrollButtonWidth,
+                                        QStyle::PM_ToolBarFrameWidth,
+                                        QStyle::PM_ToolBarHandleExtent,
+                                        QStyle::PM_ToolBarItemSpacing,
+                                        QStyle::PM_ToolBarItemMargin,
+                                        QStyle::PM_ToolBarSeparatorExtent,
+                                        QStyle::PM_ToolBarExtensionExtent,
+                                        QStyle::PM_ToolBarIconSize,
+                                        QStyle::PM_ListViewIconSize,
+                                        QStyle::PM_IconViewIconSize,
+                                        QStyle::PM_SmallIconSize,
+                                        QStyle::PM_LargeIconSize,
+                                        QStyle::PM_FocusFrameVMargin,
+                                        QStyle::PM_FocusFrameHMargin,
+                                        QStyle::PM_ToolTipLabelFrameWidth,
+                                        QStyle::PM_CheckBoxLabelSpacing,
+                                        QStyle::PM_TabBarIconSize,
+                                        QStyle::PM_SizeGripSize,
+                                        QStyle::PM_MessageBoxIconSize,
+                                        QStyle::PM_ButtonIconSize,
+                                        QStyle::PM_RadioButtonLabelSpacing,
+                                        QStyle::PM_TextCursorWidth,
+                                        QStyle::PM_TabCloseIndicatorWidth,
+                                        QStyle::PM_TabCloseIndicatorHeight,
+                                        QStyle::PM_TreeViewIndentation,
+                                        QStyle::PM_HeaderDefaultSectionSizeHorizontal,
+                                        QStyle::PM_HeaderDefaultSectionSizeVertical,
+                                        QStyle::PM_TitleBarButtonIconSize,
+                                        QStyle::PM_TitleBarButtonSize,
+                                        QStyle::PM_LineEditIconSize,
+                                        QStyle::PM_LineEditIconMargin>(metric, hash, this, option, widget);
+    if (cached) {
+        return cached->pixelMetric(metric);
+    }
+    // Unimplemented, use QCommonStyle for now
+    // QStyle::PM_MenuScrollerHeight
+    // QStyle::PM_SpinBoxSliderHeight
+    // QStyle::PM_ScrollView_ScrollBarSpacing
+    // QStyle::PM_MdiSubWindowFrameWidth
+    // QStyle::PM_MaximumDragDistance
+    // QStyle::PM_SliderTickmarkOffset
+    // QStyle::PM_SliderSpaceAvailable
+    // QStyle::PM_DockWidgetSeparatorExtent
+    // QStyle::PM_DockWidgetHandleExtent
+    // QStyle::PM_TabBarTabOverlap
+    // QStyle::PM_TabBarBaseOverlap
+    // QStyle::PM_MenuTearoffHeight
+    // QStyle::PM_DialogButtonsSeparator // Deprecated
+    // QStyle::PM_DialogButtonsButtonWidth // Deprecated
+    // QStyle::PM_DialogButtonsButtonHeight // Deprecated
+    // QStyle::PM_MdiSubWindowMinimizedWidth
+    // QStyle::PM_HeaderGripMargin
+    // QStyle::PM_DockWidgetTitleMargin
+    // QStyle::PM_DockWidgetTitleBarButtonMargin
+    // QStyle::PM_SubMenuOverlap
+    // QStyle::PM_CustomBase
+    // QStyle::PM_LayoutHorizontalSpacing
+    // QStyle::PM_LayoutVerticalSpacing
+    // QStyle::PM_LayoutLeftMargin
+    // QStyle::PM_LayoutTopMargin
+    // QStyle::PM_LayoutRightMargin
+    // QStyle::PM_LayoutBottomMargin
+    // Overrides
     switch (metric) {
     // Don't shift button text when sunken
     case QStyle::PM_TabBarTabShiftHorizontal:
@@ -398,395 +501,12 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     case QStyle::PM_ButtonShiftHorizontal:
     case QStyle::PM_ButtonShiftVertical:
     case QStyle::PM_TabBar_ScrollButtonOverlap:
-        return 0;
-    // Don't allow overlap
+        // Don't allow overlap
     case QStyle::PM_ScrollView_ScrollBarOverlap:
         return 0;
-    // Due to how QWidgets works, we just return the highest value
-    // since there is no support for returning padding per edge
-    // In QStyle "Margin" means "Padding" apparently.
-    case QStyle::PM_MenuBarVMargin:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return qMax(ev->padding().left(), ev->padding().right());
-        }
+    default:
         break;
-    case QStyle::PM_MenuBarHMargin:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return qMax(ev->padding().top(), ev->padding().bottom());
-        }
-        break;
-    case QStyle::PM_FocusFrameVMargin:
-        if (auto ev = cachedElement<FocusElement, QStyleOptionFocusRect>(hash, option, widget)) {
-            return qMax(ev->padding().left(), ev->padding().right());
-        }
-        break;
-    case QStyle::PM_FocusFrameHMargin:
-        if (auto ev = cachedElement<FocusElement, QStyleOptionFocusRect>(hash, option, widget)) {
-            return qMax(ev->padding().top(), ev->padding().bottom());
-        }
-        break;
-    case QStyle::PM_MenuHMargin:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            return qMax(ev->padding().left(), ev->padding().right());
-        }
-        break;
-    case QStyle::PM_MenuVMargin:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            return qMax(ev->padding().top(), ev->padding().bottom());
-        }
-        break;
-    // According to the docs: The size of the margin between the sort indicator and the text.
-    // So return spacing here.
-    case QStyle::PM_HeaderMargin:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->spacing();
-        }
-        break;
-    case QStyle::PM_LineEditIconMargin:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            auto margins = ev->iconPadding();
-            return (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
-        }
-        break;
-    case QStyle::PM_ButtonMargin:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->averagePadding();
-        }
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->averagePadding();
-        }
-        break;
-    case QStyle::PM_ToolBarSeparatorExtent:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->separatorExtent();
-        }
-        break;
-    case QStyle::PM_ToolTipLabelFrameWidth:
-        if (auto ev = cachedElement<ToolTipElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_ToolBarFrameWidth:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_MenuDesktopFrameWidth:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_MenuBarPanelWidth:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_DefaultFrameWidth:
-        if (auto ev = cachedElement<FrameElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_SpinBoxFrameWidth:
-        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_ComboBoxFrameWidth:
-        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_DockWidgetFrameWidth:
-        if (auto ev = cachedElement<DockWidgetElement, QStyleOptionDockWidget>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_ButtonDefaultIndicator:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->averageBorderSize();
-        }
-        break;
-    case QStyle::PM_IndicatorWidth:
-        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->indicatorSize().width();
-        }
-        break;
-    case QStyle::PM_IndicatorHeight:
-        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->indicatorSize().height();
-        }
-        break;
-    case QStyle::PM_ExclusiveIndicatorWidth:
-        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->indicatorSize().width();
-        }
-        break;
-    case QStyle::PM_ExclusiveIndicatorHeight:
-        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->indicatorSize().height();
-        }
-        break;
-    case QStyle::PM_MenuButtonIndicator:
-        if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->indicatorSize().width();
-        }
-        break;
-    case QStyle::PM_TabCloseIndicatorWidth:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            return ev->indicatorSize().width();
-        }
-        break;
-    case QStyle::PM_TabCloseIndicatorHeight:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            return ev->indicatorSize().height();
-        }
-        break;
-    case QStyle::PM_SliderLength:
-        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->height();
-        }
-        break;
-    case QStyle::PM_ScrollBarExtent:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->extent();
-        }
-        break;
-    case QStyle::PM_SliderThickness:
-        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->controlThickness();
-        }
-        break;
-    case QStyle::PM_SliderControlThickness:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->controlThickness();
-        }
-        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->controlThickness();
-        }
-        break;
-    case QStyle::PM_ToolBarHandleExtent:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->handleExtent();
-        }
-        break;
-    case QStyle::PM_ToolBarExtensionExtent:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->extensionExtent();
-        }
-        break;
-    case QStyle::PM_LayoutLeftMargin:
-    case QStyle::PM_LayoutTopMargin:
-    case QStyle::PM_LayoutRightMargin:
-    case QStyle::PM_LayoutBottomMargin: {
-        if (auto ev = cachedElement<AbstractElement, QStyleOption>(hash, option, widget)) {
-            ev->layout();
-            auto margins = ev->padding();
-            if (metric == PM_LayoutLeftMargin) {
-                return margins.left();
-            }
-            if (metric == PM_LayoutTopMargin) {
-                return margins.top();
-            }
-            if (metric == PM_LayoutBottomMargin) {
-                return margins.bottom();
-            }
-            if (metric == PM_LayoutRightMargin) {
-                return margins.right();
-            }
-        }
-    } break;
-    case QStyle::PM_LayoutHorizontalSpacing:
-    case QStyle::PM_LayoutVerticalSpacing:
-        if (auto ev = cachedElement<AbstractElement, QStyleOption>(hash, option, widget)) {
-            return ev->spacing();
-        }
-        break;
-    case QStyle::PM_TabBarTabHSpace:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            return ev->hSpace();
-        }
-        break;
-    case QStyle::PM_TabBarTabVSpace:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            return ev->vSpace();
-        }
-        break;
-    // Currently we only have one spacing value
-    case QStyle::PM_CheckBoxLabelSpacing:
-        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->spacing();
-        }
-        break;
-    case QStyle::PM_RadioButtonLabelSpacing:
-        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->spacing();
-        }
-        break;
-    case QStyle::PM_MenuBarItemSpacing:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->spacing();
-        }
-        break;
-    case QStyle::PM_ToolBarItemSpacing:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->spacing();
-        }
-        break;
-    case QStyle::PM_ToolBarItemMargin:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->averagePadding();
-        }
-        break;
-    case QStyle::PM_TabBarScrollButtonWidth:
-        if (auto ev = cachedElement<TabBarElement, QStyleOptionTabBarBase>(hash, option, widget)) {
-            return ev->scrollButtonWidth();
-        }
-        break;
-    case QStyle::PM_MenuPanelWidth:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            return ev->width();
-        }
-        break;
-    case QStyle::PM_SplitterWidth:
-        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
-            return ev->width();
-        }
-        break;
-    case QStyle::PM_TitleBarHeight:
-        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            return ev->height();
-        }
-        break;
-    case QStyle::PM_TitleBarButtonSize:
-        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            return ev->buttonWidth();
-        }
-        break;
-    case QStyle::PM_TitleBarButtonIconSize:
-        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        break;
-    case QStyle::PM_TabBarBaseHeight:
-        if (auto ev = cachedElement<TabBarElement, QStyleOptionTabBarBase>(hash, option, widget)) {
-            return ev->height();
-        }
-        break;
-    case QStyle::PM_ProgressBarChunkWidth:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            return ev->chunkWidth();
-        }
-        break;
-    case QStyle::PM_ScrollBarSliderMin:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->minimumSize();
-        }
-        break;
-    case QStyle::PM_ButtonIconSize:
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        break;
-    case QStyle::PM_TabBarIconSize:
-        if (auto ev = cachedElement<TabBarElement, QStyleOptionTabBarBase>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        break;
-    case QStyle::PM_LineEditIconSize:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        break;
-    case QStyle::PM_ToolBarIconSize:
-        if (auto ev = cachedElement<ToolBarElement, QStyleOptionToolBar>(hash, option, widget)) {
-            return ev->iconSize().width();
-        }
-        break;
-    case QStyle::PM_SizeGripSize:
-        if (auto ev = cachedElement<SizeGripElement, QStyleOptionSizeGrip>(hash, option, widget)) {
-            return ev->width();
-        }
-        break;
-    case QStyle::PM_HeaderDefaultSectionSizeHorizontal:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->width();
-        }
-        break;
-    case QStyle::PM_HeaderDefaultSectionSizeVertical:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->height();
-        }
-        break;
-    case QStyle::PM_HeaderMarkSize:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->indicatorSize().width();
-        }
-        break;
-    case QStyle::PM_TreeViewIndentation:
-        if (auto ev = cachedElement<TreeViewElement, QStyleOption>(hash, option, widget)) {
-            return ev->indentation();
-        }
-        break;
-    case QStyle::PM_ListViewIconSize:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            return ev->listViewIconSize();
-        }
-        break;
-    case QStyle::PM_SmallIconSize:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            return ev->smallIconSize();
-        }
-        break;
-    case QStyle::PM_IconViewIconSize:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            return ev->iconViewIconSize();
-        }
-        break;
-    case QStyle::PM_LargeIconSize:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            return ev->largeIconSize();
-        }
-        break;
-    case QStyle::PM_MessageBoxIconSize:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            return ev->messageBoxIconSize();
-        }
-        break;
-    case QStyle::PM_TextCursorWidth:
-        if (auto ev = cachedElement<IndicatorElement, QStyleOption>(hash, option, widget)) {
-            return ev->textCursorWidth();
-        }
-        break;
-    // Unimplemented, use QCommonStyle for now
-    case QStyle::PM_MenuScrollerHeight:
-    case QStyle::PM_SpinBoxSliderHeight:
-    case QStyle::PM_ScrollView_ScrollBarSpacing:
-    case QStyle::PM_MdiSubWindowFrameWidth:
-    case QStyle::PM_MaximumDragDistance:
-    case QStyle::PM_SliderTickmarkOffset:
-    case QStyle::PM_SliderSpaceAvailable:
-    case QStyle::PM_DockWidgetSeparatorExtent:
-    case QStyle::PM_DockWidgetHandleExtent:
-    case QStyle::PM_TabBarTabOverlap:
-    case QStyle::PM_TabBarBaseOverlap:
-    case QStyle::PM_MenuTearoffHeight:
-    case QStyle::PM_DialogButtonsSeparator: // Deprecated
-    case QStyle::PM_DialogButtonsButtonWidth: // Deprecated
-    case QStyle::PM_DialogButtonsButtonHeight: // Deprecated
-    case QStyle::PM_MdiSubWindowMinimizedWidth:
-    case QStyle::PM_HeaderGripMargin:
-    case QStyle::PM_DockWidgetTitleMargin:
-    case QStyle::PM_DockWidgetTitleBarButtonMargin:
-    case QStyle::PM_SubMenuOverlap:
-    case QStyle::PM_CustomBase:
-        break;
-    };
+    }
     return QCommonStyle::pixelMetric(metric, option, widget);
 }
 

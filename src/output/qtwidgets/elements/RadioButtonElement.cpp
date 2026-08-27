@@ -114,3 +114,18 @@ QStringList RadioButtonElement::elementHints() const
     }
     return hints;
 }
+
+qreal RadioButtonElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ExclusiveIndicatorWidth:
+        return indicatorSize().width();
+    case QStyle::PM_ExclusiveIndicatorHeight:
+        return indicatorSize().height();
+    case QStyle::PM_RadioButtonLabelSpacing:
+        return spacing();
+    default:
+        break;
+    }
+    return 0;
+}
