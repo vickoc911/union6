@@ -3,9 +3,13 @@
 
 #pragma once
 
+#include "elements/AbstractElement.h"
 #include <QStyleOption>
 
 #include <LruCache.h>
+
+class AbstractElement;
+class UnionStyle;
 
 namespace ElementCache
 {

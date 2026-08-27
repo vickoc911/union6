@@ -10,7 +10,23 @@
 #include <QStyleOption>
 #include <qstyleoption.h>
 
+#include <ElementCache.h>
+
 class UnionStyle;
+class DockWidgetElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetTitleBarText> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
+        template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetCloseButton> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
+        template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetFloatButton> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
+        template<> struct EnumToType<QStyle::SubElement, QStyle::SE_DockWidgetIcon> : public TypeHelper<DockWidgetElement, QStyleOptionDockWidget>{};
+/* clang-format on */
+}
+}
 
 class DockWidgetElement : public AbstractElement
 {

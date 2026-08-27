@@ -5,11 +5,23 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
+#include "ElementCache.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
 
 class UnionStyle;
+class TabElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::SubElement, QStyle::SE_TabBarTabText> : public TypeHelper<TabElement, QStyleOptionTab>{};
+/* clang-format on */
+}
+}
 
 class TabElement : public AbstractElement
 {

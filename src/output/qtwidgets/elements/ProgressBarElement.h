@@ -9,7 +9,22 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class ProgressBarElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::SubElement,QStyle::SE_ProgressBarLabel> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::SubElement,QStyle::SE_ProgressBarContents> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+        template<> struct EnumToType<QStyle::SubElement,QStyle::SE_ProgressBarGroove> : public TypeHelper<ProgressBarElement, QStyleOptionProgressBar>{};
+/* clang-format on */
+}
+}
 
 class ProgressBarElement : public AbstractElement
 {

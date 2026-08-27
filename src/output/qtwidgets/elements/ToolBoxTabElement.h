@@ -5,12 +5,23 @@
 
 #include "AbstractElement.h"
 #include "BackgroundDrawing.h"
+#include <ElementCache.h>
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
-#include <qstyleoption.h>
 
 class UnionStyle;
+class ToolBoxTabElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::SubElement, QStyle::SE_ToolBoxTabContents> : public TypeHelper<ToolBoxTabElement, QStyleOptionToolBox>{};
+/* clang-format on */
+}
+}
 
 class ToolBoxTabElement : public AbstractElement
 {
