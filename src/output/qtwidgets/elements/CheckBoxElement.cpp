@@ -118,3 +118,18 @@ QStringList CheckBoxElement::elementHints() const
     }
     return hints;
 }
+
+qreal CheckBoxElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_IndicatorWidth:
+        return indicatorSize().width();
+    case QStyle::PM_IndicatorHeight:
+        return indicatorSize().height();
+    case QStyle::PM_CheckBoxLabelSpacing:
+        return spacing();
+    default:
+        break;
+    }
+    return 0;
+}

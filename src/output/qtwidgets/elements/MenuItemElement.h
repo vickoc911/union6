@@ -21,6 +21,7 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement ,QStyle::CE_MenuItem> : public TypeHelper<MenuItemElement, QStyleOptionMenuItem>{};
         template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_MenuItem> : public TypeHelper<MenuItemElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_MenuButtonIndicator> : public TypeHelper<MenuItemElement, QStyleOptionMenuItem>{};
 /* clang-format on */
 }
 }
@@ -38,6 +39,7 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
 
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QStringList elementHints() const override;

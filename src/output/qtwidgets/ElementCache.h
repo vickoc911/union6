@@ -39,8 +39,10 @@ void element(std::shared_ptr<AbstractElement> &output, size_t hash, const UnionS
         return;
     }
 
-    output = std::make_shared<ElementType>(qstyleoption_cast<const OptionType *>(option), style, widget);
-    detail::s_elementCache.insert(hash, output);
+    if (const auto cast = qstyleoption_cast<const OptionType *>(option)) {
+        output = std::make_shared<ElementType>(cast, style, widget);
+        detail::s_elementCache.insert(hash, output);
+    }
     return;
 }
 }

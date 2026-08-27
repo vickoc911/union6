@@ -53,41 +53,33 @@ public:
      * \brief Draw the whole element, including text, icon, background and indicator.
      */
     virtual void draw(QPainter *painter, DrawEnums enums) const;
+
     /*!
      * \brief Prepare the layoutMap of the element, and create the required properties.
      * By default this creates proeprties for background and content.
      */
     virtual void layout();
+
     /*!
      * \brief Return the contents size of the element with padding applied by default.
      */
     virtual QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const;
+
     /*!
      * \brief Return a subelement rectangle. If not found, empty QRect() is returned instead.
      */
     virtual QRectF subElementRect(QStyle::SubElement element) const;
+
     /*!
      * \brief Return a subcontrol rectangle. If not found, empty QRect() is returned instead.
      */
     virtual QRectF subControlRect(QStyle::SubControl subControl) const;
 
-    virtual QMarginsF padding() const;
+    /*!
+     * \brief Return the given pixelmetric value. If not found, returns 0
+     */
+    virtual qreal pixelMetric(QStyle::PixelMetric pixelMetric) const;
 
-    virtual QMarginsF borderSize() const;
-
-    virtual qreal height() const;
-
-    virtual qreal width() const;
-
-    virtual qreal spacing() const;
-
-    virtual QSizeF indicatorSize() const;
-
-    virtual QSizeF iconSize() const;
-
-    qreal averagePadding() const;
-
-    qreal averageBorderSize() const;
     /*!
      * \brief Updates the properties of the element, such as text and layouting
      */
@@ -98,22 +90,27 @@ protected:
      * \brief Draw text of the element.
      */
     virtual void drawText(QPainter *painter) const;
+
     /*!
      * \brief Draw icon of the element.
      */
     virtual void drawIcon(QPainter *painter) const;
+
     /*!
      * \brief Draw whole background of the element.
      */
     virtual void drawBackground(QPainter *painter) const;
+
     /*!
      * \brief Draw only the background frame of the element.
      */
     virtual void drawFrame(QPainter *painter) const;
+
     /*!
      * \brief Draw only the background panel of the element.
      */
     virtual void drawPanel(QPainter *painter) const;
+
     /*!
      * \brief Draw the indicator of the element. This can vary from secondary icon, such as drop-down
      * arrow icon, to a checkbox, depending on the element.
@@ -172,6 +169,31 @@ protected:
      */
     virtual QMap<QString, LayoutItem> layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElements) const;
 
+    virtual QMarginsF padding() const;
+
+    virtual QMarginsF borderSize() const;
+
+    virtual qreal height() const;
+
+    virtual qreal width() const;
+
+    virtual qreal spacing() const;
+
+    virtual QSizeF indicatorSize() const;
+
+    virtual QSizeF iconSize() const;
+
+    qreal averagePadding() const;
+
+    qreal averageBorderSize() const;
+
+    qreal averageVPadding() const;
+
+    qreal averageHPadding() const;
+
+    /*!
+     * \brief Draw given icon at the rectangle. Handles the enabled status.
+     */
     void drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect) const;
 
     const QStyleOption *m_styleOption;

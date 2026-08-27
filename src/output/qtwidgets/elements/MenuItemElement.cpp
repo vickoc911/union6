@@ -252,3 +252,14 @@ QStringList MenuItemElement::elementHints() const
     }
     return hints;
 }
+
+qreal MenuItemElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_MenuButtonIndicator:
+        return indicatorSize().width();
+    default:
+        break;
+    }
+    return 0;
+}

@@ -20,6 +20,10 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_TitleBar> : public TypeHelper<TitleBarElement, QStyleOptionTitleBar>{};
+
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TitleBarHeight> : public TypeHelper<TitleBarElement, QStyleOptionTitleBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TitleBarButtonSize> : public TypeHelper<TitleBarElement, QStyleOptionTitleBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TitleBarButtonIconSize> : public TypeHelper<TitleBarElement, QStyleOptionTitleBar>{};
 /* clang-format on */
 }
 }
@@ -39,11 +43,12 @@ public:
     QRectF subControlRect(QStyle::SubControl subControl) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
 
-    qreal buttonWidth() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QStringList elementHints() const override;
     void updateSubElementList() override;
     const QStyleOptionTitleBar *m_titleBarOption = nullptr;
     QIcon queryIcon(const QString &defaultIconName, const QStringList &targetHierarchy) const;
+    qreal buttonWidth() const;
 };

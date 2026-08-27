@@ -37,9 +37,8 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
     void layout() override;
 
-    QStringList elementHints() const override;
-
 private:
+    QStringList elementHints() const override;
     void updateSubElementList() override;
     const QStyleOptionMenuItem *m_menuItemOption = nullptr;
 };
