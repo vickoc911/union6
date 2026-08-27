@@ -49,3 +49,14 @@ void SplitterElement::layout()
         m_isValid = true;
     }
 }
+
+qreal SplitterElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_SplitterWidth:
+        return width();
+    default:
+        break;
+    }
+    return 0;
+}

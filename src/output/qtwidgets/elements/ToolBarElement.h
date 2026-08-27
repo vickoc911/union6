@@ -22,6 +22,13 @@ namespace detail
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorToolBarHandle> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorToolBarSeparator> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelToolBar> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarSeparatorExtent> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarFrameWidth> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarHandleExtent> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarExtensionExtent> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarItemSpacing> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarItemMargin> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarIconSize> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
 /* clang-format on */
 }
 }
@@ -37,10 +44,7 @@ public:
     void update() override;
     void layout() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
-
-    qreal separatorExtent() const;
-    qreal handleExtent() const;
-    qreal extensionExtent() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     void updateSubElementList() override;
@@ -54,4 +58,8 @@ private:
     Union::Properties::StylePropertyGroup *m_separatorProperties;
     Union::ElementList m_extensionElementList;
     Union::Properties::StylePropertyGroup *m_extensionProperties;
+
+    qreal separatorExtent() const;
+    qreal handleExtent() const;
+    qreal extensionExtent() const;
 };

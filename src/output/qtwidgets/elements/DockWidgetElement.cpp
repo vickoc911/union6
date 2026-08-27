@@ -100,3 +100,14 @@ QRectF DockWidgetElement::subElementRect(QStyle::SubElement subElement) const
     }
     return QRect();
 }
+
+qreal DockWidgetElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_DockWidgetFrameWidth:
+        return averageBorderSize();
+    default:
+        break;
+    }
+    return 0;
+}

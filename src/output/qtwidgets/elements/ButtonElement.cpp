@@ -146,3 +146,18 @@ QStringList ButtonElement::elementHints() const
     }
     return hints;
 }
+
+qreal ButtonElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_ButtonMargin:
+        return averagePadding();
+    case QStyle::PM_ButtonDefaultIndicator:
+        return averageBorderSize();
+    case QStyle::PM_ButtonIconSize:
+        return iconSize().width();
+    default:
+        break;
+    }
+    return 0;
+}

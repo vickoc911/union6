@@ -22,6 +22,12 @@ namespace detail
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorArrowRight> : public TypeHelper<IndicatorElement, QStyleOption>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorArrowDown> : public TypeHelper<IndicatorElement, QStyleOption>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorButtonDropDown> : public TypeHelper<IndicatorElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ListViewIconSize> : public TypeHelper<IndicatorElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_SmallIconSize> : public TypeHelper<IndicatorElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_IconViewIconSize> : public TypeHelper<IndicatorElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_LargeIconSize> : public TypeHelper<IndicatorElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_MessageBoxIconSize> : public TypeHelper<IndicatorElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_TextCursorWidth> : public TypeHelper<IndicatorElement, QStyleOption>{};
 /* clang-format on */
 }
 }
@@ -37,13 +43,7 @@ public:
     ~IndicatorElement() override;
 
     void draw(QPainter *painter, DrawEnums enums) const override;
-
-    qreal listViewIconSize() const;
-    qreal smallIconSize() const;
-    qreal iconViewIconSize() const;
-    qreal largeIconSize() const;
-    qreal messageBoxIconSize() const;
-    qreal textCursorWidth() const;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     const QStyleOption *m_indicatorOption = nullptr;

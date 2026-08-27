@@ -112,6 +112,12 @@ QRectF AbstractElement::subControlRect(QStyle::SubControl subControl) const
     return QRect();
 }
 
+qreal AbstractElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    Q_UNUSED(pixelMetric);
+    return 0;
+}
+
 void AbstractElement::updateSubElementList()
 {
 }
@@ -351,6 +357,24 @@ qreal AbstractElement::averagePadding() const
         return 0;
     }
     return (margins.left() + margins.right() + margins.top() + margins.bottom()) / 4;
+}
+
+qreal AbstractElement::averageHPadding() const
+{
+    auto margins = padding();
+    if (margins.isNull()) {
+        return 0;
+    }
+    return (margins.left() + margins.right()) / 2;
+}
+
+qreal AbstractElement::averageVPadding() const
+{
+    auto margins = padding();
+    if (margins.isNull()) {
+        return 0;
+    }
+    return (margins.top() + margins.bottom()) / 2;
 }
 
 qreal AbstractElement::averageBorderSize() const

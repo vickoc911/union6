@@ -18,6 +18,8 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameFocusRect> : public TypeHelper<FocusElement, QStyleOptionFocusRect>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_FocusFrameVMargin> : public TypeHelper<FocusElement, QStyleOptionFocusRect>{};
+        template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_FocusFrameHMargin> : public TypeHelper<FocusElement, QStyleOptionFocusRect>{};
 /* clang-format on */
 }
 }
@@ -33,6 +35,7 @@ public:
     void update() override;
     void layout() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QStringList elementHints() const override;

@@ -27,6 +27,10 @@ namespace detail
     template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_HeaderEmptyArea> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorHeaderArrow> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
     template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_HeaderSection> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderMargin> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderDefaultSectionSizeHorizontal> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderDefaultSectionSizeVertical> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderMarkSize> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
 
 /* clang-format on */
 }
@@ -46,6 +50,7 @@ public:
 
     QRectF subElementRect(QStyle::SubElement element) const override;
     QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
     QStringList elementHints() const override;

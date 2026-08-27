@@ -78,7 +78,17 @@ QVariantMap TabBarElement::elementAttributes() const
     return map;
 }
 
-QStringList TabBarElement::elementHints() const
+qreal TabBarElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
 {
-    return QStringList();
+    switch (pixelMetric) {
+    case QStyle::PM_TabBarScrollButtonWidth:
+        return scrollButtonWidth();
+    case QStyle::PM_TabBarBaseHeight:
+        return height();
+    case QStyle::PM_TabBarIconSize:
+        return iconSize().width();
+    default:
+        break;
+    }
+    return 0;
 }

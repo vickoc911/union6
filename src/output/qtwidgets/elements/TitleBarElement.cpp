@@ -182,3 +182,18 @@ QStringList TitleBarElement::elementHints() const
     }
     return hints;
 }
+
+qreal TitleBarElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
+{
+    switch (pixelMetric) {
+    case QStyle::PM_TitleBarHeight:
+        return height();
+    case QStyle::PM_TitleBarButtonSize:
+        return buttonWidth();
+    case QStyle::PM_TitleBarButtonIconSize:
+        return iconSize().width();
+    default:
+        break;
+    }
+    return 0;
+}
