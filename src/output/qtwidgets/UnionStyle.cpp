@@ -302,118 +302,37 @@ void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOpt
 QSize UnionStyle::sizeFromContents(QStyle::ContentsType contentsType, const QStyleOption *option, const QSize &contentsSize, const QWidget *widget) const
 {
     const auto hash = qHashMulti(QHashSeed::globalSeed(), contentsType, option, contentsSize, widget);
-    switch (contentsType) {
-    case QStyle::CT_PushButton: {
-        if (auto ev = cachedElement<ButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-    } break;
-    case QStyle::CT_ToolButton:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_MenuItem:
-        if (auto ev = cachedElement<MenuItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_ComboBox:
-        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_TabBarTab:
-        if (auto ev = cachedElement<TabElement, QStyleOptionTab>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_Slider:
-        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_ItemViewItem:
-        if (auto ev = cachedElement<ItemViewElement, QStyleOptionViewItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_SpinBox:
-        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_ScrollBar:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_CheckBox:
-        if (auto ev = cachedElement<CheckBoxElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_RadioButton:
-        if (auto ev = cachedElement<RadioButtonElement, QStyleOptionButton>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_GroupBox:
-        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_ProgressBar:
-        if (auto ev = cachedElement<ProgressBarElement, QStyleOptionProgressBar>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_HeaderSection:
-        if (auto ev = cachedElement<HeaderElement, QStyleOptionHeader>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_LineEdit:
-        if (auto ev = cachedElement<LineEditElement, QStyleOptionFrame>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_Menu:
-        if (auto ev = cachedElement<MenuElement, QStyleOption>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_MenuBar:
-        if (auto ev = cachedElement<MenuBarElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_MenuBarItem:
-        if (auto ev = cachedElement<MenuBarItemElement, QStyleOptionMenuItem>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_SizeGrip:
-        if (auto ev = cachedElement<RubberBandElement, QStyleOptionRubberBand>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_Splitter:
-        if (auto ev = cachedElement<SplitterElement, QStyleOption>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_TabWidget:
-        if (auto ev = cachedElement<TabWidgetElement, QStyleOptionTabWidgetFrame>(hash, option, widget)) {
-            return ev->contentsSize(contentsSize).toSize();
-        }
-        break;
-    case QStyle::CT_DialogButtons:
-    case QStyle::CT_MdiControls:
-    case QStyle::CT_CustomBase:
-        break;
+    auto cached = ElementCache::element<QStyle::ContentsType,
+                                        QStyle::CT_PushButton,
+                                        QStyle::CT_CheckBox,
+                                        QStyle::CT_RadioButton,
+                                        QStyle::CT_ToolButton,
+                                        QStyle::CT_ComboBox,
+                                        QStyle::CT_Splitter,
+                                        QStyle::CT_ProgressBar,
+                                        QStyle::CT_MenuItem,
+                                        QStyle::CT_MenuBarItem,
+                                        QStyle::CT_MenuBar,
+                                        QStyle::CT_Menu,
+                                        QStyle::CT_TabBarTab,
+                                        QStyle::CT_Slider,
+                                        QStyle::CT_ScrollBar,
+                                        QStyle::CT_LineEdit,
+                                        QStyle::CT_SpinBox,
+                                        QStyle::CT_SizeGrip,
+                                        QStyle::CT_TabWidget,
+                                        QStyle::CT_HeaderSection,
+                                        QStyle::CT_GroupBox,
+                                        QStyle::CT_ItemViewItem>(contentsType, hash, this, option, widget);
+    if (cached) {
+        return cached->contentsSize(contentsSize).toSize();
+    } else {
+        // Unhandled
+        // QStyle::CT_DialogButtons:
+        // QStyle::CT_MdiControls:
+        // QStyle::CT_CustomBase:
+        return QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
     }
-    return QCommonStyle::sizeFromContents(contentsType, option, contentsSize, widget);
 }
 
 QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption *option, const QWidget *widget) const

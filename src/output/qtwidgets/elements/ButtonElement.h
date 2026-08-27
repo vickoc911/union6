@@ -29,6 +29,7 @@ namespace detail
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameButtonBevel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelButtonCommand> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelButtonBevel> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
+    template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_PushButton> : public TypeHelper<ButtonElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }

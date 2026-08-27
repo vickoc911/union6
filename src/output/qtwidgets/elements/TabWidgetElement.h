@@ -18,6 +18,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameTabWidget> : public TypeHelper<TabWidgetElement, QStyleOptionTabWidgetFrame>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_TabWidget> : public TypeHelper<TabWidgetElement, QStyleOptionTabWidgetFrame>{};
 /* clang-format on */
 }
 }

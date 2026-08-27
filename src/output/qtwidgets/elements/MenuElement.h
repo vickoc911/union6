@@ -19,6 +19,7 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelMenu> : public TypeHelper<MenuElement, QStyleOption>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_FrameMenu> : public TypeHelper<MenuElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_Menu> : public TypeHelper<MenuElement, QStyleOption>{};
 /* clang-format on */
 }
 }

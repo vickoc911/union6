@@ -26,6 +26,7 @@ namespace detail
     template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_HeaderLabel> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
     template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_HeaderEmptyArea> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
     template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorHeaderArrow> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
+    template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_HeaderSection> : public TypeHelper<HeaderElement, QStyleOptionHeader>{};
 
 /* clang-format on */
 }

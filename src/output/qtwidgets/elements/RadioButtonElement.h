@@ -24,6 +24,7 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_RadioButton> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_RadioButtonLabel> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorRadioButton> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_RadioButton> : public TypeHelper<RadioButtonElement, QStyleOptionButton>{};
 /* clang-format on */
 }
 }

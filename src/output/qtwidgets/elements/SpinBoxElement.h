@@ -23,6 +23,7 @@ namespace detail
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinMinus> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinUp> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorSpinDown> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_SpinBox> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
 /* clang-format on */
 }
 }

@@ -27,7 +27,7 @@ namespace detail
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarSlider> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarFirst> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ScrollBarLast> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
-
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_ScrollBar> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
 /* clang-format on */
 }
 }

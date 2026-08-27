@@ -19,6 +19,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_Slider> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_Slider> : public TypeHelper<SliderElement, QStyleOptionSlider>{};
 /* clang-format on */
 }
 }

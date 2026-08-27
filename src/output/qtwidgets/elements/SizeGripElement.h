@@ -18,6 +18,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_SizeGrip> : public TypeHelper<SizeGripElement, QStyleOptionSizeGrip>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_SizeGrip> : public TypeHelper<SizeGripElement, QStyleOptionSizeGrip>{};
 /* clang-format on */
 }
 }

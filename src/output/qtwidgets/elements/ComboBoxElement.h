@@ -20,6 +20,7 @@ namespace detail
 /* clang-format off */
         template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_ComboBox> : public TypeHelper<ComboBoxElement, QStyleOptionComboBox>{};
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ComboBoxLabel> : public TypeHelper<ComboBoxElement, QStyleOptionComboBox>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_ComboBox> : public TypeHelper<ComboBoxElement, QStyleOptionComboBox>{};
 /* clang-format on */
 }
 }

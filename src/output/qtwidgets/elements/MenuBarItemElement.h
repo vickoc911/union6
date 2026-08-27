@@ -20,6 +20,7 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_MenuBarItem> : public TypeHelper<MenuBarItemElement, QStyleOptionMenuItem>{};
+        template<> struct EnumToType<QStyle::ContentsType, QStyle::CT_MenuBarItem> : public TypeHelper<MenuBarItemElement, QStyleOptionMenuItem>{};
 /* clang-format on */
 }
 }
