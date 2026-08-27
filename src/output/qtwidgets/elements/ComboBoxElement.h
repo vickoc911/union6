@@ -9,7 +9,19 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class ComboBoxElement;
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_ComboBox> : public TypeHelper<ComboBoxElement, QStyleOptionComboBox>{};
+/* clang-format on */
+}
+}
 
 class ComboBoxElement : public AbstractElement
 {

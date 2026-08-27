@@ -9,7 +9,19 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class GroupBoxElement;
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_GroupBox> : public TypeHelper<GroupBoxElement, QStyleOptionGroupBox>{};
+/* clang-format on */
+}
+}
 
 class GroupBoxElement : public AbstractElement
 {

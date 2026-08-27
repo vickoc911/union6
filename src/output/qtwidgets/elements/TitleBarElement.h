@@ -8,8 +8,21 @@
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
+#include <qstyleoption.h>
+
+#include "ElementCache.h"
 
 class UnionStyle;
+class TitleBarElement;
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_TitleBar> : public TypeHelper<TitleBarElement, QStyleOptionTitleBar>{};
+/* clang-format on */
+}
+}
 
 class TitleBarElement : public AbstractElement
 {

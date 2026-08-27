@@ -9,7 +9,20 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include <ElementCache.h>
+
 class UnionStyle;
+class ToolButtonElement;
+
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_ToolButton> : public TypeHelper<ToolButtonElement, QStyleOptionToolButton>{};
+/* clang-format on */
+}
+}
 
 class ToolButtonElement : public AbstractElement
 {

@@ -8,8 +8,21 @@
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
+#include <qstyleoption.h>
+
+#include "ElementCache.h"
 
 class UnionStyle;
+class ScrollBarElement;
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_ScrollBar> : public TypeHelper<ScrollBarElement, QStyleOptionSlider>{};
+/* clang-format on */
+}
+}
 
 class ScrollBarElement : public AbstractElement
 {

@@ -662,48 +662,18 @@ QRect UnionStyle::subElementRect(QStyle::SubElement element, const QStyleOption 
 QRect UnionStyle::subControlRect(ComplexControl complexControl, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const
 {
     const auto hash = qHashMulti(QHashSeed::globalSeed(), complexControl, option, subControl, widget);
-    switch (complexControl) {
-    case QStyle::CC_ToolButton:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_ComboBox:
-        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_SpinBox:
-        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_ScrollBar:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_Slider:
-        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_GroupBox:
-        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_TitleBar:
-        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            return ev->subControlRect(subControl).toRect();
-        }
-        break;
-    case QStyle::CC_Dial:
-    case QStyle::CC_MdiControls:
-    case QStyle::CC_CustomBase:
-        break;
-    }
 
+    auto cached = ElementCache::element<QStyle::ComplexControl,
+                                        QStyle::CC_ToolButton,
+                                        QStyle::CC_SpinBox,
+                                        QStyle::CC_ComboBox,
+                                        QStyle::CC_ScrollBar,
+                                        QStyle::CC_Slider,
+                                        QStyle::CC_TitleBar,
+                                        QStyle::CC_GroupBox>(complexControl, hash, this, option, widget);
+    if (cached) {
+        return cached->subControlRect(subControl).toRect();
+    }
     // TODO: Leave Dial and MDIControls to QCommonStyle for now
     return QCommonStyle::subControlRect(complexControl, option, subControl, widget);
 }

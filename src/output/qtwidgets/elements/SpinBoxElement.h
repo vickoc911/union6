@@ -9,7 +9,19 @@
 #include <QObject>
 #include <QStyleOption>
 
+#include "ElementCache.h"
+
 class UnionStyle;
+class SpinBoxElement;
+namespace ElementCache
+{
+namespace detail
+{
+/* clang-format off */
+        template<> struct EnumToType<QStyle::ComplexControl, QStyle::CC_SpinBox> : public TypeHelper<SpinBoxElement, QStyleOptionSpinBox>{};
+/* clang-format on */
+}
+}
 
 class SpinBoxElement : public AbstractElement
 {
