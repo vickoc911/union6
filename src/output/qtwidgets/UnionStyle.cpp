@@ -245,7 +245,6 @@ void UnionStyle::drawControl(QStyle::ControlElement controlElement, const QStyle
     QCommonStyle::drawControl(controlElement, option, painter, widget);
 }
 
-// Complex controls are bit annoying. We may need to manually handle some things to make sure they work correctly
 void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const
 {
     // Make lines not look completely terrible on fractional scales
@@ -253,50 +252,21 @@ void UnionStyle::drawComplexControl(ComplexControl control, const QStyleOptionCo
     const auto hash = qHashMulti(QHashSeed::globalSeed(), control, option, widget);
     auto drawEnums = DrawEnums();
     drawEnums.ComplexControl = control;
-    switch (control) {
-    case QStyle::CC_ToolButton:
-        if (auto ev = cachedElement<ToolButtonElement, QStyleOptionToolButton>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CC_GroupBox:
-        if (auto ev = cachedElement<GroupBoxElement, QStyleOptionGroupBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CC_ComboBox:
-        if (auto ev = cachedElement<ComboBoxElement, QStyleOptionComboBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CC_SpinBox:
-        if (auto ev = cachedElement<SpinBoxElement, QStyleOptionSpinBox>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CC_ScrollBar:
-        if (auto ev = cachedElement<ScrollBarElement, QStyleOptionSlider>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CC_Slider:
-        if (auto ev = cachedElement<SliderElement, QStyleOptionSlider>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    case QStyle::CC_TitleBar:
-        if (auto ev = cachedElement<TitleBarElement, QStyleOptionTitleBar>(hash, option, widget)) {
-            ev->draw(painter, drawEnums);
-        }
-        return;
-    // Rely on QCommonStyle
-    case QStyle::CC_Dial: // TODO: need to make the dial from scratch to get this to work :(
-    case QStyle::CC_MdiControls:
-    case QStyle::CC_CustomBase:
-        break;
-    }
 
-    QCommonStyle::drawComplexControl(control, option, painter, widget);
+    auto cached = ElementCache::element<QStyle::ComplexControl,
+                                        QStyle::CC_ToolButton,
+                                        QStyle::CC_SpinBox,
+                                        QStyle::CC_ComboBox,
+                                        QStyle::CC_ScrollBar,
+                                        QStyle::CC_Slider,
+                                        QStyle::CC_TitleBar,
+                                        QStyle::CC_GroupBox>(control, hash, this, option, widget);
+    if (cached) {
+        cached->draw(painter, drawEnums);
+    } else {
+        // TODO: Dial, MDI controls
+        QCommonStyle::drawComplexControl(control, option, painter, widget);
+    }
 }
 
 QStyle::SubControl
