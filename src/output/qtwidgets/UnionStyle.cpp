@@ -636,7 +636,7 @@ void UnionStyle::polish(QWidget *widget)
         || qobject_cast<QComboBox *>(widget) || qobject_cast<QDial *>(widget) || qobject_cast<QLineEdit *>(widget) || qobject_cast<QPushButton *>(widget)
         || qobject_cast<QRadioButton *>(widget) || qobject_cast<QScrollBar *>(widget) || qobject_cast<QSlider *>(widget)
         || qobject_cast<QSplitterHandle *>(widget) || qobject_cast<QTabBar *>(widget) || qobject_cast<QTextEdit *>(widget)
-        || qobject_cast<QToolButton *>(widget) || widget->inherits("KTextEditor::View")) {
+        || qobject_cast<QToolButton *>(widget) || qobject_cast<QMenu *>(widget) || widget->inherits("KTextEditor::View")) {
         widget->setAttribute(Qt::WA_Hover);
     }
     if (auto itemView = qobject_cast<QAbstractItemView *>(widget)) {
