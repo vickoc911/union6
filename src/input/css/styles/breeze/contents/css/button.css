@@ -118,7 +118,6 @@ toolbutton.raised
         {
             border-left: 1px solid var(--button-active-border-highlight-color);
         }
-        icon-size: var(--icon-size-small);
     }
 
     &[display="icon-only"].with-menu > indicator {
