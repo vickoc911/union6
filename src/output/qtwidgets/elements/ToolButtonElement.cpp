@@ -2,12 +2,18 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ToolButtonElement.h"
+#include "BackgroundDrawing.h"
+#include "PropertiesTypes.h"
 #include "SharedNames.h"
+#include "StyleUtils.h"
 #include "UnionStyle.h"
+#include "elements/MenuBarElement.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
 #include <QStyle>
+#include <qnamespace.h>
+#include <qstyle.h>
 
 using namespace Qt::StringLiterals;
 
@@ -61,17 +67,8 @@ void ToolButtonElement::updateSubElementList()
 
 QSizeF ToolButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
-    QSizeF size = subControlRect(QStyle::SC_ToolButton).size().boundedTo(contentsSizeFromStyle);
-    size = applyPaddingToSize(size);
-
-    if (m_indicatorProperties && m_indicatorProperties->layout()) {
-        if (m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
-            size.rwidth() += m_indicatorProperties->layout()->width().value_or(0);
-        } else {
-            size.rheight() += m_indicatorProperties->layout()->height().value_or(0);
-        }
-    }
-
+    QSizeF size = applyPaddingToSize(contentsSizeFromStyle);
+    size = size.expandedTo(menuButtonRect().size());
     return size;
 }
 
@@ -87,22 +84,17 @@ QRectF ToolButtonElement::subControlRect(QStyle::SubControl subControl) const
         QRectF rect = m_toolButtonOption->rect;
         QRectF unifiedRect;
         for (const auto &m : m_layoutMap) {
-            unifiedRect = unifiedRect.united(m.rect.toRect());
+            if (m.elementName == ElementString::Indicator) {
+                unifiedRect = unifiedRect.united(menuButtonRect());
+            } else {
+                unifiedRect = unifiedRect.united(m.rect.toRect());
+            }
         }
         rect = unifiedRect;
         return rect;
     }
     if (subControl == QStyle::SC_ToolButtonMenu) {
-        QRectF menuRect = m_layoutMap[ElementString::Indicator].rect;
-        // Set the click area to full height/width, so that its easier to click
-        if (m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextUnderIcon) {
-            menuRect.setTop(backgroundRect.top());
-            menuRect.setBottom(backgroundRect.bottom());
-        } else {
-            menuRect.setLeft(backgroundRect.left());
-            menuRect.setRight(backgroundRect.right());
-        }
-        return menuRect;
+        return menuButtonRect();
     }
     return QRect();
 }
@@ -178,6 +170,15 @@ void ToolButtonElement::drawIcon(QPainter *painter) const
     }
 }
 
+void ToolButtonElement::drawIndicator(QPainter *painter) const
+{
+    auto rect = subControlRect(QStyle::SC_ToolButtonMenu);
+    auto indicatorRect = m_layoutMap[ElementString::Indicator].rect;
+    indicatorRect.moveCenter(rect.center());
+    drawBackgroundRectangle(painter, rect, m_indicatorProperties);
+    drawIconAtRect(painter, m_indicator, indicatorRect);
+}
+
 QVariantMap ToolButtonElement::elementAttributes() const
 {
     QVariantMap map;
@@ -213,4 +214,62 @@ QStringList ToolButtonElement::elementHints() const
         hints.append(u"raised"_s);
     }
     return hints;
+}
+
+QRectF ToolButtonElement::menuButtonRect() const
+{
+    if (!m_hasIndicator) {
+        return QRectF();
+    }
+
+    QRectF menuRect = m_layoutMap[ElementString::Indicator].rect;
+    QRectF buttonRect = m_toolButtonOption->rect;
+    QRectF alignmentRect = m_layoutMap[ElementString::Icon].rect.united(m_layoutMap[ElementString::Text].rect);
+
+    if (m_indicatorProperties && m_indicatorProperties->layout() && m_indicatorProperties->layout()->alignment()) {
+        auto alignH = m_indicatorProperties->layout()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
+        auto alignV = m_indicatorProperties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
+
+        switch (alignH) {
+        case Union::Properties::Alignment::Start:
+            menuRect.moveLeft(buttonRect.left());
+            break;
+        case Union::Properties::Alignment::Center:
+            menuRect.moveCenter(QPoint(buttonRect.center().x(), menuRect.center().y()));
+            break;
+        case Union::Properties::Alignment::End:
+        case Union::Properties::Alignment::Unspecified:
+        case Union::Properties::Alignment::StackCenter:
+            menuRect.moveRight(buttonRect.right());
+            break;
+        case Union::Properties::Alignment::StackFill:
+        case Union::Properties::Alignment::Fill:
+            menuRect.setRight(buttonRect.right());
+            menuRect.setLeft(buttonRect.left());
+            break;
+        }
+
+        switch (alignV) {
+        case Union::Properties::Alignment::Start:
+            menuRect.moveTop(m_toolButtonOption->rect.top());
+            menuRect.setBottom(alignmentRect.top());
+            break;
+        case Union::Properties::Alignment::Center:
+        case Union::Properties::Alignment::Unspecified:
+        case Union::Properties::Alignment::StackCenter:
+            menuRect.moveCenter(QPoint(menuRect.center().x(), m_toolButtonOption->rect.center().y()));
+            break;
+        case Union::Properties::Alignment::End:
+            menuRect.moveBottom(m_toolButtonOption->rect.bottom());
+            menuRect.setTop(alignmentRect.bottom());
+            break;
+        case Union::Properties::Alignment::Fill:
+        case Union::Properties::Alignment::StackFill:
+            menuRect.setTop(m_toolButtonOption->rect.top());
+            menuRect.setBottom(m_toolButtonOption->rect.bottom());
+            break;
+        }
+    }
+
+    return menuRect;
 }

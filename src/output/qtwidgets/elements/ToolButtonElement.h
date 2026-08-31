@@ -48,6 +48,9 @@ private:
     void updateSubElementList() override;
     void drawText(QPainter *painter) const override;
     void drawIcon(QPainter *painter) const override;
+    void drawIndicator(QPainter *painter) const override;
+    QRectF menuButtonRect() const;
+
     const QStyleOptionToolButton *m_toolButtonOption = nullptr;
     bool m_hasIndicator;
     bool m_hasArrows;
