@@ -402,13 +402,9 @@ QStringList frameHints(const QStyleOptionFrame *frameOption)
             hints.append(u"flat"_s);
         }
     }
-    case QFrame::Box:
-    case QFrame::Panel:
-    case QFrame::WinPanel:
-    case QFrame::HLine:
-    case QFrame::VLine:
-    case QFrame::StyledPanel:
+    default:
         break;
     }
+
     return hints;
 }

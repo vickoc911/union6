@@ -40,6 +40,7 @@ public:
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
+    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
     void updateSubElementList() override;
     const QStyleOptionFrame *m_frameOption = nullptr;
