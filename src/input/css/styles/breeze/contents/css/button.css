@@ -106,6 +106,15 @@ toolbutton.raised
 
     &.with-menu > indicator {
         visibility: visible;
+        layout-alignment: content end center 0;
+        width: var(--icon-size-small);
+        height: var(--icon-size-small);
+        icon-name: "arrow-down";
+        icon-color: var(--button-active-text-color);
+    }
+
+    &.with-menu-button > indicator {
+        visibility: visible;
         width: var(--icon-size-small);
         height: var(--icon-size-small);
         /* half of small-spacing */
@@ -114,6 +123,7 @@ toolbutton.raised
         layout-alignment: content end fill 0;
         icon-name: "arrow-down";
         icon-color: var(--button-active-text-color);
+        border-left: var(--button-border);
         &:hovered
         {
             border-left: 1px solid var(--button-active-border-highlight-color);
@@ -193,6 +203,19 @@ roundbutton.flat
     &:disabled {
         border: none;
         background: none;
+    }
+
+    &.with-menu-button > indicator {
+        visibility: visible;
+        width: var(--icon-size-small);
+        height: var(--icon-size-small);
+        /* half of small-spacing */
+        padding-left: 2px;
+        padding-right: 2px;
+        layout-alignment: content end fill 0;
+        icon-name: "arrow-down";
+        icon-color: var(--button-active-text-color);
+        border-left: none;
     }
 }
 
