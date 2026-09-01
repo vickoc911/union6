@@ -177,6 +177,17 @@ framewindow
     border-radius: var(--corner-radius);
 }
 
+frame {
+    &[shape="vertical-line"],
+    &[shape="horizontal-line"] {
+        border-radius: 0px;
+        border: none;
+        background-color: var(--window-border-color);
+        padding: 0px;
+        inset: 1px;
+    }
+}
+
 groupbox {
     padding: var(--small-spacing);
     border: 1px solid var(--window-border-color);
