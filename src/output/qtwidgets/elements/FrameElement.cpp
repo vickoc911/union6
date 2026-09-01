@@ -55,6 +55,30 @@ void FrameElement::updateSubElementList()
     m_subElementList.append(ElementString::Frame);
 }
 
+QVariantMap FrameElement::elementAttributes() const
+{
+    QVariantMap map;
+    switch (m_frameOption->frameShape) {
+    case QFrame::Box:
+        map[u"shape"_s] = u"box"_s;
+        break;
+    case QFrame::Panel:
+    case QFrame::WinPanel:
+        map[u"shape"_s] = u"panel"_s;
+        break;
+    case QFrame::HLine:
+        map[u"shape"_s] = u"horizontal-line"_s;
+        break;
+    case QFrame::VLine:
+        map[u"shape"_s] = u"vertical-line"_s;
+        break;
+    default:
+        break;
+    }
+
+    return map;
+}
+
 QStringList FrameElement::elementHints() const
 {
     return frameHints(m_frameOption);
