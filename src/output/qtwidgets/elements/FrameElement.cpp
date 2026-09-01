@@ -46,6 +46,9 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
     case QStyle::PE_Frame:
         drawFrame(painter);
         break;
+    case QStyle::PE_FrameLineEdit:
+        drawFrame(painter);
+        break;
     }
 }
 
@@ -53,6 +56,33 @@ void FrameElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::Frame);
+}
+
+QVariantMap FrameElement::elementAttributes() const
+{
+    QVariantMap map;
+    switch (m_frameOption->frameShape) {
+    case QFrame::NoFrame:
+        map[u"shape"_s] = u"no-frame"_s;
+        break;
+    case QFrame::Box:
+        map[u"shape"_s] = u"box"_s;
+        break;
+    case QFrame::Panel:
+    case QFrame::WinPanel:
+        map[u"shape"_s] = u"panel"_s;
+        break;
+    case QFrame::HLine:
+        map[u"shape"_s] = u"horizontal-line"_s;
+        break;
+    case QFrame::VLine:
+        map[u"shape"_s] = u"vertical-line"_s;
+        break;
+    default:
+        break;
+    }
+
+    return map;
 }
 
 QStringList FrameElement::elementHints() const
