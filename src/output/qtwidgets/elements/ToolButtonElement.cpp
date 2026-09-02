@@ -203,8 +203,16 @@ QStringList ToolButtonElement::elementHints() const
     if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::None)) {
         return hints;
     }
-    if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::Menu)) {
+
+    const bool menuButton(m_toolButtonOption->features & QStyleOptionToolButton::HasMenu
+                          && m_toolButtonOption->features & QStyleOptionToolButton::MenuButtonPopup);
+    const bool inlineArrow(m_toolButtonOption->features & QStyleOptionToolButton::HasMenu && !menuButton);
+
+    if (menuButton) {
         hints.append(u"with-menu-button"_s);
+    }
+    if (inlineArrow) {
+        hints.append(u"with-menu"_s);
     }
     if (!m_toolButtonOption->state.testFlag(QStyle::State_AutoRaise)) {
         hints.append(u"raised"_s);
