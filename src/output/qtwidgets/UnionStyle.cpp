@@ -648,6 +648,9 @@ void UnionStyle::polish(QWidget *widget)
         // remove opaque painting for scrollbars
         widget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     }
+    if (qobject_cast<QMenu *>(widget)) {
+        widget->setAttribute(Qt::WA_TranslucentBackground);
+    }
     QCommonStyle::polish(widget);
 }
 
