@@ -130,12 +130,12 @@ headerviewdelegate
 
     &.sort-ascending
     {
-        icon-name: "arrow-up-symbolic";
+        icon-name: "arrow-down-symbolic";
     }
 
     &.sort-descending
     {
-        icon-name: "arrow-down-symbolic";
+        icon-name: "arrow-up-symbolic";
     }
 }
 
