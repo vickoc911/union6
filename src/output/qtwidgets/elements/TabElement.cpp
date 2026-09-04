@@ -48,19 +48,44 @@ void TabElement::draw(QPainter *painter, DrawEnums enums) const
         return;
     }
 
+    // Rotate the painter if needed, remember to restore after
+    auto rotatePainter = [this](QPainter *painter) {
+        painter->save();
+        QRect tabRect = m_tabOption->rect;
+        if (m_isVertical) {
+            int newX, newY, newRot;
+            if (m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::TriangularEast) {
+                newX = tabRect.width() + tabRect.x();
+                newY = tabRect.y();
+                newRot = 90;
+            } else {
+                newX = tabRect.x();
+                newY = tabRect.y() + tabRect.height();
+                newRot = -90;
+            }
+            QTransform m = QTransform::fromTranslate(newX, newY);
+            m.rotate(newRot);
+            painter->setTransform(m, true);
+        }
+    };
+
     switch (enums.ControlElement) {
     case QStyle::CE_TabBarTab:
         drawBackground(painter);
+        rotatePainter(painter);
         drawIcon(painter);
         drawText(painter);
         drawIndicator(painter);
+        painter->restore();
         break;
     case QStyle::CE_TabBarTabShape:
         drawBackground(painter);
         break;
     case QStyle::CE_TabBarTabLabel:
+        rotatePainter(painter);
         drawIcon(painter);
         drawText(painter);
+        painter->restore();
         break;
     }
 }
@@ -101,6 +126,60 @@ void TabElement::layout()
     }
 
     m_layoutMap = layoutMap(m_backgroundElementList, m_tabOption, m_subElementList);
+
+    // Layout tabs for vertical painting
+
+    QRect tabRect = m_tabOption->rect;
+    // Reset the coordinates for vertical tabs
+    if (m_isVertical) {
+        tabRect.setRect(0, 0, tabRect.height(), tabRect.width());
+    }
+
+    qreal hPadding = hSpace() / 2.0;
+    qreal vPadding = vSpace() / 2.0;
+    tabRect.adjust(hPadding, vPadding, hPadding, vPadding);
+
+    if (!m_tabOption->leftButtonSize.isEmpty()) {
+        tabRect.setLeft(tabRect.left() + spacing() + (m_isVertical ? m_tabOption->leftButtonSize.height() : m_tabOption->leftButtonSize.width()));
+    }
+    if (!m_tabOption->rightButtonSize.isEmpty()) {
+        tabRect.setRight(tabRect.right() - spacing() - (m_isVertical ? m_tabOption->rightButtonSize.height() : m_tabOption->rightButtonSize.width()));
+    }
+
+    if (hasIcon()) {
+        QSizeF iconSize = m_layoutMap[ElementString::Icon].rect.size();
+        QSizeF tabIconSize = m_tabOption->icon
+                                 .actualSize(iconSize.toSize(),
+                                             (m_tabOption->state & QStyle::State_Enabled) ? QIcon::Normal : QIcon::Disabled,
+                                             (m_tabOption->state & QStyle::State_Selected) ? QIcon::On : QIcon::Off)
+                                 .toSizeF();
+        // High-dpi icons do not need adjustment; make sure tabIconSize is not larger than iconSize
+        tabIconSize = QSize(qMin(tabIconSize.width(), iconSize.width()), qMin(tabIconSize.height(), iconSize.height()));
+
+        const int offsetX = (iconSize.width() - tabIconSize.width()) / 2.0;
+        if (m_tabOption->text.isEmpty() && m_tabOption->documentMode) {
+            m_layoutMap[ElementString::Icon].rect = QRectF(tabRect.center().x() - tabIconSize.height() / 2.0,
+                                                           tabRect.center().y() - tabIconSize.height() / 2.0,
+                                                           tabIconSize.width(),
+                                                           tabIconSize.height());
+        } else {
+            m_layoutMap[ElementString::Icon].rect =
+                QRectF(tabRect.left() + offsetX, tabRect.center().y() - tabIconSize.height() / 2.0, tabIconSize.width(), tabIconSize.height());
+        }
+        if (!m_isVertical) {
+            m_layoutMap[ElementString::Icon].rect =
+                QStyle::visualRect(m_tabOption->direction, m_tabOption->rect, m_layoutMap[ElementString::Icon].rect.toRect());
+        }
+        tabRect.setLeft(tabRect.left() + tabIconSize.width() + spacing());
+    }
+
+    if (hasText()) {
+        if (!m_isVertical) {
+            tabRect = QStyle::visualRect(m_styleOption->direction, m_styleOption->rect, tabRect);
+        }
+        m_layoutMap[ElementString::Text].rect = tabRect;
+    }
+
     m_isValid = true;
 }
 
