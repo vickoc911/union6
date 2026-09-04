@@ -14,12 +14,26 @@
 
 class QStyleOption;
 
+enum class BucketType {
+    Start,
+    Center,
+    End,
+    Fill
+};
+
 struct LayoutItem {
     QString elementName;
     int order;
     Union::Properties::Alignment horizontalAlignment;
     Union::Properties::Alignment verticalAlignment;
     QRectF rect;
+};
+
+struct LayoutBucket {
+    BucketType type;
+    QRectF rect;
+    qreal spacing = 0;
+    QList<LayoutItem> items;
 };
 
 const char property_union_member_list[] = "_union_member_list";
