@@ -301,62 +301,49 @@ void AbstractElement::drawTextAtRect(QPainter *painter, const QString &text, con
 
 QMarginsF AbstractElement::padding() const
 {
-    if (m_backgroundProperties && m_backgroundProperties->layout() && m_backgroundProperties->layout()->padding()) {
-        return m_backgroundProperties->layout()->padding()->toMargins();
-    }
-    return QMarginsF();
+    return safePropertyLookup(m_backgroundProperties, QMarginsF(), &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
 }
 
 QMarginsF AbstractElement::borderSize() const
 {
-    if (m_backgroundProperties && m_backgroundProperties->border()) {
-        return m_backgroundProperties->border()->sizes();
-    }
-    return QMarginsF();
+    return safePropertyLookup(m_backgroundProperties, QMarginsF(), &StylePropertyGroup::border, &BorderPropertyGroup::sizes);
 }
 
 qreal AbstractElement::height() const
 {
-    if (m_backgroundProperties && m_backgroundProperties->layout()) {
-        return m_backgroundProperties->layout()->height().value_or(1);
+    auto height = 0.0;
+    if (m_styleOption) {
+        height = m_styleOption->rect.height();
     }
-    return m_styleOption->rect.height();
+    return safePropertyLookup(m_backgroundProperties, height, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
 }
 
 qreal AbstractElement::width() const
 {
-    if (m_backgroundProperties && m_backgroundProperties->layout()) {
-        return m_backgroundProperties->layout()->width().value_or(1);
+    auto width = 0.0;
+    if (m_styleOption) {
+        width = m_styleOption->rect.width();
     }
-    return m_styleOption->rect.width();
+    return safePropertyLookup(m_backgroundProperties, width, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
 }
 
 qreal AbstractElement::spacing() const
 {
-    if (m_backgroundProperties && m_backgroundProperties->layout()) {
-        return m_backgroundProperties->layout()->spacing().value_or(1);
-    }
-    return 0;
+    return safePropertyLookup(m_backgroundProperties, 1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
 }
 
 QSizeF AbstractElement::indicatorSize() const
 {
-    if (m_indicatorProperties && m_indicatorProperties->layout()) {
-        auto width = m_indicatorProperties->layout()->width().value_or(0);
-        auto height = m_indicatorProperties->layout()->height().value_or(0);
-        return QSizeF(width, height);
-    }
-    return QSizeF();
+    qreal width = safePropertyLookup(m_indicatorProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+    qreal height = safePropertyLookup(m_indicatorProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
+    return QSizeF(width, height);
 }
 
 QSizeF AbstractElement::iconSize() const
 {
-    if (m_backgroundProperties && m_backgroundProperties->icon()) {
-        auto width = m_backgroundProperties->icon()->width().value_or(1);
-        auto height = m_backgroundProperties->icon()->height().value_or(1);
-        return QSizeF(width, height);
-    }
-    return QSizeF();
+    qreal width = safePropertyLookup(m_backgroundProperties, 0.0, &StylePropertyGroup::icon, &IconPropertyGroup::width);
+    qreal height = safePropertyLookup(m_backgroundProperties, 0.0, &StylePropertyGroup::icon, &IconPropertyGroup::height);
+    return QSizeF(width, height);
 }
 
 qreal AbstractElement::averagePadding() const
