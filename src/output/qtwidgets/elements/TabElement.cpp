@@ -140,7 +140,7 @@ QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     const bool rightButton = !m_tabOption->leftButtonSize.isEmpty();
     const bool text = hasText();
     const bool icon = hasIcon();
-    const qreal offset = spacing();
+    const qreal offset = m_isValid ? spacing() : 0;
 
     // calculate width increment for horizontal tabs
     int widthIncrement = 0;
