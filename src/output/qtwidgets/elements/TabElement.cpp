@@ -93,9 +93,6 @@ void TabElement::draw(QPainter *painter, DrawEnums enums) const
 void TabElement::updateSubElementList()
 {
     m_subElementList.clear();
-    if (m_isClosable) {
-        m_subElementList.append(ElementString::CloseButton);
-    }
     if (!m_tabOption->icon.isNull()) {
         m_subElementList.append(ElementString::Icon);
     }
