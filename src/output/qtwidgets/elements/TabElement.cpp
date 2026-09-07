@@ -113,6 +113,7 @@ void TabElement::layout()
 
     m_backgroundElementList = prepareElements(m_tabOption, m_widget, {ElementString::Tab});
     if (!m_backgroundElementList.isEmpty()) {
+        m_backgroundProperties = queryProperties(m_backgroundElementList);
         QRect tabRect = m_tabOption->rect;
         // Reset the coordinates for vertical tabs
         if (m_isVertical) {
@@ -129,7 +130,6 @@ void TabElement::layout()
 
         auto subopt = *m_tabOption;
         subopt.rect = tabRect;
-        m_backgroundProperties = queryProperties(m_backgroundElementList);
         m_layoutMap = layoutMap(m_backgroundElementList, &subopt, m_subElementList);
         m_isValid = true;
     }
@@ -161,16 +161,15 @@ QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     }
 
     // add margins
-    QSizeF size(applyPaddingToSize(contentsSizeFromStyle));
+    QSizeF size(contentsSizeFromStyle);
 
     if (m_isVertical) {
         size.rheight() += widthIncrement;
     } else {
         size.rwidth() += widthIncrement;
     }
-    size = size.expandedTo(QSize(width(), height()));
 
-    return size;
+    return applyPaddingToSize(size);
 }
 
 QRectF TabElement::subElementRect(QStyle::SubElement element) const

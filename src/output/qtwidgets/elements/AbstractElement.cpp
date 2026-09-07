@@ -329,7 +329,7 @@ qreal AbstractElement::width() const
 
 qreal AbstractElement::spacing() const
 {
-    return safePropertyLookup(m_backgroundProperties, 1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
+    return safePropertyLookup(m_backgroundProperties, std::optional<double>(), &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing).value_or(1.0);
 }
 
 QSizeF AbstractElement::indicatorSize() const
