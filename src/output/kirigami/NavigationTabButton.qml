@@ -65,9 +65,12 @@ KT.NavigationTabButton {
     topInset: Union.Style.properties.layout.inset.top
     bottomInset: Union.Style.properties.layout.inset.bottom
 
-    font: Union.Style.properties.text.font
+    font: Union.Style.properties.text.font.qFont
 
     spacing: Union.Style.properties.layout.spacing
+
+    opacity: Union.Style.properties.display.opacity
+
     icon {
         color: Union.Style.properties.icon.color
         width: Union.Style.properties.icon.width
