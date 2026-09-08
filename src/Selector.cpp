@@ -57,6 +57,37 @@ void appendFromStream<SelectorType::Type>(QDataStream &stream, Union::SelectorLi
     destination.append(Selector::create<SelectorType::Type>(type));
 }
 
+/***** SelectorType::SubElement *****/
+template<>
+UNION_EXPORT int SelectorPrivateModel<SelectorType::SubElement, Identifier>::weight() const
+{
+    return 1;
+}
+
+template<>
+UNION_EXPORT bool SelectorPrivateModel<SelectorType::SubElement, Identifier>::matches(Element *element) const
+{
+    if (data.isEmpty()) {
+        return false;
+    }
+
+    return QString::compare(element->subElement(), data, Qt::CaseSensitivity::CaseInsensitive) == 0;
+}
+
+template<>
+UNION_EXPORT QString SelectorPrivateModel<SelectorType::SubElement, Identifier>::toString() const
+{
+    return u"SubElement(%1)"_s.arg(data);
+}
+
+template<>
+void appendFromStream<SelectorType::SubElement>(QDataStream &stream, Union::SelectorList &destination)
+{
+    Identifier type;
+    stream >> type;
+    destination.append(Selector::create<SelectorType::SubElement>(type));
+}
+
 /***** SelectorType::Id *****/
 template<>
 UNION_EXPORT int SelectorPrivateModel<SelectorType::Id, Identifier>::weight() const
@@ -283,7 +314,7 @@ UNION_EXPORT bool SelectorPrivateModel<SelectorType::ChildCombinator, Empty>::ma
 template<>
 UNION_EXPORT QString SelectorPrivateModel<SelectorType::ChildCombinator, Empty>::toString() const
 {
-    return u"Child"_s;
+    return u"ChildCombinator"_s;
 }
 
 /***** SelectorType::DescendantCombinator *****/
@@ -302,7 +333,26 @@ UNION_EXPORT bool SelectorPrivateModel<SelectorType::DescendantCombinator, Empty
 template<>
 UNION_EXPORT QString SelectorPrivateModel<SelectorType::DescendantCombinator, Empty>::toString() const
 {
-    return u"Descendant"_s;
+    return u"DescendantCombinator"_s;
+}
+
+/***** SelectorType::SubElementCombinator *****/
+template<>
+UNION_EXPORT int SelectorPrivateModel<SelectorType::SubElementCombinator, Empty>::weight() const
+{
+    return 0;
+}
+
+template<>
+UNION_EXPORT bool SelectorPrivateModel<SelectorType::SubElementCombinator, Empty>::matches([[maybe_unused]] Element *element) const
+{
+    return false;
+}
+
+template<>
+UNION_EXPORT QString SelectorPrivateModel<SelectorType::SubElementCombinator, Empty>::toString() const
+{
+    return u"SubElementCombinator"_s;
 }
 }
 
@@ -396,6 +446,16 @@ bool SelectorList::matches(const QList<Element::Ptr> &elements) const
                     eitr++;
                 }
                 break;
+            case SelectorType::SubElementCombinator:
+                sitr++;
+                eitr++;
+                while (eitr != elements.rend()) {
+                    if ((*eitr)->subElement().isEmpty()) {
+                        break;
+                    }
+                    eitr++;
+                }
+                break;
             default:
                 return false;
             }
@@ -482,8 +542,10 @@ QDataStream &operator>>(QDataStream &stream, Union::SelectorList &selectors)
                        SelectorType::AttributeEquals,
                        SelectorType::AttributeSubstringMatch,
                        SelectorType::AnyElement,
+                       SelectorType::SubElement,
                        SelectorType::ChildCombinator,
-                       SelectorType::DescendantCombinator>(selectorType, stream, selectors);
+                       SelectorType::DescendantCombinator,
+                       SelectorType::SubElementCombinator>(selectorType, stream, selectors);
     }
 
     return stream;

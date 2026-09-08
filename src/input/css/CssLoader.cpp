@@ -310,6 +310,8 @@ Union::Selector CssLoader::createSelector(const cssparser::SelectorPart &part)
         return Union::Selector::create<Union::SelectorType::DescendantCombinator>();
     case cssparser::SelectorPart::Kind::ChildCombinator:
         return Union::Selector::create<Union::SelectorType::ChildCombinator>();
+    case cssparser::SelectorPart::Kind::PartCombinator:
+        return Union::Selector::create<Union::SelectorType::SubElementCombinator>();
     }
 
     return Union::Selector::create();
