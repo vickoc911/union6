@@ -561,10 +561,16 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
     mapBucketItems(endBucket, map);
 
     centerBucket.rect.moveCenter(availableSpace.center());
+
+    // Do not modify the size if end/center bucket do not even exist.
     // Remove the spacing to avoid resizing the item too much:
-    // the spacing is already accounted in mapBucketItems
-    centerBucket.rect.setLeft(startBucket.rect.right() - centerBucket.spacing);
-    centerBucket.rect.setRight(endBucket.rect.left() + centerBucket.spacing);
+    // the spacing is already accounted in mapBucketItems.
+    if (startBucket.items.count() > 0) {
+        centerBucket.rect.setLeft(startBucket.rect.right() - startBucket.spacing);
+    }
+    if (endBucket.items.count() > 0) {
+        centerBucket.rect.setRight(endBucket.rect.left() + endBucket.spacing);
+    }
     mapBucketItems(centerBucket, map);
 
     fillBucket.rect.setLeft(startBucket.rect.right());
