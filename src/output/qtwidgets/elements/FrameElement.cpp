@@ -4,6 +4,7 @@
 #include "FrameElement.h"
 #include "SharedNames.h"
 #include "UnionStyle.h"
+#include <QAbstractScrollArea>
 #include <QApplication>
 #include <QDebug>
 #include <QLineEdit>
@@ -11,6 +12,7 @@
 #include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Properties;
 
 FrameElement::FrameElement(const QStyleOptionFrame *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -27,6 +29,35 @@ void FrameElement::update()
 {
     updateSubElementList();
     layout();
+}
+
+void FrameElement::layout()
+{
+    // Backwards compatibility for borders, as applications used this custom Breeze property to declare
+    // which borders are applied to the widget.
+
+    // Background and content is separate
+    m_backgroundElementList = prepareElements(m_styleOption, m_widget);
+    if (!m_backgroundElementList.isEmpty()) {
+        m_backgroundProperties = queryProperties(m_backgroundElementList);
+        if (m_widget && m_backgroundProperties) {
+            const auto borders = m_widget->property("_breeze_borders_sides");
+            if (borders.isValid() && m_backgroundProperties->border()) {
+                auto borderSizes = borderSize();
+                const auto value = borders.value<Qt::Edges>();
+                m_backgroundProperties->border()->left()->setSize(value & Qt::LeftEdge ? borderSizes.left() : 0.0);
+                m_backgroundProperties->border()->top()->setSize(value & Qt::TopEdge ? borderSizes.top() : 0.0);
+                m_backgroundProperties->border()->bottom()->setSize(value & Qt::BottomEdge ? borderSizes.bottom() : 0.0);
+                m_backgroundProperties->border()->right()->setSize(value & Qt::RightEdge ? borderSizes.right() : 0.0);
+            }
+        }
+        m_layoutMap = layoutMap(m_backgroundElementList, m_styleOption, m_subElementList);
+    }
+    if (m_backgroundProperties) {
+        m_isValid = true;
+    } else {
+        m_isValid = false;
+    }
 }
 
 void FrameElement::draw(QPainter *painter, DrawEnums enums) const
@@ -119,7 +150,22 @@ QVariantMap FrameElement::elementAttributes() const
 
 QStringList FrameElement::elementHints() const
 {
-    return frameHints(m_frameOption);
+    auto hints = frameHints(m_frameOption);
+
+    // Backwards compatibility:
+    // Custom KDE style hint used by KDE widgets applications, for declaring sidebars
+    if (auto scrollArea = qobject_cast<const QAbstractScrollArea *>(m_widget)) {
+        if (scrollArea->inherits("KDEPrivate::KPageListView") || scrollArea->inherits("KDEPrivate::KPageTreeView")) {
+            const bool reverseLayout(m_styleOption->direction == Qt::RightToLeft);
+            if (reverseLayout) {
+                hints.append(u"panel-right"_s);
+            } else {
+                hints.append(u"panel-left"_s);
+            }
+        }
+    }
+
+    return hints;
 }
 
 qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
@@ -131,4 +177,35 @@ qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
         break;
     }
     return 0;
+}
+
+QRectF FrameElement::subElementRect(QStyle::SubElement element) const
+{
+    if (element == QStyle::SE_FrameContents && m_widget && m_frameOption && m_isValid) {
+        // Follow what breeze does here for these sizes
+        const auto borders = m_widget->property("_breeze_borders_sides");
+        if (borders.isValid() && borders.canConvert<Qt::Edges>()) {
+            const auto value = borders.value<Qt::Edges>();
+            const auto borderSizes = borderSize();
+            auto rect = m_frameOption->rect;
+
+            if ((value & Qt::LeftEdge && m_widget->layoutDirection() == Qt::LeftToRight)
+                || (value & Qt::RightEdge && m_widget->layoutDirection() == Qt::RightToLeft)) {
+                rect.adjust(borderSizes.left(), 0, 0, 0);
+            }
+            if ((value & Qt::RightEdge && m_widget->layoutDirection() == Qt::LeftToRight)
+                || (value & Qt::LeftEdge && m_widget->layoutDirection() == Qt::RightToLeft)) {
+                rect.adjust(0, 0, -borderSizes.right(), 0);
+            }
+            if (value & Qt::TopEdge) {
+                rect.adjust(0, borderSizes.top(), 0, 0);
+            }
+            if (value & Qt::BottomEdge) {
+                rect.adjust(0, 0, 0, -borderSizes.bottom());
+            }
+
+            return rect;
+        }
+    }
+    return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }

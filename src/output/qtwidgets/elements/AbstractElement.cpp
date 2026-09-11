@@ -437,7 +437,8 @@ Union::Properties::StylePropertyGroup *AbstractElement::queryProperties(const Un
     const auto query = std::make_unique<Union::ElementQuery>(style);
     query->setElements(elements);
     query->execute();
-    return query->properties();
+    auto properties = query->properties();
+    return properties;
 }
 
 QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElementList) const
