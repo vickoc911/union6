@@ -663,6 +663,18 @@ void UnionStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_TranslucentBackground);
     }
 
+    // Skip autofilling the background inside viewports, as they overlap the borders.
+    if (auto itemView = qobject_cast<QAbstractItemView *>(widget)) {
+        if (itemView->viewport()) {
+            itemView->viewport()->setAutoFillBackground(false);
+        }
+    }
+    if (auto itemView = qobject_cast<QAbstractScrollArea *>(widget)) {
+        if (itemView->viewport()) {
+            itemView->viewport()->setAutoFillBackground(false);
+        }
+    }
+
     QCommonStyle::polish(widget);
 }
 
