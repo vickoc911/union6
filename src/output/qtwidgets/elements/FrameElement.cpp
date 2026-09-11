@@ -11,6 +11,7 @@
 #include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Properties;
 
 FrameElement::FrameElement(const QStyleOptionFrame *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -119,7 +120,19 @@ QVariantMap FrameElement::elementAttributes() const
 
 QStringList FrameElement::elementHints() const
 {
-    return frameHints(m_frameOption);
+    auto hints = frameHints(m_frameOption);
+
+    // Custom KDE style hints used by widgets applications, for declaring sidebars
+    if (m_widget && m_widget->property("_kde_side_panel_view").toBool()) {
+        const bool reverseLayout(m_styleOption->direction == Qt::RightToLeft);
+        if (reverseLayout) {
+            hints.append(u"panel-right"_s);
+        } else {
+            hints.append(u"panel-left"_s);
+        }
+    }
+
+    return hints;
 }
 
 qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const

@@ -437,7 +437,22 @@ Union::Properties::StylePropertyGroup *AbstractElement::queryProperties(const Un
     const auto query = std::make_unique<Union::ElementQuery>(style);
     query->setElements(elements);
     query->execute();
-    return query->properties();
+    auto properties = query->properties();
+
+    // Backwards compatibility for borders, as applications used this custom Breeze property to declare
+    // which borders are applied to the widget.
+    if (m_widget && properties) {
+        const auto borders = m_widget->property("_breeze_borders_sides");
+        if (borders.isValid() && properties->border()) {
+            auto borderSizes = borderSize();
+            const auto value = borders.value<Qt::Edges>();
+            properties->border()->left()->setSize(value & Qt::LeftEdge ? borderSizes.left() : 0.0);
+            properties->border()->top()->setSize(value & Qt::TopEdge ? borderSizes.top() : 0.0);
+            properties->border()->bottom()->setSize(value & Qt::BottomEdge ? borderSizes.bottom() : 0.0);
+            properties->border()->right()->setSize(value & Qt::RightEdge ? borderSizes.right() : 0.0);
+        }
+    }
+    return properties;
 }
 
 QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &elements, const QStyleOption *opt, const QStringList &subElementList) const
