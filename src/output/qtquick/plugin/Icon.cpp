@@ -18,6 +18,34 @@
 using namespace Union::Quick;
 using namespace Qt::StringLiterals;
 
+QSize iconSizeForSize(const QIcon &icon, const QSizeF &size)
+{
+    auto availableSizes = icon.availableSizes();
+    if (availableSizes.isEmpty()) {
+        return icon.actualSize(size.toSize());
+    }
+
+    std::ranges::sort(availableSizes, [](const QSize &first, const QSize &second) {
+        return first.width() < second.width();
+    });
+
+    auto smallest = availableSizes.end();
+    for (auto itr = availableSizes.begin(); itr != availableSizes.end(); ++itr) {
+        if (itr->width() > size.width() || itr->height() > size.height()) {
+            if (itr != availableSizes.begin()) {
+                smallest = itr - 1;
+            }
+            break;
+        }
+    }
+
+    if (smallest == availableSizes.end()) {
+        return icon.actualSize(size.toSize());
+    } else {
+        return *smallest;
+    }
+}
+
 Icon::Icon(QQuickItem *parent)
     : QQuickItem(parent)
 {
@@ -220,7 +248,7 @@ void Icon::updatePolish()
         m_icon = Union::StyleRegistry::instance()->platform()->platformIcon(m_name, m_color);
     }
 
-    m_iconSize = m_icon.actualSize(boundingRect().size().toSize());
+    m_iconSize = iconSizeForSize(m_icon, boundingRect().size());
     m_iconChanged = true;
     update();
 }
