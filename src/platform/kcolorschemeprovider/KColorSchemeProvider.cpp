@@ -127,6 +127,14 @@ KColorSchemeProvider::~KColorSchemeProvider() noexcept = default;
 bool KColorSchemeProvider::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == qApp && event->type() == QEvent::ApplicationPaletteChange) {
+        // This property is used by the KColorSchemeMenu that allows applications to set their own
+        // individual colors.
+        const QString colorSchemePath = qApp->property("KDE_COLOR_SCHEME_PATH").toString();
+        if (!colorSchemePath.isEmpty()) {
+            d->colorConfig = KSharedConfig::openConfig(colorSchemePath);
+        } else {
+            d->colorConfig = KSharedConfig::openConfig();
+        }
         d->cache.clear();
         // Important: If we don't reparse the global configuration, we will not
         // get any new colors.
