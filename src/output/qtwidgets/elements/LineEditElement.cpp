@@ -69,9 +69,6 @@ QSizeF LineEditElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     // LineEdit wants much more simplified size in Widgets, we ignore the width/height set in CSS.
     QMarginsF padding =
         safePropertyLookup(m_backgroundProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
-    QMarginsF inset =
-        safePropertyLookup(m_backgroundProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::inset, &SizePropertyGroup::toMargins);
-    padding += inset;
     return contentsSizeFromStyle.grownBy(padding);
 }
 
@@ -80,7 +77,7 @@ QMarginsF LineEditElement::iconPadding() const
     if (!m_isValid) {
         return QMarginsF();
     }
-    return safePropertyLookup(m_contentProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::inset, &SizePropertyGroup::toMargins);
+    return safePropertyLookup(m_contentProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
 }
 
 QRectF LineEditElement::subElementRect(QStyle::SubElement element) const
