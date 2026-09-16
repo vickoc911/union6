@@ -267,13 +267,6 @@ groupbox {
     width: 200px;
 }
 
-dockwidget {
-    border-radius: var(--corner-radius);
-    &:visual-focus,
-    &:active-focus {
-        border: 1px solid var(--highlight-color);
-    }
-}
 
 dockwidget {
     width: var(--small-element-size);
@@ -285,6 +278,10 @@ dockwidget {
     border: none;
     border-radius: 0px;
     padding: var(--small-spacing);
+    &:visual-focus,
+    &:active-focus {
+        border: 1px solid var(--highlight-color);
+    }
 
     floatbutton,
     closebutton {
