@@ -7,6 +7,7 @@
 #include <QAbstractScrollArea>
 #include <QApplication>
 #include <QDebug>
+#include <QDockWidget>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
@@ -147,8 +148,8 @@ QStringList FrameElement::elementHints() const
 
     // Backwards compatibility:
     // Custom KDE style hint used by KDE widgets applications, for declaring sidebars
-    if (auto scrollArea = qobject_cast<const QAbstractScrollArea *>(m_widget)) {
-        if (scrollArea->inherits("KDEPrivate::KPageListView") || scrollArea->inherits("KDEPrivate::KPageTreeView")) {
+    if (m_widget) {
+        if (m_widget->inherits("KDEPrivate::KPageListView") || m_widget->inherits("KDEPrivate::KPageTreeView")) {
             const bool reverseLayout(m_styleOption->direction == Qt::RightToLeft);
             if (reverseLayout) {
                 hints.append(u"panel-right"_s);
@@ -158,6 +159,27 @@ QStringList FrameElement::elementHints() const
         }
     }
 
+    if (m_widget) {
+        if (auto dock = qobject_cast<const QDockWidget *>(m_widget->parentWidget())) {
+            switch (dock->dockLocation()) {
+            case Qt::LeftDockWidgetArea:
+                hints.append(u"dock-left"_s);
+                break;
+            case Qt::RightDockWidgetArea:
+                hints.append(u"dock-right"_s);
+                break;
+            case Qt::TopDockWidgetArea:
+                hints.append(u"dock-top"_s);
+                break;
+            case Qt::BottomDockWidgetArea:
+                hints.append(u"dock-bottom"_s);
+                break;
+            case Qt::DockWidgetArea_Mask:
+            case Qt::NoDockWidgetArea:
+                break;
+            }
+        }
+    }
     return hints;
 }
 
