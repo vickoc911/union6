@@ -251,7 +251,7 @@ QStringList MenuItemElement::elementHints() const
     if (m_hasSubMenu) {
         hints.append(u"with-submenu"_s);
     }
-    if (m_isSeparator && !m_menuItemOption->text.isEmpty()) {
+    if (m_menuItemOption && m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator && !m_menuItemOption->text.isEmpty()) {
         hints.append(u"with-title"_s);
     }
     return hints;
