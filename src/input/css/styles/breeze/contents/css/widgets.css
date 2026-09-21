@@ -24,6 +24,10 @@ toolbox {
     }
 }
 
+splitterhandle {
+    background-color: var(--window-border-color);
+}
+
 /* Primitive Elements */
 
 indicatorarrowup {
