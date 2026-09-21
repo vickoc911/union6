@@ -29,6 +29,9 @@ ToolButtonElement::~ToolButtonElement()
 
 void ToolButtonElement::update()
 {
+    if (!m_toolButtonOption) {
+        return;
+    }
     m_hasIndicator =
         m_toolButtonOption->features.testFlag(QStyleOptionToolButton::HasMenu) || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Menu);
     m_hasArrows = m_toolButtonOption->features.testFlag(QStyleOptionToolButton::Arrow) && m_toolButtonOption->toolButtonStyle != Qt::ToolButtonTextOnly;
@@ -134,6 +137,9 @@ void ToolButtonElement::draw(QPainter *painter, DrawEnums enums) const
 
 void ToolButtonElement::drawIcon(QPainter *painter) const
 {
+    if (!m_toolButtonOption) {
+        return;
+    }
     if (m_toolButtonOption->toolButtonStyle == Qt::ToolButtonTextOnly) {
         return;
     }
@@ -179,6 +185,9 @@ void ToolButtonElement::drawIndicator(QPainter *painter) const
 QVariantMap ToolButtonElement::elementAttributes() const
 {
     QVariantMap map;
+    if (!m_toolButtonOption) {
+        return map;
+    }
     switch (m_toolButtonOption->toolButtonStyle) {
     case Qt::ToolButtonIconOnly:
         map[u"display"_s] = QVariant(u"icon-only"_s);
@@ -201,7 +210,7 @@ QVariantMap ToolButtonElement::elementAttributes() const
 QStringList ToolButtonElement::elementHints() const
 {
     QStringList hints;
-    if (m_toolButtonOption->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::None)) {
+    if (!m_toolButtonOption || m_toolButtonOption->features.testFlag(QStyleOptionToolButton::ToolButtonFeature::None)) {
         return hints;
     }
 
@@ -232,6 +241,9 @@ QStringList ToolButtonElement::elementHints() const
 
 void ToolButtonElement::layoutButtons()
 {
+    if (!m_toolButtonOption) {
+        return;
+    }
     m_mainButtonRect = m_toolButtonOption->rect;
     if (!m_hasIndicator) {
         m_menuButtonRect = QRectF();
@@ -308,6 +320,9 @@ void ToolButtonElement::layoutButtons()
 ArrowStyle ToolButtonElement::arrowStyle() const
 {
     // Behavior taken from breeze
+    if (!m_toolButtonOption) {
+        return ArrowStyle::None;
+    }
     const bool hasPopupMenu = (m_hasIndicator && m_toolButtonOption->features.testFlag(QStyleOptionToolButton::MenuButtonPopup));
     const bool hasInlineIndicator = (m_hasIndicator && !hasPopupMenu);
     const bool hasDelayedMenu = (hasInlineIndicator && m_toolButtonOption->features.testFlag(QStyleOptionToolButton::PopupDelay));
