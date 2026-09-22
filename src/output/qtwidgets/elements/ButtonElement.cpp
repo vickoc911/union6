@@ -99,8 +99,28 @@ QSizeF ButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background
     // to get the proper contentSize
     if (hasIndicator()) {
-        qreal spacing = m_backgroundProperties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
-        size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + spacing;
+        auto size = applyPaddingToSize(m_layoutMap[ElementString::Indicator].rect.size(), PaddingDirection::Outward, m_indicatorProperties);
+        auto alignH = m_indicatorProperties->layout()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
+        auto alignV = m_indicatorProperties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
+        switch (alignH) {
+        case Alignment::Unspecified:
+        case Alignment::Start:
+        case Alignment::End:
+            size.rwidth() += spacing();
+            break;
+        default:
+            break;
+        }
+        switch (alignV) {
+        case Alignment::Start:
+        case Alignment::End:
+        case Alignment::StackCenter:
+        case Alignment::StackFill:
+            size.rheight() += spacing();
+            break;
+        default:
+            break;
+        }
     }
     return size;
 }
@@ -112,11 +132,11 @@ QRectF ButtonElement::subElementRect(QStyle::SubElement element) const
         return QRect();
     }
 
-    if (element == QStyle::SE_PushButtonBevel || element == QStyle::SE_PushButtonFocusRect) {
-        return backgroundRectangle(m_buttonOption, m_backgroundProperties).toRect();
+    if (element == QStyle::SE_PushButtonContents) {
+        return m_buttonOption->rect;
     }
 
-    return unifiedRect(m_layoutMap);
+    return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }
 
 Union::Element::States ButtonElement::elementStates() const
