@@ -83,7 +83,32 @@ QSizeF ToolButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) cons
 {
     QSizeF size = applyPaddingToSize(contentsSizeFromStyle);
     if (hasIndicator()) {
-        size = size.expandedTo(m_menuButtonRect.size());
+        // Take note of the icon/text spacing as well
+        if (m_hasIcon && m_hasText) {
+            size.rwidth() += spacing();
+        }
+        size = size.expandedTo(applyPaddingToSize(m_menuButtonRect.size(), PaddingDirection::Outward, m_indicatorProperties));
+        auto alignH = m_indicatorProperties->layout()->alignment()->horizontal().value_or(Union::Properties::Alignment::Unspecified);
+        auto alignV = m_indicatorProperties->layout()->alignment()->vertical().value_or(Union::Properties::Alignment::Unspecified);
+        switch (alignH) {
+        case Alignment::Unspecified:
+        case Alignment::Start:
+        case Alignment::End:
+            size.rwidth() += spacing();
+            break;
+        default:
+            break;
+        }
+        switch (alignV) {
+        case Alignment::Start:
+        case Alignment::End:
+        case Alignment::StackCenter:
+        case Alignment::StackFill:
+            size.rheight() += spacing();
+            break;
+        default:
+            break;
+        }
     }
     return size;
 }
