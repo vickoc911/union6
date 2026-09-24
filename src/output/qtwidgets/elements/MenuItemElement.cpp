@@ -25,6 +25,7 @@ MenuItemElement::MenuItemElement(const QStyleOptionMenuItem *option, const Union
     , m_hasCheckableItems(false)
     , m_shortcutText(QString())
 {
+    setFlag(AbstractElementFlag::ContentsSizeIncludesAveragePadding);
     update();
 }
 
@@ -174,7 +175,6 @@ QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
                                                                   &LayoutPropertyGroup::inset,
                                                                   &SizePropertyGroup::toMargins);
             separatorSize = separatorSize.expandedTo(QSize(pad.left() + pad.right(), pad.top() + pad.bottom()));
-
             preferredSize = applyPaddingToSize(separatorSize, m_backgroundProperties);
         } else {
             QSizeF itemSize(contentsSizeFromStyle);
