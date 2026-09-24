@@ -178,12 +178,12 @@ QRectF TabElement::subElementRect(QStyle::SubElement element) const
     return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }
 
-// Padding of the tab content and the edge, only one value is taken so take the largest one
+// Padding of the tab content and the edge, only one value is taken so take the average
 int TabElement::hSpace() const
 {
     if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout() && m_backgroundProperties->layout()->padding()) {
         auto padding = m_backgroundProperties->layout()->padding()->toMargins();
-        return std::max(padding.left(), padding.right());
+        return (padding.left() + padding.right()) / 2;
     }
     return 0;
 }
@@ -192,7 +192,7 @@ int TabElement::vSpace() const
 {
     if (m_isValid && m_backgroundProperties && m_backgroundProperties->layout() && m_backgroundProperties->layout()->padding()) {
         auto padding = m_backgroundProperties->layout()->padding()->toMargins();
-        return std::max(padding.top(), padding.bottom());
+        return (padding.top() + padding.bottom()) / 2;
     }
     return 0;
 }
