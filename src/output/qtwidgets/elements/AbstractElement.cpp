@@ -313,18 +313,26 @@ QMarginsF AbstractElement::borderSize() const
 
 qreal AbstractElement::height() const
 {
+    const qreal defaultValue = 1.0;
     if (m_backgroundProperties) {
-        return m_backgroundProperties->safePropertyLookup(1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
+        return m_backgroundProperties->safePropertyLookup(defaultValue, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
+    } else if (m_styleOption) {
+        return m_styleOption->rect.height();
+    } else {
+        return defaultValue;
     }
-    return m_styleOption->rect.height();
 }
 
 qreal AbstractElement::width() const
 {
+    const qreal defaultValue = 1.0;
     if (m_backgroundProperties) {
-        return m_backgroundProperties->safePropertyLookup(1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+        return m_backgroundProperties->safePropertyLookup(defaultValue, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+    } else if (m_styleOption) {
+        return m_styleOption->rect.width();
+    } else {
+        return defaultValue;
     }
-    return m_styleOption->rect.height();
 }
 
 qreal AbstractElement::spacing() const
@@ -399,10 +407,9 @@ QSizeF AbstractElement::querySize(QStringList targetHierarchy) const
         return QSize(0, 0);
     }
     auto properties = queryProperties(elements);
-    if (properties && properties->layout()) {
-        return QSize(properties->layout()->width().value_or(0), properties->layout()->height().value_or(0));
-    }
-    return QSize(0, 0);
+    const auto width = properties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+    const auto height = properties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
+    return QSize(width, height);
 }
 
 Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy) const
@@ -528,7 +535,7 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
                 fontMetrics = QFontMetrics(styleFont.value());
             }
             elementRect = fontMetrics.boundingRect(availableSpace.toRect(), textFlags, optionText);
-            order = properties->text()->alignment()->order().value_or(0);
+            order = properties->safePropertyLookup(0, &StylePropertyGroup::text, &TextPropertyGroup::alignment, &AlignmentPropertyGroup::order);
         } else {
             elementRect.setWidth(properties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width));
             elementRect.setHeight(properties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height));
@@ -573,13 +580,16 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
     // Remove the spacing to avoid resizing the item too much:
     // the spacing is already accounted in mapBucketItems.
     centerBucket.rect.moveCenter(availableSpace.center());
-    centerBucket.rect.setLeft(availableSpace.left() - startBucket.spacing);
-    if (startBucket.items.count() > 0) {
-        centerBucket.rect.setLeft(centerBucket.rect.left() + startOffset);
+    if (startBucket.rect.intersects(centerBucket.rect)) {
+        if (startBucket.items.count() > 0) {
+            centerBucket.rect.setLeft(centerBucket.rect.left() + startOffset + spacing());
+        }
     }
-    centerBucket.rect.setRight(availableSpace.right() + endBucket.spacing);
-    if (endBucket.items.count() > 0) {
-        centerBucket.rect.setRight(centerBucket.rect.right() - endOffSet);
+    if (centerBucket.rect.intersects(endBucket.rect)) {
+        centerBucket.rect.setRight(availableSpace.right());
+        if (endBucket.items.count() > 0) {
+            centerBucket.rect.setRight(centerBucket.rect.right() - endOffSet - spacing());
+        }
     }
     mapBucketItems(centerBucket, map);
 
@@ -652,7 +662,6 @@ LayoutBucket AbstractElement::createBucket(const QList<LayoutItem> &items, const
     });
 
     // No need for spacing as there are no items
-    bucket.spacing = bucket.items.count() > 0 ? spacing() : 0;
     bucket.rect = bucket.items.count() > 0 ? resizeBucket(bucket) : QRectF();
     return bucket;
 }
@@ -663,6 +672,7 @@ QRectF AbstractElement::resizeBucket(const LayoutBucket &bucket) const
     qreal height = 0;
     QRectF bucketRect = bucket.rect;
     bool stacked = false;
+    auto space = bucket.items.count() > 0 ? spacing() : 0;
 
     // Check if we are stacking or not
     for (auto &item : bucket.items) {
@@ -673,11 +683,11 @@ QRectF AbstractElement::resizeBucket(const LayoutBucket &bucket) const
     }
 
     for (auto &item : bucket.items) {
-        const qreal itemWidth = item.rect.width() + bucket.spacing;
+        const qreal itemWidth = item.rect.width() + space;
         const qreal itemHeight = item.rect.height();
         if (stacked) {
             width = std::max(bucketRect.width(), itemWidth);
-            height += (itemHeight + bucket.spacing);
+            height += (itemHeight + space);
         } else {
             width += itemWidth;
             height = std::max(bucketRect.height(), itemHeight);
@@ -692,10 +702,10 @@ QRectF AbstractElement::resizeBucket(const LayoutBucket &bucket) const
 void AbstractElement::mapBucketItems(LayoutBucket &bucket, QMap<QString, LayoutItem> &map) const
 {
     auto bucketRect = bucket.rect;
-    int spacing = bucket.spacing;
+    int space = bucket.items.count() > 0 ? spacing() : 0;
     for (auto &item : bucket.items) {
-        const auto itemWidth = item.rect.width() + spacing;
-        const auto itemHeight = item.rect.height() + spacing;
+        const auto itemWidth = item.rect.width() + space;
+        const auto itemHeight = item.rect.height() + space;
 
         // For stackcenter/stackfill, we just want to center the rectangle based on its size.
         if (item.horizontalAlignment == Union::Properties::Alignment::Center

@@ -34,13 +34,14 @@ MenuItemElement::~MenuItemElement()
 
 void MenuItemElement::update()
 {
+    if (!m_menuItemOption) {
+        return;
+    }
     m_isSeparator = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator);
     m_hasSubMenu = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu);
     m_hasCheckBox = (m_menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive);
     m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
     m_hasCheckableItems = m_menuItemOption->menuHasCheckableItems;
-    m_menuHMargin = m_style->pixelMetric(QStyle::PM_MenuHMargin, m_styleOption, m_widget);
-    m_menuVMargin = m_style->pixelMetric(QStyle::PM_MenuVMargin, m_styleOption, m_widget);
 
     if (m_hasSubMenu) {
         m_arrowElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem, ElementString::Arrow});
@@ -132,9 +133,7 @@ void MenuItemElement::layout()
 
     if (!m_backgroundElementList.isEmpty()) {
         m_backgroundProperties = queryProperties(m_backgroundElementList);
-        auto adjustedOpt = *m_menuItemOption;
-        adjustedOpt.rect = adjustedRect(m_menuItemOption->rect).toRect();
-        m_layoutMap = layoutMap(m_backgroundElementList, &adjustedOpt, m_subElementList);
+        m_layoutMap = layoutMap(m_backgroundElementList, m_menuItemOption, m_subElementList);
 
         // IconRect in MenuItemElements are the maximum size by default.
         // Instead center the icon rectangle within the maximum size rect.
@@ -156,10 +155,10 @@ QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     QSizeF preferredSize = contentsSizeFromStyle;
     // Handle separator separately (pun not intended)
-    if (m_menuItemOption && m_backgroundProperties) {
+    if (m_menuItemOption) {
         if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator) {
-            int width = m_backgroundProperties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
-            int height = m_backgroundProperties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
+            int width = m_backgroundProperties->safePropertyLookup(1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+            int height = m_backgroundProperties->safePropertyLookup(1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
             if (hasText()) {
                 if (preferredSize.width() > width) {
                     width = preferredSize.width();
@@ -176,7 +175,7 @@ QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
             separatorSize = separatorSize.expandedTo(QSize(pad.left() + pad.right(), pad.top() + pad.bottom()));
 
             // If we have text, we want to apply padding normally. If not, we want to remove padding and utilize the insets.
-            preferredSize = applyPaddingToSize(separatorSize, hasText() ? PaddingDirection::Outward : PaddingDirection::Inward, m_backgroundProperties);
+            preferredSize = applyPaddingToSize(separatorSize);
         } else {
             QSizeF itemSize(contentsSizeFromStyle);
             int spacing = m_backgroundProperties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
@@ -197,10 +196,6 @@ QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
             preferredSize = applyPaddingToSize(itemSize);
         }
     }
-    // Adjust the contents according to the menu margins.
-    // Otherwise they wont be centered properly.
-    preferredSize.rwidth() += m_menuHMargin;
-    preferredSize.rheight() += m_menuVMargin;
     return preferredSize;
 }
 
@@ -221,9 +216,9 @@ void MenuItemElement::drawBackground(QPainter *painter) const
             }
         }
         // Ensure the rectangle is resized according to the menu margins
-        drawBackgroundRectangle(painter, rect.adjusted(0, 0, -(m_menuHMargin), -(m_menuVMargin)), m_backgroundProperties);
+        drawBackgroundRectangle(painter, rect, m_backgroundProperties);
     } else {
-        drawBackgroundRectangle(painter, adjustedRect(m_menuItemOption->rect), m_backgroundProperties);
+        drawBackgroundRectangle(painter, m_menuItemOption->rect, m_backgroundProperties);
     }
 }
 
@@ -250,10 +245,13 @@ void MenuItemElement::drawSubMenuArrow(QPainter *painter) const
 QStringList MenuItemElement::elementHints() const
 {
     QStringList hints;
+    if (!m_menuItemOption) {
+        return hints;
+    }
     if (m_hasSubMenu) {
         hints.append(u"with-submenu"_s);
     }
-    if (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator && !m_menuItemOption->text.isEmpty()) {
+    if (m_isSeparator && !m_menuItemOption->text.isEmpty()) {
         hints.append(u"with-title"_s);
     }
     return hints;
@@ -272,18 +270,11 @@ qreal MenuItemElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
     return 0;
 }
 
-QRectF MenuItemElement::adjustedRect(QRectF rect) const
-{
-    const auto frameWidth = m_style->pixelMetric(QStyle::PM_MenuPanelWidth, m_styleOption, m_widget);
-    // Follow what breeze does here to center items. See BreezeStyle::drawMenuItemControl.
-    return rect.adjusted(0, frameWidth, -(m_menuHMargin - frameWidth), -(m_menuVMargin - frameWidth));
-}
-
 Union::Element::States MenuItemElement::elementStates() const
 {
     auto states = AbstractElement::elementStates();
-    states.setFlag(Union::Element::State::Checked, m_menuItemOption->checked);
+    states.setFlag(Union::Element::State::Checked, m_menuItemOption && m_menuItemOption->checked);
     // Menuitems for some reason do not get mouseover, but they get selected instead
-    states.setFlag(Union::Element::State::Hovered, m_menuItemOption->state.testFlag(QStyle::State_Selected));
+    states.setFlag(Union::Element::State::Hovered, m_menuItemOption && m_menuItemOption->state.testFlag(QStyle::State_Selected));
     return states;
 }
