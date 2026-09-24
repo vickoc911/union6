@@ -22,6 +22,9 @@ ComboBoxElement::ComboBoxElement(const QStyleOptionComboBox *option, const Union
 
 void ComboBoxElement::update()
 {
+    if (!m_styleOption) {
+        return;
+    }
     m_editable = m_comboBoxOption->editable;
 
     setIndicator(QIcon());
@@ -62,9 +65,6 @@ void ComboBoxElement::draw(QPainter *painter, DrawEnums enums) const
     case QStyle::CC_ComboBox:
         drawBackground(painter);
         drawIcon(painter);
-        if (!isEditable()) {
-            drawText(painter);
-        }
         drawIndicator(painter);
         break;
     }
@@ -89,17 +89,16 @@ void ComboBoxElement::updateSubElementList()
 
 QSizeF ComboBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
-    QRectF rect = unifiedRect(m_layoutMap);
     // Follow the contents width
-    rect.setWidth(contentsSizeFromStyle.width());
-    auto size = applyPaddingToSize(rect.size());
-    size.rwidth() += m_layoutMap[ElementString::Indicator].rect.width() + spacing();
+    auto size = applyPaddingToSize(contentsSizeFromStyle);
+    const auto indicatorSize = applyPaddingToSize(m_layoutMap[ElementString::Indicator].rect.size());
+    size.rwidth() += indicatorSize.width() + spacing();
     return size;
 }
 
 QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
 {
-    if (!m_isValid) {
+    if (!m_isValid || !m_styleOption) {
         qCWarning(UNION_QTWIDGETS) << "subControlRect for " << subControl << "is not valid";
         return QRect();
     }
