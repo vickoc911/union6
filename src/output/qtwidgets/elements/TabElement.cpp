@@ -11,6 +11,7 @@
 #include <QTabBar>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Properties;
 
 TabElement::TabElement(const QStyleOptionTab *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -160,8 +161,18 @@ QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
         widthIncrement += offset;
     }
 
+    QMarginsF padding =
+        safePropertyLookup(m_backgroundProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
+
+    // contentSizeFromStyle includes hSpace and vSpace for which we return an
+    // average. Subtract that so applyPaddingToSize is handled correctly.
+    auto size = QSizeF{
+        contentsSizeFromStyle.width() - (padding.left() + padding.right()) / 2,
+        contentsSizeFromStyle.height() - (padding.top() + padding.bottom()) / 2,
+    };
+
     // add margins
-    QSizeF size(applyPaddingToSize(contentsSizeFromStyle));
+    size = applyPaddingToSize(size);
 
     if (m_isVertical) {
         size.rheight() += widthIncrement;
