@@ -175,8 +175,7 @@ QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
                                                                   &SizePropertyGroup::toMargins);
             separatorSize = separatorSize.expandedTo(QSize(pad.left() + pad.right(), pad.top() + pad.bottom()));
 
-            // If we have text, we want to apply padding normally. If not, we want to remove padding and utilize the insets.
-            preferredSize = applyPaddingToSize(separatorSize, hasText() ? PaddingDirection::Outward : PaddingDirection::Inward, m_backgroundProperties);
+            preferredSize = applyPaddingToSize(separatorSize, m_backgroundProperties);
         } else {
             QSizeF itemSize(contentsSizeFromStyle);
             int spacing = m_backgroundProperties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
