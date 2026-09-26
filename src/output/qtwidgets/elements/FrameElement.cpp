@@ -70,7 +70,12 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
     switch (enums.ControlElement) {
     case QStyle::CE_FocusFrame:
     case QStyle::CE_ShapedFrame:
-        drawBackground(painter);
+        // Skip drawing frames for items that have framewidth of 0, draw only background
+        if (pixelMetric(QStyle::PM_DefaultFrameWidth) == 0) {
+            drawPanel(painter);
+        } else {
+            drawBackground(painter);
+        }
         break;
     }
     // We should be prepared to draw any potential frame element
