@@ -321,7 +321,7 @@ QMarginsF AbstractElement::borderSize() const
 
 qreal AbstractElement::height() const
 {
-    const qreal defaultValue = 1.0;
+    const qreal defaultValue = 0.0;
     if (m_backgroundProperties) {
         return m_backgroundProperties->safePropertyLookup(defaultValue, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
     } else if (m_styleOption) {
@@ -333,7 +333,7 @@ qreal AbstractElement::height() const
 
 qreal AbstractElement::width() const
 {
-    const qreal defaultValue = 1.0;
+    const qreal defaultValue = 0.0;
     if (m_backgroundProperties) {
         return m_backgroundProperties->safePropertyLookup(defaultValue, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
     } else if (m_styleOption) {
@@ -345,7 +345,7 @@ qreal AbstractElement::width() const
 
 qreal AbstractElement::spacing() const
 {
-    return safePropertyLookup(m_backgroundProperties, 1.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
+    return safePropertyLookup(m_backgroundProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::spacing);
 }
 
 QSizeF AbstractElement::indicatorSize() const
