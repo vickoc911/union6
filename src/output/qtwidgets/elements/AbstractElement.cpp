@@ -77,6 +77,21 @@ bool AbstractElement::isValid() const
     return m_isValid;
 }
 
+AbstractElement::AbstractElementFlags AbstractElement::flags()
+{
+    return m_flags;
+}
+
+void AbstractElement::setFlags(AbstractElementFlags newFlags)
+{
+    m_flags = newFlags;
+}
+
+void AbstractElement::setFlag(AbstractElementFlag flag, bool apply)
+{
+    m_flags.setFlag(flag, apply);
+}
+
 void AbstractElement::layout()
 {
     // Background and content is separate
@@ -199,16 +214,21 @@ QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, Union::Properties::St
     if (!properties) {
         paddingProperties = m_backgroundProperties;
     }
-    QSizeF preferredSize = oldSize;
-    QSizeF size = preferredSize;
 
     QMarginsF padding =
         safePropertyLookup(paddingProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
     QMarginsF inset =
         safePropertyLookup(paddingProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::inset, &SizePropertyGroup::toMargins);
+
     auto width = safePropertyLookup(paddingProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
     auto height = safePropertyLookup(paddingProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
-    preferredSize = QSizeF(width, height);
+    auto preferredSize = QSizeF(width, height);
+
+    auto size = oldSize;
+    if (m_flags.testFlag(AbstractElementFlag::ContentsSizeIncludesAveragePadding)) {
+        size.rwidth() = size.width() - (padding.left() + padding.right()) / 2;
+        size.rheight() = size.height() - (padding.left() + padding.right()) / 2;
+    }
 
     // We need to apply the maximum of each component of either padding or inset
     // since we need to ensure things are large enough for either of these
