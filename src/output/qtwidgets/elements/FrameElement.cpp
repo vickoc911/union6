@@ -111,7 +111,10 @@ void FrameElement::drawFrame(QPainter *painter) const
 
     switch (m_frameOption->frameShape) {
     case QFrame::NoFrame:
-        drawPanel(painter);
+        // Only draw panel if we have autoFillBackground set
+        if (m_widget && m_widget->autoFillBackground()) {
+            drawPanel(painter);
+        }
         return;
     case QFrame::Box:
     case QFrame::Panel:
@@ -135,10 +138,22 @@ void FrameElement::updateSubElementList()
 QVariantMap FrameElement::elementAttributes() const
 {
     QVariantMap map;
+
+    // For some reason both frame widget and styleoption can have frameshape,
+    // and they can also differ. If we do not have a styleoption, rely on widget
+    // information.
+    QFrame::Shape shape;
     if (!m_frameOption) {
-        return map;
+        if (const auto frame = qobject_cast<const QFrame *>(m_widget)) {
+            shape = frame->frameShape();
+        } else {
+            return map;
+        }
+    } else {
+        shape = m_frameOption->frameShape;
     }
-    switch (m_frameOption->frameShape) {
+
+    switch (shape) {
     case QFrame::NoFrame:
         map[u"shape"_s] = u"no-frame"_s;
         break;
