@@ -23,13 +23,15 @@ using namespace Qt::StringLiterals;
 
 namespace fs = std::filesystem;
 
+static const QString DefaultFallbackStyle = u"breeze"_s;
+
 // This is implements the most minimal of PlatformPlugin that can be used as a
 // fallback if we have no existing platform plugin for the current platform.
 class FallbackPlatformPlugin : public PlatformPlugin
 {
     QString defaultStyleName() override
     {
-        return u"breeze"_s;
+        return DefaultFallbackStyle;
     }
 };
 
@@ -95,6 +97,7 @@ public:
     std::unique_ptr<StyleCache> styleCache;
 
     QHash<fs::path, Style::Ptr> styles;
+    QSet<QString> missingStyles;
 
     std::shared_ptr<PluginRegistry<PlatformPlugin>> platformRegistry;
     std::shared_ptr<PlatformPlugin> platform;
@@ -142,7 +145,12 @@ std::shared_ptr<Style> StyleRegistry::defaultStyle()
         name = platform()->defaultStyleName();
     }
 
-    return style(name);
+    auto defaultStyle = style(name);
+    if (defaultStyle) {
+        return defaultStyle;
+    }
+
+    return style(DefaultFallbackStyle);
 }
 
 std::shared_ptr<Style> StyleRegistry::style(const QString &styleId)
@@ -154,6 +162,10 @@ std::shared_ptr<Style> StyleRegistry::style(const QString &styleId)
         return itr.value();
     }
 
+    if (d->missingStyles.contains(styleId)) {
+        return nullptr;
+    }
+
     if (!d->styleCache) {
         return nullptr;
     }
@@ -161,6 +173,7 @@ std::shared_ptr<Style> StyleRegistry::style(const QString &styleId)
     auto stylePackage = d->packageHandler->package(styleId);
     if (!stylePackage.isValid()) {
         qCWarning(UNION_GENERAL) << "Could not find style" << styleId;
+        d->missingStyles.insert(styleId);
         return nullptr;
     }
 

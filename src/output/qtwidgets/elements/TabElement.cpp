@@ -144,7 +144,7 @@ QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
     }
 
     const bool leftButton = !m_tabOption->leftButtonSize.isEmpty();
-    const bool rightButton = !m_tabOption->leftButtonSize.isEmpty();
+    const bool rightButton = !m_tabOption->rightButtonSize.isEmpty();
     const bool text = hasText();
     const bool icon = hasIcon();
     const qreal offset = spacing();
@@ -164,8 +164,18 @@ QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
         widthIncrement += offset;
     }
 
+    QMarginsF padding =
+        safePropertyLookup(m_backgroundProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
+
+    // contentSizeFromStyle includes hSpace and vSpace for which we return an
+    // average. Subtract that so applyPaddingToSize is handled correctly.
+    auto size = QSizeF{
+        contentsSizeFromStyle.width() - (padding.left() + padding.right()) / 2,
+        contentsSizeFromStyle.height() - (padding.top() + padding.bottom()) / 2,
+    };
+
     // add margins
-    QSizeF size(applyPaddingToSize(contentsSizeFromStyle));
+    size = applyPaddingToSize(size);
 
     if (m_isVertical) {
         size.rheight() += widthIncrement;
@@ -182,13 +192,13 @@ QRectF TabElement::subElementRect(QStyle::SubElement element) const
     return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }
 
-// Padding of the tab content and the edge, only one value is taken so take the largest one
+// Padding of the tab content and the edge, only one value is taken so take the average
 int TabElement::hSpace() const
 {
     if (m_isValid) {
         auto padding =
             safePropertyLookup(m_backgroundProperties, QMarginsF(), &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
-        return std::max(padding.left(), padding.right());
+        return (padding.left() + padding.right()) / 2;
     }
     return 0;
 }
@@ -198,7 +208,7 @@ int TabElement::vSpace() const
     if (m_isValid) {
         auto padding =
             safePropertyLookup(m_backgroundProperties, QMarginsF(), &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
-        return std::max(padding.top(), padding.bottom());
+        return (padding.top() + padding.bottom()) / 2;
     }
     return 0;
 }
@@ -243,6 +253,16 @@ QStringList TabElement::elementHints() const
 
     if (m_isStatic) {
         hints.append(u"immutable"_s);
+    }
+
+    auto tabStyleOption = qstyleoption_cast<const QStyleOptionTab *>(m_styleOption);
+    auto tabBar = qobject_cast<const QTabBar *>(m_widget);
+    if (tabStyleOption && tabBar) {
+        if (tabStyleOption->tabIndex == 0) {
+            hints.append(u"first"_s);
+        } else if (tabStyleOption->tabIndex == tabBar->count() - 1) {
+            hints.append(u"last"_s);
+        }
     }
 
     return hints;
