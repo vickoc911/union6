@@ -135,10 +135,22 @@ void FrameElement::updateSubElementList()
 QVariantMap FrameElement::elementAttributes() const
 {
     QVariantMap map;
+
+    // For some reason both frame widget and styleoption can have frameshape,
+    // and they can also differ. If we do not have a styleoption, rely on widget
+    // information.
+    QFrame::Shape shape;
     if (!m_frameOption) {
-        return map;
+        if (const auto frame = qobject_cast<const QFrame *>(m_widget)) {
+            shape = frame->frameShape();
+        } else {
+            return map;
+        }
+    } else {
+        shape = m_frameOption->frameShape;
     }
-    switch (m_frameOption->frameShape) {
+
+    switch (shape) {
     case QFrame::NoFrame:
         map[u"shape"_s] = u"no-frame"_s;
         break;
@@ -205,6 +217,14 @@ QStringList FrameElement::elementHints() const
             }
         }
     }
+    // If we have widget frameshape and shadow set, make things flat
+    // See BUG:526232
+    if (const auto frame = qobject_cast<const QFrame *>(m_widget)) {
+        if (frame->frameShape() == QFrame::NoFrame && frame->frameShadow() == QFrame::Plain) {
+            hints.append(u"flat"_s);
+        }
+    }
+
     return hints;
 }
 

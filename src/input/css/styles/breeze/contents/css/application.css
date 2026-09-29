@@ -233,6 +233,11 @@ scrollview {
         border: none;
         border-radius: 0px;
     }
+    &.flat {
+        border: none;
+        border-radius: 0px;
+        background-color: transparent;
+    }
 }
 
 groupbox {
