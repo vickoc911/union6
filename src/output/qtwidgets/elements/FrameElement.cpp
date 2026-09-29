@@ -175,6 +175,34 @@ QVariantMap FrameElement::elementAttributes() const
         break;
     }
 
+    // Custom KDE widget. It uses PE_Widget for drawing, so
+    // handle it in here.
+    if (m_widget && m_widget->inherits("KMultiTabBar")) {
+        enum class Position {
+            Left,
+            Right,
+            Top,
+            Bottom,
+        };
+
+        const Position position = static_cast<Position>(m_widget->property("position").toInt());
+
+        switch (position) {
+        case Position::Left:
+            map[u"direction"_s] = u"left"_s;
+            break;
+        case Position::Right:
+            map[u"direction"_s] = u"right"_s;
+            break;
+        case Position::Top:
+            map[u"direction"_s] = u"top"_s;
+            break;
+        case Position::Bottom:
+            map[u"direction"_s] = u"bottom"_s;
+            break;
+        }
+    }
+
     return map;
 }
 
