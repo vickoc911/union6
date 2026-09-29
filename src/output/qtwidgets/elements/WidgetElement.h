@@ -32,6 +32,7 @@ public:
 
     void update() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+    QVariantMap elementAttributes() const override;
 
 private:
     const QStyleOption *m_widgetOption = nullptr;
