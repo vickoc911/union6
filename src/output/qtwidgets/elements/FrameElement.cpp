@@ -342,5 +342,9 @@ qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
 
 QRectF FrameElement::subElementRect(QStyle::SubElement element) const
 {
-    return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
+    auto rect = m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
+    if (element == QStyle::SE_FrameContents) {
+        return rect.marginsRemoved(borderSize().toMargins());
+    }
+    return rect;
 }
