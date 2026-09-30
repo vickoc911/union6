@@ -71,11 +71,24 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
     switch (enums.ControlElement) {
     case QStyle::CE_FocusFrame:
     case QStyle::CE_ShapedFrame:
-        // Skip drawing frames for items that have framewidth of 0, draw only background
-        if (pixelMetric(QStyle::PM_DefaultFrameWidth) == 0) {
-            drawPanel(painter);
-        } else {
+        switch (m_frameOption->frameShape) {
+        // Do nothing
+        case QFrame::NoFrame:
+            break;
+        // We always allow HLine/VLine
+        case QFrame::HLine:
+        case QFrame::VLine:
             drawBackground(painter);
+            break;
+        // Skip drawing frames for items that have framewidth of 0
+        case QFrame::Box:
+        case QFrame::Panel:
+        case QFrame::WinPanel:
+        case QFrame::StyledPanel:
+            if (pixelMetric(QStyle::PM_DefaultFrameWidth) != 0) {
+                drawBackground(painter);
+            }
+            break;
         }
         break;
     }
@@ -220,6 +233,23 @@ QStringList FrameElement::elementHints() const
             }
         }
     }
+    // Some applications use the "_breeze_borders_sides" as a way to drive the Breeze application style,
+    // keep it for backwards compatibility.
+    if (m_widget && m_widget->property("_breeze_borders_sides").isValid()) {
+        const auto edges = m_widget->property("_breeze_borders_sides").value<Qt::Edges>();
+        if (edges & Qt::LeftEdge) {
+            hints.append(u"left-edge"_s);
+        }
+        if (edges & Qt::RightEdge) {
+            hints.append(u"right-edge"_s);
+        }
+        if (edges & Qt::TopEdge) {
+            hints.append(u"top-edge"_s);
+        }
+        if (edges & Qt::BottomEdge) {
+            hints.append(u"bottom-edge"_s);
+        }
+    }
     return hints;
 }
 
@@ -325,5 +355,9 @@ qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
 
 QRectF FrameElement::subElementRect(QStyle::SubElement element) const
 {
-    return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
+    const auto rect = m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
+    if (element == QStyle::SE_FrameContents) {
+        return rect.marginsRemoved(borderSize().toMargins());
+    }
+    return rect;
 }
