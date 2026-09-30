@@ -71,10 +71,8 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
     switch (enums.ControlElement) {
     case QStyle::CE_FocusFrame:
     case QStyle::CE_ShapedFrame:
-        // Skip drawing frames for items that have framewidth of 0, draw only background
-        if (pixelMetric(QStyle::PM_DefaultFrameWidth) == 0) {
-            drawPanel(painter);
-        } else {
+        // Skip drawing frames for items that have framewidth of 0
+        if (pixelMetric(QStyle::PM_DefaultFrameWidth) != 0) {
             drawBackground(painter);
         }
         break;
@@ -95,7 +93,9 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
     case QStyle::PE_FrameButtonBevel:
     case QStyle::PE_FrameButtonTool:
     case QStyle::PE_FrameTabBarBase:
-        drawFrame(painter);
+        if (pixelMetric(QStyle::PM_DefaultFrameWidth) != 0) {
+            drawFrame(painter);
+        }
         break;
     }
 }
@@ -218,6 +218,23 @@ QStringList FrameElement::elementHints() const
                     break;
                 }
             }
+        }
+    }
+    // Some applications use the "_breeze_borders_sides" as a way to drive the Breeze application style,
+    // keep it for backwards compatibility.
+    if (m_widget && m_widget->property("_breeze_borders_sides").isValid()) {
+        const auto edges = m_widget->property("_breeze_borders_sides").value<Qt::Edges>();
+        if (edges & Qt::LeftEdge) {
+            hints.append(u"left-edge"_s);
+        }
+        if (edges & Qt::RightEdge) {
+            hints.append(u"right-edge"_s);
+        }
+        if (edges & Qt::TopEdge) {
+            hints.append(u"top-edge"_s);
+        }
+        if (edges & Qt::BottomEdge) {
+            hints.append(u"bottom-edge"_s);
         }
     }
     return hints;
