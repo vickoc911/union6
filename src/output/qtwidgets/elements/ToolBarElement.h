@@ -19,8 +19,8 @@ namespace detail
 {
 /* clang-format off */
         template<> struct EnumToType<QStyle::ControlElement, QStyle::CE_ToolBar> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
-        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorToolBarHandle> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
-        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorToolBarSeparator> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorToolBarHandle> : public TypeHelper<ToolBarElement, QStyleOption>{};
+        template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_IndicatorToolBarSeparator> : public TypeHelper<ToolBarElement, QStyleOption>{};
         template<> struct EnumToType<QStyle::PrimitiveElement, QStyle::PE_PanelToolBar> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
         template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarSeparatorExtent> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
         template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_ToolBarFrameWidth> : public TypeHelper<ToolBarElement, QStyleOptionToolBar>{};
@@ -38,7 +38,7 @@ class ToolBarElement : public AbstractElement
     Q_OBJECT
 
 public:
-    ToolBarElement(const QStyleOptionToolBar *option, const UnionStyle *style, const QWidget *widget = nullptr);
+    ToolBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~ToolBarElement() override;
 
     void update() override;
