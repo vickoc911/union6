@@ -79,7 +79,7 @@ void ComboBoxElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::Indicator);
-    if (hasText()) {
+    if (hasText() || m_editable) {
         m_subElementList.append(ElementString::Text);
     }
     if (hasIcon()) {
@@ -108,25 +108,21 @@ QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
         return backgroundRectangle(m_comboBoxOption, m_backgroundProperties).toRect();
     case QStyle::SC_ComboBoxListBoxPopup:
         return m_comboBoxOption->rect;
-
     case QStyle::SC_ComboBoxArrow: {
         auto rect = m_layoutMap[ElementString::Indicator].rect;
         rect = rect.adjusted(-spacing(), 0, spacing(), 0);
         return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, rect.toRect());
     }
-
     case QStyle::SC_ComboBoxEditField: {
-        QRectF labelRect;
-        auto rect = m_comboBoxOption->rect;
-        auto indicatorRect = subControlRect(QStyle::SC_ComboBoxArrow);
-        labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
-        // Add some spacing between the icon and text in edit field
-        if (!m_comboBoxOption->currentIcon.isNull()) {
-            labelRect.adjust(spacing(), 0, spacing(), 0);
-        }
-        return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, labelRect.toRect());
+        QRectF rect = m_comboBoxOption->rect.marginsRemoved(borderSize().toMargins());
+        rect.setWidth(rect.width() - subControlRect(QStyle::SC_ComboBoxArrow).width());
+        // When drawing the text editor, it already reserves space for icon and spacing.
+        // This means we have to remove that reservation in here to make sure it matches the
+        // actual space it's using.
+        const auto iconAdjustment = (borderSize().left() + borderSize().right() + (spacing() * 2));
+        rect.moveLeft(m_layoutMap[ElementString::Text].rect.left() - iconAdjustment - m_layoutMap[ElementString::Icon].rect.width());
+        return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, rect.toRect());
     }
-
     default:
         break;
     }
