@@ -128,7 +128,7 @@ QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
         if (noButtons) {
             rect = QRect(0, 0, bgRect.width(), bgRect.height());
         } else {
-            rect = QRect(0, 0, x, bgRect.height());
+            rect = QRect(0, 0, x + averageHPadding() + spacing(), bgRect.height());
         }
     }
     if (subControl == QStyle::SC_SpinBoxFrame) {
