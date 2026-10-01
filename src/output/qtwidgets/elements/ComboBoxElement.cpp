@@ -65,6 +65,16 @@ void ComboBoxElement::draw(QPainter *painter, DrawEnums enums) const
     case QStyle::CC_ComboBox:
         drawBackground(painter);
         drawIcon(painter);
+        painter->save();
+        painter->setBrush(Qt::transparent);
+        painter->setPen(Qt::magenta);
+        painter->drawRect(m_layoutMap[ElementString::Text].rect);
+        painter->setPen(Qt::green);
+        painter->drawRect(m_layoutMap[ElementString::Icon].rect);
+        painter->setPen(Qt::blue);
+        painter->drawRect(m_layoutMap[ElementString::Indicator].rect);
+        painter->restore();
+
         drawIndicator(painter);
         break;
     }
@@ -116,15 +126,14 @@ QRectF ComboBoxElement::subControlRect(QStyle::SubControl subControl) const
     }
 
     case QStyle::SC_ComboBoxEditField: {
-        QRectF labelRect;
-        auto rect = m_comboBoxOption->rect;
-        auto indicatorRect = subControlRect(QStyle::SC_ComboBoxArrow);
-        labelRect = QRect(rect.left(), rect.top(), rect.width() - indicatorRect.width(), rect.height());
-        // Add some spacing between the icon and text in edit field
-        if (!m_comboBoxOption->currentIcon.isNull()) {
-            labelRect.adjust(spacing(), 0, spacing(), 0);
-        }
-        return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, labelRect.toRect());
+        // When drawing the text editor, it already reserves space for icon and spacing.
+        // This means we have to remove that reservation in here to make sure it matches the
+        // actual space it's using.
+        QRectF rect = m_comboBoxOption->rect;
+        const auto extraSpace = spacing() * 2;
+        rect.setWidth(rect.width() - subControlRect(QStyle::SC_ComboBoxArrow).width() - extraSpace);
+        rect.moveLeft(m_layoutMap[ElementString::Text].rect.left() - extraSpace - m_layoutMap[ElementString::Icon].rect.width());
+        return m_style->visualRect(m_comboBoxOption->direction, m_comboBoxOption->rect, rect.toRect());
     }
 
     default:
