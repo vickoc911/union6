@@ -32,10 +32,6 @@ void SpinBoxElement::update()
         return;
     }
     m_hasFrame = m_spinBoxOption->frame;
-    m_indicatorElementList = prepareElements(m_spinBoxOption, m_widget, {ElementString::Indicator});
-    if (!m_indicatorElementList.isEmpty()) {
-        m_indicatorProperties = queryProperties(m_indicatorElementList);
-    }
     m_hasButtons = (m_spinBoxOption->buttonSymbols != QAbstractSpinBox::NoButtons);
     updateSubElementList();
     layout();
@@ -114,8 +110,8 @@ QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     const QRectF buttonRect = m_layoutMap[ElementString::Indicator].rect;
     QRectF bgRect = m_spinBoxOption->rect;
 
-    auto width = safePropertyLookup(m_backgroundProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
-    auto height = safePropertyLookup(m_backgroundProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
+    auto width = safePropertyLookup(m_elementProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+    auto height = safePropertyLookup(m_elementProperties, 0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
 
     bgRect.setWidth(std::max(bgRect.width(), width));
     bgRect.setHeight(std::max(bgRect.height(), height));
@@ -132,7 +128,7 @@ QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     }
     if (subControl == QStyle::SC_SpinBoxEditField) {
         const auto width = noButtons ? bgRect.width() : x;
-        rect = QRectF(0, 0, width + averageHPadding() + spacing(), bgRect.height());
+        rect = QRectF(0, 0, width + averageHPadding(m_elementProperties) + spacing(), bgRect.height());
     }
     if (subControl == QStyle::SC_SpinBoxFrame) {
         rect = bgRect;
@@ -150,21 +146,21 @@ void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::Primitiv
     QIcon indicatorIcon;
     switch (primitive) {
     case QStyle::PE_IndicatorSpinPlus:
-        indicatorIcon = m_style->unionIcon(m_backgroundProperties, u"spinbox-increase"_s);
+        indicatorIcon = m_style->unionIcon(m_elementProperties, u"spinbox-increase"_s);
         break;
     case QStyle::PE_IndicatorSpinMinus:
-        indicatorIcon = m_style->unionIcon(m_backgroundProperties, u"spinbox-decrease"_s);
+        indicatorIcon = m_style->unionIcon(m_elementProperties, u"spinbox-decrease"_s);
         break;
     case QStyle::PE_IndicatorSpinUp:
-        indicatorIcon = m_style->unionIcon(m_backgroundProperties, u"arrow-up-symbolic"_s);
+        indicatorIcon = m_style->unionIcon(m_elementProperties, u"arrow-up-symbolic"_s);
         break;
     case QStyle::PE_IndicatorSpinDown:
-        indicatorIcon = m_style->unionIcon(m_backgroundProperties, u"arrow-down-symbolic"_s);
+        indicatorIcon = m_style->unionIcon(m_elementProperties, u"arrow-down-symbolic"_s);
         break;
     default:
         return;
     }
-    drawIconAtRect(painter, indicatorIcon, m_styleOption->rect, m_backgroundProperties);
+    drawIconAtRect(painter, indicatorIcon, m_styleOption->rect, m_elementProperties);
 }
 
 QStringList SpinBoxElement::elementHints() const
@@ -179,7 +175,7 @@ qreal SpinBoxElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
 {
     switch (pixelMetric) {
     case QStyle::PM_SpinBoxFrameWidth:
-        return averageBorderSize();
+        return averageBorderSize(m_elementProperties);
     default:
         break;
     }

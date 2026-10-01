@@ -35,6 +35,7 @@ public:
     void update() override;
     void layout() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
+    qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
     qreal pixelMetric(QStyle::PixelMetric metric) const override;
 
