@@ -10,6 +10,7 @@
 
 #include "SharedNames.h"
 #include <QMargins>
+#include <QPainter>
 #include <QPainterPath>
 #include <QStyleOption>
 
