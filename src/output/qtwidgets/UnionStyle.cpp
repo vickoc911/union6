@@ -629,9 +629,9 @@ int UnionStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWid
     case SH_ScrollView_FrameOnlyAroundContents:
         return false;
     case SH_FormLayoutFormAlignment:
-        return Qt::AlignLeft | Qt::AlignTop;
+        return Qt::AlignLeft | Qt::AlignVCenter;
     case SH_FormLayoutLabelAlignment:
-        return Qt::AlignRight;
+        return Qt::AlignRight | Qt::AlignVCenter;
     case SH_FormLayoutFieldGrowthPolicy:
         return QFormLayout::ExpandingFieldsGrow;
     case SH_FormLayoutWrapPolicy:
