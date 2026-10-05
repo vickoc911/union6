@@ -296,13 +296,21 @@ void AbstractElement::drawIndicator(QPainter *painter) const
 void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect) const
 {
     if (m_isValid) {
-        bool enabled = true;
+        auto iconState = QIcon::Normal;
         if (m_styleOption) {
-            enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
+            if (!m_styleOption->state.testFlag(QStyle::State_Enabled)) {
+                iconState = QIcon::Disabled;
+                // Click
+            } else if (m_styleOption->state.testFlags({QStyle::State_Sunken, QStyle::State_Selected})) {
+                iconState = QIcon::Selected;
+                // Hover
+            } else if (m_styleOption->state.testFlag(QStyle::State_Selected)) {
+                iconState = QIcon::Active;
+            }
         }
         const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
         auto iconSize = rect.size();
-        const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
+        const QPixmap pixmap = icon.pixmap(iconSize.toSize(), dpr, iconState);
         painter->save();
         m_style->drawItemPixmap(painter, rect.toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
