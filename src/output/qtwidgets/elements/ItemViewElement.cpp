@@ -13,6 +13,7 @@
 #include <QTreeView>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Properties;
 
 // ItemViewElements are often used in many weird ways within applications, so we need to ensure they're
 // backwards compatible. This means we can't give them custom layouts without breaking everything.
@@ -169,7 +170,19 @@ void ItemViewElement::drawBackground(QPainter *painter) const
     const QRect rect = m_styleOption->rect;
     const QRegion clipRegion = painter->hasClipping() ? (painter->clipRegion() & rect) : rect;
     painter->setClipRegion(clipRegion);
-    AbstractElement::drawBackground(painter);
+
+    // Draw custom background color with simple rectangle if set and not selected
+    const bool hasCustomBackground = m_viewItemOption->backgroundBrush.style() != Qt::NoBrush && !m_styleOption->state.testFlag(QStyle::State_Selected);
+    if (hasCustomBackground) {
+        const auto radius =
+            safePropertyLookup(m_backgroundProperties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
+        const auto path = unevenRadiiRectPath(rect, radius);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(m_viewItemOption->backgroundBrush);
+        painter->drawPath(path);
+    } else {
+        AbstractElement::drawBackground(painter);
+    }
     painter->restore();
 }
 
@@ -188,7 +201,7 @@ void ItemViewElement::drawIcon(QPainter *painter) const
 {
     if (hasIcon() && m_isValid) {
         QRect iconRect = m_style->subElementRect(QStyle::SE_ItemViewItemDecoration, m_viewItemOption, m_widget);
-        drawIconAtRect(painter, m_icon, iconRect);
+        drawIconAtRect(painter, m_icon, iconRect, m_backgroundProperties);
     }
 }
 QVariantMap ItemViewElement::elementAttributes() const
