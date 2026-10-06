@@ -35,16 +35,11 @@ void TabElement::update()
     m_isVertical = m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::RoundedWest || m_tabOption->shape == QTabBar::TriangularEast
         || m_tabOption->shape == QTabBar::TriangularWest;
 
-    if (const auto tabBar = qobject_cast<QTabBar *>(const_cast<QWidget *>(m_widget))) {
-    tabBar->setExpanding(false);
-
-    m_isStatic = m_tabOption->documentMode
-        && !tabBar->tabsClosable()
-        && !tabBar->isMovable()
-        && (tabBar->expanding() || m_isVertical);
-} else {
-    m_isStatic = false;
-}
+    if (const auto tabBar = qobject_cast<const QTabBar *>(m_widget)) {
+        m_isStatic = m_tabOption->documentMode && tabBar && !tabBar->tabsClosable() && !tabBar->isMovable() && (tabBar->expanding() || m_isVertical);
+    } else {
+        m_isStatic = false;
+    }
 
     setIcon(m_tabOption->icon);
     setText(m_tabOption->text);

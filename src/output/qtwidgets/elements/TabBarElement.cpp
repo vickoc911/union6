@@ -111,7 +111,11 @@ int TabBarElement::styleHint(QStyle::StyleHint styleHint) const
 {
     switch (styleHint) {
     case QStyle::SH_TabBar_Alignment:
-        return Qt::AlignCenter;
+        return toQtHorizontalAlignment(safePropertyLookup(m_backgroundProperties,
+                                                          Alignment::Start,
+                                                          &StylePropertyGroup::layout,
+                                                          &LayoutPropertyGroup::alignment,
+                                                          &AlignmentPropertyGroup::horizontal));
     case QStyle::SH_TabBar_ElideMode:
         return toQtElideMode(
             safePropertyLookup(m_backgroundProperties, Union::Properties::TextElide::Right, &StylePropertyGroup::text, &TextPropertyGroup::elide));
