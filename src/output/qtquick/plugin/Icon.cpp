@@ -5,6 +5,7 @@
 
 #include <QQmlFile>
 #include <QQmlProperty>
+#include <QQuickAsyncImageProvider>
 #include <QQuickRenderControl>
 #include <QSGImageNode>
 
@@ -24,6 +25,10 @@ using namespace Qt::StringLiterals;
 // icons in favour of using a smaller icon.
 QSize iconSizeForSize(const QIcon &icon, const QSizeF &size)
 {
+    if (icon.isNull()) {
+        return size.toSize();
+    }
+
     auto availableSizes = icon.availableSizes();
     if (availableSizes.isEmpty()) {
         return icon.actualSize(size.toSize());
@@ -90,18 +95,16 @@ void Icon::setSource(const QUrl &newSource)
         return;
     }
 
-    if (!QQmlFile::isLocalFile(newSource)) {
-        if (newSource.isRelative()) {
-            // Some code might incorrectly set icon.source to an icon name, in that case
-            // treat the URL as a name.
-            qCWarning(UNION_QTQUICK) << "Relative URL" << newSource.toString() << "used as an Icon source. This is wrong, interpreting it as icon name instead";
-            setName(newSource.toString());
-        } else {
-            qCDebug(UNION_QTQUICK) << "Non-local source URL" << newSource << "used as Icon source is unsupported";
-        }
+    if (newSource.isRelative()) {
+        // Some code might incorrectly set icon.source to an icon name, in that case
+        // treat the URL as a name.
+        qCWarning(UNION_QTQUICK) << "Relative URL" << newSource.toString() << "used as an Icon source. This is wrong, interpreting it as icon name instead";
+        setName(newSource.toString());
+        return;
     }
 
     m_source = newSource;
+    polish();
     Q_EMIT sourceChanged();
 }
 
@@ -172,7 +175,7 @@ void Icon::resetControl()
 
 QSGNode *Icon::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *)
 {
-    if (m_icon.isNull()) {
+    if (std::holds_alternative<std::nullopt_t>(m_iconData)) {
         return nullptr;
     }
 
@@ -202,9 +205,7 @@ QSGNode *Icon::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *)
     }
 
     if (m_iconChanged || !imageNode->texture() || !qFuzzyCompare(m_iconDpr, dpr)) {
-        const auto mode = isEnabled() ? QIcon::Mode::Normal : QIcon::Mode::Disabled;
-        auto image = m_icon.pixmap(m_iconSize, dpr, mode).toImage();
-        imageNode->setTexture(window()->createTextureFromImage(image, QQuickWindow::TextureCanUseAtlas));
+        updateTexture(imageNode);
         m_iconChanged = false;
         m_iconDpr = dpr;
     }
@@ -238,26 +239,74 @@ void Icon::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChang
 
 void Icon::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
-    auto oldIconSize = m_iconSize;
-    m_iconSize = iconSizeForSize(m_icon, newGeometry.size());
-
-    if (oldIconSize != m_iconSize) {
-        m_iconChanged = true;
+    if (std::holds_alternative<QIcon>(m_iconData)) {
+        auto oldIconSize = m_iconSize;
+        m_iconSize = iconSizeForSize(std::get<QIcon>(m_iconData), newGeometry.size());
+        if (oldIconSize != m_iconSize) {
+            m_iconChanged = true;
+        }
     }
-    update();
-
     QQuickItem::geometryChange(newGeometry, oldGeometry);
 }
 
 void Icon::updatePolish()
 {
-    if (!m_source.isEmpty() && QQmlFile::isLocalFile(m_source)) {
-        m_icon = QIcon(QQmlFile::urlToLocalFileOrQrc(m_source));
+    auto boundingSize = boundingRect().size();
+
+    if (!m_name.isEmpty()) {
+        m_iconData = Union::StyleRegistry::instance()->platform()->platformIcon(m_name, m_color);
+        m_iconSize = iconSizeForSize(std::get<QIcon>(m_iconData), boundingSize);
+    } else if (QQmlFile::isLocalFile(m_source)) {
+        m_iconData = QIcon(QQmlFile::urlToLocalFileOrQrc(m_source));
+        m_iconSize = iconSizeForSize(std::get<QIcon>(m_iconData), boundingSize);
+    } else if (m_source.scheme() == u"image") {
+        auto provider = static_cast<QQuickImageProvider *>(qmlEngine(this)->imageProvider(m_source.host()));
+        auto id = m_source.path();
+        QSize actualSize;
+        if (provider) {
+            switch (provider->imageType()) {
+            case QQuickImageProvider::Image:
+                m_iconData = provider->requestImage(id, &actualSize, boundingSize.toSize());
+                m_iconSize = actualSize;
+                break;
+            case QQuickImageProvider::Pixmap:
+                m_iconData = provider->requestPixmap(id, &actualSize, boundingSize.toSize()).toImage();
+                m_iconSize = actualSize;
+                break;
+            case QQuickImageProvider::Texture:
+                m_iconData = provider->requestTexture(id, &actualSize, boundingSize.toSize());
+                m_iconSize = actualSize;
+                break;
+            case QQuickImageProvider::ImageResponse: {
+                auto response = static_cast<QQuickAsyncImageProvider *>(provider)->requestImageResponse(id, boundingSize.toSize());
+                connect(response, &QQuickImageResponse::finished, this, [id, response, this]() {
+                    if (response->errorString().isEmpty()) {
+                        m_iconData = response->textureFactory();
+                        m_iconSize = response->textureFactory()->textureSize();
+                    } else {
+                        m_iconData = std::nullopt;
+                        m_iconSize = QSize{};
+                    }
+                    m_iconChanged = true;
+                    update();
+                    response->deleteLater();
+                });
+                break;
+            }
+            case QQuickImageProvider::Invalid:
+                m_iconData = std::nullopt;
+                break;
+            }
+        }
+    } else if (m_source.isValid()) {
+        qCWarning(UNION_QTQUICK) << "Remote images are not supported by Union::Icon";
+        m_iconData = Union::StyleRegistry::instance()->platform()->platformIcon(u"unknown"_s, m_color);
+        m_iconSize = iconSizeForSize(std::get<QIcon>(m_iconData), boundingSize);
     } else {
-        m_icon = Union::StyleRegistry::instance()->platform()->platformIcon(m_name, m_color);
+        m_iconSize = QSize{};
+        m_iconData = std::nullopt;
     }
 
-    m_iconSize = iconSizeForSize(m_icon, boundingRect().size());
     m_iconChanged = true;
     update();
 }
@@ -297,6 +346,36 @@ void Icon::onControlIconChanged()
     setName(nameProperty.readOnGadget(data).toString());
     setSource(sourceProperty.readOnGadget(data).toUrl());
     setColor(colorProperty.readOnGadget(data).value<QColor>());
+}
+
+// Helper for std::visit
+template<class... Ts>
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
+
+void Icon::updateTexture(QSGImageNode *node)
+{
+    std::visit(overloaded{//
+                          [&](std::nullopt_t) { },
+                          [&, this](const QIcon &icon) {
+                              auto renderWindow = QQuickRenderControl::renderWindowFor(window());
+                              if (!renderWindow) {
+                                  renderWindow = window();
+                              }
+                              auto dpr = renderWindow->devicePixelRatio();
+                              auto mode = isEnabled() ? QIcon::Mode::Normal : QIcon::Mode::Disabled;
+                              auto image = icon.pixmap(m_iconSize, dpr, mode).toImage();
+                              node->setTexture(
+                                  window()->createTextureFromImage(icon.pixmap(m_iconSize, dpr, mode).toImage(), QQuickWindow::TextureCanUseAtlas));
+                          },
+                          [&](const QImage &image) {
+                              node->setTexture(window()->createTextureFromImage(image, QQuickWindow::TextureCanUseAtlas));
+                          },
+                          [&](QQuickTextureFactory *factory) {
+                              node->setTexture(factory->createTexture(window()));
+                          }},
+               m_iconData);
 }
 
 #include "moc_Icon.cpp"
