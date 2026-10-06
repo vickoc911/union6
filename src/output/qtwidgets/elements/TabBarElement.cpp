@@ -111,7 +111,7 @@ int TabBarElement::styleHint(QStyle::StyleHint styleHint) const
 {
     switch (styleHint) {
     case QStyle::SH_TabBar_Alignment:
-        return toQtHorizontalAlignment(safePropertyLookup(m_backgroundProperties,
+        return toQtHorizontalAlignment(safePropertyLookup(m_stylePropertyGroup,
                                                           Alignment::Start,
                                                           &StylePropertyGroup::layout,
                                                           &LayoutPropertyGroup::alignment,
