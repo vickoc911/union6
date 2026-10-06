@@ -578,6 +578,18 @@ int UnionStyle::styleHint(StyleHint hint, const QStyleOption *option, const QWid
         return cached->styleHint(hint);
     }
 
+    // QTabBar queries these style hints without a QStyleOption (option is nullptr),
+    // so the element cache cannot construct a TabBarElement for them. Synthesize a
+    // QStyleOptionTabBarBase from the tab bar widget instead.
+    if (option == nullptr && widget && (hint == QStyle::SH_TabBar_Alignment || hint == QStyle::SH_TabBar_ElideMode)) {
+        if (const auto *tabBar = qobject_cast<const QTabBar *>(widget)) {
+            QStyleOptionTabBarBase defaultOption;
+            defaultOption.initFrom(tabBar);
+            defaultOption.shape = tabBar->shape();
+            return TabBarElement(&defaultOption, this, widget).styleHint(hint);
+        }
+    }
+
     switch (hint) {
     case SH_RubberBand_Mask: {
         if (auto mask = qstyleoption_cast<QStyleHintReturnMask *>(returnData)) {
