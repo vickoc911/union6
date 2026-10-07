@@ -722,6 +722,10 @@ void UnionStyle::polish(QWidget *widget)
                 widget->setAutoFillBackground(false);
             }
         }
+
+        if (auto spinBox = qobject_cast<QAbstractSpinBox *>(widget)) {
+            spinBox->setAutoFillBackground(false);
+        }
     }
     if (qobject_cast<QScrollBar *>(widget)) {
         // remove opaque painting for scrollbars
