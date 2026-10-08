@@ -135,3 +135,8 @@
         Only Width value is used.
 
     type: TextCursorWidth
+
+-   name: Splitter
+    group: QtWidgets Elements
+    description: The style of a QSplitter widget.
+    type: Splitter
