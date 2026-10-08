@@ -10,4 +10,8 @@ The Union QtWidgets Output plugin implements a QStyle for QtWidgets,
 which uses data from Union's intermediate layer to style QtWidgets.
 In cases where styling is not provided, QCommonStyle is used as a fallback.
 
+Do note that QtWidgets Output has some limitations, especially regarding layouting:
+Applications tend to expect very specific behavior from QtWidgets styles, so
+these limitations are there to preserve backwards compatibility.
+
 */
