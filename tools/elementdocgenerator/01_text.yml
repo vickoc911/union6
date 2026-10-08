@@ -23,6 +23,25 @@
     -   Enabled
     hints:
         changed: Set whenever the element should visualize a changed state.
+        panel-right: Widget is KPageListView or KPageTreeView and placed in right panel.
+        panel-left: Widget is KPageListView or KPageTreeView and placed in left panel.
+        dock-left: If item is in a DockWidget that is located in LeftDockWidgetArea.
+        dock-right: If item is in a DockWidget that is located in RightDockWidgetArea.
+        dock-top: If item is in a DockWidget that is located in TopDockWidgetArea.
+        dock-bottom: If item is in a DockWidget that is located in BottomDockWidgetArea.
+        left-edge: Widget uses "_breeze_borders_sides" hint to draw left border.
+        right-edge: Widget uses "_breeze_borders_sides" hint to draw right border.
+        top-edge: Widget uses "_breeze_borders_sides" hint to draw top border.
+        bottom-edge: Widget uses "_breeze_borders_sides" hint to draw bottom border.
+    attributes:
+        shape:
+            description: Widget shape of the frame around the textfield.
+            values:
+                panel: Regular frame around the widget.
+                no-frame: Widget is flat, has no frame around it.
+                box: Widget is expected to draw a simple box frame.
+                horizontal-line: Only a horizontal line is being drawn.
+                vertical-line: Only a vertical line is being drawn
     subelements:
     -   name: Text
         description: |
@@ -71,6 +90,25 @@
     -   Enabled
     hints:
         changed: Set whenever the element should visualize a changed state.
+        panel-right: Widget is KPageListView or KPageTreeView and placed in right panel.
+        panel-left: Widget is KPageListView or KPageTreeView and placed in left panel.
+        dock-left: If item is in a DockWidget that is located in LeftDockWidgetArea.
+        dock-right: If item is in a DockWidget that is located in RightDockWidgetArea.
+        dock-top: If item is in a DockWidget that is located in TopDockWidgetArea.
+        dock-bottom: If item is in a DockWidget that is located in BottomDockWidgetArea.
+        left-edge: Widget uses "_breeze_borders_sides" hint to draw left border.
+        right-edge: Widget uses "_breeze_borders_sides" hint to draw right border.
+        top-edge: Widget uses "_breeze_borders_sides" hint to draw top border.
+        bottom-edge: Widget uses "_breeze_borders_sides" hint to draw bottom border.
+    attributes:
+        shape:
+            description: Widget shape of the Frame around TextArea.
+            values:
+                panel: Regular frame around the widget.
+                no-frame: Widget is flat, has no frame around it.
+                box: Widget is expected to draw a simple box frame.
+                horizontal-line: Only a horizontal line is being drawn.
+                vertical-line: Only a vertical line is being drawn
     subelements:
     -   name: Text
         description: |
