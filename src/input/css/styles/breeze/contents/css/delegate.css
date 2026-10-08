@@ -12,6 +12,7 @@
     --delegate-spacing: var(--medium-spacing);
     --delegate-padding: var(--small-spacing);
     --delegate-total-padding: 10px; /* spacing + padding */
+    --focus-highlight-color: mix(var(--window-text-color), var(--highlight-color), 0.7);
 }
 
 itemdelegate,
@@ -203,6 +204,16 @@ itemviewitem {
         {
             text-wrap-mode: wrap;
         }
+    }
+}
+
+focusframe {
+    background-color: transparent;
+    border: 1px solid var(--highlight-color);
+    border-radius: var(--corner-radius);
+    inset: 1px;
+    &:highlighted {
+        border: 1px solid var(--focus-highlight-color);
     }
 }
 
