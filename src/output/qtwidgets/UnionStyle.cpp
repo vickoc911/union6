@@ -114,6 +114,7 @@ using namespace Union::Properties;
 UnionStyle::UnionStyle()
     : QCommonStyle()
     , m_showMnemonics(false)
+    , _shadowHelper(std::make_unique<ShadowHelper>())
 {
     qApp->installEventFilter(this);
     Union::StyleRegistry::instance()->load();
@@ -701,6 +702,7 @@ void UnionStyle::polish(QWidget *widget)
                 widget->setAutoFillBackground(false);
             }
         }
+        _shadowHelper->registerWidget(widget);
     }
     if (qobject_cast<QScrollBar *>(widget)) {
         // remove opaque painting for scrollbars
@@ -711,6 +713,12 @@ void UnionStyle::polish(QWidget *widget)
     }
 
     QCommonStyle::polish(widget);
+}
+
+void UnionStyle::unpolish(QWidget *widget)
+{
+    _shadowHelper->unregisterWidget(widget);
+    QCommonStyle::unpolish(widget);
 }
 
 QStringList UnionStyle::widgetToElementHierarchy(const QWidget *widget) const
