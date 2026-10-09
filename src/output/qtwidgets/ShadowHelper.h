@@ -56,6 +56,12 @@ struct CompositeShadowParams {
     QPoint offset;
     ShadowParams shadow1;
     ShadowParams shadow2;
+    QColor color;
+
+    void setColor(QColor newColor)
+    {
+        color = newColor;
+    }
 
     void operator*=(qreal factor)
     {
@@ -78,7 +84,7 @@ public:
     ~ShadowHelper() override;
 
     //* shadow params from size enum
-    static CompositeShadowParams lookupShadowParams(int shadowSizeEnum);
+    static CompositeShadowParams lookupShadowParams(QWidget *widget);
 
     //* reset
     void reset();
