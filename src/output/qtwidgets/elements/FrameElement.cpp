@@ -25,6 +25,12 @@ FrameElement::FrameElement(const QStyleOptionFrame *option, const UnionStyle *st
     , m_frameOption(option)
 {
     update();
+    if (m_elementProperties && m_frameOption) {
+        m_shadowWidget = qobject_cast<QWidget *>(m_frameOption->styleObject);
+        if (m_shadowWidget) {
+            m_shadowRenderer = std::make_unique<ShadowRenderer>(m_elementProperties);
+        }
+    }
 }
 
 FrameElement::~FrameElement()
@@ -86,6 +92,7 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
             if (pixelMetric(QStyle::PM_DefaultFrameWidth) != 0) {
                 drawBackground(painter);
             }
+            drawShadow();
             break;
         }
         break;
@@ -95,19 +102,31 @@ void FrameElement::draw(QPainter *painter, DrawEnums enums) const
     switch (enums.PrimitiveElement) {
     case QStyle::PE_Frame:
     case QStyle::PE_FrameDefaultButton:
-    case QStyle::PE_FrameDockWidget:
     case QStyle::PE_FrameFocusRect:
     case QStyle::PE_FrameGroupBox:
     case QStyle::PE_FrameLineEdit:
-    case QStyle::PE_FrameMenu:
     case QStyle::PE_FrameStatusBarItem:
     case QStyle::PE_FrameTabWidget:
-    case QStyle::PE_FrameWindow:
     case QStyle::PE_FrameButtonBevel:
     case QStyle::PE_FrameButtonTool:
     case QStyle::PE_FrameTabBarBase:
         drawFrame(painter);
         break;
+    case QStyle::PE_FrameWindow:
+        drawFrame(painter);
+        drawShadow();
+        break;
+    case QStyle::PE_FrameDockWidget:
+        drawFrame(painter);
+        drawShadow();
+        break;
+    }
+}
+
+void FrameElement::drawShadow() const
+{
+    if (m_shadowRenderer && m_shadowWidget) {
+        m_shadowRenderer->drawShadow(m_shadowWidget);
     }
 }
 
