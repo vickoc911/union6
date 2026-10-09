@@ -125,3 +125,80 @@ void PlasmaPlatformPlugin::setDefaultStyle(const QString &style)
     m_defaultStyle = style;
     sendDefaultStyleChangedEvent();
 }
+
+const QVector<KWindowShadowTile::Ptr> &PlasmaPlatformPlugin::createShadowTiles(const QVector<QPixmap> &pixmaps)
+{
+    auto createTile = [](const QPixmap &source) -> KWindowShadowTile::Ptr {
+        KWindowShadowTile::Ptr tile = KWindowShadowTile::Ptr::create();
+        tile->setImage(source.toImage());
+        return tile;
+    };
+
+    // make sure size is valid
+    if (m_tiles.isEmpty()) {
+        m_tiles = {createTile(pixmaps[1]),
+                   createTile(pixmaps[2]),
+                   createTile(pixmaps[5]),
+                   createTile(pixmaps[8]),
+                   createTile(pixmaps[7]),
+                   createTile(pixmaps[6]),
+                   createTile(pixmaps[3]),
+                   createTile(pixmaps[0])};
+    }
+
+    // return relevant list of shadow tiles
+    return m_tiles;
+}
+
+bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps)
+{
+    // create platform shadow tiles if needed
+    bool shadowInstalled = false;
+    const QVector<KWindowShadowTile::Ptr> &tiles = createShadowTiles(tilePixmaps);
+    if (tiles.count() != tileAmount) {
+        return shadowInstalled;
+    }
+
+    // find a shadow associated with the widget
+    KWindowShadow *&shadow = m_shadows[window];
+
+    if (!shadow) {
+        // if there is no shadow yet, create one
+        shadow = new KWindowShadow(window);
+
+        // connect destroy signal
+        shadowInstalled = true;
+    }
+
+    if (shadow->isCreated()) {
+        shadow->destroy();
+    }
+
+    shadow->setTopTile(tiles[0]);
+    shadow->setTopRightTile(tiles[1]);
+    shadow->setRightTile(tiles[2]);
+    shadow->setBottomRightTile(tiles[3]);
+    shadow->setBottomTile(tiles[4]);
+    shadow->setBottomLeftTile(tiles[5]);
+    shadow->setLeftTile(tiles[6]);
+    shadow->setTopLeftTile(tiles[7]);
+    shadow->setPadding(shadowMargins);
+    shadow->setWindow(window);
+    shadow->create();
+    return shadowInstalled;
+}
+
+void PlasmaPlatformPlugin::resetShadowTiles()
+{
+    m_tiles.clear();
+}
+
+void PlasmaPlatformPlugin::deleteAllShadows()
+{
+    qDeleteAll(m_shadows);
+}
+
+void PlasmaPlatformPlugin::deleteWindowShadow(QWindow *window)
+{
+    delete m_shadows.take(window);
+}
