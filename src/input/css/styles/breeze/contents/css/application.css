@@ -324,6 +324,10 @@ dockwidget {
         border: 1px solid var(--highlight-color);
     }
 
+    frame {
+        box-shadow: 0px 2px var(--popup-shadow-size) 0px rgba(0, 0, 0, 0.2);
+    }
+
     floatbutton,
     closebutton {
         width: var(--small-element-size);
