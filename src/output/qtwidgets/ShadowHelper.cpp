@@ -9,6 +9,8 @@
 
 #include "BoxShadowRenderer.h"
 
+#include "BackgroundDrawing.h"
+
 #include <KWindowSystem>
 
 #include "StyleRegistry.h"
@@ -26,20 +28,8 @@
 using namespace Union::Properties;
 using namespace Qt::StringLiterals;
 
-const CompositeShadowParams s_shadowParams[] = {
-    // None
-    CompositeShadowParams(),
-    // Small
-    CompositeShadowParams(QPoint(0, 3), ShadowParams(QPoint(0, 0), 12, 0.26), ShadowParams(QPoint(0, -2), 6, 0.16)),
-    // Medium
-    CompositeShadowParams(QPoint(0, 4), ShadowParams(QPoint(0, 0), 16, 0.24), ShadowParams(QPoint(0, -2), 8, 0.14)),
-    // Large
-    CompositeShadowParams(QPoint(0, 5), ShadowParams(QPoint(0, 0), 20, 0.22), ShadowParams(QPoint(0, -3), 10, 0.12)),
-    // Very Large
-    CompositeShadowParams(QPoint(0, 6), ShadowParams(QPoint(0, 0), 24, 0.2), ShadowParams(QPoint(0, -3), 12, 0.1))};
-
 //_____________________________________________________
-CompositeShadowParams ShadowHelper::lookupShadowParams(QWidget *widget)
+Shadow ShadowHelper::lookupShadowParams(QWidget *widget)
 {
     Union::ElementList elements;
     QStringList elementTypes = widget->property("_union_member_list").toStringList();
@@ -59,18 +49,14 @@ CompositeShadowParams ShadowHelper::lookupShadowParams(QWidget *widget)
     auto shadowColor = safePropertyLookup(properties, Union::Color(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::color);
     auto shadowBlur = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::blur);
     // TODO: We only do blurring for now, need to add just size
-    // auto shadowSize = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::size);
+    auto shadowSize = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::size);
     auto shadowRadius = safePropertyLookup(properties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
     auto shadowOffset =
         safePropertyLookup(properties, QVector2D(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::offset, &OffsetPropertyGroup::toVector2D);
 
     // We need to portrude shadow around the edges for the blurAmount (or shadowSize??)
-    auto params = CompositeShadowParams(QPoint(shadowOffset.x(), shadowOffset.y()),
-                                        ShadowParams(QPoint(0, 0), shadowBlur, 1.0),
-                                        ShadowParams(QPoint(-shadowOffset.x(), -shadowOffset.y()), shadowBlur, 1.0));
-    params.color = shadowColor.toQColor();
-    // TODO: Need to get all radiuses
-    params.radius = shadowRadius.topLeft;
+    auto params = Shadow(QPoint(shadowOffset.x(), shadowOffset.y()), shadowBlur, shadowSize, shadowColor.toQColor());
+    params.cornerRadius = shadowRadius;
     return params;
 }
 
@@ -172,38 +158,15 @@ bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
 //_______________________________________________________
 TileSet ShadowHelper::shadowTiles(QWidget *widget)
 {
-    CompositeShadowParams params = lookupShadowParams(widget);
-
-    if (params.isNone()) {
-        return TileSet();
-    } else if (_shadowTiles.isValid()) {
+    if (_shadowTiles.isValid()) {
         return _shadowTiles;
     }
-
-    const qreal dpr = devicePixelRatio(widget);
-    params *= dpr;
-
-    auto withOpacity = [](const QColor &color, qreal opacity) -> QColor {
-        QColor c(color);
-        c.setAlphaF(opacity);
-        return c;
-    };
-
-    const QColor color = params.color;
-
-    const QSize boxSize =
-        BoxShadowRenderer::calculateMinimumBoxSize(params.shadow1.radius).expandedTo(BoxShadowRenderer::calculateMinimumBoxSize(params.shadow2.radius));
-
-    const qreal frameRadius = 5;
+    Shadow params = lookupShadowParams(widget);
+    const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
 
     BoxShadowRenderer shadowRenderer;
-    shadowRenderer.setBorderRadius(frameRadius);
     shadowRenderer.setBoxSize(boxSize);
-
-    const qreal strength = static_cast<qreal>(params.color.alpha()) / 255.0;
-
-    shadowRenderer.addShadow(params.shadow1.offset, params.shadow1.radius, withOpacity(color, params.shadow1.opacity * strength));
-    shadowRenderer.addShadow(params.shadow2.offset, params.shadow2.radius, withOpacity(color, params.shadow2.opacity * strength));
+    shadowRenderer.addShadow(params);
 
     QImage shadowTexture = shadowRenderer.render();
 
@@ -224,7 +187,8 @@ TileSet ShadowHelper::shadowTiles(QWidget *widget)
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
     painter.setCompositionMode(QPainter::CompositionMode_DestinationOut);
-    painter.drawRoundedRect(outerRect - margins, frameRadius, frameRadius);
+    auto path = unevenRadiiRectPath(outerRect - margins, params.cornerRadius);
+    painter.drawPath(path);
 
     // We're done.
     painter.end();
@@ -398,18 +362,10 @@ void ShadowHelper::installShadows(QWidget *widget)
 //_______________________________________________________
 QMargins ShadowHelper::shadowMargins(QWidget *widget) const
 {
-    CompositeShadowParams params = lookupShadowParams(widget);
-    if (params.isNone()) {
-        return QMargins();
-    }
-    qreal dpr = devicePixelRatio(widget);
-    params *= dpr;
+    Shadow params = lookupShadowParams(widget);
+    const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
 
-    const QSize boxSize =
-        BoxShadowRenderer::calculateMinimumBoxSize(params.shadow1.radius).expandedTo(BoxShadowRenderer::calculateMinimumBoxSize(params.shadow2.radius));
-
-    const QSizeF shadowSize = BoxShadowRenderer::calculateMinimumShadowTextureSize(boxSize, params.shadow1.radius, params.shadow1.offset)
-                                  .expandedTo(BoxShadowRenderer::calculateMinimumShadowTextureSize(boxSize, params.shadow2.radius, params.shadow2.offset));
+    const QSizeF shadowSize = BoxShadowRenderer::calculateMinimumShadowTextureSize(boxSize, params);
 
     const QRectF shadowRect(QPoint(0, 0), shadowSize);
 
@@ -445,11 +401,4 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
 void ShadowHelper::uninstallShadows(QWidget *widget)
 {
     delete _shadows.take(widget->windowHandle());
-}
-
-//_______________________________________________________
-qreal ShadowHelper::devicePixelRatio(QWidget *widget)
-{
-    // On Wayland, the compositor will upscale the shadow tiles if necessary.
-    return 1;
 }

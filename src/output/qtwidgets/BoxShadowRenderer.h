@@ -7,6 +7,7 @@
 #pragma once
 
 // Qt
+#include "ShadowHelper.h"
 #include <QColor>
 #include <QImage>
 #include <QPoint>
@@ -24,18 +25,10 @@ public:
     void setBoxSize(const QSizeF &size);
 
     /**
-     * Set the radius of box' corners.
-     * @param radius The border radius, in pixels.
-     **/
-    void setBorderRadius(qreal radius);
-
-    /**
      * Add a shadow.
-     * @param offset The offset of the shadow.
-     * @param radius The blur radius.
-     * @param color The color of the shadow.
+     * @param Shadow The shadow struct.
      **/
-    void addShadow(const QPointF &offset, double radius, const QColor &color);
+    void addShadow(const Shadow &shadow);
 
     /**
      * Render the shadow.
@@ -50,7 +43,7 @@ public:
      *
      * @param radius The blur radius of the shadow.
      **/
-    static QSize calculateMinimumBoxSize(int radius);
+    static QSize calculateMinimumBoxSize(const Shadow &shadow);
 
     /**
      * Calculate the minimum size of the shadow texture.
@@ -59,20 +52,12 @@ public:
      * is not clipped.
      *
      * @param boxSize The size of the box.
-     * @param radius The blur radius.
-     * @param offset The offset of the shadow.
+     * @param shadow The shadow struct.
      **/
-    static QSizeF calculateMinimumShadowTextureSize(const QSizeF &boxSize, double radius, const QPointF &offset);
+    static QSizeF calculateMinimumShadowTextureSize(const QSizeF &boxSize, const Shadow &shadow);
 
 private:
     QSizeF m_boxSize;
-    qreal m_borderRadius = 0.0;
-
-    struct Shadow {
-        QPointF offset;
-        double radius;
-        QColor color;
-    };
 
     QVector<Shadow> m_shadows;
 };

@@ -11,62 +11,30 @@
 
 #include <KWindowShadow>
 
+#include "properties/CornersPropertyGroup.h"
+#include <QColor>
 #include <QMap>
 #include <QMargins>
 #include <QObject>
 #include <QPointer>
 #include <QSet>
 
-struct ShadowParams {
-    ShadowParams() = default;
+struct Shadow {
+    Shadow() = default;
 
-    ShadowParams(const QPoint &offset, int radius, qreal opacity)
+    Shadow(const QPoint &offset, qreal blur, qreal spread, const QColor &color)
         : offset(offset)
-        , radius(radius)
-        , opacity(opacity)
+        , blur(blur)
+        , spread(spread)
+        , color(color)
     {
     }
 
     QPoint offset;
-    int radius = 0;
-    qreal opacity = 0;
-
-    void operator*=(qreal factor)
-    {
-        offset *= factor;
-        radius = qRound(radius * factor);
-    }
-};
-
-struct CompositeShadowParams {
-    CompositeShadowParams() = default;
-
-    CompositeShadowParams(const QPoint &offset, const ShadowParams &shadow1, const ShadowParams &shadow2)
-        : offset(offset)
-        , shadow1(shadow1)
-        , shadow2(shadow2)
-        , color(QColor())
-        , radius(0)
-    {
-    }
-
-    bool isNone() const
-    {
-        return qMax(shadow1.radius, shadow2.radius) == 0;
-    }
-
-    QPoint offset;
-    ShadowParams shadow1;
-    ShadowParams shadow2;
+    qreal blur;
+    qreal spread;
     QColor color;
-    qreal radius;
-
-    void operator*=(qreal factor)
-    {
-        offset *= factor;
-        shadow1 *= factor;
-        shadow2 *= factor;
-    }
+    Union::Properties::CornersPropertyGroup::CornerRadii cornerRadius;
 };
 
 //* handle shadow pixmaps passed to window manager via X property
@@ -82,7 +50,7 @@ public:
     ~ShadowHelper() override;
 
     //* shadow params from size enum
-    static CompositeShadowParams lookupShadowParams(QWidget *widget);
+    static Shadow lookupShadowParams(QWidget *widget);
 
     //* reset
     void reset();
@@ -102,9 +70,6 @@ public:
     //* shadow tiles
     /** is public because it is also needed for mdi windows */
     TileSet shadowTiles(QWidget *);
-
-    //* return device pixel ratio for the window containing the widget
-    static qreal devicePixelRatio(QWidget *);
 
 protected Q_SLOTS:
 
