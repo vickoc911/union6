@@ -17,6 +17,7 @@
 
 // own
 #include "BoxShadowRenderer.h"
+#include "BackgroundDrawing.h"
 
 // Qt
 #include <QPainter>
@@ -236,49 +237,50 @@ static inline void mirrorTopLeftQuadrant(QImage &image)
     }
 }
 
-static void renderShadow(QPainter *painter, const QRectF &rect, qreal borderRadius, const QPointF &offset, double radius, const QColor &color)
+static void renderShadow(QPainter *painter, const QRectF &rect, const Shadow &shadow)
 {
     const qreal dpr = painter->device()->devicePixelRatioF();
-    const QSize inflation = calculateBlurExtent(radius);
+    const QSize inflation = calculateBlurExtent(shadow.blur);
     const QSize pixelSize = ((rect.size() + 2 * inflation) * dpr).toSize();
     const QSizeF size = QSizeF(pixelSize) / dpr;
 
-    QImage shadow(pixelSize, QImage::Format_ARGB32_Premultiplied);
-    shadow.setDevicePixelRatio(dpr);
-    shadow.fill(Qt::transparent);
+    QImage shadowImage(pixelSize, QImage::Format_ARGB32_Premultiplied);
+    shadowImage.setDevicePixelRatio(dpr);
+    shadowImage.fill(Qt::transparent);
 
     QRectF boxRect(QPoint(0, 0), rect.size());
+    const qreal adjustment = shadow.blur / 1.15;
     boxRect.moveCenter(QRectF(QPoint(0, 0), size).center());
-
-    const qreal xRadius = 2.0 * borderRadius / boxRect.width();
-    const qreal yRadius = 2.0 * borderRadius / boxRect.height();
+    boxRect.adjust(adjustment, adjustment, -adjustment, -adjustment);
 
     QPainter shadowPainter;
-    shadowPainter.begin(&shadow);
+    shadowPainter.begin(&shadowImage);
     shadowPainter.setRenderHint(QPainter::Antialiasing);
     shadowPainter.setPen(Qt::NoPen);
     shadowPainter.setBrush(Qt::black);
-    shadowPainter.drawRoundedRect(boxRect, xRadius, yRadius);
+
+    auto path = unevenRadiiRectPath(boxRect, shadow.cornerRadius);
+    shadowPainter.drawPath(path);
+
     shadowPainter.end();
 
     // Because the shadow texture is symmetrical, that's enough to blur
     // only the top-left quadrant and then mirror it.
-    const QRect blurRect(0, 0, std::ceil(shadow.width() * 0.5), std::ceil(shadow.height() * 0.5));
-    const int scaledRadius = std::round(radius * dpr);
-    boxBlurAlpha(shadow, scaledRadius, blurRect);
-    mirrorTopLeftQuadrant(shadow);
+    const QRect blurRect(0, 0, std::ceil(shadowImage.width() * 0.5), std::ceil(shadowImage.height() * 0.5));
+    boxBlurAlpha(shadowImage, shadow.blur, blurRect);
+    mirrorTopLeftQuadrant(shadowImage);
 
     // Give the shadow a tint of the desired color.
-    shadowPainter.begin(&shadow);
+    shadowPainter.begin(&shadowImage);
     shadowPainter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-    shadowPainter.fillRect(shadow.rect(), color);
+    shadowPainter.fillRect(shadowImage.rect(), shadow.color);
     shadowPainter.end();
 
     // Actually, present the shadow.
-    QRectF shadowRect = shadow.rect();
+    QRectF shadowRect = shadowImage.rect();
     shadowRect.setSize(shadowRect.size() / dpr);
-    shadowRect.moveCenter(rect.center() + offset);
-    painter->drawImage(shadowRect, shadow);
+    shadowRect.moveCenter(rect.center() + shadow.offset);
+    painter->drawImage(shadowRect, shadowImage);
 }
 
 void BoxShadowRenderer::setBoxSize(const QSizeF &size)
@@ -286,17 +288,8 @@ void BoxShadowRenderer::setBoxSize(const QSizeF &size)
     m_boxSize = size;
 }
 
-void BoxShadowRenderer::setBorderRadius(qreal radius)
+void BoxShadowRenderer::addShadow(const Shadow &shadow)
 {
-    m_borderRadius = radius;
-}
-
-void BoxShadowRenderer::addShadow(const QPointF &offset, double radius, const QColor &color)
-{
-    Shadow shadow = {};
-    shadow.offset = offset;
-    shadow.radius = radius;
-    shadow.color = color;
     m_shadows.append(shadow);
 }
 
@@ -308,7 +301,7 @@ QImage BoxShadowRenderer::render() const
 
     QSizeF canvasSize;
     for (const Shadow &shadow : std::as_const(m_shadows)) {
-        canvasSize = canvasSize.expandedTo(calculateMinimumShadowTextureSize(m_boxSize, shadow.radius, shadow.offset));
+        canvasSize = canvasSize.expandedTo(calculateMinimumShadowTextureSize(m_boxSize, shadow));
     }
 
     QImage canvas(canvasSize.toSize(), QImage::Format_ARGB32_Premultiplied);
@@ -318,21 +311,29 @@ QImage BoxShadowRenderer::render() const
     boxRect.moveCenter(QRect(QPoint(0, 0), canvas.size()).center());
 
     QPainter painter(&canvas);
+    painter.setRenderHint(QPainter::Antialiasing);
     for (const Shadow &shadow : std::as_const(m_shadows)) {
-        renderShadow(&painter, boxRect, m_borderRadius, shadow.offset, shadow.radius, shadow.color);
+        const auto spreadRect = boxRect.adjusted(-shadow.spread, -shadow.spread, shadow.spread + 1, shadow.spread + 1);
+        const auto blurRect = spreadRect.adjusted(-shadow.blur, -shadow.blur, shadow.blur, shadow.blur);
+        renderShadow(&painter, blurRect, shadow);
+        painter.setPen(Qt::NoPen);
+        painter.setCompositionMode(QPainter::CompositionMode_Destination);
+        painter.setBrush(shadow.color);
+        auto spreadPath = unevenRadiiRectPath(spreadRect, shadow.cornerRadius);
+        painter.drawPath(spreadPath);
     }
     painter.end();
 
     return canvas;
 }
 
-QSize BoxShadowRenderer::calculateMinimumBoxSize(int radius)
+QSize BoxShadowRenderer::calculateMinimumBoxSize(const Shadow &shadow)
 {
-    const QSize blurExtent = calculateBlurExtent(radius);
+    const QSize blurExtent = calculateBlurExtent((shadow.blur + shadow.spread) * 2);
     return 2 * blurExtent + QSize(1, 1);
 }
 
-QSizeF BoxShadowRenderer::calculateMinimumShadowTextureSize(const QSizeF &boxSize, double radius, const QPointF &offset)
+QSizeF BoxShadowRenderer::calculateMinimumShadowTextureSize(const QSizeF &boxSize, const Shadow &shadow)
 {
-    return boxSize + 2 * calculateBlurExtent(radius) + QSizeF(std::abs(offset.x()), std::abs(offset.y()));
+    return boxSize + 2 * calculateBlurExtent((shadow.blur + shadow.spread) * 2) + QSizeF(std::abs(shadow.offset.x()), std::abs(shadow.offset.y()));
 }
