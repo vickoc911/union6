@@ -232,6 +232,7 @@ int handleUpdateCommand([[maybe_unused]] const QStringList &arguments)
         flags |= Union::PackageHandler::OperationFlag::SkipVersionCheck;
     }
 
+    std::error_code errorCode;
     auto handler = Union::StyleRegistry::instance()->packageHandler();
     if (!handler->update(package, errorCode, flags)) {
         return printErrorCode(package, errorCode);
