@@ -19,6 +19,10 @@
 #include <QPointer>
 #include <QSet>
 
+// Adjust the shadow so that its slightly under the widget to
+// avoid any gaps. Take this into account when drawing the shadow.
+constexpr int SHADOW_ADJUSTMENT = 2;
+
 struct Shadow {
     Shadow() = default;
 

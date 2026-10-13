@@ -239,19 +239,22 @@ static inline void mirrorTopLeftQuadrant(QImage &image)
 
 static void renderShadow(QPainter *painter, const QRectF &rect, const Shadow &shadow)
 {
+    QRectF boxRect(QPoint(0, 0), rect.size());
+    // Reserve space for spread
+    const qreal totalSpread = shadow.spread + SHADOW_ADJUSTMENT;
+    const QMarginsF spreadMargins = QMarginsF(totalSpread, totalSpread, totalSpread, totalSpread);
+    boxRect = boxRect.marginsAdded(spreadMargins);
+
     const qreal dpr = painter->device()->devicePixelRatioF();
     const QSize inflation = calculateBlurExtent(shadow.blur);
-    const QSize pixelSize = ((rect.size() + 2 * inflation) * dpr).toSize();
+    const QSize pixelSize = ((boxRect.size() + 2 * inflation) * dpr).toSize();
     const QSizeF size = QSizeF(pixelSize) / dpr;
 
     QImage shadowImage(pixelSize, QImage::Format_ARGB32_Premultiplied);
     shadowImage.setDevicePixelRatio(dpr);
     shadowImage.fill(Qt::transparent);
 
-    QMarginsF blurMargins = QMarginsF(shadow.blur, shadow.blur, shadow.blur, shadow.blur);
-    QRectF boxRect(QPoint(0, 0), rect.size());
     boxRect.moveCenter(QRectF(QPoint(0, 0), size).center());
-    boxRect = boxRect.marginsRemoved(blurMargins);
 
     QPainter shadowPainter;
     shadowPainter.begin(&shadowImage);
@@ -266,7 +269,10 @@ static void renderShadow(QPainter *painter, const QRectF &rect, const Shadow &sh
 
     // Because the shadow texture is symmetrical, that's enough to blur
     // only the top-left quadrant and then mirror it.
-    const QRect blurRect(0, 0, std::ceil(shadowImage.width() * 0.5), std::ceil(shadowImage.height() * 0.5));
+    const QMarginsF blurMargins = QMarginsF(shadow.blur, shadow.blur, shadow.blur, shadow.blur);
+    QRect blurRect(0, 0, std::ceil(shadowImage.width() * 0.5), std::ceil(shadowImage.height() * 0.5));
+    blurRect.marginsAdded(blurMargins.toMargins());
+    // Start the blurring from the blurMargins, not spread
     boxBlurAlpha(shadowImage, shadow.blur, blurRect);
     mirrorTopLeftQuadrant(shadowImage);
 
@@ -308,20 +314,12 @@ QImage BoxShadowRenderer::render() const
     canvas.fill(Qt::transparent);
 
     QRectF boxRect(QPoint(0, 0), m_boxSize);
-    // Add 1,1 to ensure centering due to QRect behavior
-    boxRect.moveCenter(QRect(QPoint(0, 0), canvas.size() + QSize(1, 1)).center());
+    boxRect.moveCenter(QRect(QPoint(0, 0), canvas.size()).center());
 
     QPainter painter(&canvas);
     painter.setRenderHint(QPainter::Antialiasing);
     for (const Shadow &shadow : std::as_const(m_shadows)) {
-        const auto spreadRect = boxRect.adjusted(-shadow.spread, -shadow.spread, shadow.spread + 1, shadow.spread + 1);
-        const auto blurRect = spreadRect.adjusted(-shadow.blur, -shadow.blur, shadow.blur, shadow.blur);
-        renderShadow(&painter, blurRect, shadow);
-        painter.setPen(Qt::NoPen);
-        painter.setCompositionMode(QPainter::CompositionMode_Destination);
-        painter.setBrush(shadow.color);
-        auto spreadPath = unevenRadiiRectPath(spreadRect, shadow.cornerRadius);
-        painter.drawPath(spreadPath);
+        renderShadow(&painter, boxRect, shadow);
     }
     painter.end();
 
@@ -330,12 +328,15 @@ QImage BoxShadowRenderer::render() const
 
 QSize BoxShadowRenderer::calculateMinimumBoxSize(const Shadow &shadow)
 {
-    const QSize blurExtent = calculateBlurExtent((shadow.blur));
-    return 2 * blurExtent + QSize(1, 1);
+    const QSize blurExtent = 2 * calculateBlurExtent((shadow.blur));
+    const QSize spreadExtent = 2 * QSize(shadow.spread, shadow.spread);
+    return 2 * blurExtent + spreadExtent + QSize(1, 1);
 }
 
 QSizeF BoxShadowRenderer::calculateMinimumShadowTextureSize(const QSizeF &boxSize, const Shadow &shadow)
 {
     // Give the shadow a lot of room
-    return boxSize + 2 * calculateBlurExtent((shadow.blur + shadow.spread)) + QSizeF(std::abs(shadow.offset.x()), std::abs(shadow.offset.y()));
+    const QSize blurExtent = 4 * calculateBlurExtent((shadow.blur));
+    const QSize spreadExtent = 4 * QSize(shadow.spread, shadow.spread);
+    return boxSize + blurExtent + spreadExtent + QSizeF(std::abs(shadow.offset.x()), std::abs(shadow.offset.y()));
 }

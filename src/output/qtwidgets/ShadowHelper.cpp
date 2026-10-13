@@ -178,10 +178,10 @@ TileSet ShadowHelper::shadowTiles(QWidget *widget)
     QPainter painter(&shadowTexture);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    const QMargins margins = QMargins(boxRect.left() - outerRect.left() - 2 - params.offset.x(),
-                                      boxRect.top() - outerRect.top() - 2 - params.offset.y(),
-                                      outerRect.right() - boxRect.right() - 2 + params.offset.x(),
-                                      outerRect.bottom() - boxRect.bottom() - 2 + params.offset.y());
+    const QMargins margins = QMargins(boxRect.left() - outerRect.left() - SHADOW_ADJUSTMENT - params.offset.x(),
+                                      boxRect.top() - outerRect.top() - SHADOW_ADJUSTMENT - params.offset.y(),
+                                      outerRect.right() - boxRect.right() - SHADOW_ADJUSTMENT + params.offset.x(),
+                                      outerRect.bottom() - boxRect.bottom() - SHADOW_ADJUSTMENT + params.offset.y());
 
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
@@ -371,10 +371,10 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
     QRectF boxRect(QPoint(0, 0), boxSize);
     boxRect.moveCenter(shadowRect.center());
 
-    QMarginsF margins(boxRect.left() - shadowRect.left() - 2 - params.offset.x(),
-                      boxRect.top() - shadowRect.top() - 2 - params.offset.y(),
-                      shadowRect.right() - boxRect.right() - 2 + params.offset.x(),
-                      shadowRect.bottom() - boxRect.bottom() - 2 + params.offset.y());
+    QMarginsF margins(boxRect.left() - shadowRect.left() - SHADOW_ADJUSTMENT - params.offset.x(),
+                      boxRect.top() - shadowRect.top() - SHADOW_ADJUSTMENT - params.offset.y(),
+                      shadowRect.right() - boxRect.right() - SHADOW_ADJUSTMENT + params.offset.x(),
+                      shadowRect.bottom() - boxRect.bottom() - SHADOW_ADJUSTMENT + params.offset.y());
 
     if (widget->inherits("QBalloonTip")) {
         // Balloon tip needs special margins to deal with the arrow.
