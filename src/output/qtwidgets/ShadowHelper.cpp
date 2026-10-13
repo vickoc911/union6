@@ -68,21 +68,21 @@ ShadowHelper::ShadowHelper()
 //_______________________________________________________
 ShadowHelper::~ShadowHelper()
 {
-    qDeleteAll(_shadows);
+    qDeleteAll(m_shadows);
 }
 
 //______________________________________________
 void ShadowHelper::reset()
 {
-    _tiles.clear();
-    _shadowTiles = TileSet();
+    m_tiles.clear();
+    m_shadowTiles = TileSet();
 }
 
 //_______________________________________________________
 bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 {
     // make sure widget is not already registered
-    if (_widgets.contains(widget)) {
+    if (m_widgets.contains(widget)) {
         return false;
     }
 
@@ -93,7 +93,7 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 
     // try to create shadow directly
     installShadows(widget);
-    _widgets.insert(widget);
+    m_widgets.insert(widget);
 
     // install event filter
     widget->removeEventFilter(this);
@@ -108,7 +108,7 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 //_______________________________________________________
 void ShadowHelper::unregisterWidget(QWidget *widget)
 {
-    if (_widgets.remove(widget)) {
+    if (m_widgets.remove(widget)) {
         // uninstall the event filter
         widget->removeEventFilter(this);
 
@@ -145,8 +145,8 @@ bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
 //_______________________________________________________
 TileSet ShadowHelper::shadowTiles(QWidget *widget)
 {
-    if (_shadowTiles.isValid()) {
-        return _shadowTiles;
+    if (m_shadowTiles.isValid()) {
+        return m_shadowTiles;
     }
     Shadow params = lookupShadowParams(widget);
     const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
@@ -181,23 +181,23 @@ TileSet ShadowHelper::shadowTiles(QWidget *widget)
     painter.end();
 
     const QPoint innerRectTopLeft = outerRect.center();
-    _shadowTiles = TileSet(QPixmap::fromImage(std::move(shadowTexture)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
+    m_shadowTiles = TileSet(QPixmap::fromImage(std::move(shadowTexture)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
 
-    return _shadowTiles;
+    return m_shadowTiles;
 }
 
 //_______________________________________________________
 void ShadowHelper::widgetDeleted(QObject *object)
 {
     QWidget *widget(static_cast<QWidget *>(object));
-    _widgets.remove(widget);
+    m_widgets.remove(widget);
 }
 
 //_______________________________________________________
 void ShadowHelper::windowDeleted(QObject *object)
 {
     QWindow *window(static_cast<QWindow *>(object));
-    _shadows.remove(window);
+    m_shadows.remove(window);
 }
 
 //_______________________________________________________
@@ -263,19 +263,19 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
 const QVector<KWindowShadowTile::Ptr> &ShadowHelper::createShadowTiles()
 {
     // make sure size is valid
-    if (_tiles.isEmpty()) {
-        _tiles = {createTile(_shadowTiles.pixmap(1)),
-                  createTile(_shadowTiles.pixmap(2)),
-                  createTile(_shadowTiles.pixmap(5)),
-                  createTile(_shadowTiles.pixmap(8)),
-                  createTile(_shadowTiles.pixmap(7)),
-                  createTile(_shadowTiles.pixmap(6)),
-                  createTile(_shadowTiles.pixmap(3)),
-                  createTile(_shadowTiles.pixmap(0))};
+    if (m_tiles.isEmpty()) {
+        m_tiles = {createTile(m_shadowTiles.pixmap(1)),
+                   createTile(m_shadowTiles.pixmap(2)),
+                   createTile(m_shadowTiles.pixmap(5)),
+                   createTile(m_shadowTiles.pixmap(8)),
+                   createTile(m_shadowTiles.pixmap(7)),
+                   createTile(m_shadowTiles.pixmap(6)),
+                   createTile(m_shadowTiles.pixmap(3)),
+                   createTile(m_shadowTiles.pixmap(0))};
     }
 
     // return relevant list of shadow tiles
-    return _tiles;
+    return m_tiles;
 }
 
 //______________________________________________
@@ -305,13 +305,13 @@ void ShadowHelper::installShadows(QWidget *widget)
 
     // create shadow tiles if needed
     shadowTiles(widget);
-    if (!_shadowTiles.isValid()) {
+    if (!m_shadowTiles.isValid()) {
         return;
     }
 
     // create platform shadow tiles if needed
     const QVector<KWindowShadowTile::Ptr> &tiles = createShadowTiles();
-    if (tiles.count() != numTiles) {
+    if (tiles.count() != tileAmount) {
         return;
     }
 
@@ -319,7 +319,7 @@ void ShadowHelper::installShadows(QWidget *widget)
     QWindow *window = widget->windowHandle();
 
     // find a shadow associated with the widget
-    KWindowShadow *&shadow = _shadows[window];
+    KWindowShadow *&shadow = m_shadows[window];
 
     if (!shadow) {
         // if there is no shadow yet, create one
@@ -387,5 +387,5 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
 //_______________________________________________________
 void ShadowHelper::uninstallShadows(QWidget *widget)
 {
-    delete _shadows.take(widget->windowHandle());
+    delete m_shadows.take(widget->windowHandle());
 }

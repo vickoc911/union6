@@ -113,19 +113,17 @@ protected:
 
 private:
     //* registered widgets
-    QSet<QWidget *> _widgets;
+    QSet<QWidget *> m_widgets;
 
     //* managed shadows
-    QMap<QWindow *, KWindowShadow *> _shadows;
+    QMap<QWindow *, KWindowShadow *> m_shadows;
 
     //* tileset
-    TileSet _shadowTiles;
+    TileSet m_shadowTiles;
 
-    //* number of tiles
-    enum {
-        numTiles = 8
-    };
+    // There are 8 tiles in total
+    const int tileAmount = 8;
 
     //* shared shadow tiles
-    QVector<KWindowShadowTile::Ptr> _tiles;
+    QVector<KWindowShadowTile::Ptr> m_tiles;
 };
