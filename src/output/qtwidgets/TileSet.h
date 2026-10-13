@@ -88,6 +88,11 @@ public:
         return _pixmaps[index];
     }
 
+    QVector<QPixmap> pixmapList() const
+    {
+        return _pixmaps;
+    }
+
 protected:
     //* shortcut to pixmap list
     using PixmapList = QVector<QPixmap>;

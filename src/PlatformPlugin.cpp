@@ -71,3 +71,24 @@ AnimationSpeedMultiplierChangedEvent::AnimationSpeedMultiplierChangedEvent()
     : QEvent(AnimationSpeedMultiplierChangedEvent::s_type)
 {
 }
+
+bool PlatformPlugin::installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps)
+{
+    Q_UNUSED(window);
+    Q_UNUSED(shadowMargins);
+    Q_UNUSED(tilePixmaps);
+    return false;
+}
+
+void PlatformPlugin::resetShadowTiles()
+{
+}
+
+void PlatformPlugin::deleteAllShadows()
+{
+}
+
+void PlatformPlugin::deleteWindowShadow(QWindow *window)
+{
+    Q_UNUSED(window);
+}

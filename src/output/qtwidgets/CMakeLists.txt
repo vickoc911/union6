@@ -106,7 +106,6 @@ target_link_libraries(UnionWidgetsStyle
         PUBLIC
         Qt::Widgets
         Union::Union
-        KF6::WindowSystem
 )
 
 set_target_properties(UnionWidgetsStyle PROPERTIES
