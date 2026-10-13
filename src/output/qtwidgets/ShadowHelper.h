@@ -9,8 +9,6 @@
 
 #include "TileSet.h"
 
-#include <KWindowShadow>
-
 #include "properties/CornersPropertyGroup.h"
 #include <QColor>
 #include <QMap>
@@ -18,6 +16,7 @@
 #include <QObject>
 #include <QPointer>
 #include <QSet>
+#include <QWindow>
 
 // Adjust the shadow so that its slightly under the widget to
 // avoid any gaps. Take this into account when drawing the shadow.
@@ -54,7 +53,7 @@ public:
     ~ShadowHelper() override;
 
     //* shadow params from size enum
-    static Shadow lookupShadowParams(QWidget *widget);
+    static Shadow lookupShadowParams();
 
     //* reset
     void reset();
@@ -70,7 +69,7 @@ public:
 
     //* shadow tiles
     /** is public because it is also needed for mdi windows */
-    TileSet shadowTiles(QWidget *);
+    TileSet shadowTiles();
 
 protected Q_SLOTS:
 
@@ -96,12 +95,6 @@ protected:
     //* accept widget
     bool acceptWidget(QWidget *) const;
 
-    // create shared shadow tiles from tileset
-    const QVector<KWindowShadowTile::Ptr> &createShadowTiles();
-
-    // create shadow tile from pixmap
-    KWindowShadowTile::Ptr createTile(const QPixmap &);
-
     //* installs shadow on given widget in a platform independent way
     void installShadows(QWidget *);
 
@@ -115,15 +108,6 @@ private:
     //* registered widgets
     QSet<QWidget *> m_widgets;
 
-    //* managed shadows
-    QMap<QWindow *, KWindowShadow *> m_shadows;
-
     //* tileset
     TileSet m_shadowTiles;
-
-    // There are 8 tiles in total
-    const int tileAmount = 8;
-
-    //* shared shadow tiles
-    QVector<KWindowShadowTile::Ptr> m_tiles;
 };

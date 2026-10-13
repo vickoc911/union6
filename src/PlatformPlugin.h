@@ -4,6 +4,7 @@
 #pragma once
 
 #include "PluginRegistry.h"
+#include <QWindow>
 
 #include "union_export.h"
 
@@ -78,6 +79,12 @@ public:
      * Emitted whenever animationSpeedMultiplier changes.
      */
     Q_SIGNAL void animationSpeedMultiplierChanged();
+
+    // QWidgets shadows
+    virtual bool installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps);
+    virtual void resetShadowTiles();
+    virtual void deleteAllShadows();
+    virtual void deleteWindowShadow(QWindow *window);
 
 protected:
     void sendDefaultStyleChangedEvent();
