@@ -59,9 +59,6 @@ public:
     //* reset
     void reset();
 
-    //* load config
-    void loadConfig();
-
     //* register widget
     bool registerWidget(QWidget *, bool force = false);
 

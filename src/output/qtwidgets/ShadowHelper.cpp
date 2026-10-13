@@ -121,18 +121,6 @@ void ShadowHelper::unregisterWidget(QWidget *widget)
 }
 
 //_______________________________________________________
-void ShadowHelper::loadConfig()
-{
-    // reset
-    reset();
-
-    // update property for registered widgets
-    for (QWidget *widget : _widgets) {
-        installShadows(widget);
-    }
-}
-
-//_______________________________________________________
 bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() != QEvent::PlatformSurface) {
