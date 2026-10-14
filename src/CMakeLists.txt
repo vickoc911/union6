@@ -19,6 +19,7 @@ target_sources(Union PRIVATE
     StyleCache.cpp
     StylePackage.cpp
     PackageHandler.cpp
+    TileSet.cpp
 )
 
 target_sources(Union PUBLIC
@@ -41,6 +42,7 @@ target_sources(Union PUBLIC
     PlatformPlugin.h
     StylePackage.h
     PackageHandler.h
+    TileSet.h
 )
 
 ecm_qt_declare_logging_category(Union

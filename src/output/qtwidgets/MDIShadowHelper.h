@@ -10,11 +10,11 @@
 #include <QObject>
 #include <QSet>
 
+#include <TileSet.h>
+
 #include <QPaintEvent>
 #include <QPointer>
 #include <QWidget>
-
-#include "TileSet.h"
 
 class ShadowHelper;
 
@@ -25,7 +25,7 @@ class MDIWindowShadow : public QWidget
     Q_OBJECT
 
 public:
-    explicit MDIWindowShadow(QWidget *parent, const TileSet &shadowTiles);
+    explicit MDIWindowShadow(QWidget *parent, const QImage &shadowImage);
 
     void updateGeometry();
 
@@ -44,8 +44,7 @@ private:
     //* tileset rect, used for painting
     QRect m_shadowTilesRect;
 
-    //* tileset used to draw shadow
-    TileSet m_shadowTiles;
+    Union::TileSet m_shadowTiles;
 };
 
 //* shadow manager

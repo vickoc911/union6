@@ -72,23 +72,18 @@ AnimationSpeedMultiplierChangedEvent::AnimationSpeedMultiplierChangedEvent()
 {
 }
 
-bool PlatformPlugin::installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps)
+void PlatformPlugin::installWindowShadow(QWidget *widget, const QImage &shadowImage, const QMargins &shadowMargins)
 {
-    Q_UNUSED(window);
+    Q_UNUSED(widget);
+    Q_UNUSED(shadowImage);
     Q_UNUSED(shadowMargins);
-    Q_UNUSED(tilePixmaps);
-    return false;
 }
 
-void PlatformPlugin::resetShadowTiles()
+void PlatformPlugin::resetWindowShadows()
 {
 }
 
-void PlatformPlugin::deleteAllShadows()
+void PlatformPlugin::uninstallWindowShadow(QObject *object)
 {
-}
-
-void PlatformPlugin::deleteWindowShadow(QWindow *window)
-{
-    Q_UNUSED(window);
+    Q_UNUSED(object);
 }

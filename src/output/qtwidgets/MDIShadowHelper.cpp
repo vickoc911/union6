@@ -17,10 +17,12 @@
 #include <QPainter>
 #include <QTextStream>
 
-MDIWindowShadow::MDIWindowShadow(QWidget *parent, const TileSet &shadowTiles)
+MDIWindowShadow::MDIWindowShadow(QWidget *parent, const QImage &shadowImage)
     : QWidget(parent)
-    , m_shadowTiles(shadowTiles)
 {
+    const QPoint innerRectTopLeft = QRect(QPoint(0, 0), shadowImage.size()).center();
+    m_shadowTiles = Union::TileSet(QPixmap::fromImage(std::move(shadowImage)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
+
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
     setFocusPolicy(Qt::NoFocus);
@@ -228,7 +230,7 @@ void MDIShadowHelper::installShadow(QObject *object)
     }
 
     // create new shadow
-    auto windowShadow(new MDIWindowShadow(widget->parentWidget(), m_shadowHelper->shadowTiles()));
+    auto windowShadow(new MDIWindowShadow(widget->parentWidget(), m_shadowHelper->shadowTexture()));
     windowShadow->setWidget(widget);
 }
 
