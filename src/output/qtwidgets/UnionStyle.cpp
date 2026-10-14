@@ -114,10 +114,12 @@ using namespace Union::Properties;
 UnionStyle::UnionStyle()
     : QCommonStyle()
     , m_showMnemonics(false)
-    , _shadowHelper(std::make_unique<ShadowHelper>())
+    , m_shadowHelper(std::make_unique<ShadowHelper>())
+    , m_mdiShadowHelper(std::make_unique<MDIShadowHelper>())
 {
     qApp->installEventFilter(this);
     Union::StyleRegistry::instance()->load();
+    m_mdiShadowHelper->setShadowHelper(m_shadowHelper.get());
 }
 
 UnionStyle::~UnionStyle() noexcept
@@ -702,7 +704,8 @@ void UnionStyle::polish(QWidget *widget)
                 widget->setAutoFillBackground(false);
             }
         }
-        _shadowHelper->registerWidget(widget);
+        m_shadowHelper->registerWidget(widget);
+        m_mdiShadowHelper->registerWidget(widget);
     }
     if (qobject_cast<QScrollBar *>(widget)) {
         // remove opaque painting for scrollbars
@@ -717,7 +720,8 @@ void UnionStyle::polish(QWidget *widget)
 
 void UnionStyle::unpolish(QWidget *widget)
 {
-    _shadowHelper->unregisterWidget(widget);
+    m_shadowHelper->unregisterWidget(widget);
+    m_mdiShadowHelper->unregisterWidget(widget);
     QCommonStyle::unpolish(widget);
 }
 

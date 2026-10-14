@@ -4,6 +4,7 @@
 #pragma once
 
 #include "LruCache.h"
+#include "MDIShadowHelper.h"
 #include "ShadowHelper.h"
 #include <Element.h>
 #include <Style.h>
@@ -135,6 +136,7 @@ public:
 
 private:
     bool m_showMnemonics;
-    std::unique_ptr<ShadowHelper> _shadowHelper;
+    std::unique_ptr<ShadowHelper> m_shadowHelper;
+    std::unique_ptr<MDIShadowHelper> m_mdiShadowHelper;
     void setMnemonics(bool enabled);
 };
