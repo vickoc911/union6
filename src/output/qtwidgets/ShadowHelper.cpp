@@ -42,13 +42,13 @@ Shadow ShadowHelper::lookupShadowProperties()
     const auto query = std::make_unique<Union::ElementQuery>(style);
     query->setElements(elements);
     query->execute();
-    auto properties = query->properties();
+    const auto properties = query->properties();
 
-    auto shadowColor = safePropertyLookup(properties, Union::Color(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::color);
-    auto shadowBlur = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::blur);
-    auto shadowSize = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::size);
-    auto shadowRadius = safePropertyLookup(properties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
-    auto shadowOffset =
+    const auto shadowColor = safePropertyLookup(properties, Union::Color(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::color);
+    const auto shadowBlur = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::blur);
+    const auto shadowSize = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::size);
+    const auto shadowRadius = safePropertyLookup(properties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
+    const auto shadowOffset =
         safePropertyLookup(properties, QVector2D(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::offset, &OffsetPropertyGroup::toVector2D);
 
     // We need to portrude shadow around the edges for the blurAmount (or shadowSize??)
@@ -264,7 +264,9 @@ void ShadowHelper::installShadows(QWidget *widget)
     QWindow *window = widget->windowHandle();
     auto margins = shadowMargins(widget);
     auto pixmapList = m_shadowTiles.pixmapList();
-    Union::StyleRegistry::instance()->platform()->installShadowTiles(window, margins, pixmapList);
+    if (Union::StyleRegistry::instance()->platform()->installShadowTiles(window, margins, pixmapList)) {
+        connect(window, &QWindow::destroyed, this, &ShadowHelper::windowDeleted);
+    }
 }
 
 QMargins ShadowHelper::shadowMargins(QWidget *widget) const
