@@ -17,9 +17,10 @@
 #include <QPainter>
 #include <QTextStream>
 
-MDIWindowShadow::MDIWindowShadow(QWidget *parent, const TileSet &shadowTiles)
+MDIWindowShadow::MDIWindowShadow(QWidget *parent, const QImage &shadowImage)
     : QWidget(parent)
-    , m_shadowTiles(shadowTiles)
+    , m_shadowImage(shadowImage)
+    , m_platform(Union::StyleRegistry::instance()->platform())
 {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -86,20 +87,21 @@ void MDIWindowShadow::updateZOrder()
 
 void MDIWindowShadow::paintEvent(QPaintEvent *event)
 {
-    if (!m_shadowTiles.isValid()) {
+    if (m_shadowImage.isNull()) {
         return;
     }
 
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
     painter.setClipRegion(event->region());
-    m_shadowTiles.render(m_shadowTilesRect, &painter);
+    Union::StyleRegistry::instance()->platform()->drawMdiShadow(&painter, m_shadowTilesRect);
 }
 
 //* set associated window
 void MDIWindowShadow::setWidget(QWidget *value)
 {
     m_widget = value;
+    m_platform->installWindowShadow(m_widget, m_shadowImage, QMargins());
 }
 
 //* associated window
@@ -228,7 +230,7 @@ void MDIShadowHelper::installShadow(QObject *object)
     }
 
     // create new shadow
-    auto windowShadow(new MDIWindowShadow(widget->parentWidget(), m_shadowHelper->shadowTiles()));
+    auto windowShadow(new MDIWindowShadow(widget->parentWidget(), m_shadowHelper->shadowTexture()));
     windowShadow->setWidget(widget);
 }
 
