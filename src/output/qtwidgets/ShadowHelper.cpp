@@ -264,7 +264,9 @@ void ShadowHelper::installShadows(QWidget *widget)
     QWindow *window = widget->windowHandle();
     auto margins = shadowMargins(widget);
     auto pixmapList = m_shadowTiles.pixmapList();
-    Union::StyleRegistry::instance()->platform()->installShadowTiles(window, margins, pixmapList);
+    if (Union::StyleRegistry::instance()->platform()->installShadowTiles(window, margins, pixmapList)) {
+        connect(window, &QWindow::destroyed, this, &ShadowHelper::windowDeleted);
+    }
 }
 
 QMargins ShadowHelper::shadowMargins(QWidget *widget) const
