@@ -10,16 +10,17 @@
 #include "MDIShadowHelper.h"
 
 #include "BoxShadowRenderer.h"
-#include "ShadowHelper.h"
+#include "MenuShadowHelper.h"
 
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
 #include <QTextStream>
 
-MDIWindowShadow::MDIWindowShadow(QWidget *parent, const TileSet &shadowTiles)
+MDIWindowShadow::MDIWindowShadow(QWidget *parent, const QImage &shadowImage)
     : QWidget(parent)
-    , m_shadowTiles(shadowTiles)
+    , m_shadowImage(shadowImage)
+    , m_platform(Union::StyleRegistry::instance()->platform())
 {
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -32,7 +33,7 @@ void MDIWindowShadow::updateGeometry()
         return;
     }
 
-    const auto params = ShadowHelper::lookupShadowProperties();
+    const auto params = MenuShadowHelper::lookupShadowProperties();
     if (params.isNone()) {
         return;
     }
@@ -86,23 +87,22 @@ void MDIWindowShadow::updateZOrder()
 
 void MDIWindowShadow::paintEvent(QPaintEvent *event)
 {
-    if (!m_shadowTiles.isValid()) {
+    if (m_shadowImage.isNull()) {
         return;
     }
 
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
     painter.setClipRegion(event->region());
-    m_shadowTiles.render(m_shadowTilesRect, &painter);
+    Union::StyleRegistry::instance()->platform()->drawMdiShadow(&painter, m_shadowTilesRect);
 }
 
-//* set associated window
 void MDIWindowShadow::setWidget(QWidget *value)
 {
     m_widget = value;
+    m_platform->installWindowShadow(m_widget, m_shadowImage, QMargins());
 }
 
-//* associated window
 QWidget *MDIWindowShadow::widget() const
 {
     return m_widget;
@@ -124,7 +124,7 @@ bool MDIShadowHelper::registerWidget(QWidget *widget)
     }
 
     // make sure widget is not already registered
-    if (isRegistered(widget)) {
+    if (m_registeredWidgets.contains(widget)) {
         return false;
     }
 
@@ -143,19 +143,14 @@ bool MDIShadowHelper::registerWidget(QWidget *widget)
     return true;
 }
 
-void MDIShadowHelper::setShadowHelper(ShadowHelper *shadowHelper)
+void MDIShadowHelper::setShadowHelper(MenuShadowHelper *shadowHelper)
 {
     m_shadowHelper = shadowHelper;
 }
 
-bool MDIShadowHelper::isRegistered(const QObject *widget) const
-{
-    return m_registeredWidgets.contains(widget);
-}
-
 void MDIShadowHelper::unregisterWidget(QWidget *widget)
 {
-    if (!isRegistered(widget)) {
+    if (!m_registeredWidgets.contains(widget)) {
         return;
     }
     widget->removeEventFilter(this);
@@ -228,7 +223,7 @@ void MDIShadowHelper::installShadow(QObject *object)
     }
 
     // create new shadow
-    auto windowShadow(new MDIWindowShadow(widget->parentWidget(), m_shadowHelper->shadowTiles()));
+    auto windowShadow(new MDIWindowShadow(widget->parentWidget(), m_shadowHelper->shadowTexture()));
     windowShadow->setWidget(widget);
 }
 

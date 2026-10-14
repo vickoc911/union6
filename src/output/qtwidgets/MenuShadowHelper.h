@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "TileSet.h"
+#include "StyleRegistry.h"
 
 #include "properties/CornersPropertyGroup.h"
 #include <QColor>
@@ -46,14 +46,12 @@ struct Shadow {
     }
 };
 
-class ShadowHelper : public QObject
+class MenuShadowHelper : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ShadowHelper();
-
-    ~ShadowHelper() override;
+    explicit MenuShadowHelper();
 
     static Shadow lookupShadowProperties();
 
@@ -65,13 +63,11 @@ public:
 
     bool eventFilter(QObject *, QEvent *) override;
 
-    TileSet shadowTiles();
+    QImage shadowTexture();
 
 protected Q_SLOTS:
 
     void widgetDeleted(QObject *);
-
-    void windowDeleted(QObject *);
 
 protected:
     bool acceptWidget(QWidget *) const;
@@ -84,8 +80,7 @@ protected:
 
 private:
     //* registered widgets
-    QSet<QWidget *> m_widgets;
+    QSet<QWidget *> m_registeredWidgets;
 
-    //* tileset
-    TileSet m_shadowTiles;
+    std::shared_ptr<Union::PlatformPlugin> m_platform;
 };

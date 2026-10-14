@@ -10,6 +10,8 @@
 
 #include <QPainter>
 
+using namespace Union;
+
 inline bool bits(TileSet::Tiles flags, TileSet::Tiles testFlags)
 {
     return (flags & testFlags) == testFlags;

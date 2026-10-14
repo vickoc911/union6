@@ -81,10 +81,10 @@ public:
     Q_SIGNAL void animationSpeedMultiplierChanged();
 
     // QWidgets shadows
-    virtual bool installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps);
-    virtual void resetShadowTiles();
-    virtual void deleteAllShadows();
-    virtual void deleteWindowShadow(QWindow *window);
+    virtual void installWindowShadow(QWidget *widget, const QImage &shadowImage, const QMargins &shadowMargins);
+    virtual void resetWindowShadows();
+    virtual void uninstallWindowShadow(QObject *object);
+    virtual void drawMdiShadow(QPainter *painter, const QRect paintRect);
 
 protected:
     void sendDefaultStyleChangedEvent();

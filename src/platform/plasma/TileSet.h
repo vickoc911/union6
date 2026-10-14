@@ -15,6 +15,8 @@
  * tilesets are collections of stretchable pixmaps corresponding to a given widget corners, sides, and center.
  * corner pixmaps are never stretched. center pixmaps are
  */
+namespace Union
+{
 
 class TileSet
 {
@@ -111,4 +113,5 @@ private:
     int _h3;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(TileSet::Tiles)
+}
+Q_DECLARE_OPERATORS_FOR_FLAGS(Union::TileSet::Tiles)
