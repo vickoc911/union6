@@ -18,6 +18,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         BoxShadowRenderer.h
         ShadowHelper.cpp
         ShadowHelper.h
+        MDIShadowHelper.cpp
+        MDIShadowHelper.h
         TileSet.cpp
         TileSet.h
         SharedNames.h
