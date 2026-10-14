@@ -12,6 +12,7 @@
 
 #include <KIconColors>
 #include <KRuntimePlatform>
+#include <QWidget>
 
 using namespace Qt::StringLiterals;
 
@@ -20,6 +21,8 @@ static const QString DefaultStyleId = u"breeze"_s;
 PlasmaPlatformPlugin::PlasmaPlatformPlugin(QObject *parent)
     : Union::PlatformPlugin(parent)
     , m_kdeGlobalsWatcher(KConfigWatcher::create(KSharedConfig::openConfig()))
+    , m_shadows(QMap<QWindow *, KWindowShadow *>())
+    , m_tiles(QVector<KWindowShadowTile::Ptr>())
 {
     KConfigGroup generalCfg = KConfigGroup(KSharedConfig::openConfig(), u"KDE"_s);
     m_smoothScroll = generalCfg.readEntry(u"SmoothScroll"_s, true);
@@ -149,16 +152,28 @@ const QVector<KWindowShadowTile::Ptr> &PlasmaPlatformPlugin::createShadowTiles(c
     // return relevant list of shadow tiles
     return m_tiles;
 }
-
-bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps)
+void PlasmaPlatformPlugin::installWindowShadow(QWidget *widget, const QImage &shadowImage, const QMargins &shadowMargins)
 {
-    // create platform shadow tiles if needed
-    bool shadowInstalled = false;
-    const QVector<KWindowShadowTile::Ptr> &tiles = createShadowTiles(tilePixmaps);
-    if (tiles.count() != tileAmount) {
-        return shadowInstalled;
+    if (shadowImage.isNull()) {
+        return;
     }
 
+    const QPoint innerRectTopLeft = QRect(QPoint(0, 0), shadowImage.size()).center();
+    m_shadowTiles = Union::TileSet(QPixmap::fromImage(std::move(shadowImage)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
+    if (!m_shadowTiles.isValid()) {
+        return;
+    }
+
+    const QVector<KWindowShadowTile::Ptr> &tiles = createShadowTiles(m_shadowTiles.pixmapList());
+    if (tiles.count() != tileAmount) {
+        return;
+    }
+
+    QWindow *window = widget->windowHandle();
+    // Not a window, but we want to create a shadow anyway (MDI shadows for example), so return early.
+    if (!window) {
+        return;
+    }
     // find a shadow associated with the widget
     KWindowShadow *&shadow = m_shadows[window];
 
@@ -167,7 +182,7 @@ bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &s
         shadow = new KWindowShadow(window);
 
         // connect destroy signal
-        shadowInstalled = true;
+        connect(window, &QWindow::destroyed, this, &PlasmaPlatformPlugin::uninstallWindowShadow);
     }
 
     if (shadow->isCreated()) {
@@ -185,20 +200,21 @@ bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &s
     shadow->setPadding(shadowMargins);
     shadow->setWindow(window);
     shadow->create();
-    return shadowInstalled;
 }
 
-void PlasmaPlatformPlugin::resetShadowTiles()
+void PlasmaPlatformPlugin::resetWindowShadows()
 {
     m_tiles.clear();
 }
 
-void PlasmaPlatformPlugin::deleteAllShadows()
+void PlasmaPlatformPlugin::uninstallWindowShadow(QObject *object)
 {
-    qDeleteAll(m_shadows);
+    if (auto window = static_cast<QWindow *>(object)) {
+        delete m_shadows.take(window);
+    }
 }
 
-void PlasmaPlatformPlugin::deleteWindowShadow(QWindow *window)
+void PlasmaPlatformPlugin::drawMdiShadow(QPainter *painter, const QRect paintRect)
 {
-    delete m_shadows.take(window);
+    m_shadowTiles.render(paintRect, painter);
 }
