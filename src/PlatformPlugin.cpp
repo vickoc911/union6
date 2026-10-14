@@ -84,11 +84,7 @@ void PlatformPlugin::resetShadowTiles()
 {
 }
 
-void PlatformPlugin::deleteAllShadows()
+void PlatformPlugin::deleteWindowShadow(QObject *object)
 {
-}
-
-void PlatformPlugin::deleteWindowShadow(QWindow *window)
-{
-    Q_UNUSED(window);
+    Q_UNUSED(object);
 }
