@@ -69,14 +69,6 @@ protected Q_SLOTS:
     void windowDeleted(QObject *);
 
 protected:
-    bool isMenu(QWidget *) const;
-
-    bool isToolTip(QWidget *) const;
-
-    bool isDockWidget(QWidget *) const;
-
-    bool isToolBar(QWidget *) const;
-
     bool acceptWidget(QWidget *) const;
 
     void installShadows(QWidget *);

@@ -189,26 +189,6 @@ void ShadowHelper::windowDeleted(QObject *object)
     Union::StyleRegistry::instance()->platform()->deleteWindowShadow(window);
 }
 
-bool ShadowHelper::isMenu(QWidget *widget) const
-{
-    return qobject_cast<QMenu *>(widget);
-}
-
-bool ShadowHelper::isToolTip(QWidget *widget) const
-{
-    return widget->inherits("QTipLabel") || (widget->windowFlags() & Qt::WindowType_Mask) == Qt::ToolTip;
-}
-
-bool ShadowHelper::isDockWidget(QWidget *widget) const
-{
-    return qobject_cast<QDockWidget *>(widget);
-}
-
-bool ShadowHelper::isToolBar(QWidget *widget) const
-{
-    return qobject_cast<QToolBar *>(widget);
-}
-
 bool ShadowHelper::acceptWidget(QWidget *widget) const
 {
     if (widget->property("_KDE_NET_WM_SKIP_SHADOW").toBool()) {
@@ -218,7 +198,7 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
         return true;
     }
 
-    if (isMenu(widget)) {
+    if (qobject_cast<QMenu *>(widget)) {
         return true;
     }
 
@@ -227,12 +207,12 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
         return true;
     }
 
-    if (isToolTip(widget) && !widget->inherits("Plasma::ToolTip")) {
+    if ((widget->inherits("QTipLabel") || (widget->windowFlags() & Qt::WindowType_Mask) == Qt::ToolTip) && !widget->inherits("Plasma::ToolTip")) {
         return true;
     }
 
     // detached widgets
-    if (isDockWidget(widget) || isToolBar(widget)) {
+    if (qobject_cast<QDockWidget *>(widget) || qobject_cast<QToolBar *>(widget)) {
         return true;
     }
 
