@@ -190,8 +190,10 @@ void ShadowHelper::widgetDeleted(QObject *object)
 
 void ShadowHelper::windowDeleted(QObject *object)
 {
-    QWindow *window(static_cast<QWindow *>(object));
-    Union::StyleRegistry::instance()->platform()->deleteWindowShadow(window);
+    if (Union::StyleRegistry::instance()->platform()) {
+        QWindow *window(static_cast<QWindow *>(object));
+        Union::StyleRegistry::instance()->platform()->deleteWindowShadow(window);
+    }
 }
 
 bool ShadowHelper::acceptWidget(QWidget *widget) const
