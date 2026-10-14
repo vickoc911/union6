@@ -20,6 +20,8 @@ static const QString DefaultStyleId = u"breeze"_s;
 PlasmaPlatformPlugin::PlasmaPlatformPlugin(QObject *parent)
     : Union::PlatformPlugin(parent)
     , m_kdeGlobalsWatcher(KConfigWatcher::create(KSharedConfig::openConfig()))
+    , m_shadows(QMap<QWindow *, KWindowShadow *>())
+    , m_tiles(QVector<KWindowShadowTile::Ptr>())
 {
     KConfigGroup generalCfg = KConfigGroup(KSharedConfig::openConfig(), u"KDE"_s);
     m_smoothScroll = generalCfg.readEntry(u"SmoothScroll"_s, true);
@@ -168,6 +170,7 @@ bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &s
 
         // connect destroy signal
         shadowInstalled = true;
+        connect(window, &QWindow::destroyed, this, &PlasmaPlatformPlugin::deleteWindowShadow);
     }
 
     if (shadow->isCreated()) {
@@ -193,12 +196,9 @@ void PlasmaPlatformPlugin::resetShadowTiles()
     m_tiles.clear();
 }
 
-void PlasmaPlatformPlugin::deleteAllShadows()
+void PlasmaPlatformPlugin::deleteWindowShadow(QObject *object)
 {
-    qDeleteAll(m_shadows);
-}
-
-void PlasmaPlatformPlugin::deleteWindowShadow(QWindow *window)
-{
-    delete m_shadows.take(window);
+    if (auto window = static_cast<QWindow *>(object)) {
+        delete m_shadows.take(window);
+    }
 }
