@@ -4,29 +4,27 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
+// Copied over from the Breeze shadow implementation
+
 #include "TileSet.h"
 
 #include <QPainter>
 
-//___________________________________________________________
 inline bool bits(TileSet::Tiles flags, TileSet::Tiles testFlags)
 {
     return (flags & testFlags) == testFlags;
 }
 
-//______________________________________________________________________________________
 inline qreal devicePixelRatio(const QPixmap &pixmap)
 {
     return pixmap.devicePixelRatio();
 }
 
-//______________________________________________________________________________________
 inline void setDevicePixelRatio(QPixmap &pixmap, qreal value)
 {
     return pixmap.setDevicePixelRatio(value);
 }
 
-//______________________________________________________________
 void TileSet::initPixmap(PixmapList &pixmaps, const QPixmap &source, int width, int height, const QRect &rect)
 {
     QSize size(width, height);
@@ -55,7 +53,6 @@ void TileSet::initPixmap(PixmapList &pixmaps, const QPixmap &source, int width, 
     }
 }
 
-//______________________________________________________________
 TileSet::TileSet()
     : _w1(0)
     , _h1(0)
@@ -65,7 +62,6 @@ TileSet::TileSet()
     _pixmaps.reserve(9);
 }
 
-//______________________________________________________________
 TileSet::TileSet(const QPixmap &source, int w1, int h1, int w2, int h2)
     : _w1(w1)
     , _h1(h1)
@@ -94,7 +90,6 @@ TileSet::TileSet(const QPixmap &source, int w1, int h1, int w2, int h2)
     initPixmap(_pixmaps, source, _w3, _h3, QRect(_w1 + w2, _h1 + h2, _w3, _h3));
 }
 
-//___________________________________________________________
 void TileSet::render(const QRect &constRect, QPainter *painter, Tiles tiles) const
 {
     const bool oldHint(painter->testRenderHint(QPainter::SmoothPixmapTransform));

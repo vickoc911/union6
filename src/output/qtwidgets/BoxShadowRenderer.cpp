@@ -15,11 +15,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-// own
+// This implementation has been copied over from Breeze.
+
 #include "BoxShadowRenderer.h"
 #include "BackgroundDrawing.h"
 
-// Qt
 #include <QPainter>
 #include <QtMath>
 

@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2014 Hugo Pereira Da Costa <hugo.pereira@free.fr>
  * SPDX-FileCopyrightText: 2018, 2020 Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+ * SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
@@ -26,8 +27,7 @@
 using namespace Union::Properties;
 using namespace Qt::StringLiterals;
 
-//_____________________________________________________
-Shadow ShadowHelper::lookupShadowParams()
+Shadow ShadowHelper::lookupShadowProperties()
 {
     Union::ElementList elements;
     QStringList elementTypes = {u"menu"_s, u"popup"_s};
@@ -57,13 +57,11 @@ Shadow ShadowHelper::lookupShadowParams()
     return params;
 }
 
-//_____________________________________________________
 ShadowHelper::ShadowHelper()
     : QObject()
 {
 }
 
-//_______________________________________________________
 ShadowHelper::~ShadowHelper()
 {
     if (Union::StyleRegistry::instance()->platform()) {
@@ -71,14 +69,12 @@ ShadowHelper::~ShadowHelper()
     }
 }
 
-//______________________________________________
 void ShadowHelper::reset()
 {
     Union::StyleRegistry::instance()->platform()->resetShadowTiles();
     m_shadowTiles = TileSet();
 }
 
-//_______________________________________________________
 bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 {
     // make sure widget is not already registered
@@ -95,7 +91,6 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
     installShadows(widget);
     m_widgets.insert(widget);
 
-    // install event filter
     widget->removeEventFilter(this);
     widget->installEventFilter(this);
 
@@ -105,7 +100,6 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
     return true;
 }
 
-//_______________________________________________________
 void ShadowHelper::unregisterWidget(QWidget *widget)
 {
     if (m_widgets.remove(widget)) {
@@ -120,7 +114,6 @@ void ShadowHelper::unregisterWidget(QWidget *widget)
     }
 }
 
-//_______________________________________________________
 bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() != QEvent::PlatformSurface) {
@@ -142,13 +135,12 @@ bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-//_______________________________________________________
 TileSet ShadowHelper::shadowTiles()
 {
     if (m_shadowTiles.isValid()) {
         return m_shadowTiles;
     }
-    Shadow params = lookupShadowParams();
+    Shadow params = lookupShadowProperties();
     const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
 
     BoxShadowRenderer shadowRenderer;
@@ -162,7 +154,7 @@ TileSet ShadowHelper::shadowTiles()
     QRect boxRect(QPoint(0, 0), boxSize);
     boxRect.moveCenter(outerRect.center());
 
-    // Mask out inner rect.
+    // Mask out inner rect, so when menu is turned off the shadow doesn't peek through.
     QPainter painter(&shadowTexture);
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -177,7 +169,6 @@ TileSet ShadowHelper::shadowTiles()
     auto path = unevenRadiiRectPath(outerRect - margins, params.cornerRadius);
     painter.drawPath(path);
 
-    // We're done.
     painter.end();
 
     const QPoint innerRectTopLeft = outerRect.center();
@@ -186,48 +177,40 @@ TileSet ShadowHelper::shadowTiles()
     return m_shadowTiles;
 }
 
-//_______________________________________________________
 void ShadowHelper::widgetDeleted(QObject *object)
 {
     QWidget *widget(static_cast<QWidget *>(object));
     m_widgets.remove(widget);
 }
 
-//_______________________________________________________
 void ShadowHelper::windowDeleted(QObject *object)
 {
     QWindow *window(static_cast<QWindow *>(object));
     Union::StyleRegistry::instance()->platform()->deleteWindowShadow(window);
 }
 
-//_______________________________________________________
 bool ShadowHelper::isMenu(QWidget *widget) const
 {
     return qobject_cast<QMenu *>(widget);
 }
 
-//_______________________________________________________
 bool ShadowHelper::isToolTip(QWidget *widget) const
 {
     return widget->inherits("QTipLabel") || (widget->windowFlags() & Qt::WindowType_Mask) == Qt::ToolTip;
 }
 
-//_______________________________________________________
 bool ShadowHelper::isDockWidget(QWidget *widget) const
 {
     return qobject_cast<QDockWidget *>(widget);
 }
 
-//_______________________________________________________
 bool ShadowHelper::isToolBar(QWidget *widget) const
 {
     return qobject_cast<QToolBar *>(widget);
 }
 
-//_______________________________________________________
 bool ShadowHelper::acceptWidget(QWidget *widget) const
 {
-    // flags
     if (widget->property("_KDE_NET_WM_SKIP_SHADOW").toBool()) {
         return false;
     }
@@ -235,7 +218,6 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
         return true;
     }
 
-    // menus
     if (isMenu(widget)) {
         return true;
     }
@@ -245,7 +227,6 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
         return true;
     }
 
-    // tooltips
     if (isToolTip(widget) && !widget->inherits("Plasma::ToolTip")) {
         return true;
     }
@@ -255,15 +236,9 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
         return true;
     }
 
-    // reject
     return false;
 }
 
-//______________________________________________
-
-//______________________________________________
-
-//_______________________________________________________
 void ShadowHelper::installShadows(QWidget *widget)
 {
     if (!widget) {
@@ -292,10 +267,9 @@ void ShadowHelper::installShadows(QWidget *widget)
     Union::StyleRegistry::instance()->platform()->installShadowTiles(window, margins, pixmapList);
 }
 
-//_______________________________________________________
 QMargins ShadowHelper::shadowMargins(QWidget *widget) const
 {
-    Shadow params = lookupShadowParams();
+    Shadow params = lookupShadowProperties();
     const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
 
     const QSizeF shadowSize = BoxShadowRenderer::calculateMinimumShadowTextureSize(boxSize, params);
@@ -310,8 +284,8 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
                       shadowRect.right() - boxRect.right() - SHADOW_ADJUSTMENT + params.offset.x(),
                       shadowRect.bottom() - boxRect.bottom() - SHADOW_ADJUSTMENT + params.offset.y());
 
+    // Balloon tip needs special margins to deal with the arrow.
     if (widget->inherits("QBalloonTip")) {
-        // Balloon tip needs special margins to deal with the arrow.
         int top = widget->contentsMargins().top();
         int bottom = widget->contentsMargins().bottom();
 
@@ -330,7 +304,6 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
     return margins.toMargins();
 }
 
-//_______________________________________________________
 void ShadowHelper::uninstallShadows(QWidget *widget)
 {
     Union::StyleRegistry::instance()->platform()->deleteWindowShadow(widget->windowHandle());

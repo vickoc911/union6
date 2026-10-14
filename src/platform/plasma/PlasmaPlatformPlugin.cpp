@@ -159,8 +159,6 @@ bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &s
         return shadowInstalled;
     }
 
-    // get the underlying window for the widget
-
     // find a shadow associated with the widget
     KWindowShadow *&shadow = m_shadows[window];
 

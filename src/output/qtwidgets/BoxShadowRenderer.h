@@ -6,7 +6,6 @@
 
 #pragma once
 
-// Qt
 #include "ShadowHelper.h"
 #include <QColor>
 #include <QImage>
@@ -16,8 +15,6 @@
 class BoxShadowRenderer
 {
 public:
-    // Compiler generated constructors & destructor are fine.
-
     /**
      * Set the size of the box.
      * @param size The size of the box.

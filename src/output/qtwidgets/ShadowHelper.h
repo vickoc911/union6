@@ -1,6 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2014 Hugo Pereira Da Costa <hugo.pereira@free.fr>
  * SPDX-FileCopyrightText: 2020 Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+ * SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
  *
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
@@ -40,68 +41,48 @@ struct Shadow {
     Union::Properties::CornersPropertyGroup::CornerRadii cornerRadius;
 };
 
-//* handle shadow pixmaps passed to window manager via X property
 class ShadowHelper : public QObject
 {
     Q_OBJECT
 
 public:
-    //* constructor
     explicit ShadowHelper();
 
-    //* destructor
     ~ShadowHelper() override;
 
-    //* shadow params from size enum
-    static Shadow lookupShadowParams();
+    static Shadow lookupShadowProperties();
 
-    //* reset
     void reset();
 
-    //* register widget
     bool registerWidget(QWidget *, bool force = false);
 
-    //* unregister widget
     void unregisterWidget(QWidget *);
 
-    //* event filter
     bool eventFilter(QObject *, QEvent *) override;
 
-    //* shadow tiles
-    /** is public because it is also needed for mdi windows */
     TileSet shadowTiles();
 
 protected Q_SLOTS:
 
-    //* unregister widget
     void widgetDeleted(QObject *);
 
-    //* unregister window
     void windowDeleted(QObject *);
 
 protected:
-    //* true if widget is a menu
     bool isMenu(QWidget *) const;
 
-    //* true if widget is a tooltip
     bool isToolTip(QWidget *) const;
 
-    //* dock widget
     bool isDockWidget(QWidget *) const;
 
-    //* toolbar
     bool isToolBar(QWidget *) const;
 
-    //* accept widget
     bool acceptWidget(QWidget *) const;
 
-    //* installs shadow on given widget in a platform independent way
     void installShadows(QWidget *);
 
-    //* uninstalls shadow on given widget in a platform independent way
     void uninstallShadows(QWidget *);
 
-    //* gets the shadow margins for the given widget
     QMargins shadowMargins(QWidget *) const;
 
 private:
