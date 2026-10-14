@@ -83,8 +83,7 @@ public:
     // QWidgets shadows
     virtual bool installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps);
     virtual void resetShadowTiles();
-    virtual void deleteAllShadows();
-    virtual void deleteWindowShadow(QWindow *window);
+    virtual void deleteWindowShadow(QObject *object);
 
 protected:
     void sendDefaultStyleChangedEvent();

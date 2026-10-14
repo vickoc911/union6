@@ -28,8 +28,7 @@ public:
     // QWidget Window shadows
     bool installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps) override;
     void resetShadowTiles() override;
-    void deleteAllShadows() override;
-    void deleteWindowShadow(QWindow *window) override;
+    void deleteWindowShadow(QObject *object) override;
 
 private:
     Q_SLOT void setSmoothScroll(bool enabled);

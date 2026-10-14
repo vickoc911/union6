@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "StyleRegistry.h"
 #include "TileSet.h"
 
 #include "properties/CornersPropertyGroup.h"
@@ -53,8 +54,6 @@ class ShadowHelper : public QObject
 public:
     explicit ShadowHelper();
 
-    ~ShadowHelper() override;
-
     static Shadow lookupShadowProperties();
 
     void reset();
@@ -70,8 +69,6 @@ public:
 protected Q_SLOTS:
 
     void widgetDeleted(QObject *);
-
-    void windowDeleted(QObject *);
 
 protected:
     bool acceptWidget(QWidget *) const;
