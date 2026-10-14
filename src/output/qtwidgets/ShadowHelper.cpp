@@ -7,14 +7,12 @@
  */
 
 // This implementation has been copied over from Breeze.
-
 #include "ShadowHelper.h"
 
 #include "BoxShadowRenderer.h"
 
 #include "BackgroundDrawing.h"
 
-#include "StyleRegistry.h"
 #include <ElementQuery.h>
 #include <QApplication>
 #include <QDockWidget>
@@ -29,51 +27,15 @@
 using namespace Union::Properties;
 using namespace Qt::StringLiterals;
 
-Shadow ShadowHelper::lookupShadowProperties()
-{
-    Union::ElementList elements;
-    QStringList elementTypes = {u"menu"_s, u"popup"_s};
-    for (const auto &elementType : elementTypes) {
-        auto unionElement = Union::Element::create();
-        unionElement->setType(elementType);
-        elements.append(unionElement);
-    }
-
-    Q_ASSERT(!elements.isEmpty());
-    const auto style = Union::StyleRegistry::instance()->defaultStyle();
-    const auto query = std::make_unique<Union::ElementQuery>(style);
-    query->setElements(elements);
-    query->execute();
-    const auto properties = query->properties();
-
-    const auto shadowColor = safePropertyLookup(properties, Union::Color(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::color);
-    const auto shadowBlur = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::blur);
-    const auto shadowSize = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::size);
-    const auto shadowRadius = safePropertyLookup(properties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
-    const auto shadowOffset =
-        safePropertyLookup(properties, QVector2D(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::offset, &OffsetPropertyGroup::toVector2D);
-
-    // We need to portrude shadow around the edges for the blurAmount (or shadowSize??)
-    auto params = Shadow(QPoint(shadowOffset.x(), shadowOffset.y()), shadowBlur, shadowSize, shadowColor.toQColor());
-    params.cornerRadius = shadowRadius;
-    return params;
-}
-
 ShadowHelper::ShadowHelper()
     : QObject()
+    , m_platform(Union::StyleRegistry::instance()->platform())
 {
-}
-
-ShadowHelper::~ShadowHelper()
-{
-    if (Union::StyleRegistry::instance()->platform()) {
-        Union::StyleRegistry::instance()->platform()->deleteAllShadows();
-    }
 }
 
 void ShadowHelper::reset()
 {
-    Union::StyleRegistry::instance()->platform()->resetShadowTiles();
+    m_platform->resetShadowTiles();
     m_shadowTiles = TileSet();
 }
 
@@ -188,14 +150,6 @@ void ShadowHelper::widgetDeleted(QObject *object)
     m_widgets.remove(widget);
 }
 
-void ShadowHelper::windowDeleted(QObject *object)
-{
-    if (Union::StyleRegistry::instance()->platform()) {
-        QWindow *window(static_cast<QWindow *>(object));
-        Union::StyleRegistry::instance()->platform()->deleteWindowShadow(window);
-    }
-}
-
 bool ShadowHelper::acceptWidget(QWidget *widget) const
 {
     if (widget->property("_KDE_NET_WM_SKIP_SHADOW").toBool()) {
@@ -251,9 +205,7 @@ void ShadowHelper::installShadows(QWidget *widget)
     QWindow *window = widget->windowHandle();
     auto margins = shadowMargins(widget);
     auto pixmapList = m_shadowTiles.pixmapList();
-    if (Union::StyleRegistry::instance()->platform()->installShadowTiles(window, margins, pixmapList)) {
-        connect(window, &QWindow::destroyed, this, &ShadowHelper::windowDeleted);
-    }
+    m_platform->installShadowTiles(window, margins, pixmapList);
 }
 
 QMargins ShadowHelper::shadowMargins(QWidget *widget) const
@@ -295,5 +247,35 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
 
 void ShadowHelper::uninstallShadows(QWidget *widget)
 {
-    Union::StyleRegistry::instance()->platform()->deleteWindowShadow(widget->windowHandle());
+    m_platform->deleteWindowShadow(widget->windowHandle());
+}
+
+Shadow ShadowHelper::lookupShadowProperties()
+{
+    Union::ElementList elements;
+    QStringList elementTypes = {u"menu"_s, u"popup"_s};
+    for (const auto &elementType : elementTypes) {
+        auto unionElement = Union::Element::create();
+        unionElement->setType(elementType);
+        elements.append(unionElement);
+    }
+
+    Q_ASSERT(!elements.isEmpty());
+    const auto style = Union::StyleRegistry::instance()->defaultStyle();
+    const auto query = std::make_unique<Union::ElementQuery>(style);
+    query->setElements(elements);
+    query->execute();
+    const auto properties = query->properties();
+
+    const auto shadowColor = safePropertyLookup(properties, Union::Color(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::color);
+    const auto shadowBlur = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::blur);
+    const auto shadowSize = safePropertyLookup(properties, 0.0, &StylePropertyGroup::shadow, &ShadowPropertyGroup::size);
+    const auto shadowRadius = safePropertyLookup(properties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
+    const auto shadowOffset =
+        safePropertyLookup(properties, QVector2D(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::offset, &OffsetPropertyGroup::toVector2D);
+
+    // We need to portrude shadow around the edges for the blurAmount (or shadowSize??)
+    auto params = Shadow(QPoint(shadowOffset.x(), shadowOffset.y()), shadowBlur, shadowSize, shadowColor.toQColor());
+    params.cornerRadius = shadowRadius;
+    return params;
 }
