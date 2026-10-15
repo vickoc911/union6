@@ -12,6 +12,7 @@
 
 #include <KIconColors>
 #include <KRuntimePlatform>
+#include <QWidget>
 
 using namespace Qt::StringLiterals;
 
@@ -151,16 +152,24 @@ const QVector<KWindowShadowTile::Ptr> &PlasmaPlatformPlugin::createShadowTiles(c
     // return relevant list of shadow tiles
     return m_tiles;
 }
-
-bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &shadowMargins, const QVector<QPixmap> &tilePixmaps)
+void PlasmaPlatformPlugin::installShadow(QWidget *widget, const QImage &shadowImage, const QMargins &shadowMargins)
 {
-    // create platform shadow tiles if needed
-    bool shadowInstalled = false;
-    const QVector<KWindowShadowTile::Ptr> &tiles = createShadowTiles(tilePixmaps);
-    if (tiles.count() != tileAmount) {
-        return shadowInstalled;
+    if (shadowImage.isNull()) {
+        return;
     }
 
+    const QPoint innerRectTopLeft = QRect(QPoint(0, 0), shadowImage.size()).center();
+    m_shadowTiles = TileSet(QPixmap::fromImage(std::move(shadowImage)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
+    if (!m_shadowTiles.isValid()) {
+        return;
+    }
+
+    const QVector<KWindowShadowTile::Ptr> &tiles = createShadowTiles(m_shadowTiles.pixmapList());
+    if (tiles.count() != tileAmount) {
+        return;
+    }
+
+    QWindow *window = widget->windowHandle();
     // find a shadow associated with the widget
     KWindowShadow *&shadow = m_shadows[window];
 
@@ -169,7 +178,6 @@ bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &s
         shadow = new KWindowShadow(window);
 
         // connect destroy signal
-        shadowInstalled = true;
         connect(window, &QWindow::destroyed, this, &PlasmaPlatformPlugin::deleteWindowShadow);
     }
 
@@ -188,7 +196,6 @@ bool PlasmaPlatformPlugin::installShadowTiles(QWindow *window, const QMargins &s
     shadow->setPadding(shadowMargins);
     shadow->setWindow(window);
     shadow->create();
-    return shadowInstalled;
 }
 
 void PlasmaPlatformPlugin::resetShadowTiles()

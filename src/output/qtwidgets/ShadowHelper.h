@@ -9,7 +9,6 @@
 #pragma once
 
 #include "StyleRegistry.h"
-#include "TileSet.h"
 
 #include "properties/CornersPropertyGroup.h"
 #include <QColor>
@@ -64,7 +63,7 @@ public:
 
     bool eventFilter(QObject *, QEvent *) override;
 
-    TileSet shadowTiles();
+    QImage shadowTexture();
 
 protected Q_SLOTS:
 
@@ -81,10 +80,7 @@ protected:
 
 private:
     //* registered widgets
-    QSet<QWidget *> m_widgets;
-
-    //* tileset
-    TileSet m_shadowTiles;
+    QSet<QWidget *> m_registeredWidgets;
 
     std::shared_ptr<Union::PlatformPlugin> m_platform;
 };
