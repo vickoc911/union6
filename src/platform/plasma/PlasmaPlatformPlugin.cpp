@@ -159,7 +159,7 @@ void PlasmaPlatformPlugin::installShadow(QWidget *widget, const QImage &shadowIm
     }
 
     const QPoint innerRectTopLeft = QRect(QPoint(0, 0), shadowImage.size()).center();
-    m_shadowTiles = TileSet(QPixmap::fromImage(std::move(shadowImage)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
+    m_shadowTiles = Union::TileSet(QPixmap::fromImage(std::move(shadowImage)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
     if (!m_shadowTiles.isValid()) {
         return;
     }

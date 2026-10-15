@@ -19,8 +19,10 @@
 
 MDIWindowShadow::MDIWindowShadow(QWidget *parent, const QImage &shadowImage)
     : QWidget(parent)
-    , m_shadowImage(shadowImage)
 {
+    const QPoint innerRectTopLeft = QRect(QPoint(0, 0), shadowImage.size()).center();
+    m_shadowTiles = Union::TileSet(QPixmap::fromImage(std::move(shadowImage)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
+
     setAttribute(Qt::WA_OpaquePaintEvent, false);
     setAttribute(Qt::WA_TransparentForMouseEvents, true);
     setFocusPolicy(Qt::NoFocus);
@@ -86,19 +88,14 @@ void MDIWindowShadow::updateZOrder()
 
 void MDIWindowShadow::paintEvent(QPaintEvent *event)
 {
-    if (m_shadowImage.isNull()) {
+    if (!m_shadowTiles.isValid()) {
         return;
     }
 
     QPainter painter(this);
     painter.setRenderHints(QPainter::Antialiasing);
     painter.setClipRegion(event->region());
-    QRectF shadowRect = m_shadowImage.rect();
-    shadowRect.setSize(m_shadowTilesRect.size());
-    // shadowRect.moveCenter(m_widget->rect().center());
-
-    painter.drawImage(shadowRect, m_shadowImage);
-    // m_shadowTiles.render(m_shadowTilesRect, &painter);
+    m_shadowTiles.render(m_shadowTilesRect, &painter);
 }
 
 //* set associated window
