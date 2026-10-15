@@ -10,6 +10,8 @@
 #include <QObject>
 #include <QSet>
 
+#include <TileSet.h>
+
 #include <QPaintEvent>
 #include <QPointer>
 #include <QWidget>
@@ -42,7 +44,7 @@ private:
     //* tileset rect, used for painting
     QRect m_shadowTilesRect;
 
-    QImage m_shadowImage;
+    Union::TileSet m_shadowTiles;
 };
 
 //* shadow manager

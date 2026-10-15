@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "TileSet.h"
 #include <KConfigWatcher>
 #include <KWindowShadow>
 #include <QWindow>
+#include <TileSet.h>
 
 #include <PlatformPlugin.h>
 
@@ -47,7 +47,7 @@ private:
     // Managed shadows
     QMap<QWindow *, KWindowShadow *> m_shadows;
     // Shared shadow tiles
-    TileSet m_shadowTiles;
+    Union::TileSet m_shadowTiles;
     QVector<KWindowShadowTile::Ptr> m_tiles;
     // There are 8 tiles in total
     const int tileAmount = 8;

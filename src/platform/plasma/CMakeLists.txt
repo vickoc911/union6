@@ -5,8 +5,6 @@ add_library(union-platform-plasma MODULE)
 target_sources(union-platform-plasma PRIVATE
     PlasmaPlatformPlugin.cpp
     PlasmaPlatformPlugin.h
-    TileSet.cpp
-    TileSet.h
 )
 
 target_link_libraries(union-platform-plasma PRIVATE Union KF6::CoreAddons KF6::ConfigGui KF6::IconThemes Qt6::DBus KF6::WindowSystem Qt6::Widgets)
