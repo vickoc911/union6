@@ -639,7 +639,16 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
 
 Union::Element::Ptr AbstractElement::createElement(const QString &name) const
 {
-    auto unionElement = Union::Element::create();
+    Union::Element::Ptr unionElement;
+    auto itr = std::find_if(m_elementList.begin(), m_elementList.end(), [name](const Union::Element::Ptr &element) {
+        return (element && element->type() == name);
+    });
+    if (itr == m_elementList.end()) {
+        unionElement = Union::Element::create();
+    } else {
+        unionElement = *(itr);
+    }
+
     unionElement->setType(name);
     unionElement->setStates(elementStates());
     unionElement->setAttributes(elementAttributes());
