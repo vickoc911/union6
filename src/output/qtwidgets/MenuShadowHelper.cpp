@@ -7,7 +7,7 @@
  */
 
 // This implementation has been copied over from Breeze.
-#include "ShadowHelper.h"
+#include "MenuShadowHelper.h"
 
 #include "BoxShadowRenderer.h"
 
@@ -27,18 +27,18 @@
 using namespace Union::Properties;
 using namespace Qt::StringLiterals;
 
-ShadowHelper::ShadowHelper()
+MenuShadowHelper::MenuShadowHelper()
     : QObject()
     , m_platform(Union::StyleRegistry::instance()->platform())
 {
 }
 
-void ShadowHelper::reset()
+void MenuShadowHelper::reset()
 {
     m_platform->resetWindowShadows();
 }
 
-bool ShadowHelper::registerWidget(QWidget *widget, bool force)
+bool MenuShadowHelper::registerWidget(QWidget *widget, bool force)
 {
     // make sure widget is not already registered
     if (m_registeredWidgets.contains(widget)) {
@@ -58,12 +58,12 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
     widget->installEventFilter(this);
 
     // connect destroy signal
-    connect(widget, &QObject::destroyed, this, &ShadowHelper::widgetDeleted);
+    connect(widget, &QObject::destroyed, this, &MenuShadowHelper::widgetDeleted);
 
     return true;
 }
 
-void ShadowHelper::unregisterWidget(QWidget *widget)
+void MenuShadowHelper::unregisterWidget(QWidget *widget)
 {
     if (m_registeredWidgets.remove(widget)) {
         // uninstall the event filter
@@ -77,7 +77,7 @@ void ShadowHelper::unregisterWidget(QWidget *widget)
     }
 }
 
-bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
+bool MenuShadowHelper::eventFilter(QObject *object, QEvent *event)
 {
     if (event->type() != QEvent::PlatformSurface) {
         return false;
@@ -98,7 +98,7 @@ bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-QImage ShadowHelper::shadowTexture()
+QImage MenuShadowHelper::shadowTexture()
 {
     Shadow params = lookupShadowProperties();
     if (params.isNone()) {
@@ -137,13 +137,13 @@ QImage ShadowHelper::shadowTexture()
     return shadowTexture;
 }
 
-void ShadowHelper::widgetDeleted(QObject *object)
+void MenuShadowHelper::widgetDeleted(QObject *object)
 {
     QWidget *widget(static_cast<QWidget *>(object));
     m_registeredWidgets.remove(widget);
 }
 
-bool ShadowHelper::acceptWidget(QWidget *widget) const
+bool MenuShadowHelper::acceptWidget(QWidget *widget) const
 {
     if (widget->property("_KDE_NET_WM_SKIP_SHADOW").toBool()) {
         return false;
@@ -173,7 +173,7 @@ bool ShadowHelper::acceptWidget(QWidget *widget) const
     return false;
 }
 
-void ShadowHelper::installShadows(QWidget *widget)
+void MenuShadowHelper::installShadows(QWidget *widget)
 {
     if (!widget) {
         return;
@@ -194,7 +194,7 @@ void ShadowHelper::installShadows(QWidget *widget)
     m_platform->installWindowShadow(widget, texture, margins);
 }
 
-QMargins ShadowHelper::shadowMargins(QWidget *widget) const
+QMargins MenuShadowHelper::shadowMargins(QWidget *widget) const
 {
     Shadow params = lookupShadowProperties();
     const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
@@ -231,12 +231,12 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
     return margins.toMargins();
 }
 
-void ShadowHelper::uninstallShadows(QWidget *widget)
+void MenuShadowHelper::uninstallShadows(QWidget *widget)
 {
     m_platform->uninstallWindowShadow(widget->windowHandle());
 }
 
-Shadow ShadowHelper::lookupShadowProperties()
+Shadow MenuShadowHelper::lookupShadowProperties()
 {
     Union::ElementList elements;
     QStringList elementTypes = {u"menu"_s, u"popup"_s};

@@ -16,7 +16,7 @@
 #include <QPointer>
 #include <QWidget>
 
-class ShadowHelper;
+class MenuShadowHelper;
 
 //* frame shadow
 /** this allows the shadow to be painted over the widgets viewport */
@@ -57,7 +57,7 @@ class MDIShadowHelper : public QObject
 public:
     explicit MDIShadowHelper();
 
-    void setShadowHelper(ShadowHelper *shadowHelper);
+    void setShadowHelper(MenuShadowHelper *shadowHelper);
 
     bool registerWidget(QWidget *);
     void unregisterWidget(QWidget *);
@@ -89,5 +89,5 @@ private:
     QSet<const QObject *> m_registeredWidgets;
 
     //* shadow helper used to generate the shadows
-    QPointer<ShadowHelper> m_shadowHelper;
+    QPointer<MenuShadowHelper> m_shadowHelper;
 };

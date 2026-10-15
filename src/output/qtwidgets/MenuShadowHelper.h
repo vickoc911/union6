@@ -46,12 +46,12 @@ struct Shadow {
     }
 };
 
-class ShadowHelper : public QObject
+class MenuShadowHelper : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ShadowHelper();
+    explicit MenuShadowHelper();
 
     static Shadow lookupShadowProperties();
 

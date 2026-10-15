@@ -10,7 +10,7 @@
 #include "MDIShadowHelper.h"
 
 #include "BoxShadowRenderer.h"
-#include "ShadowHelper.h"
+#include "MenuShadowHelper.h"
 
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -33,7 +33,7 @@ void MDIWindowShadow::updateGeometry()
         return;
     }
 
-    const auto params = ShadowHelper::lookupShadowProperties();
+    const auto params = MenuShadowHelper::lookupShadowProperties();
     if (params.isNone()) {
         return;
     }
@@ -145,7 +145,7 @@ bool MDIShadowHelper::registerWidget(QWidget *widget)
     return true;
 }
 
-void MDIShadowHelper::setShadowHelper(ShadowHelper *shadowHelper)
+void MDIShadowHelper::setShadowHelper(MenuShadowHelper *shadowHelper)
 {
     m_shadowHelper = shadowHelper;
 }

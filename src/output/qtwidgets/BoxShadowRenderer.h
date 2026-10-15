@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "ShadowHelper.h"
+#include "MenuShadowHelper.h"
 #include <QColor>
 #include <QImage>
 #include <QPoint>

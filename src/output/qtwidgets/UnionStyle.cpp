@@ -114,12 +114,12 @@ using namespace Union::Properties;
 UnionStyle::UnionStyle()
     : QCommonStyle()
     , m_showMnemonics(false)
-    , m_shadowHelper(std::make_unique<ShadowHelper>())
+    , m_menuShadowHelper(std::make_unique<MenuShadowHelper>())
     , m_mdiShadowHelper(std::make_unique<MDIShadowHelper>())
 {
     qApp->installEventFilter(this);
     Union::StyleRegistry::instance()->load();
-    m_mdiShadowHelper->setShadowHelper(m_shadowHelper.get());
+    m_mdiShadowHelper->setShadowHelper(m_menuShadowHelper.get());
 }
 
 UnionStyle::~UnionStyle() noexcept
@@ -704,7 +704,7 @@ void UnionStyle::polish(QWidget *widget)
                 widget->setAutoFillBackground(false);
             }
         }
-        m_shadowHelper->registerWidget(widget);
+        m_menuShadowHelper->registerWidget(widget);
         m_mdiShadowHelper->registerWidget(widget);
     }
     if (qobject_cast<QScrollBar *>(widget)) {
@@ -720,7 +720,7 @@ void UnionStyle::polish(QWidget *widget)
 
 void UnionStyle::unpolish(QWidget *widget)
 {
-    m_shadowHelper->unregisterWidget(widget);
+    m_menuShadowHelper->unregisterWidget(widget);
     m_mdiShadowHelper->unregisterWidget(widget);
     QCommonStyle::unpolish(widget);
 }
