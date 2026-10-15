@@ -20,8 +20,6 @@ target_sources(UnionWidgetsStyle PRIVATE
         ShadowHelper.h
         MDIShadowHelper.cpp
         MDIShadowHelper.h
-        TileSet.cpp
-        TileSet.h
         SharedNames.h
         StyleUtils.cpp
         StyleUtils.h

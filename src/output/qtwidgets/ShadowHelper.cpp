@@ -36,13 +36,12 @@ ShadowHelper::ShadowHelper()
 void ShadowHelper::reset()
 {
     m_platform->resetShadowTiles();
-    m_shadowTiles = TileSet();
 }
 
 bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 {
     // make sure widget is not already registered
-    if (m_widgets.contains(widget)) {
+    if (m_registeredWidgets.contains(widget)) {
         return false;
     }
 
@@ -53,7 +52,7 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 
     // try to create shadow directly
     installShadows(widget);
-    m_widgets.insert(widget);
+    m_registeredWidgets.insert(widget);
 
     widget->removeEventFilter(this);
     widget->installEventFilter(this);
@@ -66,7 +65,7 @@ bool ShadowHelper::registerWidget(QWidget *widget, bool force)
 
 void ShadowHelper::unregisterWidget(QWidget *widget)
 {
-    if (m_widgets.remove(widget)) {
+    if (m_registeredWidgets.remove(widget)) {
         // uninstall the event filter
         widget->removeEventFilter(this);
 
@@ -99,14 +98,11 @@ bool ShadowHelper::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-TileSet ShadowHelper::shadowTiles()
+QImage ShadowHelper::shadowTexture()
 {
-    if (m_shadowTiles.isValid()) {
-        return m_shadowTiles;
-    }
     Shadow params = lookupShadowProperties();
     if (params.isNone()) {
-        return TileSet();
+        return QImage();
     }
     const QSize boxSize = BoxShadowRenderer::calculateMinimumBoxSize(params);
 
@@ -138,16 +134,13 @@ TileSet ShadowHelper::shadowTiles()
 
     painter.end();
 
-    const QPoint innerRectTopLeft = outerRect.center();
-    m_shadowTiles = TileSet(QPixmap::fromImage(std::move(shadowTexture)), innerRectTopLeft.x(), innerRectTopLeft.y(), 1, 1);
-
-    return m_shadowTiles;
+    return shadowTexture;
 }
 
 void ShadowHelper::widgetDeleted(QObject *object)
 {
     QWidget *widget(static_cast<QWidget *>(object));
-    m_widgets.remove(widget);
+    m_registeredWidgets.remove(widget);
 }
 
 bool ShadowHelper::acceptWidget(QWidget *widget) const
@@ -196,16 +189,9 @@ void ShadowHelper::installShadows(QWidget *widget)
         return;
     }
 
-    // create shadow tiles if needed
-    shadowTiles();
-    if (!m_shadowTiles.isValid()) {
-        return;
-    }
-
-    QWindow *window = widget->windowHandle();
-    auto margins = shadowMargins(widget);
-    auto pixmapList = m_shadowTiles.pixmapList();
-    m_platform->installShadowTiles(window, margins, pixmapList);
+    const auto texture = shadowTexture();
+    const auto margins = shadowMargins(widget);
+    m_platform->installShadow(widget, texture, margins);
 }
 
 QMargins ShadowHelper::shadowMargins(QWidget *widget) const
@@ -247,7 +233,7 @@ QMargins ShadowHelper::shadowMargins(QWidget *widget) const
 
 void ShadowHelper::uninstallShadows(QWidget *widget)
 {
-    m_platform->deleteWindowShadow(widget->windowHandle());
+    m_platform->uninstallShadow(widget->windowHandle());
 }
 
 Shadow ShadowHelper::lookupShadowProperties()
