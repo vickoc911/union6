@@ -136,6 +136,45 @@ notebook > header > tabs > tab button.flat {
     margin-left: $spacing;
 }
 
+list,
+treeview.view {
+    color: @theme_text_color;
+    background-color: @theme_base_color;
+}
+
+.navigation-sidebar,
+stacksidebar list {
+    color: @theme_fg_color;
+    background-color: @theme_bg_color;
+}
+
+/* margins are what separate the navigation sidebar rows */
+stacksidebar list separator {
+    min-height: 0;
+    background: none;
+}
+
+expander arrow,
+treeview.view.expander {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $arrow-right;
+}
+
+expander arrow:dir(rtl),
+treeview.view.expander:dir(rtl) {
+    -gtk-icon-source: $arrow-left;
+}
+
+expander arrow:checked,
+treeview.view.expander:checked {
+    -gtk-icon-source: $arrow-down;
+}
+
+expander title > arrow {
+    margin-right: $spacing;
+}
+
 *:drop(active) {
     box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
 }

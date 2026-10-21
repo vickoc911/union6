@@ -171,6 +171,16 @@ notebook > header.right > tabs > arrow.up {
     -gtk-icon-source: $arrow-down;
 }
 
+treeview.view {
+    border-left-color: @borders;
+    border-top-color: @borders;
+}
+
+treeview.view.separator {
+    min-height: $separator-width;
+    color: @borders;
+}
+
 spinner {
     opacity: 0;
     min-width: $icon-size;

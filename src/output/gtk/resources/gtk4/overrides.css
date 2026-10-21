@@ -16,3 +16,8 @@
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
+
+row:selected link,
+row:selected button.link {
+    color: currentColor;
+}

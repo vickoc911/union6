@@ -71,6 +71,25 @@ static const QList CheckStates = {
     Backdrop,
 };
 
+static const QList RowStates = {
+    Base,
+    state(u":hover"_s, Hovered),
+    state(u":active"_s, Pressed),
+    state(u":selected"_s, Highlighted),
+    state(u":selected:hover"_s, Highlighted | Hovered),
+    state(u":disabled"_s, Disabled),
+};
+
+// Rows only react to the pointer if they're activatable
+static const QList ActivatableRowStates = {
+    Base,
+    state(u".activatable:hover"_s, Hovered),
+    state(u".activatable:active"_s, Pressed),
+    state(u":selected"_s, Highlighted),
+    state(u".activatable:selected:hover"_s, Highlighted | Hovered),
+    state(u":disabled"_s, Disabled),
+};
+
 // GTK marks the combo box button as checked while the popup is open
 static const QList ComboStates = {
     Base,
@@ -109,6 +128,15 @@ static const QList CheckBoxIndicatorStates = {
     state(u":disabled"_s, Disabled),
     state(u":checked:disabled"_s, Checked | Disabled),
     Backdrop,
+};
+
+// Header buttons don't react to the pointer. These undo the states from the button rules
+static const QList HeaderStates = {
+    Base,
+    state(u":hover"_s, {}),
+    state(u":active"_s, {}),
+    state(u":focus-visible"_s, {}),
+    state(u":disabled"_s, Disabled),
 };
 
 static const QList BaseAndBackdrop = {Base, Backdrop};
@@ -729,6 +757,46 @@ static void appendRules(QList<RuleSpec> &specs)
         .partial = true,
     });
 
+    specs.append({
+        .selector = u".navigation-sidebar > row"_s,
+        .path = {element(u"ItemDelegate"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
+        .variants = RowStates,
+    });
+
+    // GTK rows react to the pointer, so they're the hover list delegates.
+    specs.append({
+        .selector = u"list > row"_s,
+        .path = {element(u"ItemDelegate"_s, {u"inside-list"_s, u"hover-enabled"_s})},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
+        .variants = ActivatableRowStates,
+    });
+
+    specs.append({
+        .selector = u"list > row:last-child"_s,
+        .path = {element(u"ItemDelegate"_s, {u"inside-list"_s, u"hover-enabled"_s, u"last-in-list"_s})},
+        .features = Feature::Padding | Feature::Margin,
+        .variants = {Base},
+        .parents = {u"list > row"_s},
+        .partial = true,
+    });
+
+    specs.append({
+        .selector = u"treeview.view"_s,
+        .path = {element(u"TreeViewDelegate"_s)},
+        .features = Feature::Background | Feature::TextColor,
+        .variants = {Base, state(u":selected"_s, Highlighted), state(u":disabled"_s, Disabled), Backdrop},
+    });
+
+    // GTK 3 only has tree views, GTK 4 has column views too
+    specs.append({
+        .selector = u"columnview > header > button, treeview.view header button"_s,
+        .path = {element(u"HeaderViewDelegate"_s)},
+        .features = Feature::Background | Feature::Border | Feature::TextColor | Feature::Font | Feature::Padding | Feature::Corners | Feature::Shadow,
+        .variants = HeaderStates,
+        .parents = {u"button"_s},
+    });
+
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead
     // FIXME: define the hover and pressed colours of these in breeze union, until then they look the same in every state
     const auto accentStates = [](Union::Element::States base) {
@@ -769,6 +837,13 @@ static void appendRules(QList<RuleSpec> &specs)
 static void appendGtk4Rules(QList<RuleSpec> &specs)
 {
     specs.append({
+        .selector = u"popover.emoji-picker emoji"_s,
+        .path = {element(u"ItemDelegate"_s)},
+        .features = Feature::Background,
+        .variants = {state(u":hover"_s, Hovered), state(u":focus"_s, Hovered)},
+    });
+
+    specs.append({
         .selector = u"checkbutton{} > radio"_s,
         .path = {element(u"RadioButton"_s), element(u"Indicator"_s)},
         .features = Feature::Frame | Feature::MinSize | Feature::Outline | Feature::IconSource,
@@ -798,6 +873,45 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
         .variants = BaseAndDisabled,
         .stateAnchor = 0,
     });
+
+    specs.append({
+        .selector = u"listview > row"_s,
+        .path = {element(u"ItemDelegate"_s, {u"inside-list"_s, u"hover-enabled"_s})},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
+        .variants = ActivatableRowStates,
+    });
+
+    specs.append({
+        .selector = u"listview > row:last-child"_s,
+        .path = {element(u"ItemDelegate"_s, {u"inside-list"_s, u"hover-enabled"_s, u"last-in-list"_s})},
+        .features = Feature::Padding | Feature::Margin,
+        .variants = {Base},
+        .parents = {u"listview > row"_s},
+        .partial = true,
+    });
+
+    // column views are tables in Union, the cells are the delegates so the rows don't get padding
+    specs.append({
+        .selector = u"columnview > listview > row"_s,
+        .path = {element(u"ItemDelegate"_s, {u"inside-table"_s})},
+        .features = Feature::Frame | Feature::TextColor,
+        .variants = ActivatableRowStates,
+        .parents = {u"listview > row"_s},
+    });
+
+    specs.append({
+        .selector = u"columnview > listview > row > cell"_s,
+        .path = {element(u"ItemDelegate"_s, {u"inside-table"_s})},
+        .features = Feature::Padding,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"gridview > child"_s,
+        .path = {element(u"ItemDelegate"_s, {}, {{u"display"_s, u"text-under-icon"_s}})},
+        .features = Feature::Frame | Feature::TextColor,
+        .variants = {Base, state(u":hover"_s, Hovered), state(u":selected"_s, Highlighted), state(u":disabled"_s, Disabled)},
+    });
 }
 
 static void appendGtk3Rules(QList<RuleSpec> &specs)
@@ -815,6 +929,15 @@ static void appendGtk3Rules(QList<RuleSpec> &specs)
         .features = Feature::Frame | Feature::MinSize | Feature::Outline | Feature::IconSource,
         .variants = CheckStates,
         .stateAnchor = 0,
+    });
+
+    // GTK 3 stack sidebars are missing the navigation-sidebar class
+    specs.append({
+        .selector = u"stacksidebar list > row"_s,
+        .path = {element(u"ItemDelegate"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
+        .variants = ActivatableRowStates,
+        .parents = {u"list > row"_s},
     });
 }
 

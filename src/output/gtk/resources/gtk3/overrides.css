@@ -4,3 +4,8 @@
  */
 
 /* selectors that have to win over union generated rules */
+
+row:selected *:link,
+row:selected button.link {
+    color: currentColor;
+}

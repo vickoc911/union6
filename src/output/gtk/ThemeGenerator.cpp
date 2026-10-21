@@ -385,6 +385,7 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
         {u"round-button-radius"_s, {{u"RoundButton"_s}}, Feature::Corners, u"border-radius"_s},
         {u"border-width"_s, {{u"Frame"_s}}, Feature::Border, u"border-width"_s},
         {u"focus-width"_s, {{u"TextField"_s}}, Feature::Outline, u"outline-width"_s, State::VisualFocus},
+        {u"separator-width"_s, {{u"MenuSeparator"_s}}, Feature::MinHeight, u"min-height"_s},
         {u"icon-size"_s, {{u"SmallIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"icon-size-large"_s, {{u"LargeIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"spacing"_s, button, Feature::Spacing, u"border-spacing"_s},
