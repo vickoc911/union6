@@ -835,6 +835,15 @@ static void appendRules(QList<RuleSpec> &specs)
         .stateAnchor = 1,
     });
 
+    // Override the window background that base.css gives .background
+    specs.append({
+        .selector = u"tooltip.background"_s,
+        .path = {element(u"ToolTip"_s)},
+        .features = Feature::Background | Feature::Border | Feature::Corners | Feature::TextColor | Feature::Font | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+    });
+
     specs.append({
         .selector = u".navigation-sidebar > row"_s,
         .path = {element(u"ItemDelegate"_s)},
@@ -881,6 +890,32 @@ static void appendRules(QList<RuleSpec> &specs)
         .features = Feature::Border | Feature::Corners,
         .variants = BaseAndBackdrop,
         .borderMode = BorderMode::Real,
+    });
+
+    const QList<std::pair<QString, QVariantMap>> messageTypes = {
+        {u"info"_s, {}},
+        {u"question"_s, {}},
+        {u"warning"_s, {{u"type"_s, u"warning"_s}}},
+        {u"error"_s, {{u"type"_s, u"error"_s}}},
+    };
+
+    for (const auto &messageType : messageTypes) {
+        specs.append({
+            .selector = u"infobar.%1 > revealer > box"_s.arg(messageType.first),
+            .path = {element(u"InlineMessage"_s, {}, messageType.second)},
+            .features = Feature::Background | Feature::Border | Feature::Corners | Feature::TextColor | Feature::Padding,
+            .variants = {Base},
+        });
+    }
+
+    // the close button of a Kirigami inline message is a tool button, GTK 4 gave it a full button frame
+    specs.append({
+        .selector = u"infobar button.close"_s,
+        .path = {element(u"ToolButton"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Outline,
+        .variants = ButtonStates,
+        .parents = {u"button"_s},
+        .partial = true,
     });
 
     specs.append({
@@ -1213,6 +1248,27 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
         });
     }
 
+    specs.append({
+        .selector = u"window.dialog > .dialog-vbox > box:not(.dialog-action-box)"_s,
+        .path = {element(u"Dialog"_s)},
+        .features = Feature::Padding,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"window.dialog.message > .dialog-vbox > box > box > box"_s,
+        .path = {element(u"Dialog"_s)},
+        .features = Feature::Spacing,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"window.dialog .dialog-action-area"_s,
+        .path = {element(u"DialogButtonBox"_s)},
+        .features = Feature::Padding | Feature::Spacing,
+        .variants = {Base},
+    });
+
     // Window controls fill the header bar height, the image is what you actually see
     // TODO: define the hover and click states in breeze union (colours, backdrop, border)
     specs.append({
@@ -1371,6 +1427,20 @@ static void appendGtk3Rules(QList<RuleSpec> &specs)
         .selector = u"calendar:indeterminate"_s,
         .path = {element(u"MonthGrid"_s), element(u"Label"_s)},
         .features = Feature::TextColor,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"dialog .dialog-vbox, messagedialog .dialog-vbox"_s,
+        .path = {element(u"Dialog"_s)},
+        .features = Feature::Padding,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u".dialog-action-area"_s,
+        .path = {element(u"DialogButtonBox"_s)},
+        .features = Feature::Padding,
         .variants = {Base},
     });
 

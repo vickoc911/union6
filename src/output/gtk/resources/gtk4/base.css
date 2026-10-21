@@ -271,6 +271,10 @@ popover.menu box.inline-buttons {
     border-spacing: $spacing;
 }
 
+tooltip > box {
+    border-spacing: $spacing-medium;
+}
+
 list,
 listview,
 columnview,
@@ -341,6 +345,10 @@ searchbar > revealer > box {
 
 searchbar > revealer > box {
     padding: $spacing;
+}
+
+infobar > revealer > box {
+    border-spacing: $spacing-medium;
 }
 
 calendar > header {

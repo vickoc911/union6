@@ -293,3 +293,7 @@ calendar:selected {
 image:disabled {
     opacity: $dim-opacity;
 }
+
+buttonbox {
+    -GtkButtonBox-child-min-height: 0;
+}
