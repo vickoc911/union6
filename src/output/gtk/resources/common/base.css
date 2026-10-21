@@ -1,0 +1,73 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/* nodes with no Union equivalent. $ vars get replaced at gen time */
+
+* {
+    -gtk-secondary-caret-color: @theme_selected_bg_color;
+}
+
+.background {
+    color: @theme_fg_color;
+    background-color: @theme_bg_color;
+}
+
+.background:backdrop:not(tooltip) {
+    color: @theme_unfocused_fg_color;
+    background-color: @theme_unfocused_bg_color;
+}
+
+label:disabled {
+    color: @insensitive_fg_color;
+}
+
+label.error,
+.error {
+    color: @error_color;
+}
+
+label.warning,
+.warning {
+    color: @warning_color;
+}
+
+label.success,
+.success {
+    color: @success_color;
+}
+
+.large-title,
+.title-1 {
+    font-weight: $heading-weight;
+    font-size: $heading-1-size;
+}
+
+.title-2 {
+    font-weight: $heading-weight;
+    font-size: $heading-2-size;
+}
+
+.title-3 {
+    font-weight: $heading-weight;
+    font-size: $heading-3-size;
+}
+
+.title-4 {
+    font-weight: $heading-weight;
+    font-size: $heading-4-size;
+}
+
+.heading,
+label.title {
+    font-weight: $heading-weight;
+}
+
+.monospace {
+    font-family: monospace;
+}
+
+.numeric {
+    font-feature-settings: "tnum";
+}

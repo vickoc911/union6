@@ -1,0 +1,48 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/* GTK 3 nodes with no Union equivalent. $ vars get replaced at gen time */
+
+.view,
+textview text,
+iconview {
+    color: @theme_text_color;
+    background-color: @theme_base_color;
+}
+
+.view:disabled,
+textview text:disabled {
+    color: @insensitive_fg_color;
+    background-color: @insensitive_base_color;
+}
+
+.view:selected,
+iconview:selected {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+selection,
+label selection,
+entry selection,
+textview text selection {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+.dim-label,
+label.separator,
+scale value,
+headerbar .subtitle {
+    opacity: $dim-opacity;
+}
+
+*:drop(active) {
+    box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
+}
+
+image:disabled {
+    opacity: $dim-opacity;
+}
