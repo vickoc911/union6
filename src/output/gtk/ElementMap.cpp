@@ -220,6 +220,46 @@ static AdjustFunction marksAdjust(ElementPath tickMark, Qt::Orientation orientat
     };
 }
 
+// GTK 3 draws the arrow as big as its box, so the box is the icon size and the rest of the length is padding
+static AdjustFunction scrollArrowAdjust(Qt::Orientation orientation)
+{
+    return [orientation](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto button = context.query({element(u"TabScrollButton"_s)});
+        const auto icon = button && button->icon() ? button->icon()->width().value_or(0.0) : 0.0;
+        const auto length = layoutValue(button, orientation == Qt::Horizontal ? &LayoutPropertyGroup::width : &LayoutPropertyGroup::height);
+        if (icon <= 0.0 || length <= icon) {
+            return;
+        }
+
+        const auto padding = toPx((length - icon) / 2.0);
+        declarations.set(orientation == Qt::Horizontal ? u"min-width"_s : u"min-height"_s, toPx(icon));
+        declarations.set(u"padding"_s,
+                         orientation == Qt::Horizontal ? shorthand(u"0"_s, padding, u"0"_s, padding) : shorthand(padding, u"0"_s, padding, u"0"_s));
+    };
+}
+
+// GTK stretches buttons to the height of their box, visible on tab close button hover
+static AdjustFunction circleAdjust(ElementPath path)
+{
+    return [path](DeclarationList &declarations, const RuleContext &context, const StateVariant &variant) {
+        const auto properties = context.query(path, variant.states);
+        const auto color = declarations.value(u"background-color"_s);
+        if (!properties || !properties->corners() || !color || color == u"transparent") {
+            return;
+        }
+
+        const auto size = std::min(layoutValue(properties, &LayoutPropertyGroup::width), layoutValue(properties, &LayoutPropertyGroup::height));
+        const auto radii = properties->corners()->radii();
+        if (size <= 0.0 || std::min({radii.topLeft, radii.topRight, radii.bottomRight, radii.bottomLeft}) < size / 2.0) {
+            return;
+        }
+
+        declarations.set(u"background-color"_s, u"transparent"_s);
+        declarations.set(u"background-image"_s, u"radial-gradient(circle closest-side, %1 calc(100% - 1px), transparent)"_s.arg(color.value()));
+        declarations.remove(u"border-radius"_s);
+    };
+}
+
 static QMarginsF borderWidths(const std::shared_ptr<StylePropertyGroup> &properties)
 {
     const auto border = properties ? properties->border() : nullptr;
@@ -612,6 +652,81 @@ static void appendRules(QList<RuleSpec> &specs)
         .features = Feature::Background | Feature::Border,
         .variants = BaseAndDisabled,
         .stateAnchor = 0,
+    });
+
+    for (const auto &direction : {u"top"_s, u"bottom"_s, u"left"_s, u"right"_s}) {
+        const auto attributes = QVariantMap{{u"direction"_s, direction}};
+
+        // the line goes under the tabs so the open tab joins the page
+        specs.append({
+            .selector = u"notebook > header.%1"_s.arg(direction),
+            .path = {element(u"TabBar"_s, {}, attributes)},
+            .features = Feature::Background | Feature::Border,
+            .variants = BaseAndBackdrop,
+        });
+
+        specs.append({
+            .selector = u"notebook > header.%1 > tabs > tab"_s.arg(direction),
+            .path = {element(u"TabBar"_s, {}, attributes), element(u"TabButton"_s, {}, attributes)},
+            .features = Feature::Frame | Feature::TextColor | Feature::Font | Feature::Padding,
+            .variants =
+                {
+                    Base,
+                    hint(u":first-child"_s, {u"first"_s}),
+                    hint(u":last-child"_s, {u"last"_s}),
+                    hint(u":only-child"_s, {u"first"_s, u"last"_s}),
+                    state(u":hover"_s, Hovered),
+                    state(u":checked"_s, Checked),
+                    state(u":checked:hover"_s, Checked | Hovered),
+                    state(u":disabled"_s, Disabled),
+                    Backdrop,
+                },
+        });
+    }
+
+    // scroll arrows only get the length along the tab bar so they don't make the tabs taller
+    specs.append({
+        .selector = u"notebook > header.top > tabs > arrow, notebook > header.bottom > tabs > arrow"_s,
+        .path = {element(u"TabScrollButton"_s)},
+        .features = Feature::MinWidth | Feature::IconSize,
+        .variants = {Base},
+        .adjust = scrollArrowAdjust(Qt::Horizontal),
+    });
+
+    specs.append({
+        .selector = u"notebook > header.left > tabs > arrow, notebook > header.right > tabs > arrow"_s,
+        .path = {element(u"TabScrollButton"_s)},
+        .features = Feature::MinHeight | Feature::IconSize,
+        .variants = {Base},
+        .adjust = scrollArrowAdjust(Qt::Vertical),
+    });
+
+    const ElementPath closeButton = {element(u"TabBar"_s), element(u"TabButton"_s), element(u"CloseButton"_s)};
+    specs.append({
+        .selector = u"notebook > header > tabs > tab button.flat"_s,
+        .path = closeButton,
+        .features = Feature::Background | Feature::Corners | Feature::TextColor | Feature::MinSize,
+        .variants = {Base, state(u":hover"_s, Hovered), state(u":active"_s, Pressed), state(u":disabled"_s, Disabled)},
+        .parents = {u"button"_s, u"button.flat"_s},
+        .adjust = circleAdjust(closeButton),
+    });
+
+    specs.append({
+        .selector = u"notebook > stack:not(:only-child)"_s,
+        .path = {element(u"TabWidget"_s)},
+        .features = Feature::Background,
+        .variants = BaseAndBackdrop,
+    });
+
+    // only notebooks with a border get the page frame, overrides.css sorts out the tab side
+    specs.append({
+        .selector = u"notebook.frame > stack:not(:only-child)"_s,
+        .path = {element(u"TabWidget"_s)},
+        .features = Feature::Border | Feature::Corners | Feature::Padding,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+        .parents = {u"notebook > stack:not(:only-child)"_s},
+        .partial = true,
     });
 
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead

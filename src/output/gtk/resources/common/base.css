@@ -128,6 +128,49 @@ scrollbar.horizontal slider {
     min-width: calc(2 * $scrollbar-size);
 }
 
+/*
+ * GTK can't select a tab by what's in it so the length goes on the label.
+ * Labels on left & right tabs aren't rotated either, so every tab is as long
+ * as a top one
+ */
+notebook > header > tabs > tab {
+    min-height: $tab-height;
+}
+
+notebook > header > tabs > tab > label,
+notebook > header > tabs > tab > box > label:only-child {
+    min-width: $tab-width;
+}
+
+/* next to an icon or close button */
+notebook > header > tabs > tab > box > label {
+    min-width: calc($tab-width - $tab-button-size - $spacing);
+}
+
+notebook > header > tabs > tab button.flat {
+    padding: 0;
+}
+
+notebook > header.top > tabs > arrow.down,
+notebook > header.bottom > tabs > arrow.down {
+    -gtk-icon-source: $arrow-left;
+}
+
+notebook > header.top > tabs > arrow.up,
+notebook > header.bottom > tabs > arrow.up {
+    -gtk-icon-source: $arrow-right;
+}
+
+notebook > header.left > tabs > arrow.down,
+notebook > header.right > tabs > arrow.down {
+    -gtk-icon-source: $arrow-up;
+}
+
+notebook > header.left > tabs > arrow.up,
+notebook > header.right > tabs > arrow.up {
+    -gtk-icon-source: $arrow-down;
+}
+
 spinner {
     opacity: 0;
     min-width: $icon-size;

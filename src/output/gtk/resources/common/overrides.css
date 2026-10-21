@@ -45,6 +45,28 @@ spinbutton.vertical > button {
     padding: $spacing;
 }
 
+/* the tab bar line is the page edge on the tab side, top & left headers come before the stack */
+notebook.frame > header.top + stack {
+    border-top-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+notebook.frame > header.left + stack {
+    border-left-width: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* bottom & right headers come after it so they overlap the page edge like the Union tab widget inset */
+notebook.frame > header.bottom {
+    margin-top: -$border-width;
+}
+
+notebook.frame > header.right {
+    margin-left: -$border-width;
+}
+
 /*
  * apps ask for round buttons with .circular, only the button rule sets corners so it doesn't need to fight.
  * GTK shrinks a radius that's too big to half the height like Union does, so wide ones are pills
