@@ -494,7 +494,7 @@ Union::Properties::StylePropertyGroup *AbstractElement::queryProperties(const Un
 
 QMap<QString, LayoutItem> AbstractElement::layoutMap(const QStyleOption *opt, const QStringList &subElementList) const
 {
-    QMap<QString, LayoutItem> map;
+    QMap<QString, LayoutItem> map = m_layoutMap;
     QList<LayoutItem> items;
     QStringList subElements = subElementList;
 
@@ -504,25 +504,26 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const QStyleOption *opt, co
     // If subelement list is empty, just use default widget item.
     // This ensures any custom components get layouted too.
     if (subElements.empty()) {
-        qCDebug(UNION_QTWIDGETS) << "No subelements given, using Widget placeholder for" << elements;
+        qCDebug(UNION_QTWIDGETS) << "No subelements given, using Widget placeholder for" << subElements;
         subElements = {ElementString::Widget};
     }
 
     // Setup the container rectangle
-    auto properties = m_elementProperties;
     auto currentHierarchy = m_elementList;
-    QRectF availableSpace = backgroundRectangle(opt, properties);
-    QMarginsF padding = safePropertyLookup(properties, QMarginsF(), &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
-    availableSpace = availableSpace.marginsRemoved(padding);
+    const QRectF availableSpace = backgroundRectangle(opt, m_elementProperties).marginsRemoved(padding());
 
     // Prepare all subelements
     for (const auto &subElement : subElements) {
+        // Use the option rectangle size to determine if we need to calculate it again
+        if (m_layoutMap.contains(subElement) && opt && m_layoutMap[subElement].styleOptionRect == opt->rect) {
+            continue;
+        }
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
         if (subElement != ElementString::Icon && subElement != ElementString::Text) {
             currentHierarchy.append(createElement(subElement));
         }
-        properties = queryProperties(currentHierarchy);
+        auto properties = queryProperties(currentHierarchy);
         Union::Properties::Alignment horizontalAlignment;
         Union::Properties::Alignment verticalAlignment;
         int order = 0;
@@ -596,7 +597,16 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const QStyleOption *opt, co
         item.verticalAlignment = verticalAlignment;
         item.order = order;
         item.rect = elementRect;
+        if (opt) {
+            item.styleOptionRect = opt->rect;
+        } else {
+            item.styleOptionRect = QRect();
+        }
         items.append(item);
+    }
+
+    if (items.isEmpty()) {
+        return m_layoutMap;
     }
 
     // Actual layouting starts here

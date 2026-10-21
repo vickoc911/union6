@@ -28,6 +28,7 @@ struct LayoutItem {
     Union::Properties::Alignment horizontalAlignment;
     Union::Properties::Alignment verticalAlignment;
     QRectF rect;
+    QRect styleOptionRect;
 };
 
 struct LayoutBucket {
