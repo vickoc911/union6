@@ -77,3 +77,13 @@ stackswitcher > button.text-button {
     padding-left: 0;
     padding-right: 0;
 }
+
+entry.error {
+    color: @error_color;
+    border-color: @error_color;
+}
+
+entry.warning {
+    color: @warning_color;
+    border-color: @warning_color;
+}

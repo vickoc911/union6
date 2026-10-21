@@ -32,6 +32,11 @@ textview > text > selection {
     background-color: @theme_selected_bg_color;
 }
 
+text > block-cursor {
+    color: @theme_base_color;
+    background-color: currentColor;
+}
+
 .dim-label,
 label.separator,
 scale > value,
@@ -91,6 +96,34 @@ menubutton arrow.left {
 
 menubutton arrow.right {
     -gtk-icon-source: $arrow-right;
+}
+
+entry > image {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-size: $icon-size;
+}
+
+entry > image.left {
+    margin-right: $spacing-medium;
+}
+
+entry > image.right {
+    margin-left: $spacing-medium;
+}
+
+entry > progress {
+    border-bottom: $progress-thickness solid @theme_selected_bg_color;
+    background: none;
+    box-shadow: none;
+}
+
+spinbutton > text {
+    padding: 0 $spacing-medium;
+}
+
+spinbutton.vertical > text {
+    padding: 0;
 }
 
 :drop(active) {

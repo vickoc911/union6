@@ -380,12 +380,15 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
     };
 
     const QList<Metric> metrics = {
+        {u"radius"_s, button, Feature::Corners, u"border-radius"_s},
         {u"round-button-radius"_s, {{u"RoundButton"_s}}, Feature::Corners, u"border-radius"_s},
         {u"border-width"_s, {{u"Frame"_s}}, Feature::Border, u"border-width"_s},
         {u"focus-width"_s, {{u"TextField"_s}}, Feature::Outline, u"outline-width"_s, State::VisualFocus},
         {u"icon-size"_s, {{u"SmallIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"icon-size-large"_s, {{u"LargeIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"spacing"_s, button, Feature::Spacing, u"border-spacing"_s},
+        {u"spacing-medium"_s, {{u"DialogButtonBox"_s}}, Feature::Spacing, u"border-spacing"_s},
+        {u"progress-thickness"_s, {{u"ProgressBar"_s, {u"horizontal"_s}}}, Feature::MinHeight, u"min-height"_s},
         {u"heading-1-size"_s, heading(u"level-1"_s), Feature::Font, u"font-size"_s},
         {u"heading-2-size"_s, heading(u"level-2"_s), Feature::Font, u"font-size"_s},
         {u"heading-3-size"_s, heading(u"level-3"_s), Feature::Font, u"font-size"_s},

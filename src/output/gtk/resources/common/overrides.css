@@ -41,6 +41,10 @@
     margin-top: -$border-width;
 }
 
+spinbutton.vertical > button {
+    padding: $spacing;
+}
+
 /*
  * apps ask for round buttons with .circular, only the button rule sets corners so it doesn't need to fight.
  * GTK shrinks a radius that's too big to half the height like Union does, so wide ones are pills

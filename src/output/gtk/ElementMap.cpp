@@ -3,7 +3,9 @@
 
 #include "ElementMap.h"
 
+#include <properties/BorderPropertyGroup.h>
 #include <properties/LayoutPropertyGroup.h>
+#include <properties/LinePropertyGroup.h>
 #include <properties/SizePropertyGroup.h>
 
 using namespace Qt::StringLiterals;
@@ -19,6 +21,7 @@ static constexpr auto Pressed = State::Pressed;
 static constexpr auto Checked = State::Checked;
 static constexpr auto Disabled = State::Disabled;
 static constexpr auto VisualFocus = State::VisualFocus;
+static constexpr auto ActiveFocus = State::ActiveFocus;
 static constexpr auto Highlighted = State::Highlighted;
 
 static const StateVariant Base{};
@@ -42,6 +45,15 @@ static const QList ButtonStates = {
     Backdrop,
 };
 
+// GTK entries show focus any time they have keyboard focus
+static const QList EntryStates = {
+    Base,
+    state(u":hover"_s, Hovered),
+    state(u":focus-within"_s, ActiveFocus | VisualFocus),
+    state(u":disabled"_s, Disabled),
+    Backdrop,
+};
+
 // GTK marks the combo box button as checked while the popup is open
 static const QList ComboStates = {
     Base,
@@ -54,9 +66,62 @@ static const QList ComboStates = {
 };
 
 static const QList BaseAndBackdrop = {Base, Backdrop};
+static const QList BaseAndDisabled = {Base, state(u":disabled"_s, Disabled)};
+
 static ElementSpec element(const QString &type, const QStringList &hints = {}, const QVariantMap &attributes = {})
 {
     return ElementSpec{type, hints, attributes};
+}
+
+static qreal layoutValue(const std::shared_ptr<StylePropertyGroup> &properties, std::optional<qreal> (LayoutPropertyGroup::*getter)() const)
+{
+    if (!properties || !properties->layout()) {
+        return 0.0;
+    }
+    return (properties->layout()->*getter)().value_or(0.0);
+}
+
+static QMarginsF borderWidths(const std::shared_ptr<StylePropertyGroup> &properties)
+{
+    const auto border = properties ? properties->border() : nullptr;
+    if (!border) {
+        return {};
+    }
+    const auto size = [](const LinePropertyGroup *line) {
+        return line ? line->size().value_or(0.0) : 0.0;
+    };
+    return QMarginsF(size(border->left()), size(border->top()), size(border->right()), size(border->bottom()));
+}
+
+// Union places spin box indicators from the edge of the whole spin box but GTK puts the buttons inside its
+// padding, which apps like GIMP change. Only keep the padding before the text & size it with min-height
+static AdjustFunction spinBoxAdjust(ElementPath spinBox)
+{
+    return [spinBox](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto properties = context.query(spinBox);
+        if (!properties || !properties->layout() || !properties->layout()->padding()) {
+            return;
+        }
+
+        const auto border = borderWidths(properties);
+        const auto padding = properties->layout()->padding()->toMargins();
+        declarations.set(u"padding"_s, shorthand(u"0"_s, u"0"_s, u"0"_s, toPx(padding.left() - border.left())));
+        declarations.set(u"min-height"_s, toPx(layoutValue(properties, &LayoutPropertyGroup::height) - border.top() - border.bottom()));
+    };
+}
+
+static AdjustFunction spinButtonAdjust(ElementPath spinBox, ElementPath indicator, bool atEnd)
+{
+    return [spinBox, indicator, atEnd](DeclarationList &declarations, const RuleContext &context, const StateVariant &variant) {
+        declarations.set(u"padding"_s, u"0"_s);
+        declarations.set(u"box-shadow"_s, declarations.value(u"box-shadow"_s).value_or(u"none"_s));
+
+        const auto border = borderWidths(context.query(spinBox));
+        const auto properties = context.query(indicator, variant.states);
+        const auto margins = properties && properties->layout() && properties->layout()->margins() ? properties->layout()->margins()->toMargins() : QMarginsF{};
+        const auto end = atEnd ? toPx(margins.right() - border.right()) : u"0"_s;
+        declarations.set(u"margin"_s, shorthand(toPx(margins.top() - border.top()), end, toPx(margins.bottom() - border.bottom()), u"0"_s));
+    };
 }
 
 // only the sides of the labels padding from the button
@@ -123,6 +188,84 @@ static void appendRules(QList<RuleSpec> &specs)
         .variants = {Base},
     });
 
+    specs.append({
+        .selector = u"entry"_s,
+        .path = {element(u"TextField"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Font | Feature::Padding | Feature::MinHeight | Feature::Outline,
+        .variants = EntryStates,
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
+        .selector = u"spinbutton:not(.vertical)"_s,
+        .path = {element(u"SpinBox"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Font | Feature::Padding | Feature::MinHeight | Feature::Outline,
+        .variants = EntryStates,
+        .borderMode = BorderMode::Real,
+        .adjust = spinBoxAdjust({element(u"SpinBox"_s)}),
+    });
+
+    // Union spin boxes don't stack the buttons around the text, vertical ones just get the frame
+    specs.append({
+        .selector = u"spinbutton.vertical"_s,
+        .path = {element(u"SpinBox"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Outline,
+        .variants = EntryStates,
+        .borderMode = BorderMode::Real,
+    });
+
+    // GTK puts both buttons at the end so they both use the Union increase button
+    // corners are squared unless they're hovered or pressed.
+    const ElementPath spinBox{element(u"SpinBox"_s)};
+    const ElementPath increase{element(u"SpinBox"_s), element(u"Indicator"_s, {u"increase"_s})};
+    const auto spinButton = [&](const QString &selector, bool atEnd) {
+        return RuleSpec{
+            .selector = selector,
+            .path = increase,
+            .features =
+                Feature::Background | Feature::Border | Feature::Corners | Feature::TextColor | Feature::IconColor | Feature::IconSource | Feature::MinWidth,
+            .variants =
+                {
+                    Base,
+                    state(u":hover"_s, Hovered),
+                    state(u":active"_s, Pressed),
+                    state(u":disabled"_s, Disabled),
+                    Backdrop,
+                },
+            .parents = atEnd ? QStringList{u"button"_s, u"spinbutton:not(.vertical) > button"_s} : QStringList{u"button"_s},
+            .adjust = spinButtonAdjust(spinBox, increase, atEnd),
+        };
+    };
+    specs.append(spinButton(u"spinbutton:not(.vertical) > button"_s, false));
+    specs.append(spinButton(u"spinbutton:not(.vertical) > button.up"_s, true));
+
+    specs.append({
+        .selector = u"spinbutton:not(.vertical) > button.down"_s,
+        .path = {element(u"SpinBox"_s), element(u"Indicator"_s, {u"decrease"_s})},
+        .features = Feature::IconSource,
+        .variants = {Base},
+        .parents = {u"spinbutton:not(.vertical) > button"_s},
+        .partial = true,
+    });
+
+    // Vertical spin buttons stack +/- around the text with no frame of their
+    // own, so they only get the indicator look while hovered or pressed
+    specs.append({
+        .selector = u"spinbutton.vertical > button"_s,
+        .path = {element(u"SpinBox"_s), element(u"Indicator"_s)},
+        .features = Feature::Background | Feature::Border | Feature::Corners | Feature::TextColor | Feature::IconColor,
+        .variants =
+            {
+                Base,
+                state(u":hover"_s, Hovered),
+                state(u":active"_s, Pressed),
+                state(u":disabled"_s, Disabled),
+                Backdrop,
+            },
+        .parents = {u"button"_s},
+        .partial = true,
+    });
+
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead
     // FIXME: define the hover and pressed colours of these in breeze union, until then they look the same in every state
     const auto accentStates = [](Union::Element::States base) {
@@ -168,6 +311,14 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
         .path = {element(u"ComboBox"_s), element(u"Indicator"_s)},
         .features = Feature::IconSource | Feature::MinSize,
         .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"entry{} > text > placeholder"_s,
+        .path = {element(u"TextField"_s), element(u"Text"_s, {u"placeholder"_s})},
+        .features = Feature::TextColor,
+        .variants = BaseAndDisabled,
+        .stateAnchor = 0,
     });
 }
 

@@ -49,6 +49,36 @@ button.link:visited {
     color: @link_visited_color;
 }
 
+entry image {
+    min-width: $icon-size;
+    min-height: $icon-size;
+}
+
+entry image.left {
+    margin-right: $spacing-medium;
+}
+
+entry image.right {
+    margin-left: $spacing-medium;
+}
+
+entry progress {
+    border-bottom: $progress-thickness solid @theme_selected_bg_color;
+    background: none;
+    box-shadow: none;
+}
+
+spinbutton entry {
+    padding: 0 $spacing-medium;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+spinbutton.vertical entry {
+    padding: 0;
+}
+
 *:drop(active) {
     box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
 }
