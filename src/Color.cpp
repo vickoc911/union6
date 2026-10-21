@@ -542,6 +542,67 @@ QString Color::toString() const
     return u"Color("_s + data->toString() + u")"_s;
 }
 
+QString Color::customSource() const
+{
+    if (data->type == ColorData::Type::Custom) {
+        return static_cast<const CustomData *>(data.get())->source;
+    }
+
+    return QString{};
+}
+
+QStringList Color::customArguments() const
+{
+    if (data->type == ColorData::Type::Custom) {
+        return static_cast<const CustomData *>(data.get())->arguments;
+    }
+
+    return QStringList{};
+}
+
+QList<Color> Color::operands() const
+{
+    switch (data->type) {
+    case ColorData::Type::AddOperation:
+    case ColorData::Type::SubtractOperation:
+    case ColorData::Type::MultiplyOperation: {
+        auto operation = static_cast<const ColorOperationData *>(data.get());
+        return {operation->color, operation->other};
+    }
+    case ColorData::Type::MixOperation: {
+        auto mix = static_cast<const MixOperationData *>(data.get());
+        return {mix->color, mix->other};
+    }
+    case ColorData::Type::SetOperation:
+        return {static_cast<const SetOperationData *>(data.get())->color};
+    case ColorData::Type::Empty:
+    case ColorData::Type::RGBA:
+    case ColorData::Type::Custom:
+        break;
+    }
+
+    return {};
+}
+
+qreal Color::mixAmount() const
+{
+    if (data->type == ColorData::Type::MixOperation) {
+        return static_cast<const MixOperationData *>(data.get())->amount;
+    }
+
+    return 0.0;
+}
+
+std::array<std::optional<uint8_t>, 4> Color::setComponents() const
+{
+    if (data->type == ColorData::Type::SetOperation) {
+        auto set = static_cast<const SetOperationData *>(data.get());
+        return {set->r, set->g, set->b, set->a};
+    }
+
+    return {};
+}
+
 Color Color::rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     return Color(new RgbaData(r, g, b, a));

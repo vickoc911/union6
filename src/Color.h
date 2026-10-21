@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <array>
 #include <memory>
+#include <optional>
 
 #include <QColor>
 #include <QSharedData>
@@ -139,6 +141,43 @@ public:
      * Returns a string representation of this color.
      */
     QString toString() const;
+
+    /*!
+     * Returns the name of the ColorProvider of a custom color.
+     *
+     * Returns an empty string if this is not a custom color.
+     */
+    QString customSource() const;
+
+    /*!
+     * Returns the arguments that are passed to the ColorProvider of a custom
+     * color.
+     *
+     * Returns an empty list if this is not a custom color.
+     */
+    QStringList customArguments() const;
+
+    /*!
+     * Returns the colors an operation color operates on.
+     *
+     * For add, subtract, multiply and mix colors, these are the two colors the
+     * operation combines, in order. For set colors, this is the color of which
+     * some components are replaced. Returns an empty list for other types.
+     */
+    QList<Color> operands() const;
+
+    /*!
+     * Returns the amount of a mix color, or 0.0 if this is not a mix color.
+     */
+    qreal mixAmount() const;
+
+    /*!
+     * Returns the components that a set color replaces, in the order red,
+     * green, blue, alpha. Components that are not replaced are \c{std::nullopt}.
+     *
+     * All components are \c{std::nullopt} if this is not a set color.
+     */
+    std::array<std::optional<uint8_t>, 4> setComponents() const;
 
     /*!
      * Return a new RGBA color.
