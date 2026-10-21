@@ -98,6 +98,10 @@ menubutton arrow.right {
     -gtk-icon-source: $arrow-right;
 }
 
+dropdown > popover listview > row image {
+    -gtk-icon-size: $icon-size;
+}
+
 entry > image {
     min-width: $icon-size;
     min-height: $icon-size;
@@ -166,6 +170,58 @@ scrolledwindow > undershoot {
 }
 
 notebook > header > tabs > tab > box {
+    border-spacing: $spacing;
+}
+
+/* only draw the popover contents, the rest is room for the shadow */
+popover.background,
+popover.background:backdrop {
+    background: none;
+}
+
+/* popovers hold widgets like a little dialog */
+popover > contents {
+    padding: $dialog-padding;
+}
+
+/* lists in popovers use the popover's colour */
+popover list,
+popover listview {
+    background: none;
+}
+
+popover.menu modelbutton > box {
+    border-spacing: $menu-spacing;
+}
+
+popover.menu modelbutton > accelerator {
+    margin-left: $shortcut-spacing;
+}
+
+popover.menu modelbutton check.left,
+popover.menu modelbutton radio.left,
+popover.menu modelbutton arrow.left {
+    margin-right: $indicator-spacing;
+}
+
+popover.menu modelbutton check.right,
+popover.menu modelbutton radio.right,
+popover.menu modelbutton arrow.right {
+    margin-left: $indicator-spacing;
+}
+
+popover.menu modelbutton arrow {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $arrow-right;
+}
+
+popover.menu modelbutton arrow.left {
+    -gtk-icon-source: $arrow-left;
+}
+
+popover.menu box.inline-buttons {
+    padding: 0 $spacing-large;
     border-spacing: $spacing;
 }
 

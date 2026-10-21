@@ -758,6 +758,44 @@ static void appendRules(QList<RuleSpec> &specs)
     });
 
     specs.append({
+        .selector = u"popover.menu modelbutton"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Font | Feature::Padding | Feature::MinSize,
+        .variants =
+            {
+                Base,
+                state(u":hover"_s, Hovered),
+                state(u":selected"_s, Hovered),
+                state(u":active"_s, Pressed),
+                state(u":disabled"_s, Disabled),
+            },
+    });
+
+    specs.append({
+        .selector = u"popover.menu modelbutton{} > accelerator"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"ShortcutText"_s)},
+        .features = Feature::TextColor,
+        .variants = BaseAndDisabled,
+        .gtkMarker = 0,
+    });
+
+    specs.append({
+        .selector = u"popover.menu modelbutton check{}"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::IconSource,
+        .variants = IndicatorStates,
+        .stateAnchor = 1,
+    });
+
+    specs.append({
+        .selector = u"popover.menu modelbutton radio{}"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s, {u"exclusive"_s}), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::IconSource,
+        .variants = IndicatorStates,
+        .stateAnchor = 1,
+    });
+
+    specs.append({
         .selector = u".navigation-sidebar > row"_s,
         .path = {element(u"ItemDelegate"_s)},
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
@@ -797,6 +835,20 @@ static void appendRules(QList<RuleSpec> &specs)
         .parents = {u"button"_s},
     });
 
+    specs.append({
+        .selector = u"popover.menu modelbutton arrow:not(.left)"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"Arrow"_s)},
+        .features = Feature::IconSource | Feature::MinSize,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"menubar"_s,
+        .path = {element(u"MenuBar"_s)},
+        .features = Feature::Background | Feature::TextColor,
+        .variants = BaseAndBackdrop,
+    });
+
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead
     // FIXME: define the hover and pressed colours of these in breeze union, until then they look the same in every state
     const auto accentStates = [](Union::Element::States base) {
@@ -824,6 +876,13 @@ static void appendRules(QList<RuleSpec> &specs)
         .variants = accentStates({}),
         .parents = {u"button"_s},
         .partial = true,
+    });
+
+    specs.append({
+        .selector = u"popover.menu separator"_s,
+        .path = {element(u"Menu"_s), element(u"MenuSeparator"_s)},
+        .features = Feature::Background | Feature::Margin,
+        .variants = {Base},
     });
 
     specs.append({
@@ -875,6 +934,40 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
     });
 
     specs.append({
+        .selector = u"popover > contents"_s,
+        .path = {element(u"Popup"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
+        .selector = u"popover > arrow"_s,
+        .path = {element(u"Popup"_s)},
+        .features = Feature::Background | Feature::Border,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
+        .selector = u"popover.menu > contents"_s,
+        .path = {element(u"Menu"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+        .parents = {u"popover > contents"_s},
+    });
+
+    specs.append({
+        .selector = u"popover.menu > arrow"_s,
+        .path = {element(u"Menu"_s)},
+        .features = Feature::Background | Feature::Border,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+        .parents = {u"popover > arrow"_s},
+    });
+
+    specs.append({
         .selector = u"listview > row"_s,
         .path = {element(u"ItemDelegate"_s, {u"inside-list"_s, u"hover-enabled"_s})},
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
@@ -912,6 +1005,45 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
         .features = Feature::Frame | Feature::TextColor,
         .variants = {Base, state(u":hover"_s, Hovered), state(u":selected"_s, Highlighted), state(u":disabled"_s, Disabled)},
     });
+
+    specs.append({
+        .selector = u"dropdown > popover > contents"_s,
+        .path = {element(u"Popup"_s, {u"combobox"_s})},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+        .parents = {u"popover > contents"_s},
+    });
+
+    // GTK selects drop-down rows on hover, all of it is the combo box highlight
+    specs.append({
+        .selector = u"dropdown > popover listview > row"_s,
+        .path = {element(u"Popup"_s, {u"combobox"_s}), element(u"ItemDelegate"_s)},
+        .features = Feature::Frame | Feature::TextColor,
+        .variants =
+            {
+                Base,
+                state(u".activatable:hover"_s, Highlighted),
+                state(u":selected"_s, Highlighted),
+                state(u".activatable:selected:hover"_s, Highlighted),
+                state(u":disabled"_s, Disabled),
+            },
+        .parents = {u"listview > row"_s},
+    });
+
+    specs.append({
+        .selector = u"dropdown > popover listview > row > box"_s,
+        .path = {element(u"Popup"_s, {u"combobox"_s}), element(u"ItemDelegate"_s)},
+        .features = Feature::Spacing,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"menubar > item"_s,
+        .path = {element(u"MenuBar"_s), element(u"MenuBarItem"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::MinHeight,
+        .variants = {Base, state(u":hover"_s, Hovered), state(u":selected"_s, Highlighted)},
+    });
 }
 
 static void appendGtk3Rules(QList<RuleSpec> &specs)
@@ -938,6 +1070,84 @@ static void appendGtk3Rules(QList<RuleSpec> &specs)
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
         .variants = ActivatableRowStates,
         .parents = {u"list > row"_s},
+    });
+
+    // No contents node on GTK 3 popovers
+    specs.append({
+        .selector = u"popover.background"_s,
+        .path = {element(u"Popup"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
+        .selector = u"popover.background.menu"_s,
+        .path = {element(u"Menu"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+        .parents = {u"popover.background"_s},
+    });
+
+    specs.append({
+        .selector = u"menu, .menu, .context-menu"_s,
+        .path = {element(u"Menu"_s)},
+        .features = Feature::Background | Feature::Border | Feature::TextColor | Feature::Padding,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
+        .selector = u"menu menuitem, .menu menuitem, .context-menu menuitem"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Font | Feature::Padding | Feature::MinHeight,
+        .variants = {Base, state(u":hover"_s, Hovered), state(u":disabled"_s, Disabled)},
+    });
+
+    specs.append({
+        .selector = u"menuitem{} accelerator"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"ShortcutText"_s)},
+        .features = Feature::TextColor,
+        .variants = BaseAndDisabled,
+        .gtkMarker = 0,
+    });
+
+    specs.append({
+        .selector = u"menuitem arrow"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"Arrow"_s)},
+        .features = Feature::IconSource | Feature::MinSize,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"menuitem check{}"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::IconSource,
+        .variants = IndicatorStates,
+        .stateAnchor = 1,
+    });
+
+    specs.append({
+        .selector = u"menuitem radio{}"_s,
+        .path = {element(u"Menu"_s), element(u"MenuItem"_s, {u"exclusive"_s}), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::IconSource,
+        .variants = IndicatorStates,
+        .stateAnchor = 1,
+    });
+
+    specs.append({
+        .selector = u"menu separator, .menu separator, .context-menu separator"_s,
+        .path = {element(u"Menu"_s), element(u"MenuSeparator"_s)},
+        .features = Feature::Background | Feature::Margin,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"menubar > menuitem"_s,
+        .path = {element(u"MenuBar"_s), element(u"MenuBarItem"_s)},
+        .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::MinHeight,
+        .variants = {Base, state(u":hover"_s, Hovered)},
     });
 }
 

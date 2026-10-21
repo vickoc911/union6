@@ -171,6 +171,11 @@ notebook > header.right > tabs > arrow.up {
     -gtk-icon-source: $arrow-down;
 }
 
+popover.menu label.title {
+    padding: $spacing $spacing-large;
+    font-weight: $heading-weight;
+}
+
 treeview.view {
     border-left-color: @borders;
     border-top-color: @borders;

@@ -17,6 +17,12 @@
     border-bottom-left-radius: 0;
 }
 
+/* popover menu items in button rows don't need a min width */
+popover.menu box.inline-buttons modelbutton,
+popover.menu box.circular-buttons modelbutton {
+    min-width: 0;
+}
+
 row:selected link,
 row:selected button.link {
     color: currentColor;

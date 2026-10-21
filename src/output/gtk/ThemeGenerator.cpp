@@ -378,6 +378,7 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
     auto arrow = [](const QString &direction) {
         return ElementPath{{u"IndicatorArrow"_s + direction}};
     };
+    const ElementPath menuItem{{u"Menu"_s}, {u"MenuItem"_s}};
     const ElementPath tab{{u"TabBar"_s}, {u"TabButton"_s}};
 
     const QList<Metric> metrics = {
@@ -392,6 +393,9 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
         {u"spacing-medium"_s, {{u"DialogButtonBox"_s}}, Feature::Spacing, u"border-spacing"_s},
         {u"spacing-large"_s, {{u"Pane"_s}}, Feature::Padding, u"padding"_s},
         {u"indicator-spacing"_s, {{u"CheckDelegate"_s}}, Feature::Spacing, u"border-spacing"_s},
+        {u"dialog-padding"_s, {{u"Dialog"_s}}, Feature::Padding, u"padding"_s},
+        {u"menu-spacing"_s, menuItem, Feature::Spacing, u"border-spacing"_s},
+        {u"shortcut-spacing"_s, menuItem + ElementPath{{u"ShortcutText"_s}}, Feature::Spacing, u"border-spacing"_s},
         {u"scrollbar-size"_s, {{u"ScrollBar"_s, {u"vertical"_s}}}, Feature::MinWidth, u"min-width"_s},
         {u"tab-width"_s, tab, Feature::MinWidth | Feature::Padding, u"min-width"_s},
         {u"tab-height"_s, tab, Feature::MinHeight | Feature::Padding, u"min-height"_s},

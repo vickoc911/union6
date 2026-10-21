@@ -136,6 +136,37 @@ notebook > header > tabs > tab button.flat {
     margin-left: $spacing;
 }
 
+/* GTK 3 popovers hold widgets like a little dialog */
+popover.background {
+    padding: $dialog-padding;
+}
+
+popover list {
+    background: none;
+}
+
+modelbutton arrow,
+menuitem arrow {
+    min-width: $icon-size;
+    min-height: $icon-size;
+}
+
+modelbutton arrow {
+    -gtk-icon-source: $arrow-right;
+}
+
+modelbutton arrow:dir(rtl) {
+    -gtk-icon-source: $arrow-left;
+}
+
+menuitem accelerator {
+    margin-left: $shortcut-spacing;
+}
+
+menubar {
+    padding: 0;
+}
+
 list,
 treeview.view {
     color: @theme_text_color;
