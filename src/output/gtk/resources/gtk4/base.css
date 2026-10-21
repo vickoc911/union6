@@ -148,6 +148,19 @@ dropdown > popover listview > row image {
     -gtk-icon-size: $icon-size;
 }
 
+/* GTK sizes icons asked for as normal or large with these classes */
+.normal-icons {
+    -gtk-icon-size: $icon-size;
+}
+
+.large-icons {
+    -gtk-icon-size: $icon-size-large;
+}
+
+iconview {
+    -gtk-icon-size: $iconview-icon-size;
+}
+
 entry > image {
     min-width: $icon-size;
     min-height: $icon-size;

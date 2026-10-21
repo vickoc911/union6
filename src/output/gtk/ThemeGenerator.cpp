@@ -391,6 +391,7 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
         {u"splitter-width"_s, {{u"Splitter"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"icon-size"_s, {{u"SmallIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"icon-size-large"_s, {{u"LargeIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
+        {u"iconview-icon-size"_s, {{u"IconViewIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"spacing"_s, button, Feature::Spacing, u"border-spacing"_s},
         {u"spacing-medium"_s, {{u"DialogButtonBox"_s}}, Feature::Spacing, u"border-spacing"_s},
         {u"spacing-large"_s, {{u"Pane"_s}}, Feature::Padding, u"padding"_s},
