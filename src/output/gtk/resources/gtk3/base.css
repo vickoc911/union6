@@ -165,6 +165,11 @@ levelbar block.empty {
     box-shadow: none;
 }
 
+/* GTK 3 draws a grip on paned handles, the Union splitter is just a line */
+paned > separator {
+    -gtk-icon-source: none;
+}
+
 /* Union scroll bars don't have buttons */
 scrollbar {
     -GtkScrollbar-has-backward-stepper: false;
@@ -180,6 +185,11 @@ scrolledwindow undershoot {
 /* no border-spacing for boxes in GTK 3 */
 notebook > header > tabs > tab button.flat {
     margin-left: $spacing;
+}
+
+/* GTK 4 apps put margins on the notification box themselves, GTK 3 ones don't */
+frame.app-notification > border {
+    padding: $spacing-large;
 }
 
 /* GTK 3 popovers hold widgets like a little dialog */
@@ -252,8 +262,28 @@ expander title > arrow {
     margin-right: $spacing;
 }
 
+frame.flat > border,
+scrolledwindow.frame.flat {
+    border-style: none;
+}
+
 searchbar > revealer > box {
     padding: $spacing;
+}
+
+/* GTK 3 calendars don't have nodes for days */
+calendar {
+    padding: $spacing;
+}
+
+calendar.header {
+    border-bottom: $border-width solid @borders;
+}
+
+calendar:selected {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+    border-radius: $radius;
 }
 
 *:drop(active) {

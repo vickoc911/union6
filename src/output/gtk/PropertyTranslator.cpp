@@ -391,9 +391,8 @@ static DeclarationList translateProperties(const StylePropertyGroup *properties,
         }
     }
 
-    // Union measures padding & inset different from GTK. The size is the background, insets go outside it
-    // and padding starts at the outer edge. GTK puts margin, border and padding outside the min size
-    //   margin = inset
+    // Union & GTK measure padding and insets different
+    //   margin = inset + margins
     //   padding = padding - inset - border
     //   min size = size - border - padding on both sides
     const auto layout = properties->layout();
@@ -405,6 +404,7 @@ static DeclarationList translateProperties(const StylePropertyGroup *properties,
     const bool usePadding = features.testFlag(Feature::Padding);
     const auto padding = sizeValues(layout->padding());
     const auto inset = useMargin ? sizeValues(layout->inset()) : std::array<std::optional<qreal>, 4>{};
+    const auto margins = useMargin ? sizeValues(layout->margins()) : std::array<std::optional<qreal>, 4>{};
 
     std::array<qreal, 4> edges{};
     std::array<qreal, 4> gtkPadding{};
@@ -415,10 +415,10 @@ static DeclarationList translateProperties(const StylePropertyGroup *properties,
         const auto sideInset = inset[side].value_or(0.0);
         const auto innerEdge = sideInset + realBorder[side];
         hasPadding = hasPadding || padding[side].has_value();
-        hasMargin = hasMargin || inset[side].has_value();
+        hasMargin = hasMargin || inset[side].has_value() || margins[side].has_value();
         gtkPadding[side] = std::max(0.0, padding[side].value_or(0.0) - innerEdge);
         edges[side] = realBorder[side] + (usePadding ? gtkPadding[side] : 0.0);
-        gtkMargin[side] = sideInset;
+        gtkMargin[side] = sideInset + margins[side].value_or(0.0);
     }
 
     if (usePadding && hasPadding) {

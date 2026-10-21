@@ -876,6 +876,21 @@ static void appendRules(QList<RuleSpec> &specs)
     });
 
     specs.append({
+        .selector = u"scrolledwindow.frame"_s,
+        .path = {element(u"Frame"_s)},
+        .features = Feature::Border | Feature::Corners,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
+        .selector = u"rubberband, .rubberband"_s,
+        .path = {element(u"RubberBand"_s)},
+        .features = Feature::Background | Feature::Border | Feature::Corners,
+        .variants = {Base},
+    });
+
+    specs.append({
         .selector = u"popover.menu modelbutton arrow:not(.left)"_s,
         .path = {element(u"Menu"_s), element(u"MenuItem"_s), element(u"Arrow"_s)},
         .features = Feature::IconSource | Feature::MinSize,
@@ -887,6 +902,14 @@ static void appendRules(QList<RuleSpec> &specs)
         .path = {element(u"MenuBar"_s)},
         .features = Feature::Background | Feature::TextColor,
         .variants = BaseAndBackdrop,
+    });
+
+    specs.append({
+        .selector = u".card"_s,
+        .path = {element(u"Card"_s)},
+        .features = Feature::Frame | Feature::TextColor,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
     });
 
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead
@@ -944,6 +967,57 @@ static void appendRules(QList<RuleSpec> &specs)
         .path = {element(u"ScrollAreaCorner"_s)},
         .features = Feature::Background,
         .variants = BaseAndBackdrop,
+    });
+
+    // the splitter only has a width, base.css uses it for both orientations
+    specs.append({
+        .selector = u"paned > separator"_s,
+        .path = {element(u"Splitter"_s)},
+        .features = Feature::Background,
+        .variants = {Base},
+    });
+
+    // wide handles are the split view handle with its margins. GTK only grabs a handle inside its margin
+    // so the margins become padding around the line
+    const auto wideHandle = [](DeclarationList &declarations, const RuleContext &, const StateVariant &) {
+        if (const auto margin = declarations.value(u"margin"_s)) {
+            declarations.remove(u"margin"_s);
+            declarations.set(u"padding"_s, margin.value());
+            declarations.set(u"background-clip"_s, u"content-box"_s);
+        }
+    };
+
+    specs.append({
+        .selector = u"paned.wide.horizontal > separator"_s,
+        .path = {element(u"SplitView"_s, {u"horizontal"_s}), element(u"Handle"_s)},
+        .features = Feature::Background | Feature::MinWidth | Feature::Margin,
+        .variants = {Base},
+        .parents = {u"paned > separator"_s},
+        .adjust = wideHandle,
+    });
+
+    specs.append({
+        .selector = u"paned.wide.vertical > separator"_s,
+        .path = {element(u"SplitView"_s, {u"vertical"_s}), element(u"Handle"_s)},
+        .features = Feature::Background | Feature::MinHeight | Feature::Margin,
+        .variants = {Base},
+        .parents = {u"paned > separator"_s},
+        .adjust = wideHandle,
+    });
+
+    specs.append({
+        .selector = u"textview > text"_s,
+        .path = {element(u"TextArea"_s)},
+        .features = Feature::Background | Feature::TextColor,
+        .variants = BaseAndDisabled,
+    });
+
+    specs.append({
+        .selector = u"calendar"_s,
+        .path = {element(u"MonthGrid"_s)},
+        .features = Feature::Frame | Feature::TextColor,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
     });
 }
 
@@ -1099,6 +1173,46 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
         .variants = {Base, state(u":hover"_s, Hovered), state(u":selected"_s, Highlighted)},
     });
 
+    specs.append({
+        .selector = u"frame"_s,
+        .path = {element(u"Frame"_s)},
+        .features = Feature::Border | Feature::Corners,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+    });
+
+    // In-app notifications float over the content like a popup
+    specs.append({
+        .selector = u"frame.app-notification"_s,
+        .path = {element(u"Popup"_s)},
+        .features = Feature::Frame | Feature::TextColor,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+        .parents = {u"frame"_s},
+    });
+
+    struct CalendarLabel {
+        QString selector;
+        QString container;
+        QStringList hints;
+    };
+
+    const QList<CalendarLabel> calendarLabels = {
+        {u"calendar > grid > label.day-name"_s, u"DayOfWeekRow"_s, {}},
+        {u"calendar > grid > label.week-number"_s, u"WeekNumberColumn"_s, {}},
+        {u"calendar > grid > label.day-number.other-month"_s, u"MonthGrid"_s, {}},
+        {u"calendar > grid > label.day-number:not(.other-month)"_s, u"MonthGrid"_s, {u"current-month"_s}},
+        {u"calendar > grid > label.day-number.today"_s, u"MonthGrid"_s, {u"current-month"_s, u"today"_s}},
+    };
+    for (const auto &label : calendarLabels) {
+        specs.append({
+            .selector = label.selector,
+            .path = {element(label.container), element(u"Label"_s, label.hints)},
+            .features = Feature::Background | Feature::TextColor,
+            .variants = {Base},
+        });
+    }
+
     // Window controls fill the header bar height, the image is what you actually see
     // TODO: define the hover and click states in breeze union (colours, backdrop, border)
     specs.append({
@@ -1147,6 +1261,24 @@ static void appendGtk3Rules(QList<RuleSpec> &specs)
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::Margin,
         .variants = ActivatableRowStates,
         .parents = {u"list > row"_s},
+    });
+
+    specs.append({
+        .selector = u"frame > border"_s,
+        .path = {element(u"Frame"_s)},
+        .features = Feature::Border | Feature::Corners,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+    });
+
+    // GTK 3 draws the frame on the border node, same popup look as GTK 4
+    specs.append({
+        .selector = u"frame.app-notification > border"_s,
+        .path = {element(u"Popup"_s)},
+        .features = Feature::Frame,
+        .variants = {Base},
+        .borderMode = BorderMode::Real,
+        .parents = {u"frame > border"_s},
     });
 
     // No contents node on GTK 3 popovers
@@ -1225,6 +1357,21 @@ static void appendGtk3Rules(QList<RuleSpec> &specs)
         .path = {element(u"MenuBar"_s), element(u"MenuBarItem"_s)},
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::MinHeight,
         .variants = {Base, state(u":hover"_s, Hovered)},
+    });
+
+    // GTK 3 calendars only have states for the days, no nodes
+    specs.append({
+        .selector = u"calendar.highlight"_s,
+        .path = {element(u"DayOfWeekRow"_s), element(u"Label"_s)},
+        .features = Feature::TextColor,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"calendar:indeterminate"_s,
+        .path = {element(u"MonthGrid"_s), element(u"Label"_s)},
+        .features = Feature::TextColor,
+        .variants = {Base},
     });
 
     // Title buttons aren't stretched in GTK 3 so they need the size set directly
