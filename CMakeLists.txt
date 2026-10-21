@@ -101,7 +101,7 @@ if (BUILD_INPUT_PLASMASVG)
     find_package(ryml REQUIRED)
 endif()
 
-if (BUILD_PLATFORM_PLASMA)
+if (BUILD_PLATFORM_PLASMA OR BUILD_OUTPUT_GTK)
     find_package(Qt6DBus ${QT_MIN_VERSION} CONFIG REQUIRED)
 endif()
 

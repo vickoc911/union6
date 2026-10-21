@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 // SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
 
+#include <QDBusConnection>
+#include <QDBusMessage>
 #include <QGuiApplication>
 #include <QStandardPaths>
 
@@ -10,6 +12,8 @@
 #include "gtk_logging.h"
 
 using namespace Qt::StringLiterals;
+
+static const QString GtkConfigService = u"org.kde.GtkConfig"_s;
 
 int main(int argc, char **argv)
 {
@@ -24,7 +28,9 @@ int main(int argc, char **argv)
     }
 
     const auto directory = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/themes/union"_s;
-    Union::Gtk::ThemeGenerator(style).writeTheme(directory);
+    if (Union::Gtk::ThemeGenerator(style).writeTheme(directory)) {
+        QDBusConnection::sessionBus().send(QDBusMessage::createMethodCall(GtkConfigService, u"/GtkConfig"_s, GtkConfigService, u"reloadGtkTheme"_s));
+    }
 
     return 0;
 }

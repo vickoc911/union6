@@ -2,5 +2,5 @@
 # SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
 
 add_executable(union-gtk-theme main.cpp)
-target_link_libraries(union-gtk-theme PRIVATE UnionGtkOutput)
+target_link_libraries(union-gtk-theme PRIVATE UnionGtkOutput Qt6::DBus)
 install(TARGETS union-gtk-theme ${KDE_INSTALL_DEFAULT_ARGS})
