@@ -407,6 +407,7 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
         {u"heading-4-size"_s, heading(u"level-4"_s), Feature::Font, u"font-size"_s},
         {u"heading-weight"_s, heading(u"level-1"_s), Feature::Font, u"font-weight"_s},
         {u"dim-opacity"_s, {{u"Heading"_s, {u"secondary"_s}}}, Feature::Opacity, u"opacity"_s},
+        {u"window-shadow"_s, {{u"Dialog"_s}}, Feature::Shadow, u"box-shadow"_s},
         {u"busy-icon"_s, {{u"BusyIndicator"_s}}, Feature::IconSource, u"-gtk-icon-source"_s},
         {u"arrow-up"_s, arrow(u"Up"_s), Feature::IconSource, u"-gtk-icon-source"_s},
         {u"arrow-down"_s, arrow(u"Down"_s), Feature::IconSource, u"-gtk-icon-source"_s},

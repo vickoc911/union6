@@ -357,6 +357,30 @@ static void appendRules(QList<RuleSpec> &specs)
     });
 
     specs.append({
+        .selector = u"headerbar"_s,
+        .path = {element(u"ToolBar"_s, {u"header"_s})},
+        .features = Feature::Background | Feature::Border | Feature::TextColor | Feature::Padding | Feature::MinHeight,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+    });
+
+    // toolbar nodes in GTK 3, just a class in GTK 4
+    specs.append({
+        .selector = u".toolbar, toolbar"_s,
+        .path = {element(u"ToolBar"_s)},
+        .features = Feature::Background | Feature::TextColor | Feature::Padding | Feature::MinHeight,
+        .variants = BaseAndBackdrop,
+    });
+
+    specs.append({
+        .selector = u"actionbar > revealer > box"_s,
+        .path = {element(u"ToolBar"_s, {u"footer"_s})},
+        .features = Feature::Background | Feature::Border | Feature::TextColor | Feature::Padding | Feature::MinHeight,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
         .selector = u"button"_s,
         .path = {element(u"Button"_s)},
         .features = Feature::Control,
@@ -378,6 +402,22 @@ static void appendRules(QList<RuleSpec> &specs)
         .features = Feature::None,
         .variants = {Base},
         .adjust = sidePaddingAdjust({element(u"Button"_s)}),
+    });
+
+    specs.append({
+        .selector = u".toolbar button, toolbar button"_s,
+        .path = {element(u"ToolBar"_s), element(u"ToolButton"_s)},
+        .features = Feature::Control,
+        .variants = ButtonStates,
+        .parents = {u"button"_s},
+    });
+
+    specs.append({
+        .selector = u"headerbar button"_s,
+        .path = {element(u"ToolBar"_s, {u"header"_s}), element(u"ToolButton"_s)},
+        .features = Feature::Control,
+        .variants = ButtonStates,
+        .parents = {u"button"_s},
     });
 
     specs.append({
@@ -886,6 +926,20 @@ static void appendRules(QList<RuleSpec> &specs)
     });
 
     specs.append({
+        .selector = u"headerbar separator.vertical"_s,
+        .path = {element(u"ToolBar"_s, {u"header"_s}), element(u"ToolSeparator"_s, {u"vertical"_s})},
+        .features = Feature::Background | Feature::MinWidth | Feature::Margin,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u".toolbar separator.vertical, actionbar separator.vertical, toolbar separator"_s,
+        .path = {element(u"ToolBar"_s), element(u"ToolSeparator"_s, {u"vertical"_s})},
+        .features = Feature::Background | Feature::MinWidth | Feature::Margin,
+        .variants = {Base},
+    });
+
+    specs.append({
         .selector = u"scrolledwindow > junction"_s,
         .path = {element(u"ScrollAreaCorner"_s)},
         .features = Feature::Background,
@@ -1044,6 +1098,29 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::MinHeight,
         .variants = {Base, state(u":hover"_s, Hovered), state(u":selected"_s, Highlighted)},
     });
+
+    // Window controls fill the header bar height, the image is what you actually see
+    // TODO: define the hover and click states in breeze union (colours, backdrop, border)
+    specs.append({
+        .selector = u"windowcontrols > button > image"_s,
+        .path = {element(u"TitleBar"_s), element(u"CloseButton"_s)},
+        .features = Feature::MinSize,
+        .variants = {Base},
+        .adjust =
+            [](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+                const auto titleBar = context.query({element(u"TitleBar"_s)});
+                if (titleBar && titleBar->icon() && titleBar->icon()->width().value_or(0.0) > 0.0) {
+                    declarations.set(u"-gtk-icon-size"_s, toPx(titleBar->icon()->width().value()));
+                }
+            },
+    });
+
+    specs.append({
+        .selector = u"windowcontrols > button{} > image"_s,
+        .path = {element(u"ToolBar"_s, {u"header"_s}), element(u"ToolButton"_s)},
+        .features = Feature::Background | Feature::Border | Feature::Corners | Feature::TextColor,
+        .variants = {Base, state(u":hover"_s, Hovered), state(u":active"_s, Pressed), Backdrop},
+    });
 }
 
 static void appendGtk3Rules(QList<RuleSpec> &specs)
@@ -1148,6 +1225,14 @@ static void appendGtk3Rules(QList<RuleSpec> &specs)
         .path = {element(u"MenuBar"_s), element(u"MenuBarItem"_s)},
         .features = Feature::Frame | Feature::TextColor | Feature::Padding | Feature::MinHeight,
         .variants = {Base, state(u":hover"_s, Hovered)},
+    });
+
+    // Title buttons aren't stretched in GTK 3 so they need the size set directly
+    specs.append({
+        .selector = u"headerbar button.titlebutton, .titlebar button.titlebutton"_s,
+        .path = {element(u"TitleBar"_s), element(u"CloseButton"_s)},
+        .features = Feature::MinSize,
+        .variants = {Base},
     });
 }
 

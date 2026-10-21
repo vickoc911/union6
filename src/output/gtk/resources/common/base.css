@@ -72,6 +72,15 @@ label.title {
     font-feature-settings: "tnum";
 }
 
+headerbar .title {
+    padding: 0 $spacing-large;
+    font-weight: $heading-weight;
+}
+
+headerbar .subtitle {
+    font-size: smaller;
+}
+
 /* the side padding is on the label so it survives apps overriding button padding */
 stackswitcher > button.text-button {
     padding-left: 0;
@@ -184,6 +193,10 @@ treeview.view {
 treeview.view.separator {
     min-height: $separator-width;
     color: @borders;
+}
+
+searchbar > revealer > box {
+    box-shadow: inset 0 -$border-width @borders;
 }
 
 spinner {

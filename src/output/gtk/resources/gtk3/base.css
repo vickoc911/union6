@@ -49,6 +49,52 @@ button.link:visited {
     color: @link_visited_color;
 }
 
+/*
+ * GTK 3 draws the frame & shadow of CSD windows on the decoration node. The
+ * margin is the resize area, same width as GTK 4
+ */
+decoration {
+    margin: 12px;
+    border-radius: $radius $radius 0 0;
+    box-shadow: $window-shadow, 0 0 0 $border-width @borders;
+}
+
+decoration:backdrop {
+    box-shadow: $window-shadow, 0 0 0 $border-width @unfocused_borders;
+}
+
+messagedialog.csd decoration {
+    border-radius: $radius;
+}
+
+.maximized decoration,
+.fullscreen decoration,
+.tiled decoration,
+.tiled-top decoration,
+.tiled-left decoration,
+.tiled-right decoration,
+.tiled-bottom decoration {
+    border-radius: 0;
+    box-shadow: 0 0 0 $border-width @borders;
+}
+
+.maximized decoration,
+.fullscreen decoration,
+.ssd decoration,
+.popup decoration,
+tooltip decoration {
+    box-shadow: none;
+}
+
+/* without compositing the resize area gets drawn around the window */
+.solid-csd decoration {
+    margin: 0;
+    padding: $spacing;
+    border-radius: 0;
+    background-color: @theme_bg_color;
+    box-shadow: inset 0 0 0 $border-width @borders;
+}
+
 entry image {
     min-width: $icon-size;
     min-height: $icon-size;
@@ -204,6 +250,10 @@ treeview.view.expander:checked {
 
 expander title > arrow {
     margin-right: $spacing;
+}
+
+searchbar > revealer > box {
+    padding: $spacing;
 }
 
 *:drop(active) {

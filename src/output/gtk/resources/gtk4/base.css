@@ -71,6 +71,52 @@ button.link > label {
     text-decoration-line: underline;
 }
 
+window.csd {
+    border-radius: $radius $radius 0 0;
+    box-shadow: $window-shadow, 0 0 0 $border-width @borders;
+}
+
+window.csd:backdrop {
+    box-shadow: $window-shadow, 0 0 0 $border-width @unfocused_borders;
+}
+
+window.csd.dialog.message {
+    border-radius: $radius;
+}
+
+window.maximized,
+window.fullscreen,
+window.tiled,
+window.tiled-top,
+window.tiled-left,
+window.tiled-right,
+window.tiled-bottom {
+    border-radius: 0;
+    box-shadow: 0 0 0 $border-width @borders;
+}
+
+window.maximized,
+window.fullscreen {
+    box-shadow: none;
+}
+
+window.solid-csd {
+    border-radius: 0;
+    padding: $spacing;
+    box-shadow: inset 0 0 0 $border-width @borders;
+}
+
+headerbar > windowhandle > box > box.start,
+headerbar > windowhandle > box > box.end,
+headerbar > windowhandle > box > box.start > box,
+headerbar > windowhandle > box > box.end > box {
+    border-spacing: $spacing;
+}
+
+windowcontrols {
+    border-spacing: $spacing;
+}
+
 button > box,
 menubutton > button > box,
 dropdown > button > box {
@@ -280,6 +326,16 @@ expander-widget > box > title {
 
 expander-widget > box > title > expander {
     margin-right: $spacing;
+}
+
+.toolbar,
+actionbar > revealer > box,
+searchbar > revealer > box {
+    border-spacing: $spacing;
+}
+
+searchbar > revealer > box {
+    padding: $spacing;
 }
 
 popover.emoji-picker emoji {
