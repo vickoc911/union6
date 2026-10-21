@@ -517,12 +517,6 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     // QStyle::PM_DockWidgetTitleBarButtonMargin
     // QStyle::PM_SubMenuOverlap
     // QStyle::PM_CustomBase
-    // QStyle::PM_LayoutHorizontalSpacing
-    // QStyle::PM_LayoutVerticalSpacing
-    // QStyle::PM_LayoutLeftMargin
-    // QStyle::PM_LayoutTopMargin
-    // QStyle::PM_LayoutRightMargin
-    // QStyle::PM_LayoutBottomMargin
     // Overrides
     switch (metric) {
         // If no QStyleOption is provided, return 1 so that we do not
@@ -538,6 +532,12 @@ int UnionStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, cons
     // Don't allow overlap
     case QStyle::PM_ScrollView_ScrollBarOverlap:
     case QStyle::PM_MenuBarPanelWidth:
+    case QStyle::PM_LayoutHorizontalSpacing:
+    case QStyle::PM_LayoutVerticalSpacing:
+    case QStyle::PM_LayoutLeftMargin:
+    case QStyle::PM_LayoutTopMargin:
+    case QStyle::PM_LayoutRightMargin:
+    case QStyle::PM_LayoutBottomMargin:
         return 0;
     default:
         break;
