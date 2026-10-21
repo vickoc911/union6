@@ -93,3 +93,55 @@ switch image {
     margin: calc(-0.5 * $icon-size) 0;
     color: transparent;
 }
+
+/* GTK sizes the progress node by its min size but Union fills the bar */
+progressbar.horizontal > trough > progress {
+    min-height: $progress-thickness;
+}
+
+progressbar.vertical > trough > progress {
+    min-width: $progress-thickness;
+}
+
+progressbar > text {
+    font-size: smaller;
+}
+
+progressbar.osd > trough {
+    border-radius: 0;
+    background: none;
+}
+
+progressbar.osd > trough > progress {
+    border-radius: 0;
+}
+
+scrollbar.overlay-indicator:not(.hovering) {
+    background: none;
+}
+
+scrollbar.vertical slider {
+    min-height: calc(2 * $scrollbar-size);
+}
+
+scrollbar.horizontal slider {
+    min-width: calc(2 * $scrollbar-size);
+}
+
+spinner {
+    opacity: 0;
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $busy-icon;
+}
+
+spinner:checked {
+    opacity: 1;
+    animation: union-spin 1s linear infinite;
+}
+
+@keyframes union-spin {
+    to {
+        -gtk-icon-transform: rotate(1turn);
+    }
+}

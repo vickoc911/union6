@@ -98,6 +98,39 @@ modelbutton radio:dir(rtl) {
     margin-left: $indicator-spacing;
 }
 
+scale trough > fill {
+    border-radius: $radius;
+}
+
+levelbar.discrete.horizontal block {
+    margin: 0 $border-width;
+}
+
+levelbar.discrete.vertical block {
+    margin: $border-width 0;
+}
+
+levelbar block.low {
+    background-color: @warning_color;
+}
+
+levelbar block.empty {
+    background: none;
+    box-shadow: none;
+}
+
+/* Union scroll bars don't have buttons */
+scrollbar {
+    -GtkScrollbar-has-backward-stepper: false;
+    -GtkScrollbar-has-forward-stepper: false;
+    background-color: @theme_base_color;
+}
+
+scrolledwindow overshoot,
+scrolledwindow undershoot {
+    background: none;
+}
+
 *:drop(active) {
     box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
 }

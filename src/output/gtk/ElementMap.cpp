@@ -127,6 +127,15 @@ static qreal layoutValue(const std::shared_ptr<StylePropertyGroup> &properties, 
     return (properties->layout()->*getter)().value_or(0.0);
 }
 
+static qreal paddingSum(const std::shared_ptr<StylePropertyGroup> &properties, Qt::Orientation orientation)
+{
+    if (!properties || !properties->layout() || !properties->layout()->padding()) {
+        return 0.0;
+    }
+    const auto margins = properties->layout()->padding()->toMargins();
+    return orientation == Qt::Horizontal ? margins.left() + margins.right() : margins.top() + margins.bottom();
+}
+
 // GTK centres slider and switch handles in the trough. Negative margins let a handle that's bigger than the trough overflow it
 static AdjustFunction overflowAdjust(ElementPath troughPath, Qt::Orientation orientation)
 {
@@ -162,6 +171,51 @@ static AdjustFunction trackBorderAdjust(ElementPath troughPath)
         if (trough && trough->corners()) {
             const auto radius = trough->corners()->radii().topLeft;
             declarations.set(u"border-radius"_s, toPx(radius) + u" / "_s + toPx(radius + overflow));
+        }
+    };
+}
+
+static AdjustFunction scrollbarSliderAdjust(ElementPath scrollbarPath, Qt::Orientation orientation)
+{
+    return [scrollbarPath, orientation](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto scrollbar = context.query(scrollbarPath);
+        const auto crossAxis = orientation == Qt::Vertical ? Qt::Horizontal : Qt::Vertical;
+        auto size = layoutValue(scrollbar, &LayoutPropertyGroup::width);
+        if (orientation == Qt::Horizontal && !scrollbarPath.last().hints.contains(u"noninteractive"_s)) {
+            size = layoutValue(scrollbar, &LayoutPropertyGroup::height);
+        }
+        const auto thickness = std::max(1.0, size - paddingSum(scrollbar, crossAxis));
+        declarations.set(orientation == Qt::Vertical ? u"min-width"_s : u"min-height"_s, toPx(thickness));
+    };
+}
+
+// the slider handle sticks out of the trough, scales need room for it on the cross axis
+static AdjustFunction scalePaddingAdjust(ElementSpec slider, Qt::Orientation orientation)
+{
+    return [slider, orientation](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto size = orientation == Qt::Horizontal ? &LayoutPropertyGroup::height : &LayoutPropertyGroup::width;
+        const auto handle = layoutValue(context.query({slider, element(u"Handle"_s)}), size);
+        const auto padding = toPx(std::max(0.0, (handle - layoutValue(context.query({slider}), size)) / 2.0));
+        declarations.set(u"padding"_s,
+                         orientation == Qt::Horizontal ? shorthand(padding, u"0"_s, padding, u"0"_s) : shorthand(u"0"_s, padding, u"0"_s, padding));
+    };
+}
+
+// tick marks keep the Union tick mark margin from the trough, marks.top is on the other side so it's mirrored
+static AdjustFunction marksAdjust(ElementPath tickMark, Qt::Orientation orientation, bool before)
+{
+    return [tickMark, orientation, before](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto properties = context.query(tickMark);
+        const auto margins = properties && properties->layout() ? properties->layout()->margins() : nullptr;
+        if (!margins) {
+            return;
+        }
+
+        const auto margin = toPx((orientation == Qt::Horizontal ? margins->top() : margins->left()).value_or(0.0));
+        if (orientation == Qt::Horizontal) {
+            declarations.set(before ? u"margin-bottom"_s : u"margin-top"_s, margin);
+        } else {
+            declarations.set(before ? u"margin-right"_s : u"margin-left"_s, margin);
         }
     };
 }
@@ -400,6 +454,166 @@ static void appendRules(QList<RuleSpec> &specs)
         .adjust = overflowAdjust({element(u"Switch"_s), element(u"Indicator"_s)}, Qt::Horizontal),
     });
 
+    for (const auto orientation : {Qt::Horizontal, Qt::Vertical}) {
+        const auto name = orientation == Qt::Horizontal ? u"horizontal"_s : u"vertical"_s;
+        const auto minSize = orientation == Qt::Horizontal ? Feature::MinHeight : Feature::MinWidth;
+        const auto slider = element(u"Slider"_s, {name});
+
+        specs.append({
+            .selector = u"scale.%1"_s.arg(name),
+            .path = {slider},
+            .features = Feature::None,
+            .variants = {Base},
+            .adjust = scalePaddingAdjust(slider, orientation),
+        });
+
+        for (const bool before : {true, false}) {
+            const auto marks = before ? u"top"_s : u"bottom"_s;
+            specs.append({
+                .selector = u"scale.%1 > marks.%2"_s.arg(name, marks),
+                .path = {slider, element(u"TickMark"_s)},
+                .features = Feature::None,
+                .variants = {Base},
+                .adjust = marksAdjust({slider, element(u"TickMark"_s)}, orientation, before),
+            });
+        }
+
+        specs.append({
+            .selector = u"scale.%1 trough"_s.arg(name),
+            .path = {slider},
+            .features = Feature::Background | Feature::Border | Feature::Corners | minSize,
+            .variants = {Base, state(u":disabled"_s, Disabled), Backdrop},
+        });
+
+        specs.append({
+            .selector = u"scale.%1{} trough > slider{}"_s.arg(name),
+            .path = {slider, element(u"Handle"_s)},
+            .features = Feature::Frame | Feature::MinSize | Feature::Outline,
+            .variants =
+                {
+                    Base,
+                    state(u":hover"_s, Hovered),
+                    StateVariant{.pseudo = u":active"_s, .states = Pressed, .unionAnchor = 0},
+                    StateVariant{.pseudo = u":focus-visible"_s, .states = VisualFocus, .unionAnchor = 0, .gtkMarker = 0},
+                    StateVariant{.pseudo = u":disabled"_s, .states = Disabled, .unionAnchor = 0},
+                    Backdrop,
+                },
+            .adjust = overflowAdjust({slider}, orientation),
+        });
+
+        specs.append({
+            .selector = u"progressbar.%1 > trough"_s.arg(name),
+            .path = {element(u"ProgressBar"_s, {name})},
+            .features = Feature::Background | Feature::Border | Feature::Corners | Feature::MinSize,
+            .variants = BaseAndDisabled,
+        });
+
+        specs.append({
+            .selector = u"scale.%1 > marks > mark > indicator"_s.arg(name),
+            .path = {slider, element(u"TickMark"_s)},
+            .features = Feature::Background | Feature::MinSize,
+            .variants = BaseAndDisabled,
+            .stateAnchor = 0,
+        });
+
+        specs.append({
+            .selector = u"levelbar.%1 > trough"_s.arg(name),
+            .path = {element(u"ProgressBar"_s, {name})},
+            .features = Feature::Background | Feature::Border | Feature::Corners,
+            .variants = BaseAndDisabled,
+        });
+
+        const auto progressBar = element(u"ProgressBar"_s, {name});
+        specs.append({
+            .selector = u"levelbar.%1 > trough > block"_s.arg(name),
+            .path = {progressBar, element(u"Chunk"_s)},
+            .features = Feature::Corners | Feature::MinSize,
+            .variants = {Base},
+            .adjust =
+                [progressBar, orientation](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+                    const auto bar = context.query({progressBar});
+                    if (orientation == Qt::Horizontal) {
+                        declarations.set(u"min-height"_s, toPx(layoutValue(bar, &LayoutPropertyGroup::height)));
+                    } else {
+                        declarations.set(u"min-width"_s, toPx(layoutValue(bar, &LayoutPropertyGroup::width)));
+                        declarations.set(u"min-height"_s, toPx(layoutValue(context.query({progressBar, element(u"Chunk"_s)}), &LayoutPropertyGroup::width)));
+                    }
+                },
+        });
+
+        const auto scrollbar = element(u"ScrollBar"_s, {name});
+        specs.append({
+            .selector = u"scrollbar.%1"_s.arg(name),
+            .path = {scrollbar},
+            .features = Feature::Background | Feature::Border | Feature::Padding,
+            .variants = {Base},
+            .borderMode = BorderMode::Real,
+        });
+
+        specs.append({
+            .selector = u"scrollbar.%1 slider"_s.arg(name),
+            .path = {scrollbar, element(u"Handle"_s)},
+            .features = Feature::Background | Feature::Border | Feature::Corners,
+            .variants =
+                {
+                    Base,
+                    state(u":hover"_s, Hovered),
+                    state(u":active"_s, Pressed),
+                    state(u":disabled"_s, Disabled),
+                },
+            .adjust = scrollbarSliderAdjust({scrollbar}, orientation),
+        });
+
+        const auto indicator = element(u"ScrollBar"_s, {name, u"noninteractive"_s});
+        specs.append({
+            .selector = u"scrollbar.%1.overlay-indicator:not(.hovering)"_s.arg(name),
+            .path = {indicator},
+            .features = Feature::Background | Feature::Border | Feature::Padding,
+            .variants = {Base},
+            .borderMode = BorderMode::Real,
+        });
+
+        specs.append({
+            .selector = u"scrollbar.%1.overlay-indicator:not(.hovering) slider"_s.arg(name),
+            .path = {indicator, element(u"Handle"_s)},
+            .features = Feature::Background | Feature::Border | Feature::Corners,
+            .variants = {Base},
+            .adjust = scrollbarSliderAdjust({indicator}, orientation),
+        });
+    }
+
+    specs.append({
+        .selector = u"scale{} trough > highlight"_s,
+        .path = {element(u"Slider"_s), element(u"Fill"_s)},
+        .features = Feature::Background | Feature::Border | Feature::Corners,
+        .variants = BaseAndDisabled,
+        .stateAnchor = 0,
+    });
+
+    // Scale fill is a range, like the buffered part of a video
+    specs.append({
+        .selector = u"scale trough > fill"_s,
+        .path = {element(u"ProgressBar"_s)},
+        .features = Feature::Background,
+        .variants = {Base},
+    });
+
+    specs.append({
+        .selector = u"progressbar{} > trough > progress"_s,
+        .path = {element(u"ProgressBar"_s), element(u"Track"_s)},
+        .features = Feature::Background | Feature::Border | Feature::Corners,
+        .variants = BaseAndDisabled,
+        .stateAnchor = 0,
+    });
+
+    specs.append({
+        .selector = u"levelbar{} > trough > block.filled, levelbar{} > trough > block.high, levelbar{} > trough > block.full"_s,
+        .path = {element(u"ProgressBar"_s), element(u"Track"_s)},
+        .features = Feature::Background | Feature::Border,
+        .variants = BaseAndDisabled,
+        .stateAnchor = 0,
+    });
+
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead
     // FIXME: define the hover and pressed colours of these in breeze union, until then they look the same in every state
     const auto accentStates = [](Union::Element::States base) {
@@ -427,6 +641,13 @@ static void appendRules(QList<RuleSpec> &specs)
         .variants = accentStates({}),
         .parents = {u"button"_s},
         .partial = true,
+    });
+
+    specs.append({
+        .selector = u"scrolledwindow > junction"_s,
+        .path = {element(u"ScrollAreaCorner"_s)},
+        .features = Feature::Background,
+        .variants = BaseAndBackdrop,
     });
 }
 

@@ -131,6 +131,40 @@ checkbutton {
     border-spacing: $indicator-spacing;
 }
 
+scale > trough > fill {
+    border-radius: $radius;
+}
+
+levelbar.discrete.horizontal > trough > block {
+    margin: 0 $border-width;
+}
+
+levelbar.discrete.vertical > trough > block {
+    margin: $border-width 0;
+}
+
+levelbar > trough > block.low {
+    background-color: @warning_color;
+}
+
+levelbar > trough > block.empty {
+    background: none;
+    box-shadow: none;
+}
+
+/*
+ * GTK puts hovered scroll bars on top of the content, Union has them next to
+ * it on the view background
+ */
+scrollbar {
+    background-color: @theme_base_color;
+}
+
+scrolledwindow > overshoot,
+scrolledwindow > undershoot {
+    background: none;
+}
+
 :drop(active) {
     box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
 }
