@@ -998,6 +998,14 @@ static void appendRules(QList<RuleSpec> &specs)
     });
 
     specs.append({
+        .selector = u"statusbar"_s,
+        .path = {element(u"StatusBar"_s)},
+        .features = Feature::Background | Feature::Border,
+        .variants = BaseAndBackdrop,
+        .borderMode = BorderMode::Real,
+    });
+
+    specs.append({
         .selector = u"scrolledwindow > junction"_s,
         .path = {element(u"ScrollAreaCorner"_s)},
         .features = Feature::Background,
