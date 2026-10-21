@@ -3,11 +3,15 @@
 
 #include "ElementMap.h"
 
+#include <properties/BackgroundPropertyGroup.h>
 #include <properties/BorderPropertyGroup.h>
 #include <properties/CornersPropertyGroup.h>
 #include <properties/LayoutPropertyGroup.h>
 #include <properties/LinePropertyGroup.h>
 #include <properties/SizePropertyGroup.h>
+#include <properties/TextPropertyGroup.h>
+
+#include "ColorTranslator.h"
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
@@ -342,6 +346,40 @@ static AdjustFunction sidePaddingAdjust(ElementPath path)
 
         const auto padding = properties->layout()->padding()->toMargins();
         declarations.set(u"padding"_s, shorthand(u"0"_s, toPx(padding.right()), u"0"_s, toPx(padding.left())));
+    };
+}
+
+// suggested & destructive buttons don't have hover or pressed colours, get the breeze kirigami values
+static AdjustFunction accentStateAdjust(ElementPath path, Union::Element::States baseStates)
+{
+    return [path, baseStates](DeclarationList &declarations, const RuleContext &context, const StateVariant &variant) {
+        if (!(variant.states & (Pressed | Hovered))) {
+            return;
+        }
+
+        const auto card = context.query({element(u"Card"_s)}, variant.states.testFlag(Pressed) ? Pressed : Hovered);
+        const auto cardColor = card && card->background() ? card->background()->color() : std::nullopt;
+        if (!cardColor || cardColor->type() != Union::ColorData::Type::MixOperation) {
+            return;
+        }
+
+        const auto properties = context.query(path, baseStates);
+        const auto background = properties && properties->background() ? properties->background()->color() : std::nullopt;
+        if (!background) {
+            return;
+        }
+
+        auto accent = properties->border() && properties->border()->top() ? properties->border()->top()->color() : std::nullopt;
+        if (!accent || toColorExpression(accent) == toColorExpression(background)) {
+            accent = properties->text() ? properties->text()->color() : std::nullopt;
+        }
+        if (!accent) {
+            return;
+        }
+
+        if (const auto mixed = toColorExpression(Union::Color::mix(background.value(), accent.value(), cardColor->mixAmount()))) {
+            declarations.set(u"background-color"_s, mixed.value());
+        }
     };
 }
 
@@ -958,22 +996,26 @@ static void appendRules(QList<RuleSpec> &specs)
         };
     };
 
+    const ElementPath suggested{element(u"ItemDelegate"_s)};
     specs.append({
         .selector = u"button.suggested-action:not(:disabled){}, headerbar button.suggested-action:not(:disabled){}"_s,
-        .path = {element(u"ItemDelegate"_s)},
+        .path = suggested,
         .features = Feature::Frame | Feature::TextColor | Feature::IconColor,
         .variants = accentStates(Highlighted),
         .parents = {u"button"_s},
         .partial = true,
+        .adjust = accentStateAdjust(suggested, Highlighted),
     });
 
+    const ElementPath destructive{element(u"InlineMessage"_s, {}, {{u"type"_s, u"error"_s}})};
     specs.append({
         .selector = u"button.destructive-action:not(:disabled){}, headerbar button.destructive-action:not(:disabled){}"_s,
-        .path = {element(u"InlineMessage"_s, {}, {{u"type"_s, u"error"_s}})},
+        .path = destructive,
         .features = Feature::Background | Feature::Border | Feature::Shadow | Feature::TextColor | Feature::IconColor,
         .variants = accentStates({}),
         .parents = {u"button"_s},
         .partial = true,
+        .adjust = accentStateAdjust(destructive, {}),
     });
 
     specs.append({
