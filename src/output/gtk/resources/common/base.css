@@ -87,3 +87,9 @@ entry.warning {
     color: @warning_color;
     border-color: @warning_color;
 }
+
+/* the on/off glyphs aren't part of the Union switch, hide them without making the track taller */
+switch image {
+    margin: calc(-0.5 * $icon-size) 0;
+    color: transparent;
+}

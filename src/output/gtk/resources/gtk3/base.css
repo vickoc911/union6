@@ -79,6 +79,25 @@ spinbutton.vertical entry {
     padding: 0;
 }
 
+/* same spacing Breeze has next to a check box */
+checkbutton > check:dir(ltr),
+radiobutton > radio:dir(ltr),
+menuitem check:dir(ltr),
+menuitem radio:dir(ltr),
+modelbutton check:dir(ltr),
+modelbutton radio:dir(ltr) {
+    margin-right: $indicator-spacing;
+}
+
+checkbutton > check:dir(rtl),
+radiobutton > radio:dir(rtl),
+menuitem check:dir(rtl),
+menuitem radio:dir(rtl),
+modelbutton check:dir(rtl),
+modelbutton radio:dir(rtl) {
+    margin-left: $indicator-spacing;
+}
+
 *:drop(active) {
     box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
 }

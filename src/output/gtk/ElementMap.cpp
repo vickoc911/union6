@@ -4,6 +4,7 @@
 #include "ElementMap.h"
 
 #include <properties/BorderPropertyGroup.h>
+#include <properties/CornersPropertyGroup.h>
 #include <properties/LayoutPropertyGroup.h>
 #include <properties/LinePropertyGroup.h>
 #include <properties/SizePropertyGroup.h>
@@ -32,6 +33,11 @@ static StateVariant state(const QString &pseudo, Union::Element::States states)
     return StateVariant{.pseudo = pseudo, .states = states};
 }
 
+static StateVariant hint(const QString &pseudo, const QStringList &hints)
+{
+    return StateVariant{.pseudo = pseudo, .hints = hints};
+}
+
 static const QList ButtonStates = {
     Base,
     state(u":hover"_s, Hovered),
@@ -54,6 +60,17 @@ static const QList EntryStates = {
     Backdrop,
 };
 
+static const QList CheckStates = {
+    Base,
+    state(u":hover"_s, Hovered),
+    state(u":checked"_s, Checked),
+    state(u":checked:hover"_s, Checked | Hovered),
+    state(u":focus-visible"_s, VisualFocus),
+    state(u":disabled"_s, Disabled),
+    state(u":checked:disabled"_s, Checked | Disabled),
+    Backdrop,
+};
+
 // GTK marks the combo box button as checked while the popup is open
 static const QList ComboStates = {
     Base,
@@ -62,6 +79,35 @@ static const QList ComboStates = {
     state(u":checked"_s, Pressed),
     state(u":focus-visible"_s, VisualFocus),
     state(u":disabled"_s, Disabled),
+    Backdrop,
+};
+
+// Checks & radios that aren't in a check button (menus, tree views) carry the states themselves
+static const QList IndicatorStates = {
+    Base,
+    state(u":checked"_s, Checked),
+    state(u":disabled"_s, Disabled),
+    state(u":checked:disabled"_s, Checked | Disabled),
+};
+
+static const QList CheckIndicatorStates = {
+    Base,
+    state(u":checked"_s, Checked),
+    hint(u":indeterminate"_s, {u"indeterminate"_s}),
+    state(u":disabled"_s, Disabled),
+    state(u":checked:disabled"_s, Checked | Disabled),
+};
+
+static const QList CheckBoxIndicatorStates = {
+    Base,
+    state(u":hover"_s, Hovered),
+    state(u":checked"_s, Checked),
+    state(u":checked:hover"_s, Checked | Hovered),
+    state(u":focus-visible"_s, VisualFocus),
+    hint(u":indeterminate"_s, {u"indeterminate"_s}),
+    StateVariant{.pseudo = u":indeterminate:disabled"_s, .states = Disabled, .hints = {u"indeterminate"_s}},
+    state(u":disabled"_s, Disabled),
+    state(u":checked:disabled"_s, Checked | Disabled),
     Backdrop,
 };
 
@@ -79,6 +125,45 @@ static qreal layoutValue(const std::shared_ptr<StylePropertyGroup> &properties, 
         return 0.0;
     }
     return (properties->layout()->*getter)().value_or(0.0);
+}
+
+// GTK centres slider and switch handles in the trough. Negative margins let a handle that's bigger than the trough overflow it
+static AdjustFunction overflowAdjust(ElementPath troughPath, Qt::Orientation orientation)
+{
+    return [troughPath, orientation](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto size = orientation == Qt::Horizontal ? &LayoutPropertyGroup::height : &LayoutPropertyGroup::width;
+        const auto trough = context.query(troughPath);
+        const auto handle = context.query(troughPath + ElementPath{element(u"Handle"_s)});
+        const auto overflow = (layoutValue(handle, size) - layoutValue(trough, size)) / 2.0;
+        if (overflow > 0.0) {
+            declarations.set(u"margin"_s, orientation == Qt::Horizontal ? toPx(-overflow) + u" 0"_s : u"0 "_s + toPx(-overflow));
+        }
+    };
+}
+
+// GTK sizes a switch by its track, so the handle stuck out of it & rows taller than the track stretched it.
+// Union sizes it by the handle, so add the overhang as a transparent border the background doesn't paint
+static AdjustFunction trackBorderAdjust(ElementPath troughPath)
+{
+    return [troughPath](DeclarationList &declarations, const RuleContext &context, const StateVariant &) {
+        const auto trough = context.query(troughPath);
+        const auto handle = context.query(troughPath + ElementPath{element(u"Handle"_s)});
+        const auto overflow = (layoutValue(handle, &LayoutPropertyGroup::height) - layoutValue(trough, &LayoutPropertyGroup::height)) / 2.0;
+        if (overflow <= 0.0) {
+            return;
+        }
+
+        declarations.set(u"border-style"_s, u"solid"_s);
+        declarations.set(u"border-color"_s, u"transparent"_s);
+        declarations.set(u"border-width"_s, toPx(overflow) + u" 0"_s);
+        declarations.set(u"background-clip"_s, u"padding-box"_s);
+
+        // corners are measured on the outside of the border, so they need the overhang only vertically
+        if (trough && trough->corners()) {
+            const auto radius = trough->corners()->radii().topLeft;
+            declarations.set(u"border-radius"_s, toPx(radius) + u" / "_s + toPx(radius + overflow));
+        }
+    };
 }
 
 static QMarginsF borderWidths(const std::shared_ptr<StylePropertyGroup> &properties)
@@ -266,6 +351,55 @@ static void appendRules(QList<RuleSpec> &specs)
         .partial = true,
     });
 
+    specs.append({
+        .selector = u"checkbutton"_s,
+        .path = {element(u"CheckBox"_s)},
+        .features = Feature::TextColor | Feature::Font | Feature::Padding,
+        .variants = {Base, state(u":disabled"_s, Disabled), Backdrop},
+    });
+
+    specs.append({
+        .selector = u"check"_s,
+        .path = {element(u"CheckBox"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::IconSource,
+        .variants = CheckIndicatorStates,
+        .stateAnchor = 0,
+    });
+
+    specs.append({
+        .selector = u"radio"_s,
+        .path = {element(u"RadioButton"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::IconSource,
+        .variants = IndicatorStates,
+        .stateAnchor = 0,
+    });
+
+    specs.append({
+        .selector = u"checkbutton{} > check"_s,
+        .path = {element(u"CheckBox"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::Outline | Feature::IconSource,
+        .variants = CheckBoxIndicatorStates,
+        .stateAnchor = 0,
+    });
+
+    specs.append({
+        .selector = u"switch"_s,
+        .path = {element(u"Switch"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize,
+        .variants = CheckStates,
+        .stateAnchor = 0,
+        .adjust = trackBorderAdjust({element(u"Switch"_s), element(u"Indicator"_s)}),
+    });
+
+    specs.append({
+        .selector = u"switch{} > slider"_s,
+        .path = {element(u"Switch"_s), element(u"Indicator"_s), element(u"Handle"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::Outline,
+        .variants = CheckStates,
+        .stateAnchor = 0,
+        .adjust = overflowAdjust({element(u"Switch"_s), element(u"Indicator"_s)}, Qt::Horizontal),
+    });
+
     // Suggested & destructive actions don't exist in Union. Use a selected item and an error message instead
     // FIXME: define the hover and pressed colours of these in breeze union, until then they look the same in every state
     const auto accentStates = [](Union::Element::States base) {
@@ -299,6 +433,14 @@ static void appendRules(QList<RuleSpec> &specs)
 static void appendGtk4Rules(QList<RuleSpec> &specs)
 {
     specs.append({
+        .selector = u"checkbutton{} > radio"_s,
+        .path = {element(u"RadioButton"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::Outline | Feature::IconSource,
+        .variants = CheckStates,
+        .stateAnchor = 0,
+    });
+
+    specs.append({
         .selector = u"dropdown > button"_s,
         .path = {element(u"ComboBox"_s)},
         .features = Feature::Control,
@@ -322,12 +464,32 @@ static void appendGtk4Rules(QList<RuleSpec> &specs)
     });
 }
 
+static void appendGtk3Rules(QList<RuleSpec> &specs)
+{
+    specs.append({
+        .selector = u"radiobutton"_s,
+        .path = {element(u"RadioButton"_s)},
+        .features = Feature::TextColor | Feature::Font | Feature::Padding,
+        .variants = {Base, state(u":disabled"_s, Disabled), Backdrop},
+    });
+
+    specs.append({
+        .selector = u"radiobutton{} > radio"_s,
+        .path = {element(u"RadioButton"_s), element(u"Indicator"_s)},
+        .features = Feature::Frame | Feature::MinSize | Feature::Outline | Feature::IconSource,
+        .variants = CheckStates,
+        .stateAnchor = 0,
+    });
+}
+
 QList<RuleSpec> ruleSpecs(GtkVersion version)
 {
     QList<RuleSpec> specs;
     appendRules(specs);
     if (version == GtkVersion::Gtk4) {
         appendGtk4Rules(specs);
+    } else {
+        appendGtk3Rules(specs);
     }
     return specs;
 }
