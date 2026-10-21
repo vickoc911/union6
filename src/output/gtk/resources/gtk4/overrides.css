@@ -4,3 +4,15 @@
  */
 
 /*  selectors that have to win over union generated rules */
+
+.linked:not(.vertical) > menubutton:not(:last-child):not(:only-child) > button,
+.linked:not(.vertical) > dropdown:not(:last-child):not(:only-child) > button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.linked:not(.vertical) > menubutton:not(:first-child):not(:only-child) > button,
+.linked:not(.vertical) > dropdown:not(:first-child):not(:only-child) > button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

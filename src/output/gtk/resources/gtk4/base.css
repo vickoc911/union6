@@ -52,6 +52,47 @@ headerbar .subtitle {
     font-weight: $heading-weight;
 }
 
+link,
+button.link {
+    color: @link_color;
+}
+
+link:visited,
+button.link:visited {
+    color: @link_visited_color;
+}
+
+button.link > label {
+    text-decoration-line: underline;
+}
+
+button > box,
+menubutton > button > box,
+dropdown > button > box {
+    border-spacing: $spacing;
+}
+
+menubutton arrow {
+    min-width: $icon-size;
+    min-height: $icon-size;
+}
+
+menubutton arrow.down {
+    -gtk-icon-source: $arrow-down;
+}
+
+menubutton arrow.up {
+    -gtk-icon-source: $arrow-up;
+}
+
+menubutton arrow.left {
+    -gtk-icon-source: $arrow-left;
+}
+
+menubutton arrow.right {
+    -gtk-icon-source: $arrow-right;
+}
+
 :drop(active) {
     box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
 }

@@ -71,3 +71,9 @@ label.title {
 .numeric {
     font-feature-settings: "tnum";
 }
+
+/* the side padding is on the label so it survives apps overriding button padding */
+stackswitcher > button.text-button {
+    padding-left: 0;
+    padding-right: 0;
+}

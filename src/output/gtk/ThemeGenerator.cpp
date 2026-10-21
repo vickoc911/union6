@@ -371,19 +371,31 @@ QHash<QString, QString> ThemeGenerator::metrics(ThemeAssets &assets) const
         Union::Element::States states = {};
     };
 
+    const ElementPath button{{u"Button"_s}};
     auto heading = [](const QString &level) {
         return ElementPath{{u"Heading"_s, {u"primary"_s, level}}};
     };
+    auto arrow = [](const QString &direction) {
+        return ElementPath{{u"IndicatorArrow"_s + direction}};
+    };
 
     const QList<Metric> metrics = {
+        {u"round-button-radius"_s, {{u"RoundButton"_s}}, Feature::Corners, u"border-radius"_s},
+        {u"border-width"_s, {{u"Frame"_s}}, Feature::Border, u"border-width"_s},
         {u"focus-width"_s, {{u"TextField"_s}}, Feature::Outline, u"outline-width"_s, State::VisualFocus},
+        {u"icon-size"_s, {{u"SmallIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
         {u"icon-size-large"_s, {{u"LargeIconSize"_s}}, Feature::MinWidth, u"min-width"_s},
+        {u"spacing"_s, button, Feature::Spacing, u"border-spacing"_s},
         {u"heading-1-size"_s, heading(u"level-1"_s), Feature::Font, u"font-size"_s},
         {u"heading-2-size"_s, heading(u"level-2"_s), Feature::Font, u"font-size"_s},
         {u"heading-3-size"_s, heading(u"level-3"_s), Feature::Font, u"font-size"_s},
         {u"heading-4-size"_s, heading(u"level-4"_s), Feature::Font, u"font-size"_s},
         {u"heading-weight"_s, heading(u"level-1"_s), Feature::Font, u"font-weight"_s},
         {u"dim-opacity"_s, {{u"Heading"_s, {u"secondary"_s}}}, Feature::Opacity, u"opacity"_s},
+        {u"arrow-up"_s, arrow(u"Up"_s), Feature::IconSource, u"-gtk-icon-source"_s},
+        {u"arrow-down"_s, arrow(u"Down"_s), Feature::IconSource, u"-gtk-icon-source"_s},
+        {u"arrow-left"_s, arrow(u"Left"_s), Feature::IconSource, u"-gtk-icon-source"_s},
+        {u"arrow-right"_s, arrow(u"Right"_s), Feature::IconSource, u"-gtk-icon-source"_s},
     };
 
     QHash<QString, QString> result;
