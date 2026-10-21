@@ -215,6 +215,7 @@ static bool writeStylesheet(const QString &directory, const GeneratedStylesheet 
     QDir(directory).mkpath(u"assets"_s);
 
     bool changed = writeIfChanged(directory + u"/gtk.css"_s, sheet.css.toUtf8());
+    changed |= writeIfChanged(directory + u"/colors.css"_s, sheet.colors.toUtf8());
     // GTK falls back to its built-in theme if there's no dark variant
     changed |= writeIfChanged(directory + u"/gtk-dark.css"_s, "@import url(\"gtk.css\");\n");
     for (const auto &asset : sheet.assets) {
@@ -543,13 +544,31 @@ GeneratedStylesheet ThemeGenerator::generate(GtkVersion version) const
     const auto metrics = this->metrics(assets);
 
     QString css = u"/* Generated from the Union style \"%1\", do not edit. */\n\n"_s.arg(m_style->id());
+    // kde-gtk-config's colors.css has higher priority and replaces these
+    css += u"@import url(\"colors.css\");\n\n"_s;
     css += palette() + u"\n"_s;
     css += substituteMetrics(readStylesheet(u"base.css"_s, version), metrics) + u"\n"_s;
     css += rules(version, assets);
     css += substituteMetrics(readStylesheet(u"overrides.css"_s, version), metrics);
 
+    // Fallback values for the colour scheme colours we use, in case
+    // kde-gtk-config doesn't define them
+    static const QRegularExpression colorName(u"@((?:active|inactive|disabled)_[a-z]+_[a-z]+_[a-z]+)\\b"_s);
+    QSet<QString> names;
+    QString colors;
+    for (const auto &match : colorName.globalMatch(css)) {
+        const auto name = match.captured(1);
+        if (!names.contains(name)) {
+            names.insert(name);
+            if (const auto color = resolveColor(Union::Color::custom(u"kcolorscheme"_s, name.split(u'_')))) {
+                colors += u"@define-color %1 %2;\n"_s.arg(name, toCssColor(color.value()));
+            }
+        }
+    }
+
     return GeneratedStylesheet{
         .css = css,
+        .colors = colors,
         .assets = assets.files(),
     };
 }

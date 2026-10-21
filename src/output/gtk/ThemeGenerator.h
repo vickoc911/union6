@@ -21,6 +21,7 @@ class ThemeAssets;
 
 struct GeneratedStylesheet {
     QString css;
+    QString colors;
     std::map<QString, QByteArray> assets;
 };
 

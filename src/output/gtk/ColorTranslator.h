@@ -20,6 +20,8 @@ QString toCssColor(const QColor &color);
 
 /*!
  * \brief Convert a colour to a GTK CSS colour expression.
+ *
+ * can only output dynamic colours for kcolorscheme mapped with kde-gtk-config
  */
 std::optional<QString> toColorExpression(const std::optional<Union::Color> &color);
 }

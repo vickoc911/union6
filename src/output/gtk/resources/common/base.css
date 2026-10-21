@@ -38,6 +38,11 @@ label.success,
     color: @success_color;
 }
 
+.osd {
+    color: @active_complementary_foreground_text;
+    background-color: @active_complementary_background_normal;
+}
+
 .large-title,
 .title-1 {
     font-weight: $heading-weight;
