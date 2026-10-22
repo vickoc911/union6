@@ -38,5 +38,6 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
 
 private:
+    QString fallbackElementName([[maybe_unused]] const QStyleOption *opt) const override;
     const QStyleOptionSizeGrip *m_sizeGripOption = nullptr;
 };

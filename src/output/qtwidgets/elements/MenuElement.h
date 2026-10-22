@@ -43,5 +43,6 @@ public:
 
 private:
     void updateSubElementList() override;
+    QString fallbackElementName([[maybe_unused]] const QStyleOption *opt) const override;
     const QStyleOption *m_menuOption = nullptr;
 };

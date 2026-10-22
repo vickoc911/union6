@@ -42,5 +42,6 @@ public:
 
 private:
     void updateSubElementList() override;
+    QString fallbackElementName([[maybe_unused]] const QStyleOption *opt) const override;
     const QStyleOptionToolBox *m_toolBoxOption = nullptr;
 };
