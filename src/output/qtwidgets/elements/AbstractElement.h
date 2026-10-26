@@ -242,6 +242,9 @@ protected:
 
     AbstractElementFlags m_flags;
 
+    mutable QSizeF m_oldContentSize;
+    mutable QSizeF m_oldPaddedSize;
+
 private:
     Union::Element::Ptr createElement(const QString &name) const;
 
