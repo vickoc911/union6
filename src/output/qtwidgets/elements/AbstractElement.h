@@ -250,20 +250,15 @@ protected:
             opt = *newOpt;
         } else {
             opt = StyleOption();
-            // Ensure we have the same data as the regular styleoption
-            opt.state = m_styleOption.state;
-            opt.direction = m_styleOption.direction;
-            opt.rect = m_styleOption.rect;
-            opt.fontMetrics = m_styleOption.fontMetrics;
-            opt.palette = m_styleOption.palette;
-            opt.styleObject = m_styleOption.styleObject;
-
             if (m_widget) {
                 opt.initFrom(m_widget);
             }
         }
         return opt;
     }
+
+    mutable QSizeF m_oldContentSize;
+    mutable QSizeF m_oldPaddedSize;
 
 private:
     Union::Element::Ptr createElement(const QString &name) const;
