@@ -265,6 +265,9 @@ protected:
         return opt;
     }
 
+    mutable QSizeF m_oldContentSize;
+    mutable QSizeF m_oldPaddedSize;
+
 private:
     Union::Element::Ptr createElement(const QString &name) const;
 

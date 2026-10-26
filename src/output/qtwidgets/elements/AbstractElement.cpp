@@ -20,6 +20,7 @@ AbstractElement::AbstractElement(const QStyleOption *option, const UnionStyle *s
     , m_widget(widget)
     , m_elementQuery(std::make_unique<Union::ElementQuery>(Union::StyleRegistry::instance()->defaultStyle()))
 {
+    update(option);
 }
 
 AbstractElement::~AbstractElement()
@@ -207,6 +208,11 @@ QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, Union::Properties::St
     if (!m_isValid) {
         return oldSize;
     }
+
+    if (m_oldContentSize == oldSize) {
+        return m_oldPaddedSize;
+    }
+
     auto paddingProperties = defaultPropertyGroup(properties);
     QMarginsF padding =
         safePropertyLookup(paddingProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
@@ -241,7 +247,9 @@ QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, Union::Properties::St
         size.setHeight(preferredSize.height());
     }
 
-    return size.toSize();
+    m_oldPaddedSize = size;
+
+    return m_oldPaddedSize.toSize();
 }
 
 void AbstractElement::drawBackground(QPainter *painter) const
