@@ -100,7 +100,7 @@ void TabElement::draw(QPainter *painter, DrawEnums enums) const
 void TabElement::drawText(QPainter *painter) const
 {
     if (hasText() && m_isValid) {
-        auto textContainer = subElementRect(QStyle::SE_TabBarTabText);
+        auto textContainer = m_style->subElementRect(QStyle::SE_TabBarTabText, &m_tabOption, m_widget);
         auto alignment = m_layoutMap[ElementString::Text].horizontalAlignment;
         auto textRect = m_layoutMap[ElementString::Text].rect;
 
