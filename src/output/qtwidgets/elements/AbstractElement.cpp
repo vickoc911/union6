@@ -203,6 +203,7 @@ QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, Union::Properties::St
     if (!m_isValid) {
         return oldSize;
     }
+
     auto paddingProperties = defaultPropertyGroup(properties);
     QMarginsF padding =
         safePropertyLookup(paddingProperties, QMarginsF{}, &StylePropertyGroup::layout, &LayoutPropertyGroup::padding, &SizePropertyGroup::toMargins);
