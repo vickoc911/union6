@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ToolTipElement.h"
+#include "FrameElement.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -52,9 +53,14 @@ void ToolTipElement::layout()
     }
 }
 
+QVariantMap ToolTipElement::elementAttributes() const
+{
+    return FrameElement::sharedFrameAttributes(m_frameOption, m_widget);
+}
+
 QStringList ToolTipElement::elementHints() const
 {
-    return frameHints(m_frameOption);
+    return FrameElement::sharedFrameHints(m_frameOption);
 }
 
 qreal ToolTipElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
