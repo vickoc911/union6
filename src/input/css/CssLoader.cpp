@@ -311,7 +311,6 @@ Union::Selector CssLoader::createSelector(const cssparser::SelectorPart &part)
     case cssparser::SelectorPart::Kind::DescendantCombinator:
         return Union::Selector::create<Union::SelectorType::DescendantCombinator>();
     case cssparser::SelectorPart::Kind::ChildCombinator:
-    case cssparser::SelectorPart::Kind::PartCombinator:
         return Union::Selector::create<Union::SelectorType::ChildCombinator>();
     case cssparser::SelectorPart::Kind::PartCombinator:
         return Union::Selector::create<Union::SelectorType::SubElementCombinator>();
