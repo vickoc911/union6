@@ -44,6 +44,7 @@ public:
 
 private:
     void updateSubElementList() override;
+    QVariantMap elementAttributes() const override;
     QStringList elementHints() const override;
     QString fallbackElementName(const QStyleOption *opt) const override;
     QMarginsF iconPadding() const;
