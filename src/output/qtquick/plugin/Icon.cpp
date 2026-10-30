@@ -341,8 +341,11 @@ void Icon::onControlIconChanged()
     if (m_style->query() && m_style->query()->properties()) {
         auto properties = m_style->query()->properties();
 
-        if (width <= 0 || height <= 0) {
+        if (width <= 0) {
             width = properties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::width);
+        }
+
+        if (height <= 0) {
             height = properties->safePropertyLookup(0.0, &StylePropertyGroup::layout, &LayoutPropertyGroup::height);
         }
 
