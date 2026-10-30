@@ -48,29 +48,9 @@ T.Switch {
 
     Union.Positioner.positionItems: [indicator, contentItem]
 
-    indicator: Item {
-        Union.Element.type: "Indicator"
+    contentItem: P.DefaultContentItem { control: control }
 
-        implicitWidth: Union.Style.properties.layout.width ?? 0
-        implicitHeight: Union.Style.properties.layout.height ?? 0
-
-        Union.StyledRectangle { anchors.fill: parent }
-
-        Union.StyledRectangle {
-            Union.Element.type: "Handle"
-
-            anchors.verticalCenter: parent.verticalCenter
-
-            property real minimumX: Union.Style.properties.layout.margins.left ?? 0
-            property real maximumX: parent.width - width - (Union.Style.properties.layout.margins.right ?? 0)
-            x: Math.max(minimumX, Math.min(maximumX, minimumX + control.visualPosition * (maximumX - minimumX)))
-        }
-    }
-
-    contentItem: P.DefaultContentItem {
-        control: control
-        wrapMode: Text.Wrap
-    }
+    indicator: P.SwitchIndicator { control: control }
 
     background: Union.StyledRectangle { }
 }
