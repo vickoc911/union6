@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+// SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
+
+#pragma once
+
+#include "UnionPainter.h"
+#include <ElementQuery.h>
+#include <QGraphicsDropShadowEffect>
+#include <QGraphicsEffect>
+#include <QIcon>
+#include <QObject>
+#include <QStyleOption>
+
+class UnionGraphicsEffect : public QGraphicsDropShadowEffect
+{
+    Q_OBJECT
+public:
+    UnionGraphicsEffect(QObject *parent);
+    ~UnionGraphicsEffect() override;
+
+    void setProperties(Union::StylePropertyGroupPtr properties);
+    void setOutlineRect(const QRectF &rect);
+
+    void draw(QPainter *painter) override;
+
+private:
+    Union::StylePropertyGroupPtr m_properties;
+    bool m_isValid;
+    QRectF m_outlineRect;
+};
