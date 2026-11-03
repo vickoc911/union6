@@ -5,13 +5,22 @@
 
 #include <QEvent>
 #include <QObject>
+#include <QPoint>
+#include <QTimer>
 #include <QWidget>
 
 class DragEventFilter : public QObject
 {
     Q_OBJECT
-
 public:
+    enum class DragState {
+        Locked,
+        StartDrag,
+        Dragging,
+        Unlocked
+    };
+    Q_ENUMS(DragState)
+
     explicit DragEventFilter(QObject *parent);
 
     void installWidget(QWidget *widget);
@@ -19,8 +28,14 @@ public:
     bool eventFilter(QObject *object, QEvent *event) override;
 
 protected:
-    bool mouseMoveEvent(QObject *object, QEvent *event);
-    bool allowDrag(QWidget *widget);
+    bool mousePressEvent(QWidget *widget, QMouseEvent *event);
+    bool mouseMoveEvent(QWidget *widget, QMouseEvent *event);
+    bool mouseReleaseEvent(QWidget *widget, QMouseEvent *event);
+    bool allowDrag(QWidget *widget) const;
+    void startDrag(QWidget *widget);
 
-    bool m_dragLocked = false;
+    QTimer *m_dragTimer;
+    QPointF m_clickPosition;
+    QPointF m_currentPosition;
+    DragState m_currentState;
 };

@@ -3,6 +3,7 @@
 
 #include "DragEventFilter.h"
 
+#include <QApplication>
 #include <QDialog>
 #include <QDockWidget>
 #include <QMainWindow>
@@ -13,7 +14,12 @@
 
 DragEventFilter::DragEventFilter(QObject *parent)
     : QObject(parent)
+    , m_dragTimer(new QTimer(this))
+    , m_clickPosition(QPointF())
+    , m_currentPosition(QPointF())
+    , m_currentState(DragState::Unlocked)
 {
+    m_dragTimer->setSingleShot(true);
 }
 
 void DragEventFilter::installWidget(QWidget *widget)
@@ -33,42 +39,77 @@ void DragEventFilter::uninstallWidget(QWidget *widget)
 
 bool DragEventFilter::eventFilter(QObject *object, QEvent *event)
 {
-    switch (event->type()) {
-    case QEvent::MouseButtonPress:
-        // In case we are dragging mouse from ie. a toolbutton to draggable area, we are locked
-        // so that the drag does not start immediately. User has to release the mouse
-        // button and then click on area that can be dragged for the operation to start.
-        m_dragLocked = true;
-        break;
-    case QEvent::MouseMove:
-        return mouseMoveEvent(object, event);
-    case QEvent::MouseButtonRelease:
-        m_dragLocked = false;
-        break;
-    default:
-        break;
-    }
-    return false;
-}
-
-bool DragEventFilter::mouseMoveEvent(QObject *object, [[maybe_unused]] QEvent *event)
-{
+    auto mouseEvent = static_cast<QMouseEvent *>(event);
     if (const auto widget = qobject_cast<QWidget *>(object)) {
-        if (m_dragLocked && allowDrag(widget) && widget->window() && widget->window()->windowHandle()) {
-            // We rely on startSystemMove to start and stop these drag actions properly
-            widget->window()->windowHandle()->startSystemMove();
+        switch (event->type()) {
+        case QEvent::MouseButtonPress:
+            return mousePressEvent(widget, mouseEvent);
+        case QEvent::MouseMove:
+            return mouseMoveEvent(widget, mouseEvent);
+        case QEvent::MouseButtonRelease:
+            return mouseReleaseEvent(widget, mouseEvent);
+        default:
+            break;
         }
-        return true;
     }
     return false;
 }
 
-bool DragEventFilter::allowDrag(QWidget *widget)
+bool DragEventFilter::mousePressEvent(QWidget *widget, QMouseEvent *event)
+{
+    // In case we are dragging mouse from ie. a toolbutton to draggable area, we are locked
+    // so that the drag does not start immediately. User has to release the mouse
+    // button and then click on area that can be dragged for the operation to start.
+    m_currentState = DragState::Locked;
+    m_clickPosition = event->position();
+    connect(m_dragTimer, &QTimer::timeout, this, [this, widget]() {
+        switch (m_currentState) {
+        case DragState::Locked:
+        case DragState::StartDrag:
+            startDrag(widget);
+        case DragState::Dragging:
+        case DragState::Unlocked:
+            break;
+        }
+    });
+    m_dragTimer->start(QApplication::startDragTime());
+    return false;
+}
+
+bool DragEventFilter::mouseMoveEvent(QWidget *widget, QMouseEvent *event)
+{
+    // We want to start dragging when either time is cleared or the distance is cleared,
+    // like in Breeze QStyle
+    switch (m_currentState) {
+    case DragState::Locked: {
+        m_currentPosition = event->position();
+        // Check if we have moved over the threshold
+        if ((m_clickPosition - m_currentPosition).manhattanLength() >= QApplication::startDragDistance()) {
+            m_currentState = DragState::StartDrag;
+        }
+    } break;
+    case DragState::StartDrag:
+        startDrag(widget);
+        break;
+    case DragState::Dragging:
+    case DragState::Unlocked:
+        break;
+    }
+    return false;
+}
+
+bool DragEventFilter::mouseReleaseEvent([[maybe_unused]] QWidget *widget, [[maybe_unused]] QMouseEvent *event)
+{
+    m_dragTimer->stop();
+    m_currentState = DragState::Unlocked;
+    return false;
+}
+
+bool DragEventFilter::allowDrag(QWidget *widget) const
 {
     if (!widget) {
         return false;
     }
-
     // If we are already doing something like resizing a window, don't allow drag.
     if (widget->cursor().shape() != Qt::ArrowCursor) {
         return false;
@@ -82,6 +123,14 @@ bool DragEventFilter::allowDrag(QWidget *widget)
         }
         return true;
     }
-
     return false;
+}
+
+void DragEventFilter::startDrag(QWidget *widget)
+{
+    if (allowDrag(widget) && widget->window() && widget->window()->windowHandle()) {
+        // We rely on startSystemMove to start and stop these drag actions properly
+        widget->window()->windowHandle()->startSystemMove();
+        m_currentState = DragState::Dragging;
+    }
 }
