@@ -73,7 +73,7 @@ QImage ShadowRenderer::shadowTexture()
     painter.setPen(Qt::NoPen);
     painter.setBrush(Qt::black);
     painter.setCompositionMode(QPainter::CompositionMode_DestinationOut);
-    auto path = unevenRadiiRectPath(outerRect - margins, params.cornerRadius);
+    auto path = BackgroundDrawing::unevenRadiiRectPath(outerRect - margins, params.cornerRadius);
     painter.drawPath(path);
 
     painter.end();

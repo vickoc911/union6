@@ -29,44 +29,7 @@ void UnionGraphicsEffect::draw(QPainter *painter)
             safePropertyLookup(m_properties, Union::Color(), &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::color);
         auto outlineSize = safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::size);
 
-        if (const auto border = m_properties->outline()) {
-            // painter->setRenderHint(QPainter::Antialiasing, true);
-            //  Make simpler border shapes if complex ones are not necessary
-            const auto corners = m_properties->corners();
-            const auto rect = m_outlineRect;
-            const QMarginsF borderSizes = {outlineSize, outlineSize, outlineSize, outlineSize};
-            // Draw borders
-            if (const auto top = border->top()) {
-                drawLineProperty(painter, rect, SubNodeIndex::Top, borderSizes, top, corners);
-            }
-            if (const auto right = border->right()) {
-                drawLineProperty(painter, rect, SubNodeIndex::Right, borderSizes, right, corners);
-            }
-            if (const auto bottom = border->bottom()) {
-                drawLineProperty(painter, rect, SubNodeIndex::Bottom, borderSizes, bottom, corners);
-            }
-            if (const auto left = border->left()) {
-                drawLineProperty(painter, rect, SubNodeIndex::Left, borderSizes, left, corners);
-            }
-
-            // Draw corners if at least one border is present
-            if (borderSizes.top() || borderSizes.left()) {
-                const auto topLeft = corners ? corners->topLeft() : nullptr;
-                drawOutlineCornerProperty(painter, rect, SubNodeIndex::TopLeft, border, topLeft);
-            }
-            if (borderSizes.top() || borderSizes.right()) {
-                const auto topRight = corners ? corners->topRight() : nullptr;
-                drawOutlineCornerProperty(painter, rect, SubNodeIndex::TopRight, border, topRight);
-            }
-            if (borderSizes.bottom() || borderSizes.right()) {
-                const auto bottomRight = corners ? corners->bottomRight() : nullptr;
-                drawOutlineCornerProperty(painter, rect, SubNodeIndex::BottomRight, border, bottomRight);
-            }
-            if (borderSizes.bottom() || borderSizes.left()) {
-                const auto bottomLeft = corners ? corners->bottomLeft() : nullptr;
-                drawOutlineCornerProperty(painter, rect, SubNodeIndex::BottomLeft, border, bottomLeft);
-            }
-        }
+        if (const auto border = m_properties->outline()) { }
     }
 }
 
