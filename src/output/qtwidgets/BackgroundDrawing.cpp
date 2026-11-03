@@ -427,3 +427,113 @@ void drawCornerProperty(QPainter *painter,
     painter->drawPath(path);
     painter->restore();
 }
+
+void drawOutlineCornerProperty(QPainter *painter,
+                               const QRectF &rect,
+                               SubNodeIndex subNodeIndex,
+                               const Union::Properties::OutlinePropertyGroup *outline,
+                               const Union::Properties::CornerPropertyGroup *corner)
+{
+    const auto borderSizes = QMarginsF(outline->left()->size().value_or(0),
+                                       outline->top()->size().value_or(0),
+                                       outline->right()->size().value_or(0),
+                                       outline->bottom()->size().value_or(0));
+
+    QPainterPath path;
+    QLinearGradient cornerTransition;
+    const auto radius =
+        corner ? std::min<double>({static_cast<double>(rect.width()) / 2, static_cast<double>(rect.height()) / 2, corner->radius().value_or(0.0)}) : 0.0;
+    double innerRadius = 0.0;
+    // Start, end, top and left assume a top-left corner being drawn clockwise which gets rotated
+    double topMargin = 0.0;
+    double leftMargin = 0.0;
+    QColor startColor = Qt::transparent;
+    QColor endColor = Qt::transparent;
+
+    painter->save();
+    painter->setPen(Qt::transparent);
+
+    switch (subNodeIndex) {
+    case SubNodeIndex::TopLeft: {
+        leftMargin = borderSizes.left();
+        topMargin = borderSizes.top();
+
+        startColor = outline->left() ? outline->left()->color().value().toQColor() : Qt::transparent;
+        endColor = outline->top() ? outline->top()->color().value().toQColor() : Qt::transparent;
+
+        painter->translate(rect.x(), rect.y());
+    } break;
+
+    case SubNodeIndex::TopRight: {
+        leftMargin = borderSizes.top();
+        topMargin = borderSizes.right();
+
+        startColor = outline->top() ? outline->top()->color().value().toQColor() : Qt::transparent;
+        endColor = outline->right() ? outline->right()->color().value().toQColor() : Qt::transparent;
+
+        painter->translate(rect.x() + rect.width(), rect.y());
+        painter->rotate(90);
+    } break;
+
+    case SubNodeIndex::BottomRight: {
+        leftMargin = borderSizes.right();
+        topMargin = borderSizes.bottom();
+
+        startColor = outline->right() ? outline->right()->color().value().toQColor() : Qt::transparent;
+        endColor = outline->bottom() ? outline->bottom()->color().value().toQColor() : Qt::transparent;
+
+        painter->translate(rect.x() + rect.width(), rect.y() + rect.height());
+        painter->rotate(180);
+    } break;
+
+    case SubNodeIndex::BottomLeft: {
+        leftMargin = borderSizes.bottom();
+        topMargin = borderSizes.left();
+
+        startColor = outline->bottom() ? outline->bottom()->color().value().toQColor() : Qt::transparent;
+        endColor = outline->left() ? outline->left()->color().value().toQColor() : Qt::transparent;
+
+        painter->translate(rect.x(), rect.y() + rect.height());
+        painter->rotate(270);
+    } break;
+
+    default: {
+        break;
+    }
+    }
+
+    innerRadius = std::max(radius - std::min(topMargin, leftMargin), 0.0);
+
+    // Draw path only when necessary, otherwise draw a simple rectangle
+    if (radius) {
+        path.moveTo(radius + leftMargin, 0);
+
+        path.lineTo(radius, 0);
+        path.arcTo(QRectF(0, 0, radius * 2, radius * 2), 90, 90);
+        path.lineTo(0, radius + topMargin);
+        path.lineTo(leftMargin, radius + topMargin);
+        path.lineTo(leftMargin, innerRadius + topMargin);
+        if (innerRadius) {
+            path.arcTo(QRectF(leftMargin, topMargin, innerRadius * 2, innerRadius * 2), 180, -90);
+        }
+        path.lineTo(leftMargin + radius, topMargin);
+        path.lineTo(leftMargin + radius, 0);
+        path.lineTo(radius, 0);
+
+        path.closeSubpath();
+    } else {
+        path.addRect(QRectF(0, 0, leftMargin, topMargin));
+    }
+
+    if (startColor == endColor) {
+        painter->setBrush(startColor);
+    } else {
+        cornerTransition = QLinearGradient(QPointF(0, radius + topMargin), QPointF(radius + leftMargin, 0));
+        cornerTransition.setColorAt(0, startColor);
+        cornerTransition.setColorAt(1, endColor);
+        painter->setBrush(QBrush(cornerTransition));
+    }
+
+    painter->drawPath(path);
+    painter->restore();
+}
