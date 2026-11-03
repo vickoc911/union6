@@ -4,6 +4,7 @@
 #include "ButtonElement.h"
 #include "SharedNames.h"
 #include "StyleUtils.h"
+#include "UnionGraphicsEffect.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -43,6 +44,12 @@ void ButtonElement::update()
 
     updateSubElementList();
     layout();
+    if (m_widget && m_widget->graphicsEffect()) {
+        if (const auto effect = qobject_cast<UnionGraphicsEffect *>(m_widget->graphicsEffect())) {
+            effect->setOutlineRect(m_widget->rect());
+            effect->setProperties(m_elementProperties);
+        }
+    }
 }
 
 void ButtonElement::draw(QPainter *painter, DrawEnums enums) const

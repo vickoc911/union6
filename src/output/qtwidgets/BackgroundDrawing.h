@@ -70,3 +70,9 @@ void drawCornerProperty(QPainter *painter,
                         SubNodeIndex subNodeIndex,
                         const Union::Properties::BorderPropertyGroup *border,
                         const Union::Properties::CornerPropertyGroup *corner);
+
+void drawOutlineCornerProperty(QPainter *painter,
+                               const QRectF &rect,
+                               SubNodeIndex subNodeIndex,
+                               const Union::Properties::OutlinePropertyGroup *outline,
+                               const Union::Properties::CornerPropertyGroup *corner);

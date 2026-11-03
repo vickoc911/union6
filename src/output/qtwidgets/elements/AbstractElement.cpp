@@ -3,6 +3,7 @@
 
 #include "AbstractElement.h"
 #include "SharedNames.h"
+#include "UnionGraphicsEffect.h"
 #include "UnionStyle.h"
 #include "qtwidgets_logging.h"
 #include <QApplication>
