@@ -53,13 +53,22 @@ public:
     FontPropertyGroupQuick *font() const;
 
     /*!
-     * \qmlproperty Union::Properties::TextAlignment TextPropertyGroupQuick::alignment
+     * \qmlproperty Union::Properties::HorizontalTextAlignment TextPropertyGroupQuick::horizontalAlignment
      *
-     * Exposes TextPropertyGroup::alignment to QML.
+     * Exposes TextPropertyGroup::horizontalAlignment to QML.
      */
-    Q_PROPERTY(QJSValue alignment READ alignment NOTIFY alignmentChanged)
-    QJSValue alignment() const;
-    Q_SIGNAL void alignmentChanged();
+    Q_PROPERTY(QJSValue horizontalAlignment READ horizontalAlignment NOTIFY horizontalAlignmentChanged)
+    QJSValue horizontalAlignment() const;
+    Q_SIGNAL void horizontalAlignmentChanged();
+
+    /*!
+     * \qmlproperty Union::Properties::VerticalTextAlignment TextPropertyGroupQuick::verticalAlignment
+     *
+     * Exposes TextPropertyGroup::verticalAlignment to QML.
+     */
+    Q_PROPERTY(QJSValue verticalAlignment READ verticalAlignment NOTIFY verticalAlignmentChanged)
+    QJSValue verticalAlignment() const;
+    Q_SIGNAL void verticalAlignmentChanged();
 
     /*!
      * \qmlproperty Union::Properties::TextWrapMode TextPropertyGroupQuick::wrapMode

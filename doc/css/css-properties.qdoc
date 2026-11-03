@@ -223,7 +223,7 @@ if the element has no visible text.
 
 \section2 font
 
-These properties all relate to the font used for the text of an element.
+\brief A group containing properties relating to the font used for an element.
 
 
 \section3 font-family (<string>)
@@ -274,10 +274,19 @@ The spacing between words of the font used for an element.
 
 \section3 text-align (start | center | end | justify)
 
-The alignment of the text of an element. This is distinct from layout
-alignment in that layout alignment determines the alignment of an element's
-box within an item, but the text alignment determines how the text aligns
-within that box.
+The horizontal alignment of the text of an element. This is distinct from
+layout alignment in that layout alignment determines the alignment of an
+element's box within an item, but the text alignment determines how the
+text aligns within that box.
+
+
+
+\section3 vertical-align (top | middle | bottom)
+
+The vertical alignment of the text of an element. This is distinct from
+layout alignment in that layout alignment determines the alignment of an
+element's box within an item, but the text alignment determines how the
+text aligns within that box.
 
 
 

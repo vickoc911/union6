@@ -35,7 +35,8 @@ void TextPropertyGroupQuick::update(TextPropertyGroup *newState)
         m_font->update(newState->font());
     }
 
-    Q_EMIT alignmentChanged();
+    Q_EMIT horizontalAlignmentChanged();
+    Q_EMIT verticalAlignmentChanged();
     Q_EMIT wrapModeChanged();
     Q_EMIT elideChanged();
     Q_EMIT updated();
@@ -51,13 +52,27 @@ FontPropertyGroupQuick *TextPropertyGroupQuick::font() const
     return m_font.get();
 }
 
-QJSValue TextPropertyGroupQuick::alignment() const
+QJSValue TextPropertyGroupQuick::horizontalAlignment() const
 {
     if (!m_state) {
         return QJSValue(QJSValue::UndefinedValue);
     }
 
-    auto value = m_state->alignment();
+    auto value = m_state->horizontalAlignment();
+    if (value) {
+        return m_style->engine()->toScriptValue(value.value());
+    }
+
+    return QJSValue(QJSValue::UndefinedValue);
+}
+
+QJSValue TextPropertyGroupQuick::verticalAlignment() const
+{
+    if (!m_state) {
+        return QJSValue(QJSValue::UndefinedValue);
+    }
+
+    auto value = m_state->verticalAlignment();
     if (value) {
         return m_style->engine()->toScriptValue(value.value());
     }

@@ -151,6 +151,10 @@
     syntax: "start | center | end | justify";
 }
 
+@property vertical-align {
+    syntax: "top | middle | bottom";
+}
+
 @property text-wrap-mode {
     syntax: "no-wrap | word-wrap | manual-wrap | wrap-anywhere | wrap-at-word-boundary-or-anywhere | wrap";
 }

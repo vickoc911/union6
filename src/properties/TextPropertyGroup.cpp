@@ -16,7 +16,8 @@ class Union::Properties::TextPropertyGroupPrivate
 {
 public:
     std::unique_ptr<FontPropertyGroup> font;
-    std::optional<Union::Properties::TextAlignment> alignment;
+    std::optional<Union::Properties::HorizontalTextAlignment> horizontalAlignment;
+    std::optional<Union::Properties::VerticalTextAlignment> verticalAlignment;
     std::optional<Union::Properties::TextWrapMode> wrapMode;
     std::optional<Union::Properties::TextElide> elide;
 };
@@ -31,7 +32,8 @@ TextPropertyGroup::TextPropertyGroup(const TextPropertyGroup &other)
 {
     d->font = std::make_unique<FontPropertyGroup>();
     *(d->font) = *(other.d->font);
-    d->alignment = other.d->alignment;
+    d->horizontalAlignment = other.d->horizontalAlignment;
+    d->verticalAlignment = other.d->verticalAlignment;
     d->wrapMode = other.d->wrapMode;
     d->elide = other.d->elide;
 }
@@ -47,7 +49,8 @@ TextPropertyGroup &TextPropertyGroup::operator=(const TextPropertyGroup &other)
 {
     if (this != &other) {
         *(d->font) = *(other.d->font);
-        d->alignment = other.d->alignment;
+        d->horizontalAlignment = other.d->horizontalAlignment;
+        d->verticalAlignment = other.d->verticalAlignment;
         d->wrapMode = other.d->wrapMode;
         d->elide = other.d->elide;
     }
@@ -70,18 +73,32 @@ void TextPropertyGroup::setFont(std::unique_ptr<FontPropertyGroup> &&newValue)
     d->font = std::move(newValue);
 }
 
-std::optional<Union::Properties::TextAlignment> TextPropertyGroup::alignment() const
+std::optional<Union::Properties::HorizontalTextAlignment> TextPropertyGroup::horizontalAlignment() const
 {
-    return d->alignment;
+    return d->horizontalAlignment;
 }
 
-void TextPropertyGroup::setAlignment(const std::optional<Union::Properties::TextAlignment> &newValue)
+void TextPropertyGroup::setHorizontalAlignment(const std::optional<Union::Properties::HorizontalTextAlignment> &newValue)
 {
-    if (newValue == d->alignment) {
+    if (newValue == d->horizontalAlignment) {
         return;
     }
 
-    d->alignment = newValue;
+    d->horizontalAlignment = newValue;
+}
+
+std::optional<Union::Properties::VerticalTextAlignment> TextPropertyGroup::verticalAlignment() const
+{
+    return d->verticalAlignment;
+}
+
+void TextPropertyGroup::setVerticalAlignment(const std::optional<Union::Properties::VerticalTextAlignment> &newValue)
+{
+    if (newValue == d->verticalAlignment) {
+        return;
+    }
+
+    d->verticalAlignment = newValue;
 }
 
 std::optional<Union::Properties::TextWrapMode> TextPropertyGroup::wrapMode() const
@@ -117,7 +134,10 @@ bool TextPropertyGroup::hasAnyValue() const
     if (d->font && d->font->hasAnyValue()) {
         return true;
     }
-    if (d->alignment.has_value()) {
+    if (d->horizontalAlignment.has_value()) {
+        return true;
+    }
+    if (d->verticalAlignment.has_value()) {
         return true;
     }
     if (d->wrapMode.has_value()) {
@@ -138,7 +158,10 @@ bool TextPropertyGroup::isEmpty() const
     if (d->font && !d->font->isEmpty()) {
         return false;
     }
-    if (d->alignment.has_value() && d->alignment.value() != emptyValue<Union::Properties::TextAlignment>()) {
+    if (d->horizontalAlignment.has_value() && d->horizontalAlignment.value() != emptyValue<Union::Properties::HorizontalTextAlignment>()) {
+        return false;
+    }
+    if (d->verticalAlignment.has_value() && d->verticalAlignment.value() != emptyValue<Union::Properties::VerticalTextAlignment>()) {
         return false;
     }
     if (d->wrapMode.has_value() && d->wrapMode.value() != emptyValue<Union::Properties::TextWrapMode>()) {
@@ -188,9 +211,15 @@ QString TextPropertyGroup::toString(int indentation, ToStringFlags flags) const
     } else {
         out << empty << maybeNewLine;
     }
-    out << indent(indentation, multiline, false) << "alignment: ";
-    if (d->alignment) {
-        out << d->alignment.value() << maybeNewLine;
+    out << indent(indentation, multiline, false) << "horizontalAlignment: ";
+    if (d->horizontalAlignment) {
+        out << d->horizontalAlignment.value() << maybeNewLine;
+    } else {
+        out << empty << maybeNewLine;
+    }
+    out << indent(indentation, multiline, false) << "verticalAlignment: ";
+    if (d->verticalAlignment) {
+        out << d->verticalAlignment.value() << maybeNewLine;
     } else {
         out << empty << maybeNewLine;
     }
@@ -229,8 +258,11 @@ void TextPropertyGroup::resolveProperties(const TextPropertyGroup *source, TextP
         }
         FontPropertyGroup::resolveProperties(source->d->font.get(), destination->d->font.get());
     }
-    if (!destination->d->alignment.has_value()) {
-        destination->d->alignment = source->d->alignment;
+    if (!destination->d->horizontalAlignment.has_value()) {
+        destination->d->horizontalAlignment = source->d->horizontalAlignment;
+    }
+    if (!destination->d->verticalAlignment.has_value()) {
+        destination->d->verticalAlignment = source->d->verticalAlignment;
     }
     if (!destination->d->wrapMode.has_value()) {
         destination->d->wrapMode = source->d->wrapMode;
@@ -244,7 +276,8 @@ std::unique_ptr<TextPropertyGroup> TextPropertyGroup::empty()
 {
     auto result = std::make_unique<TextPropertyGroup>();
     result->d->font = FontPropertyGroup::empty();
-    result->d->alignment = emptyValue<Union::Properties::TextAlignment>();
+    result->d->horizontalAlignment = emptyValue<Union::Properties::HorizontalTextAlignment>();
+    result->d->verticalAlignment = emptyValue<Union::Properties::VerticalTextAlignment>();
     result->d->wrapMode = emptyValue<Union::Properties::TextWrapMode>();
     result->d->elide = emptyValue<Union::Properties::TextElide>();
     return result;
@@ -259,7 +292,10 @@ bool Union::Properties::operator==(const TextPropertyGroup &left, const TextProp
     } else if (left.font() != right.font()) {
         return false;
     }
-    if (left.alignment() != right.alignment()) {
+    if (left.horizontalAlignment() != right.horizontalAlignment()) {
+        return false;
+    }
+    if (left.verticalAlignment() != right.verticalAlignment()) {
         return false;
     }
     if (left.wrapMode() != right.wrapMode()) {
@@ -291,7 +327,8 @@ QDataStream &operator<<(QDataStream &stream, const Union::Properties::TextProper
             stream << data;
         }
     }
-    stream << type->alignment();
+    stream << type->horizontalAlignment();
+    stream << type->verticalAlignment();
     stream << type->wrapMode();
     stream << type->elide();
     return stream;
@@ -310,9 +347,14 @@ QDataStream &operator>>(QDataStream &stream, std::unique_ptr<Union::Properties::
         }
     }
     {
-        std::optional<Union::Properties::TextAlignment> data;
+        std::optional<Union::Properties::HorizontalTextAlignment> data;
         stream >> data;
-        type->setAlignment(data);
+        type->setHorizontalAlignment(data);
+    }
+    {
+        std::optional<Union::Properties::VerticalTextAlignment> data;
+        stream >> data;
+        type->setVerticalAlignment(data);
     }
     {
         std::optional<Union::Properties::TextWrapMode> data;

@@ -23,7 +23,8 @@ private Q_SLOTS:
 
         // A null instance should not have any values for its properties.
         QVERIFY(!property->font());
-        QVERIFY(!property->alignment().has_value());
+        QVERIFY(!property->horizontalAlignment().has_value());
+        QVERIFY(!property->verticalAlignment().has_value());
         QVERIFY(!property->wrapMode().has_value());
         QVERIFY(!property->elide().has_value());
     }
@@ -34,7 +35,8 @@ private Q_SLOTS:
 
         // An empty instance should only have values that are considered "empty".
         QCOMPARE(*property->font(), *FontPropertyGroup::empty());
-        QCOMPARE(property->alignment().value(), emptyValue<Union::Properties::TextAlignment>());
+        QCOMPARE(property->horizontalAlignment().value(), emptyValue<Union::Properties::HorizontalTextAlignment>());
+        QCOMPARE(property->verticalAlignment().value(), emptyValue<Union::Properties::VerticalTextAlignment>());
         QCOMPARE(property->wrapMode().value(), emptyValue<Union::Properties::TextWrapMode>());
         QCOMPARE(property->elide().value(), emptyValue<Union::Properties::TextElide>());
     }
@@ -58,10 +60,17 @@ private Q_SLOTS:
             QVERIFY(!property->hasAnyValue());
         }
         {
-            Union::Properties::TextAlignment value;
-            property->setAlignment(value);
+            Union::Properties::HorizontalTextAlignment value;
+            property->setHorizontalAlignment(value);
             QVERIFY(property->hasAnyValue());
-            property->setAlignment(std::nullopt);
+            property->setHorizontalAlignment(std::nullopt);
+            QVERIFY(!property->hasAnyValue());
+        }
+        {
+            Union::Properties::VerticalTextAlignment value;
+            property->setVerticalAlignment(value);
+            QVERIFY(property->hasAnyValue());
+            property->setVerticalAlignment(std::nullopt);
             QVERIFY(!property->hasAnyValue());
         }
         {
@@ -94,7 +103,8 @@ private Q_SLOTS:
         QVERIFY(!destination->hasAnyValue());
 
         source->setFont(testFontPropertyGroupInstance());
-        source->setAlignment(Union::Properties::TextAlignment{});
+        source->setHorizontalAlignment(Union::Properties::HorizontalTextAlignment{});
+        source->setVerticalAlignment(Union::Properties::VerticalTextAlignment{});
         source->setWrapMode(Union::Properties::TextWrapMode{});
         source->setElide(Union::Properties::TextElide{});
 
@@ -106,7 +116,8 @@ private Q_SLOTS:
         QVERIFY(destination->hasAnyValue());
 
         QCOMPARE(*destination->font(), *source->font());
-        QCOMPARE(destination->alignment(), source->alignment());
+        QCOMPARE(destination->horizontalAlignment(), source->horizontalAlignment());
+        QCOMPARE(destination->verticalAlignment(), source->verticalAlignment());
         QCOMPARE(destination->wrapMode(), source->wrapMode());
         QCOMPARE(destination->elide(), source->elide());
     }

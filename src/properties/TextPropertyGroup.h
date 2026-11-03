@@ -102,20 +102,36 @@ public:
     void setFont(std::unique_ptr<FontPropertyGroup> &&newValue);
 
     /*!
-        The alignment of the text of an element. This is distinct from layout
-alignment in that layout alignment determines the alignment of an element's
-box within an item, but the text alignment determines how the text aligns
-within that box.
+        The horizontal alignment of the text of an element. This is distinct from
+layout alignment in that layout alignment determines the alignment of an
+element's box within an item, but the text alignment determines how the
+text aligns within that box.
 
      */
-    std::optional<Union::Properties::TextAlignment> alignment() const;
+    std::optional<Union::Properties::HorizontalTextAlignment> horizontalAlignment() const;
 
     /*!
-     * Set the value of alignment.
+     * Set the value of horizontalAlignment.
      *
      * \a newValue The new value or \c{std::nullopt} to unset the value.
      */
-    void setAlignment(const std::optional<Union::Properties::TextAlignment> &newValue);
+    void setHorizontalAlignment(const std::optional<Union::Properties::HorizontalTextAlignment> &newValue);
+
+    /*!
+        The vertical alignment of the text of an element. This is distinct from
+layout alignment in that layout alignment determines the alignment of an
+element's box within an item, but the text alignment determines how the
+text aligns within that box.
+
+     */
+    std::optional<Union::Properties::VerticalTextAlignment> verticalAlignment() const;
+
+    /*!
+     * Set the value of verticalAlignment.
+     *
+     * \a newValue The new value or \c{std::nullopt} to unset the value.
+     */
+    void setVerticalAlignment(const std::optional<Union::Properties::VerticalTextAlignment> &newValue);
 
     /*!
         The wrap mode for the text of an element.

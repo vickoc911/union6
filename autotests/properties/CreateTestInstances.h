@@ -173,7 +173,8 @@ std::unique_ptr<TextPropertyGroup> testTextPropertyGroupInstance()
     auto instance = std::make_unique<TextPropertyGroup>();
 
     instance->setFont(testFontPropertyGroupInstance());
-    instance->setAlignment(Union::Properties::TextAlignment{});
+    instance->setHorizontalAlignment(Union::Properties::HorizontalTextAlignment{});
+    instance->setVerticalAlignment(Union::Properties::VerticalTextAlignment{});
     instance->setWrapMode(Union::Properties::TextWrapMode{});
     instance->setElide(Union::Properties::TextElide{});
 
