@@ -3,6 +3,7 @@
 
 #include "AbstractElement.h"
 #include "SharedNames.h"
+#include "UnionGraphicsEffect.h"
 #include "UnionStyle.h"
 #include "qtwidgets_logging.h"
 #include <QApplication>
@@ -333,6 +334,19 @@ void AbstractElement::drawTextAtRect(QPainter *painter, const QString &text, con
         painter->setFont(font);
         m_style->drawItemText(painter, rect.toRect(), textFlags, m_styleOption->palette, enabled, elidedText(text, rect, property));
         painter->restore();
+    }
+}
+
+void AbstractElement::updateGraphicsEffect(const QRectF &rect, const Union::StylePropertyGroupPtr &properties) const
+{
+    const auto property = defaultPropertyGroup(properties);
+    if (m_styleOption && property) {
+        if (auto widget = qobject_cast<QWidget *>(m_styleOption->styleObject)) {
+            if (auto graphics = qobject_cast<UnionGraphicsEffect *>(widget->graphicsEffect())) {
+                graphics->setDrawRect(rect);
+                graphics->setProperties(property);
+            }
+        }
     }
 }
 

@@ -39,6 +39,7 @@ void SliderElement::update()
         m_isReverse = !m_isReverse;
     }
     layout();
+    updateGraphicsEffect(subControlRect(QStyle::SC_SliderHandle));
 }
 
 void SliderElement::layout()

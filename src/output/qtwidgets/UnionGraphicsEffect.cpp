@@ -20,19 +20,19 @@ UnionGraphicsEffect::~UnionGraphicsEffect()
 
 void UnionGraphicsEffect::draw(QPainter *painter)
 {
-    // Draw shadow first with QGraphicsDropShadowEffect
-    QGraphicsDropShadowEffect::draw(painter);
+    if (m_isValid) {
+        // Draw shadow first with QGraphicsDropShadowEffect
+        QGraphicsDropShadowEffect::draw(painter);
 
-    // Now draw outline
-    if (m_isValid && !m_outlineRect.isNull()) {
-        auto outlineColor =
-            safePropertyLookup(m_properties, Union::Color(), &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::color);
-
+        // Now draw outline
         UnionPainter p(painter, m_properties);
-        // need to resize the painter area for these
-        p.setRect(m_outlineRect.adjusted(-10, -10, 10, 10));
+        // Use the drawRect with the outline margins so we draw the outline to correct position
+        p.setRect(m_drawRect.marginsAdded(m_outlineSize.toMargins()));
         p.setParts(UnionPainter::Parts::Outline);
         p.draw();
+
+    } else {
+        drawSource(painter);
     }
 }
 
@@ -40,8 +40,6 @@ void UnionGraphicsEffect::setProperties(Union::StylePropertyGroupPtr properties)
 {
     if (properties) {
         m_properties = properties;
-        m_isValid = true;
-        setEnabled(true);
         auto shadowColor = safePropertyLookup(m_properties, Union::Color(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::color);
         auto shadowOffset =
             safePropertyLookup(m_properties, QVector2D(), &StylePropertyGroup::shadow, &ShadowPropertyGroup::offset, &OffsetPropertyGroup::toVector2D);
@@ -49,10 +47,30 @@ void UnionGraphicsEffect::setProperties(Union::StylePropertyGroupPtr properties)
         setColor(shadowColor.toQColor());
         setBlurRadius(shadowBlur);
         setOffset(shadowOffset.x(), shadowOffset.y());
+
+        m_outlineSize.setTop(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::size));
+        m_outlineSize.setLeft(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::left, &LinePropertyGroup::size));
+        m_outlineSize.setBottom(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::bottom, &LinePropertyGroup::size));
+        m_outlineSize.setRight(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::right, &LinePropertyGroup::size));
+
+        // If we dont draw shadow, ensure we still give room for the outline
+        if (blurRadius() <= 0) {
+            setBlurRadius(std::max({m_outlineSize.top(), m_outlineSize.bottom(), m_outlineSize.right(), m_outlineSize.left()}));
+        }
+
+        m_isValid = true;
+        setEnabled(true);
     }
 }
 
-void UnionGraphicsEffect::setOutlineRect(const QRectF &rect)
+void UnionGraphicsEffect::setDrawRect(const QRectF &rect)
 {
-    m_outlineRect = rect;
+    m_drawRect = rect;
+}
+
+QRectF UnionGraphicsEffect::boundingRectFor(const QRectF &rect) const
+{
+    // Ensure our bounding rect has enough space to draw both outline and shadow
+    auto newRect = QGraphicsDropShadowEffect::boundingRectFor(rect);
+    return newRect.marginsAdded(m_outlineSize);
 }

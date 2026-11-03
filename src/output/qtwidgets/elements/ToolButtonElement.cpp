@@ -42,6 +42,7 @@ void ToolButtonElement::update()
     setText(m_toolButtonOption->text);
     updateSubElementList();
     layout();
+    updateGraphicsEffect(m_toolButtonOption->rect);
 }
 
 void ToolButtonElement::layout()
