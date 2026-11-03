@@ -48,7 +48,9 @@ void TabBarElement::drawBackground(QPainter *painter) const
     if (!m_tabBarOption) {
         return;
     }
-    drawBackgroundRectangle(painter, m_tabBarOption->rect, m_elementProperties, BackgroundParts::FrameOnly);
+    BackgroundDrawing h(painter, m_elementProperties, m_tabBarOption, m_widget);
+    h.setParts(BackgroundDrawing::Parts::FrameOnly);
+    h.draw();
 }
 
 qreal TabBarElement::scrollButtonWidth() const

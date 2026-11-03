@@ -120,14 +120,18 @@ QRectF ToolBarElement::handleSeparatorRect(qreal extent) const
 void ToolBarElement::drawHandle(QPainter *painter) const
 {
     if (m_isValid && m_styleOption && m_handleProperties) {
-        drawBackgroundRectangle(painter, handleSeparatorRect(handleExtent()), m_handleProperties);
+        BackgroundDrawing h(painter, m_handleProperties, m_styleOption, m_widget);
+        h.setRect(handleSeparatorRect(handleExtent()));
+        h.draw();
     }
 }
 
 void ToolBarElement::drawSeparator(QPainter *painter) const
 {
     if (m_isValid && m_styleOption && m_separatorProperties) {
-        drawBackgroundRectangle(painter, handleSeparatorRect(separatorExtent()), m_handleProperties);
+        BackgroundDrawing h(painter, m_separatorProperties, m_styleOption, m_widget);
+        h.setRect(handleSeparatorRect(separatorExtent()));
+        h.draw();
     }
 }
 

@@ -18,27 +18,37 @@
 
 static Union::LruImageCache imageCache;
 
-// This file handles all the background drawing related functions
-
-void drawBackgroundRectangle(QPainter *painter,
-                             const QRectF &mainRect,
-                             const Union::StylePropertyGroupPtr &style,
-                             BackgroundParts parts,
-                             const QColor &backgroundOverride)
+BackgroundDrawing::BackgroundDrawing(QPainter *painter, const Union::StylePropertyGroupPtr &properties, const QStyleOption *option, const QWidget *widget)
+    : QObject(nullptr)
+    , m_painter(painter)
+    , m_properties(properties)
+    , m_option(option)
+    , m_widget(widget)
+    , m_drawParts(Parts::All)
+    , m_drawRect(option->rect)
+    , m_overrideColor(QColor())
 {
-    if (!style) {
+}
+
+BackgroundDrawing::~BackgroundDrawing()
+{
+}
+
+void BackgroundDrawing::draw()
+{
+    if (!m_properties) {
         return;
     }
 
-    painter->save();
+    m_painter->save();
 
-    QRectF rect = mainRect;
+    QRectF rect = m_drawRect;
     // Remove any insets we may have, we do not want to draw them
-    if (style->layout() && style->layout()->inset()) {
+    if (m_properties->layout() && m_properties->layout()->inset()) {
         auto height = rect.height();
         auto width = rect.width();
         // Ensure we do not go out of bounds
-        rect = rect.marginsRemoved(style->layout()->inset()->toMargins());
+        rect = rect.marginsRemoved(m_properties->layout()->inset()->toMargins());
         if (rect.height() <= 0 || rect.width() <= 0) {
             rect = centerRect(rect.toRect(), width, height);
         }
@@ -50,7 +60,7 @@ void drawBackgroundRectangle(QPainter *painter,
     bool allBordersEqual = false;
     bool allBorderColorsEqual = false;
 
-    if (const auto border = style->border()) {
+    if (const auto border = m_properties->border()) {
         borderSizes = border->sizes();
         allBordersEqual = qFuzzyCompare(borderSizes.left(), borderSizes.right()) && qFuzzyCompare(borderSizes.top(), borderSizes.bottom())
             && qFuzzyCompare(borderSizes.left(), borderSizes.top());
@@ -70,7 +80,7 @@ void drawBackgroundRectangle(QPainter *painter,
     Union::Properties::CornersPropertyGroup::CornerRadii innerCornerRadii = {0, 0, 0, 0};
     bool allCornerRadiiEqual = false;
 
-    if (const auto corners = style->corners()) {
+    if (const auto corners = m_properties->corners()) {
         cornerRadii = corners->radii();
         constrainedRadii = constrainRadii(rect, cornerRadii);
         allCornerRadiiEqual = qFuzzyCompare(constrainedRadii.topLeft, constrainedRadii.topRight)
@@ -80,7 +90,7 @@ void drawBackgroundRectangle(QPainter *painter,
 
         // Make space for outlines
         // Shrink inner radii
-        if (style->border()) {
+        if (m_properties->border()) {
             innerCornerRadii = {std::max(innerCornerRadii.topLeft - std::min(borderSizes.top(), borderSizes.left()), 0.0),
                                 std::max(innerCornerRadii.topRight - std::min(borderSizes.top(), borderSizes.right()), 0.0),
                                 std::max(innerCornerRadii.bottomLeft - std::min(borderSizes.bottom(), borderSizes.left()), 0.0),
@@ -89,8 +99,8 @@ void drawBackgroundRectangle(QPainter *painter,
     }
 
     // Draw background (panel)
-    if (parts != BackgroundParts::FrameOnly) {
-        if (const auto background = style->background()) {
+    if (m_drawParts != Parts::FrameOnly) {
+        if (const auto background = m_properties->background()) {
             QPainterPath path;
             // Draw less complex rectangles if complex ones are not needed
             if (allCornerRadiiEqual && !constrainedRadii.topLeft) {
@@ -101,44 +111,44 @@ void drawBackgroundRectangle(QPainter *painter,
                 path = unevenRadiiRectPath(innerRect, innerCornerRadii);
             }
 
-            if (backgroundOverride.isValid()) {
-                painter->setPen(Qt::transparent);
-                painter->setBrush(backgroundOverride);
-                painter->drawPath(path);
+            if (m_overrideColor.isValid()) {
+                m_painter->setPen(Qt::transparent);
+                m_painter->setBrush(m_overrideColor);
+                m_painter->drawPath(path);
             } else if (const auto color = background->color()) {
-                painter->setPen(Qt::transparent);
-                painter->setBrush(color.value().toQColor());
-                painter->drawPath(path);
+                m_painter->setPen(Qt::transparent);
+                m_painter->setBrush(color.value().toQColor());
+                m_painter->drawPath(path);
             }
             if (const auto image = background->image(); image && image->source()) {
-                painter->save();
-                painter->setClipPath(path);
+                m_painter->save();
+                m_painter->setClipPath(path);
 
                 QSizeF imageSize;
-                imageSize.setHeight(style->layout()->height().value_or(16));
-                imageSize.setWidth(style->layout()->width().value_or(16));
+                imageSize.setHeight(m_properties->layout()->height().value_or(16));
+                imageSize.setWidth(m_properties->layout()->width().value_or(16));
                 auto loadedImage = imageCache.load(image->source().value(), imageSize);
                 if (image->flags().value().testAnyFlag(Union::Properties::ImageFlag::Mask)) {
-                    painter->setBrush(Qt::transparent);
-                    painter->setPen(image->maskColor()->toQColor());
+                    m_painter->setBrush(Qt::transparent);
+                    m_painter->setPen(image->maskColor()->toQColor());
                     QBitmap mask = QBitmap::fromImage(loadedImage.createAlphaMask());
                     auto imageRect = innerRect;
                     imageRect.setWidth(mask.width());
                     imageRect.setHeight(mask.height());
                     imageRect.moveCenter(innerRect.center());
-                    painter->drawPixmap(imageRect.topLeft(), mask);
+                    m_painter->drawPixmap(imageRect.topLeft(), mask);
                 } else {
-                    painter->drawImage(innerRect, loadedImage);
+                    m_painter->drawImage(innerRect, loadedImage);
                 }
 
-                painter->restore();
+                m_painter->restore();
             }
         }
     }
     // Draw borders and corners (frame)
-    if (parts != BackgroundParts::PanelOnly) {
-        if (const auto border = style->border()) {
-            painter->setRenderHint(QPainter::Antialiasing, true);
+    if (m_drawParts != Parts::PanelOnly) {
+        if (const auto border = m_properties->border()) {
+            m_painter->setRenderHint(QPainter::Antialiasing, true);
             // Make simpler border shapes if complex ones are not necessary
             if (allBordersEqual && allBorderColorsEqual && allCornerRadiiEqual) { // All radii and borders identical
                 QPainterPath rectangularOutline;
@@ -149,9 +159,9 @@ void drawBackgroundRectangle(QPainter *painter,
 
                 rectangularOutline = rectangularOutline.subtracted(innerRectangularOutline);
 
-                painter->setPen(Qt::transparent);
-                painter->setBrush(border->top()->color().value().toQColor());
-                painter->drawPath(rectangularOutline);
+                m_painter->setPen(Qt::transparent);
+                m_painter->setBrush(border->top()->color().value().toQColor());
+                m_painter->drawPath(rectangularOutline);
             } else if (allBordersEqual && allBorderColorsEqual) { // All borders identical
                 QPainterPath rectangularOutline;
                 QPainterPath innerRectangularOutline;
@@ -161,50 +171,50 @@ void drawBackgroundRectangle(QPainter *painter,
 
                 rectangularOutline = rectangularOutline.subtracted(innerRectangularOutline);
 
-                painter->setPen(Qt::transparent);
-                painter->setBrush(border->top()->color().value().toQColor());
-                painter->drawPath(rectangularOutline);
+                m_painter->setPen(Qt::transparent);
+                m_painter->setBrush(border->top()->color().value().toQColor());
+                m_painter->drawPath(rectangularOutline);
             } else { // All other complex scenarios
-                const auto corners = style->corners();
+                const auto corners = m_properties->corners();
                 // Draw borders
                 if (const auto top = border->top()) {
-                    drawLineProperty(painter, rect, SubNodeIndex::Top, borderSizes, top, corners);
+                    drawLineProperty(m_painter, rect, SubNodeIndex::Top, borderSizes, top, corners);
                 }
                 if (const auto right = border->right()) {
-                    drawLineProperty(painter, rect, SubNodeIndex::Right, borderSizes, right, corners);
+                    drawLineProperty(m_painter, rect, SubNodeIndex::Right, borderSizes, right, corners);
                 }
                 if (const auto bottom = border->bottom()) {
-                    drawLineProperty(painter, rect, SubNodeIndex::Bottom, borderSizes, bottom, corners);
+                    drawLineProperty(m_painter, rect, SubNodeIndex::Bottom, borderSizes, bottom, corners);
                 }
                 if (const auto left = border->left()) {
-                    drawLineProperty(painter, rect, SubNodeIndex::Left, borderSizes, left, corners);
+                    drawLineProperty(m_painter, rect, SubNodeIndex::Left, borderSizes, left, corners);
                 }
 
                 // Draw corners if at least one border is present
                 if (borderSizes.top() || borderSizes.left()) {
                     const auto topLeft = corners ? corners->topLeft() : nullptr;
-                    drawCornerProperty(painter, rect, SubNodeIndex::TopLeft, border, topLeft);
+                    drawCornerProperty(m_painter, rect, SubNodeIndex::TopLeft, border, topLeft);
                 }
                 if (borderSizes.top() || borderSizes.right()) {
                     const auto topRight = corners ? corners->topRight() : nullptr;
-                    drawCornerProperty(painter, rect, SubNodeIndex::TopRight, border, topRight);
+                    drawCornerProperty(m_painter, rect, SubNodeIndex::TopRight, border, topRight);
                 }
                 if (borderSizes.bottom() || borderSizes.right()) {
                     const auto bottomRight = corners ? corners->bottomRight() : nullptr;
-                    drawCornerProperty(painter, rect, SubNodeIndex::BottomRight, border, bottomRight);
+                    drawCornerProperty(m_painter, rect, SubNodeIndex::BottomRight, border, bottomRight);
                 }
                 if (borderSizes.bottom() || borderSizes.left()) {
                     const auto bottomLeft = corners ? corners->bottomLeft() : nullptr;
-                    drawCornerProperty(painter, rect, SubNodeIndex::BottomLeft, border, bottomLeft);
+                    drawCornerProperty(m_painter, rect, SubNodeIndex::BottomLeft, border, bottomLeft);
                 }
             }
         }
     }
 
-    painter->restore();
+    m_painter->restore();
 }
 
-QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
+QPainterPath BackgroundDrawing::unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
 {
     QPainterPath path;
 
@@ -245,7 +255,22 @@ QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::Co
     return path;
 }
 
-Union::Properties::CornersPropertyGroup::CornerRadii constrainRadii(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
+void BackgroundDrawing::setParts(Parts parts)
+{
+    m_drawParts = parts;
+}
+
+void BackgroundDrawing::setOverrideBackgroundColor(const QColor &color)
+{
+    m_overrideColor = color;
+}
+void BackgroundDrawing::setRect(const QRectF &rect)
+{
+    m_drawRect = rect;
+}
+
+Union::Properties::CornersPropertyGroup::CornerRadii BackgroundDrawing::constrainRadii(const QRectF &rect,
+                                                                                       const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii)
 {
     auto topLeft = std::min({rect.width() / 2.0, rect.height() / 2.0, cornerRadii.topLeft});
     auto topRight = std::min({rect.width() / 2.0, rect.height() / 2.0, cornerRadii.topRight});
@@ -260,12 +285,12 @@ Union::Properties::CornersPropertyGroup::CornerRadii constrainRadii(const QRectF
     return constrainedRadii;
 }
 
-void drawLineProperty(QPainter *painter,
-                      const QRectF &rect,
-                      SubNodeIndex subNodeIndex,
-                      const QMarginsF &borderSizes,
-                      const Union::Properties::LinePropertyGroup *line,
-                      const Union::Properties::CornersPropertyGroup *corners)
+void BackgroundDrawing::drawLineProperty(QPainter *painter,
+                                         const QRectF &rect,
+                                         SubNodeIndex subNodeIndex,
+                                         const QMarginsF &borderSizes,
+                                         const Union::Properties::LinePropertyGroup *line,
+                                         const Union::Properties::CornersPropertyGroup *corners)
 {
     auto cornerRadii = corners ? constrainRadii(rect, corners->radii()) : Union::Properties::CornersPropertyGroup::CornerRadii{};
 
@@ -321,11 +346,11 @@ void drawLineProperty(QPainter *painter,
 }
 
 // TODO: Fix tiny gaps caused by antialiasing between corners and borders
-void drawCornerProperty(QPainter *painter,
-                        const QRectF &rect,
-                        SubNodeIndex subNodeIndex,
-                        const Union::Properties::BorderPropertyGroup *border,
-                        const Union::Properties::CornerPropertyGroup *corner)
+void BackgroundDrawing::drawCornerProperty(QPainter *painter,
+                                           const QRectF &rect,
+                                           SubNodeIndex subNodeIndex,
+                                           const Union::Properties::BorderPropertyGroup *border,
+                                           const Union::Properties::CornerPropertyGroup *corner)
 {
     const auto borderSizes = border->sizes();
 
@@ -382,116 +407,6 @@ void drawCornerProperty(QPainter *painter,
 
         startColor = border->bottom() ? border->bottom()->color().value().toQColor() : Qt::transparent;
         endColor = border->left() ? border->left()->color().value().toQColor() : Qt::transparent;
-
-        painter->translate(rect.x(), rect.y() + rect.height());
-        painter->rotate(270);
-    } break;
-
-    default: {
-        break;
-    }
-    }
-
-    innerRadius = std::max(radius - std::min(topMargin, leftMargin), 0.0);
-
-    // Draw path only when necessary, otherwise draw a simple rectangle
-    if (radius) {
-        path.moveTo(radius + leftMargin, 0);
-
-        path.lineTo(radius, 0);
-        path.arcTo(QRectF(0, 0, radius * 2, radius * 2), 90, 90);
-        path.lineTo(0, radius + topMargin);
-        path.lineTo(leftMargin, radius + topMargin);
-        path.lineTo(leftMargin, innerRadius + topMargin);
-        if (innerRadius) {
-            path.arcTo(QRectF(leftMargin, topMargin, innerRadius * 2, innerRadius * 2), 180, -90);
-        }
-        path.lineTo(leftMargin + radius, topMargin);
-        path.lineTo(leftMargin + radius, 0);
-        path.lineTo(radius, 0);
-
-        path.closeSubpath();
-    } else {
-        path.addRect(QRectF(0, 0, leftMargin, topMargin));
-    }
-
-    if (startColor == endColor) {
-        painter->setBrush(startColor);
-    } else {
-        cornerTransition = QLinearGradient(QPointF(0, radius + topMargin), QPointF(radius + leftMargin, 0));
-        cornerTransition.setColorAt(0, startColor);
-        cornerTransition.setColorAt(1, endColor);
-        painter->setBrush(QBrush(cornerTransition));
-    }
-
-    painter->drawPath(path);
-    painter->restore();
-}
-
-void drawOutlineCornerProperty(QPainter *painter,
-                               const QRectF &rect,
-                               SubNodeIndex subNodeIndex,
-                               const Union::Properties::OutlinePropertyGroup *outline,
-                               const Union::Properties::CornerPropertyGroup *corner)
-{
-    const auto borderSizes = QMarginsF(outline->left()->size().value_or(0),
-                                       outline->top()->size().value_or(0),
-                                       outline->right()->size().value_or(0),
-                                       outline->bottom()->size().value_or(0));
-
-    QPainterPath path;
-    QLinearGradient cornerTransition;
-    const auto radius =
-        corner ? std::min<double>({static_cast<double>(rect.width()) / 2, static_cast<double>(rect.height()) / 2, corner->radius().value_or(0.0)}) : 0.0;
-    double innerRadius = 0.0;
-    // Start, end, top and left assume a top-left corner being drawn clockwise which gets rotated
-    double topMargin = 0.0;
-    double leftMargin = 0.0;
-    QColor startColor = Qt::transparent;
-    QColor endColor = Qt::transparent;
-
-    painter->save();
-    painter->setPen(Qt::transparent);
-
-    switch (subNodeIndex) {
-    case SubNodeIndex::TopLeft: {
-        leftMargin = borderSizes.left();
-        topMargin = borderSizes.top();
-
-        startColor = outline->left() ? outline->left()->color().value().toQColor() : Qt::transparent;
-        endColor = outline->top() ? outline->top()->color().value().toQColor() : Qt::transparent;
-
-        painter->translate(rect.x(), rect.y());
-    } break;
-
-    case SubNodeIndex::TopRight: {
-        leftMargin = borderSizes.top();
-        topMargin = borderSizes.right();
-
-        startColor = outline->top() ? outline->top()->color().value().toQColor() : Qt::transparent;
-        endColor = outline->right() ? outline->right()->color().value().toQColor() : Qt::transparent;
-
-        painter->translate(rect.x() + rect.width(), rect.y());
-        painter->rotate(90);
-    } break;
-
-    case SubNodeIndex::BottomRight: {
-        leftMargin = borderSizes.right();
-        topMargin = borderSizes.bottom();
-
-        startColor = outline->right() ? outline->right()->color().value().toQColor() : Qt::transparent;
-        endColor = outline->bottom() ? outline->bottom()->color().value().toQColor() : Qt::transparent;
-
-        painter->translate(rect.x() + rect.width(), rect.y() + rect.height());
-        painter->rotate(180);
-    } break;
-
-    case SubNodeIndex::BottomLeft: {
-        leftMargin = borderSizes.bottom();
-        topMargin = borderSizes.left();
-
-        startColor = outline->bottom() ? outline->bottom()->color().value().toQColor() : Qt::transparent;
-        endColor = outline->left() ? outline->left()->color().value().toQColor() : Qt::transparent;
 
         painter->translate(rect.x(), rect.y() + rect.height());
         painter->rotate(270);
