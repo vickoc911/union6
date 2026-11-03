@@ -13,28 +13,29 @@ class BackgroundDrawing : public QObject
 {
     Q_OBJECT
 public:
-    enum class BackgroundParts {
+    enum class Parts {
         All,
         PanelOnly,
         FrameOnly
     };
+    Q_ENUM(Parts)
 
-    BackgroundDrawing(QPainter *painter, const Union::StylePropertyGroupPtr &style, const QStyleOption *option, const QWidget *widget = nullptr);
+    BackgroundDrawing(QPainter *painter, const Union::StylePropertyGroupPtr &properties, const QStyleOption *option, const QWidget *widget = nullptr);
     ~BackgroundDrawing() override;
 
     /*!
      * \brief Draw a Union StylePropertyGroup, such as the center, border and corners.
      */
-    void drawBackgroundRectangle();
+    void draw();
 
     /*!
      * \brief Generates a QPainterPath to use with outlines and rounded corners.
      */
-    QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii);
+    static QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii);
 
-    void setDrawParts(BackgroundParts parts);
+    void setParts(Parts parts);
     void setOverrideBackgroundColor(const QColor &color);
-    void setDrawRect(const QRectF &rect);
+    void setRect(const QRectF &rect);
 
 private:
     enum class SubNodeIndex {
@@ -73,11 +74,11 @@ private:
                             const Union::Properties::CornerPropertyGroup *corner);
 
     QPainter *m_painter;
-    Union::StylePropertyGroupPtr m_style;
+    Union::StylePropertyGroupPtr m_properties;
     const QStyleOption *m_option;
     const QWidget *m_widget;
 
-    BackgroundParts m_drawParts;
+    Parts m_drawParts;
     QRectF m_drawRect;
     QColor m_overrideColor;
 };

@@ -18,13 +18,13 @@
 
 static Union::LruImageCache imageCache;
 
-BackgroundDrawing::BackgroundDrawing(QPainter *painter, const Union::StylePropertyGroupPtr &style, const QStyleOption *option, const QWidget *widget)
+BackgroundDrawing::BackgroundDrawing(QPainter *painter, const Union::StylePropertyGroupPtr &properties, const QStyleOption *option, const QWidget *widget)
     : QObject(nullptr)
     , m_painter(painter)
-    , m_style(style)
+    , m_properties(properties)
     , m_option(option)
     , m_widget(widget)
-    , m_drawParts(BackgroundParts::All)
+    , m_drawParts(Parts::All)
     , m_drawRect(option->rect)
     , m_overrideColor(QColor())
 {
@@ -34,9 +34,9 @@ BackgroundDrawing::~BackgroundDrawing()
 {
 }
 
-void BackgroundDrawing::drawBackgroundRectangle()
+void BackgroundDrawing::draw()
 {
-    if (!m_style) {
+    if (!m_properties) {
         return;
     }
 
@@ -44,11 +44,11 @@ void BackgroundDrawing::drawBackgroundRectangle()
 
     QRectF rect = m_drawRect;
     // Remove any insets we may have, we do not want to draw them
-    if (m_style->layout() && m_style->layout()->inset()) {
+    if (m_properties->layout() && m_properties->layout()->inset()) {
         auto height = rect.height();
         auto width = rect.width();
         // Ensure we do not go out of bounds
-        rect = rect.marginsRemoved(m_style->layout()->inset()->toMargins());
+        rect = rect.marginsRemoved(m_properties->layout()->inset()->toMargins());
         if (rect.height() <= 0 || rect.width() <= 0) {
             rect = centerRect(rect.toRect(), width, height);
         }
@@ -60,7 +60,7 @@ void BackgroundDrawing::drawBackgroundRectangle()
     bool allBordersEqual = false;
     bool allBorderColorsEqual = false;
 
-    if (const auto border = m_style->border()) {
+    if (const auto border = m_properties->border()) {
         borderSizes = border->sizes();
         allBordersEqual = qFuzzyCompare(borderSizes.left(), borderSizes.right()) && qFuzzyCompare(borderSizes.top(), borderSizes.bottom())
             && qFuzzyCompare(borderSizes.left(), borderSizes.top());
@@ -80,7 +80,7 @@ void BackgroundDrawing::drawBackgroundRectangle()
     Union::Properties::CornersPropertyGroup::CornerRadii innerCornerRadii = {0, 0, 0, 0};
     bool allCornerRadiiEqual = false;
 
-    if (const auto corners = m_style->corners()) {
+    if (const auto corners = m_properties->corners()) {
         cornerRadii = corners->radii();
         constrainedRadii = constrainRadii(rect, cornerRadii);
         allCornerRadiiEqual = qFuzzyCompare(constrainedRadii.topLeft, constrainedRadii.topRight)
@@ -90,7 +90,7 @@ void BackgroundDrawing::drawBackgroundRectangle()
 
         // Make space for outlines
         // Shrink inner radii
-        if (m_style->border()) {
+        if (m_properties->border()) {
             innerCornerRadii = {std::max(innerCornerRadii.topLeft - std::min(borderSizes.top(), borderSizes.left()), 0.0),
                                 std::max(innerCornerRadii.topRight - std::min(borderSizes.top(), borderSizes.right()), 0.0),
                                 std::max(innerCornerRadii.bottomLeft - std::min(borderSizes.bottom(), borderSizes.left()), 0.0),
@@ -99,8 +99,8 @@ void BackgroundDrawing::drawBackgroundRectangle()
     }
 
     // Draw background (panel)
-    if (m_drawParts != BackgroundParts::FrameOnly) {
-        if (const auto background = m_style->background()) {
+    if (m_drawParts != Parts::FrameOnly) {
+        if (const auto background = m_properties->background()) {
             QPainterPath path;
             // Draw less complex rectangles if complex ones are not needed
             if (allCornerRadiiEqual && !constrainedRadii.topLeft) {
@@ -125,8 +125,8 @@ void BackgroundDrawing::drawBackgroundRectangle()
                 m_painter->setClipPath(path);
 
                 QSizeF imageSize;
-                imageSize.setHeight(m_style->layout()->height().value_or(16));
-                imageSize.setWidth(m_style->layout()->width().value_or(16));
+                imageSize.setHeight(m_properties->layout()->height().value_or(16));
+                imageSize.setWidth(m_properties->layout()->width().value_or(16));
                 auto loadedImage = imageCache.load(image->source().value(), imageSize);
                 if (image->flags().value().testAnyFlag(Union::Properties::ImageFlag::Mask)) {
                     m_painter->setBrush(Qt::transparent);
@@ -146,8 +146,8 @@ void BackgroundDrawing::drawBackgroundRectangle()
         }
     }
     // Draw borders and corners (frame)
-    if (m_drawParts != BackgroundParts::PanelOnly) {
-        if (const auto border = m_style->border()) {
+    if (m_drawParts != Parts::PanelOnly) {
+        if (const auto border = m_properties->border()) {
             m_painter->setRenderHint(QPainter::Antialiasing, true);
             // Make simpler border shapes if complex ones are not necessary
             if (allBordersEqual && allBorderColorsEqual && allCornerRadiiEqual) { // All radii and borders identical
@@ -175,7 +175,7 @@ void BackgroundDrawing::drawBackgroundRectangle()
                 m_painter->setBrush(border->top()->color().value().toQColor());
                 m_painter->drawPath(rectangularOutline);
             } else { // All other complex scenarios
-                const auto corners = m_style->corners();
+                const auto corners = m_properties->corners();
                 // Draw borders
                 if (const auto top = border->top()) {
                     drawLineProperty(m_painter, rect, SubNodeIndex::Top, borderSizes, top, corners);
@@ -255,7 +255,7 @@ QPainterPath BackgroundDrawing::unevenRadiiRectPath(const QRectF &rect, const Un
     return path;
 }
 
-void BackgroundDrawing::setDrawParts(BackgroundParts parts)
+void BackgroundDrawing::setParts(Parts parts)
 {
     m_drawParts = parts;
 }
@@ -264,7 +264,7 @@ void BackgroundDrawing::setOverrideBackgroundColor(const QColor &color)
 {
     m_overrideColor = color;
 }
-void BackgroundDrawing::setDrawRect(const QRectF &rect)
+void BackgroundDrawing::setRect(const QRectF &rect)
 {
     m_drawRect = rect;
 }

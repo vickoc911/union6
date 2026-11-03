@@ -108,7 +108,9 @@ void RadioButtonElement::updateSubElementList()
 
 void RadioButtonElement::drawIndicator(QPainter *painter) const
 {
-    drawBackgroundRectangle(painter, subElementRect(QStyle::SE_RadioButtonIndicator), m_indicatorProperties);
+    BackgroundDrawing b(painter, m_indicatorProperties, m_styleOption, m_widget);
+    b.setRect(subElementRect(QStyle::SE_RadioButtonIndicator));
+    b.draw();
 }
 
 Union::IdentifierList RadioButtonElement::elementHints() const
