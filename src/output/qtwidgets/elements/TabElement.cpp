@@ -45,6 +45,7 @@ void TabElement::update()
     setText(m_tabOption->text);
     updateSubElementList();
     layout();
+    updateGraphicsEffect(m_tabOption->rect);
 }
 
 void TabElement::draw(QPainter *painter, DrawEnums enums) const

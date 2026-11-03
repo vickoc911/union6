@@ -38,6 +38,7 @@ void RadioButtonElement::update()
     setText(m_buttonOption->text);
     updateSubElementList();
     layout();
+    updateGraphicsEffect(m_buttonOption->rect);
 }
 
 void RadioButtonElement::draw(QPainter *painter, DrawEnums enums) const
