@@ -146,15 +146,25 @@ Q_ENUM_NS(TextDecoration)
 Q_DECLARE_FLAGS(TextDecorations, TextDecoration)
 
 /*!
- * \enum Union::Properties::TextAlignment
+ * \enum Union::Properties::HorizontalTextAlignment
  */
-enum class TextAlignment {
+enum class HorizontalTextAlignment {
     Start = Qt::AlignLeft,
     Center = Qt::AlignHCenter,
     End = Qt::AlignRight,
     Justify = Qt::AlignJustify,
 };
-Q_ENUM_NS(TextAlignment)
+Q_ENUM_NS(HorizontalTextAlignment)
+
+/*!
+ * \enum Union::Properties::VerticalTextAlignment
+ */
+enum class VerticalTextAlignment {
+    Top = Qt::AlignTop,
+    Middle = Qt::AlignVCenter,
+    Bottom = Qt::AlignBottom,
+};
+Q_ENUM_NS(VerticalTextAlignment)
 
 /*
  * A template method to get an empty value of a certain type.

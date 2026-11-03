@@ -55,7 +55,8 @@ css_type_map = {
     "Union::Properties::TextElide": "none | left | middle | right",
     # Note: This syntax is rather long because we currently do not support lists of keywords
     "Union::Properties::TextDecorations": "none | ((underline | overline | line-through) (underline | overline | line-through) (underline | overline | line-through)) | ((underline | overline | line-through) (underline | overline | line-through)) | (underline | overline | line-through)",
-    "Union::Properties::TextAlignment": "start | center | end | justify",
+    "Union::Properties::HorizontalTextAlignment": "start | center | end | justify",
+    "Union::Properties::VerticalTextAlignment": "top | middle | bottom",
 }
 
 

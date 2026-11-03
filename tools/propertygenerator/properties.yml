@@ -424,16 +424,27 @@ children:
                                 return m_state->toQFont();
                             }
 
-            alignment:
-                type: Union::Properties::TextAlignment
+            horizontalAlignment:
+                type: Union::Properties::HorizontalTextAlignment
                 doc: |
-                    The alignment of the text of an element. This is distinct from layout
-                    alignment in that layout alignment determines the alignment of an element's
-                    box within an item, but the text alignment determines how the text aligns
-                    within that box.
+                    The horizontal alignment of the text of an element. This is distinct from
+                    layout alignment in that layout alignment determines the alignment of an
+                    element's box within an item, but the text alignment determines how the
+                    text aligns within that box.
 
                 css:
                     name: text-align
+
+            verticalAlignment:
+                type: Union::Properties::VerticalTextAlignment
+                doc: |
+                    The vertical alignment of the text of an element. This is distinct from
+                    layout alignment in that layout alignment determines the alignment of an
+                    element's box within an item, but the text alignment determines how the
+                    text aligns within that box.
+
+                css:
+                    name: vertical-align
 
             wrapMode:
                 type: Union::Properties::TextWrapMode
