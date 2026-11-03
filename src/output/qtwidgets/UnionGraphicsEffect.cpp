@@ -24,15 +24,16 @@ void UnionGraphicsEffect::draw(QPainter *painter)
     QGraphicsDropShadowEffect::draw(painter);
 
     // Now draw outline
-    if (m_isValid && !m_outlineRect.isNull()) {
+    if (m_isValid) {
         auto outlineColor =
             safePropertyLookup(m_properties, Union::Color(), &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::color);
 
-        UnionPainter p(painter, m_properties);
-        // need to resize the painter area for these
-        p.setRect(m_outlineRect.adjusted(-10, -10, 10, 10));
-        p.setParts(UnionPainter::Parts::Outline);
-        p.draw();
+        if (outlineColor.isValid()) {
+            UnionPainter p(painter, m_properties);
+            p.setRect(boundingRect());
+            p.setParts(UnionPainter::Parts::Outline);
+            p.draw();
+        }
     }
 }
 
@@ -52,7 +53,16 @@ void UnionGraphicsEffect::setProperties(Union::StylePropertyGroupPtr properties)
     }
 }
 
-void UnionGraphicsEffect::setOutlineRect(const QRectF &rect)
+QRectF UnionGraphicsEffect::boundingRectFor(const QRectF &rect) const
 {
-    m_outlineRect = rect;
+    auto newRect = QGraphicsDropShadowEffect::boundingRectFor(rect);
+    if (m_properties) {
+        QMarginsF outlineSize;
+        outlineSize.setTop(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::size));
+        outlineSize.setLeft(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::left, &LinePropertyGroup::size));
+        outlineSize.setBottom(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::bottom, &LinePropertyGroup::size));
+        outlineSize.setRight(safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::right, &LinePropertyGroup::size));
+        newRect = newRect.marginsAdded(outlineSize);
+    }
+    return newRect;
 }

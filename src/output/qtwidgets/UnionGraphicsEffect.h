@@ -19,12 +19,11 @@ public:
     ~UnionGraphicsEffect() override;
 
     void setProperties(Union::StylePropertyGroupPtr properties);
-    void setOutlineRect(const QRectF &rect);
-
     void draw(QPainter *painter) override;
+
+    QRectF boundingRectFor(const QRectF &rect) const override;
 
 private:
     Union::StylePropertyGroupPtr m_properties;
     bool m_isValid;
-    QRectF m_outlineRect;
 };
