@@ -360,6 +360,9 @@ void CssLoader::createProperties(StylePropertyGroup *output, std::span<const css
             ,Case{StartsWith{"font"}, [&]{
                 setTextProperty(output, property);
             }}
+            ,Case{"vertical-align", [&]{
+                setTextProperty(output, property);
+            }}
             ,Case{StartsWith{"icon"}, [&]{
                 setIconProperty(output, property);
             }}
@@ -529,7 +532,10 @@ void CssLoader::setTextProperty(StylePropertyGroup *output, const cssparser::Pro
     /* clang-format off */
     switchString(property
         ,Case{"text-align", [&](auto &&value) {
-            text->setAlignment(toEnumValue<TextAlignment>(value));
+            text->setHorizontalAlignment(toEnumValue<HorizontalTextAlignment>(value));
+        }}
+        ,Case{"vertical-align", [&](auto &&value) {
+            text->setVerticalAlignment(toEnumValue<VerticalTextAlignment>(value));
         }}
         ,Case{StartsWith{"font"}, [&]{
             setFontProperty(text.instance, property);
