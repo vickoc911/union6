@@ -27,6 +27,8 @@ target_sources(UnionWidgetsStyle PRIVATE
         UnionStyle.h
         UnionStylePlugin.cpp
         UnionStylePlugin.h
+        UnionGraphicsEffect.cpp
+        UnionGraphicsEffect.h
         elements/AbstractElement.cpp
         elements/AbstractElement.h
         elements/ButtonElement.cpp
