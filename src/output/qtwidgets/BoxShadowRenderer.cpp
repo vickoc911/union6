@@ -263,7 +263,7 @@ static void renderShadow(QPainter *painter, const QRectF &rect, const BoxShadowR
     shadowPainter.setPen(Qt::NoPen);
     shadowPainter.setBrush(Qt::black);
 
-    auto path = unevenRadiiRectPath(boxRect, shadow.cornerRadius);
+    auto path = BackgroundDrawing::unevenRadiiRectPath(boxRect, shadow.cornerRadius);
     shadowPainter.drawPath(path);
 
     shadowPainter.end();
