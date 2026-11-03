@@ -37,6 +37,7 @@ void CheckBoxElement::update()
     }
     updateSubElementList();
     layout();
+    updateGraphicsEffect(m_buttonOption->rect);
 }
 
 void CheckBoxElement::draw(QPainter *painter, DrawEnums enums) const

@@ -225,6 +225,12 @@ protected:
      */
     void drawTextAtRect(QPainter *painter, const QString &text, const QRectF &rect, const Union::StylePropertyGroupPtr &properties = nullptr) const;
 
+    /*!
+     * \brief Updates the outline and dropshadow for the element,
+     * if it has the graphics widget added.
+     */
+    void updateGraphicsEffect(const QRectF &rect, const Union::StylePropertyGroupPtr &properties = nullptr) const;
+
     const QStyleOption *m_styleOption = nullptr;
     const UnionStyle *m_style = nullptr;
     const QWidget *m_widget = nullptr;

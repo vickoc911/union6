@@ -40,6 +40,7 @@ void SliderElement::update()
     }
     updateSubElementList();
     layout();
+    updateGraphicsEffect(subControlRect(QStyle::SC_SliderHandle));
 }
 
 void SliderElement::layout()
