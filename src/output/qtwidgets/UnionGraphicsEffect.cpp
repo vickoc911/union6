@@ -27,9 +27,12 @@ void UnionGraphicsEffect::draw(QPainter *painter)
     if (m_isValid && !m_outlineRect.isNull()) {
         auto outlineColor =
             safePropertyLookup(m_properties, Union::Color(), &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::color);
-        auto outlineSize = safePropertyLookup(m_properties, 0.0, &StylePropertyGroup::outline, &OutlinePropertyGroup::top, &LinePropertyGroup::size);
 
-        if (const auto border = m_properties->outline()) { }
+        BackgroundDrawing p(painter, m_properties);
+        // need to resize the painter area for these
+        p.setRect(m_outlineRect.adjusted(-10, -10, 10, 10));
+        p.setParts(BackgroundDrawing::Parts::Outline);
+        p.draw();
     }
 }
 

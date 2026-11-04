@@ -20,6 +20,14 @@ ButtonElement::ButtonElement(const QStyleOptionButton *option, const UnionStyle 
     , m_buttonOption(option)
 {
     update();
+    if (m_styleOption) {
+        if (auto widget = qobject_cast<QWidget *>(m_styleOption->styleObject)) {
+            if (auto graphics = qobject_cast<UnionGraphicsEffect *>(widget->graphicsEffect())) {
+                graphics->setProperties(m_elementProperties);
+                graphics->setOutlineRect(m_styleOption->rect);
+            }
+        }
+    }
 }
 
 ButtonElement::~ButtonElement()
