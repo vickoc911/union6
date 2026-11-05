@@ -6,8 +6,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import org.kde.union.impl as Union
-
-import "private" as P
+import org.kde.union.private as P
 
 T.SwitchDelegate {
     id: control
@@ -64,43 +63,7 @@ T.SwitchDelegate {
 
     contentItem: P.DefaultContentItem { control: control }
 
-    indicator:  Item {
-        Union.Element.type: "Indicator"
-        Union.Element.states {
-            hovered: control.hovered
-            activeFocus: control.activeFocus
-            visualFocus: control.visualFocus
-            pressed: control.down
-            checked: control.checked
-            enabled: control.enabled
-        }
-
-        implicitWidth: Union.Style.properties.layout.width ?? 0
-        implicitHeight: Union.Style.properties.layout.height ?? 0
-
-        Union.PositionedItem.minimumWidth: Union.Style.properties.layout.width
-        Union.PositionedItem.minimumHeight: Union.Style.properties.layout.height
-
-        Union.StyledRectangle { anchors.fill: parent }
-
-        Union.StyledRectangle {
-            Union.Element.type: "Handle"
-            Union.Element.states {
-                hovered: control.hovered
-                activeFocus: control.activeFocus
-                visualFocus: control.visualFocus
-                pressed: control.down
-                checked: control.checked
-                enabled: control.enabled
-            }
-
-            anchors.verticalCenter: parent.verticalCenter
-
-            property real minimumX: Union.Style.properties.layout.margins.left ?? 0
-            property real maximumX: parent.width - width - (Union.Style.properties.layout.margins.right ?? 0)
-            x: Math.max(minimumX, Math.min(maximumX, minimumX + control.visualPosition * (maximumX - minimumX)))
-        }
-    }
+    indicator: P.SwitchIndicator { control: control }
 
     background: Union.StyledRectangle { }
 }

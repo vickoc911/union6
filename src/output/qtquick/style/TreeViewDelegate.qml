@@ -6,8 +6,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import org.kde.union.impl as Union
-
-import "private" as P
+import org.kde.union.private as P
 
 T.TreeViewDelegate {
     id: control
@@ -89,13 +88,8 @@ T.TreeViewDelegate {
         visible: control.isTreeNode && implicitWidth > 0
     }
 
-    indicator: Union.Icon {
-        Union.Element.type: "Indicator"
-        implicitWidth: Union.Style.properties.layout.width ?? 0
-        implicitHeight: Union.Style.properties.layout.height ?? 0
-        color: Union.Style.properties.icon.color
-        name: Union.Style.properties.icon.name
-        visible: control.isTreeNode && control.hasChildren
+    indicator: P.DefaultIndicator {
+        visible: control.isTreeNode && control.hasChildren && (Union.Style.properties.display.visible ?? true)
     }
 
     contentItem: P.DefaultContentItem {

@@ -6,8 +6,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import org.kde.union.impl as Union
-
-import "private" as P
+import org.kde.union.private as P
 
 T.TextField {
     id: control
@@ -55,24 +54,9 @@ T.TextField {
     horizontalAlignment: Union.Alignment.toQtHorizontal(Union.Style.properties.text.alignment.horizontal)
     verticalAlignment: Union.Alignment.toQtVertical(Union.Style.properties.text.alignment.vertical)
 
-    Text {
+    P.PlaceholderText {
         id: placeholder
-
-        Union.Element.hints: Union.ElementHint { name: "placeholder" }
-
-        x: control.leftPadding
-        y: control.topPadding
-        width: control.width - (control.leftPadding + control.rightPadding)
-        height: control.height - (control.topPadding + control.bottomPadding)
-
-        text: control.placeholderText
-        font: Union.Style.properties.text.font.qFont ?? Application.font
-        color: Union.Style.properties.text.color ?? control.palette.placeholderText
-        horizontalAlignment: control.horizontalAlignment
-        verticalAlignment: control.verticalAlignment
-        visible: !control.length && !control.preeditText
-        elide: Text.ElideRight
-        renderType: control.renderType
+        control: control
     }
 
     background: Union.StyledRectangle {}

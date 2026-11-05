@@ -4,9 +4,9 @@
 
 import QtQuick
 import QtQuick.Templates as T
-import org.kde.union.impl as Union
 
-import "private" as P
+import org.kde.union.impl as Union
+import org.kde.union.private as P
 
 T.DelayButton {
     id: control
@@ -63,18 +63,13 @@ T.DelayButton {
 
     contentItem: P.DefaultContentItem { control: control }
 
-    indicator: Union.Icon {
-        Union.Element.type: "Indicator"
-        implicitWidth: Union.Style.properties.layout.width ?? 0
-        implicitHeight: Union.Style.properties.layout.height ?? 0
-        name: Union.Style.properties.icon.name
-        color: Union.Style.properties.icon.color
-        visible: name !== ""
-    }
+    indicator: P.DefaultIndicator { }
 
     background: Union.StyledRectangle {
+        id: background
+
         Union.StyledRectangle {
-            Union.Element.type: "Fill"
+            Union.Element.type: "Filled"
             x: control.mirrored ? parent.width * (1.0 - control.progress) : 0.0
             width: control.progress * parent.width
             height: parent.height

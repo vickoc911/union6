@@ -8,8 +8,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import org.kde.union.impl as Union
-
-import "private" as P
+import org.kde.union.private as P
 
 T.SearchField {
     id: control
@@ -60,23 +59,13 @@ T.SearchField {
         required property int index
     }
 
-    searchIndicator.indicator: Union.Icon {
+    searchIndicator.indicator: P.DefaultIndicator {
         Union.Element.type: "SearchIndicator"
-        color: Union.Style.properties.icon.color
-        implicitWidth: Union.Style.properties.icon.width
-        implicitHeight: Union.Style.properties.icon.height
-        name: Union.Style.properties.icon.name
-        source: Union.Style.properties.icon.source
     }
 
-    clearIndicator.indicator: Union.Icon {
+    clearIndicator.indicator: P.DefaultIndicator {
         Union.Element.type: "ClearIndicator"
-        color: Union.Style.properties.icon.color
-        implicitWidth: Union.Style.properties.icon.width
-        implicitHeight: Union.Style.properties.icon.height
-        name: Union.Style.properties.icon.name
-        source: Union.Style.properties.icon.source
-        visible: control.text.length > 0
+        visible: control.text.length > 0 && (Union.Style.properties.display.visible ?? true)
     }
 
     contentItem: T.TextField {
@@ -89,23 +78,8 @@ T.SearchField {
         horizontalAlignment: Union.Alignment.toQtHorizontal(control.Union.Style.properties.text.alignment.horizontal)
         verticalAlignment: Union.Alignment.toQtVertical(control.Union.Style.properties.text.alignment.vertical)
 
-        Text {
-            id: placeholder
-
-            Union.Element.hints: Union.ElementHint { name: "placeholder" }
-
-            x: parent.leftPadding
-            y: parent.topPadding
-            width: parent.width - parent.leftPadding - parent.rightPadding
-            height: parent.height - parent.topPadding - parent.bottomPadding
-
-            text: control.placeholderText
-            font: parent.font
-            color: control.palette.placeholderText
-            visible: !parent.length && !parent.preeditText && (!parent.activeFocus || parent.horizontalAlignment !== Qt.AlignHCenter)
-            verticalAlignment: parent.verticalAlignment
-            renderType: parent.renderType
-            elide: parent.wrapMode == Text.NoWrap ? Text.ElideRight : Text.ElideNone
+        P.PlaceholderText {
+            control: parent
         }
     }
 

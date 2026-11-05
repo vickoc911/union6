@@ -6,8 +6,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import org.kde.union.impl as Union
-
-import "private" as P
+import org.kde.union.private as P
 
 T.RadioButton {
     id: control
@@ -56,9 +55,7 @@ T.RadioButton {
 
     Union.Positioner.positionItems: [contentItem, indicator]
 
-    indicator: Union.StyledRectangle {
-        Union.Element.type: "Indicator"
-    }
+    indicator: P.DefaultIndicator { }
 
     contentItem: P.DefaultContentItem {
         control: control
