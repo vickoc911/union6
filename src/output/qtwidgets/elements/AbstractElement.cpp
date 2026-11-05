@@ -329,6 +329,9 @@ void AbstractElement::drawTextAtRect(QPainter *painter, const QString &text, con
             }
         }
         textFlags = textFlagsFromProperties(properties);
+        if (m_flags.testFlag(AbstractElementFlag::DrawMnemonics)) {
+            textFlags |= Qt::TextHideMnemonic;
+        }
         painter->save();
         painter->setPen(textColor);
         painter->setFont(font);
@@ -573,6 +576,9 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const Union::ElementList &e
             auto textFlags = textFlagsFromProperties(properties);
             textFlags |= Qt::TextShowMnemonic;
             auto fontMetrics = opt->fontMetrics;
+            if (m_widget) {
+                fontMetrics = QFontMetrics(m_widget->font());
+            }
             auto styleFont = properties->safePropertyLookup(std::optional<QFont>(), &StylePropertyGroup::text, &TextPropertyGroup::font);
             if (styleFont.has_value()) {
                 fontMetrics = QFontMetrics(styleFont.value());
