@@ -3,6 +3,7 @@
 
 #include "ItemViewElement.h"
 #include "SharedNames.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -177,8 +178,8 @@ void ItemViewElement::drawBackground(QPainter *painter) const
         const auto radius =
             safePropertyLookup(m_elementProperties, CornersPropertyGroup::CornerRadii(), &StylePropertyGroup::corners, &CornersPropertyGroup::radii);
 
-        UnionPainter b(painter, m_elementProperties, m_viewItemOption, m_widget);
-        const auto path = b.unevenRadiiRectPath(rect, radius);
+        UnionPainter unionPainter(painter, m_elementProperties);
+        const auto path = unionPainter.unevenRadiiRectPath(rect, radius);
         painter->setPen(Qt::NoPen);
         painter->setBrush(m_viewItemOption->backgroundBrush);
         painter->drawPath(path);
@@ -193,10 +194,11 @@ void ItemViewElement::drawBackground(QPainter *painter) const
             overrideColor = m_viewItemOption->backgroundBrush.color();
             parts = UnionPainter::Parts::PanelOnly;
         }
-        UnionPainter b(painter, m_elementProperties, m_styleOption, m_widget);
-        b.setOverrideBackgroundColor(overrideColor);
-        b.setParts(parts);
-        b.draw();
+        UnionPainter unionPainter(painter, m_elementProperties);
+        unionPainter.setOverrideBackgroundColor(overrideColor);
+        unionPainter.setParts(parts);
+        unionPainter.setRect(m_viewItemOption->rect);
+        unionPainter.draw();
     }
     painter->restore();
 }
