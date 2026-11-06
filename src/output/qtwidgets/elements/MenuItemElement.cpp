@@ -5,6 +5,7 @@
 #include "PropertiesTypes.h"
 #include "SharedNames.h"
 #include "StyleUtils.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include "elements/AbstractElement.h"
 #include <QApplication>
@@ -77,7 +78,9 @@ void MenuItemElement::draw(QPainter *painter, DrawEnums enums) const
     case QStyle::CE_MenuItem:
         drawBackground(painter);
         if (m_hasCheckBox || m_hasRadioButton) {
-            drawBackgroundRectangle(painter, m_layoutMap[ElementString::Indicator].rect, m_checkProperties);
+            UnionPainter unionPainter(painter, m_checkProperties);
+            unionPainter.setRect(m_layoutMap[ElementString::Indicator].rect);
+            unionPainter.draw();
         }
         drawIcon(painter);
         drawText(painter);
@@ -225,9 +228,13 @@ void MenuItemElement::drawBackground(QPainter *painter) const
             }
         }
         // Ensure the rectangle is resized according to the menu margins
-        drawBackgroundRectangle(painter, rect, m_separatorProperties);
+        UnionPainter unionPainter(painter, m_separatorProperties);
+        unionPainter.setRect(rect);
+        unionPainter.draw();
     } else {
-        drawBackgroundRectangle(painter, m_menuItemOption->rect, m_elementProperties);
+        UnionPainter unionPainter(painter, m_elementProperties);
+        unionPainter.setRect(m_styleOption->rect);
+        unionPainter.draw();
     }
 }
 

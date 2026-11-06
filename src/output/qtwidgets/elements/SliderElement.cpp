@@ -3,6 +3,7 @@
 
 #include "SliderElement.h"
 #include "SharedNames.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include "elements/AbstractElement.h"
 #include <QApplication>
@@ -39,6 +40,7 @@ void SliderElement::update()
         m_isReverse = !m_isReverse;
     }
     layout();
+    updateGraphicsEffect(subControlRect(QStyle::SC_SliderHandle));
 }
 
 void SliderElement::layout()
@@ -113,7 +115,9 @@ void SliderElement::draw(QPainter *painter, DrawEnums enums) const
             progress.setHeight(progressHeight);
         }
     }
-    drawBackgroundRectangle(painter, progress, m_contentProperties);
+    UnionPainter unionPainter(painter, m_contentProperties);
+    unionPainter.setRect(progress);
+    unionPainter.draw();
 
     // Tickmark drawing is copied from breeze
     if (m_sliderOption && m_tickProperties && m_sliderOption->subControls.testFlag(QStyle::SC_SliderTickmarks)) {
@@ -143,11 +147,15 @@ void SliderElement::draw(QPainter *painter, DrawEnums enums) const
                 const int position(m_style->sliderPositionFromValue(m_sliderOption->minimum, m_sliderOption->maximum, current, available, m_isInverted)
                                    + handleOffset);
                 for (const auto &tickLine : std::as_const(ticks)) {
+                    QRectF translatedRect;
                     if (m_isHorizontal) {
-                        drawBackgroundRectangle(painter, tickLine.translated(reverse ? (rect.width() - position) : position, 0), props);
+                        translatedRect = tickLine.translated(reverse ? (rect.width() - position) : position, 0);
                     } else {
-                        drawBackgroundRectangle(painter, tickLine.translated(0, position), props);
+                        translatedRect = tickLine.translated(0, position);
                     }
+                    UnionPainter unionPainter(painter, props);
+                    unionPainter.setRect(translatedRect);
+                    unionPainter.draw();
                 }
 
                 // go to next position
@@ -157,14 +165,16 @@ void SliderElement::draw(QPainter *painter, DrawEnums enums) const
     }
 
     // Handle
-    auto handle = subControlRect(QStyle::SC_SliderHandle);
-    drawBackgroundRectangle(painter, handle, m_indicatorProperties);
+    UnionPainter handlePainter(painter, m_indicatorProperties);
+    handlePainter.setRect(subControlRect(QStyle::SC_SliderHandle));
+    handlePainter.draw();
 }
 
 void SliderElement::drawBackground(QPainter *painter) const
 {
-    auto grooveRect = subControlRect(QStyle::SC_SliderGroove);
-    drawBackgroundRectangle(painter, grooveRect, m_elementProperties);
+    UnionPainter unionPainter(painter, m_elementProperties);
+    unionPainter.setRect(subControlRect(QStyle::SC_SliderGroove));
+    unionPainter.draw();
 }
 
 QSizeF SliderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const

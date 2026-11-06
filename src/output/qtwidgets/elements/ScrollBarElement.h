@@ -4,13 +4,10 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "BackgroundDrawing.h"
+#include "ElementCache.h"
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
-#include <qstyleoption.h>
-
-#include "ElementCache.h"
 
 class UnionStyle;
 class ScrollBarElement;

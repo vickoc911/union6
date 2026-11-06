@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "TabBarElement.h"
-#include "BackgroundDrawing.h"
 #include "SharedNames.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -48,7 +48,10 @@ void TabBarElement::drawBackground(QPainter *painter) const
     if (!m_tabBarOption) {
         return;
     }
-    drawBackgroundRectangle(painter, m_tabBarOption->rect, m_elementProperties, BackgroundParts::FrameOnly);
+    UnionPainter unionPainter(painter, m_elementProperties);
+    unionPainter.setParts(UnionPainter::Parts::FrameOnly);
+    unionPainter.setRect(m_styleOption->rect);
+    unionPainter.draw();
 }
 
 qreal TabBarElement::scrollButtonWidth() const

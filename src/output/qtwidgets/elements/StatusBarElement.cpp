@@ -3,6 +3,7 @@
 
 #include "StatusBarElement.h"
 #include "SharedNames.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -70,7 +71,9 @@ void StatusBarElement::layout()
 
 void StatusBarElement::drawItem(QPainter *painter) const
 {
-    drawBackgroundRectangle(painter, m_statusBarOption->rect, m_contentProperties);
+    UnionPainter unionPainter(painter, m_contentProperties);
+    unionPainter.setRect(m_styleOption->rect);
+    unionPainter.draw();
 }
 
 QString StatusBarElement::fallbackElementName([[maybe_unused]] const QStyleOption *opt) const

@@ -3,7 +3,9 @@
 
 #include "LineEditElement.h"
 #include "FrameElement.h"
+#include "SharedNames.h"
 #include "StyleUtils.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -11,8 +13,6 @@
 #include <QPainter>
 #include <QStyle>
 #include <QTableWidget>
-
-#include "SharedNames.h"
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
@@ -78,11 +78,11 @@ void LineEditElement::drawBackground(QPainter *painter) const
         backgroundOverride = palette.base().color();
     }
 
-    drawBackgroundRectangle(painter,
-                            m_styleOption->rect,
-                            m_elementProperties,
-                            m_hasFrame ? BackgroundParts::All : BackgroundParts::PanelOnly,
-                            backgroundOverride);
+    UnionPainter unionPainter(painter, m_elementProperties);
+    unionPainter.setParts(m_hasFrame ? UnionPainter::Parts::All : UnionPainter::Parts::PanelOnly);
+    unionPainter.setOverrideBackgroundColor(backgroundOverride);
+    unionPainter.setRect(m_styleOption->rect);
+    unionPainter.draw();
 }
 
 void LineEditElement::updateSubElementList()

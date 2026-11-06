@@ -2,14 +2,13 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "RadioButtonElement.h"
+#include "SharedNames.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
 #include <QPainter>
 #include <QStyle>
-#include <qstyle.h>
-
-#include "SharedNames.h"
 
 using namespace Qt::StringLiterals;
 
@@ -39,6 +38,7 @@ void RadioButtonElement::update()
     setText(m_buttonOption->text);
     updateSubElementList();
     layout();
+    updateGraphicsEffect(m_buttonOption->rect);
 }
 
 void RadioButtonElement::draw(QPainter *painter, DrawEnums enums) const
@@ -109,7 +109,9 @@ void RadioButtonElement::updateSubElementList()
 
 void RadioButtonElement::drawIndicator(QPainter *painter) const
 {
-    drawBackgroundRectangle(painter, subElementRect(QStyle::SE_RadioButtonIndicator), m_indicatorProperties);
+    UnionPainter unionPainter(painter, m_indicatorProperties);
+    unionPainter.setRect(subElementRect(QStyle::SE_RadioButtonIndicator));
+    unionPainter.draw();
 }
 
 Union::IdentifierList RadioButtonElement::elementHints() const

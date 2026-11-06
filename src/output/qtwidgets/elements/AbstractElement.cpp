@@ -3,6 +3,8 @@
 
 #include "AbstractElement.h"
 #include "SharedNames.h"
+#include "UnionGraphicsEffect.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include "qtwidgets_logging.h"
 #include <QApplication>
@@ -243,21 +245,29 @@ QSizeF AbstractElement::applyPaddingToSize(QSizeF oldSize, const Union::StylePro
 void AbstractElement::drawBackground(QPainter *painter) const
 {
     if (m_isValid && m_styleOption) {
-        drawBackgroundRectangle(painter, m_styleOption->rect, m_elementProperties);
+        UnionPainter unionPainter(painter, m_elementProperties);
+        unionPainter.setRect(m_styleOption->rect);
+        unionPainter.draw();
     }
 }
 
 void AbstractElement::drawFrame(QPainter *painter) const
 {
     if (m_isValid && m_styleOption) {
-        drawBackgroundRectangle(painter, m_styleOption->rect, m_elementProperties, BackgroundParts::FrameOnly);
+        UnionPainter unionPainter(painter, m_elementProperties);
+        unionPainter.setParts(UnionPainter::Parts::FrameOnly);
+        unionPainter.setRect(m_styleOption->rect);
+        unionPainter.draw();
     }
 }
 
 void AbstractElement::drawPanel(QPainter *painter) const
 {
     if (m_isValid && m_styleOption) {
-        drawBackgroundRectangle(painter, m_styleOption->rect, m_elementProperties, BackgroundParts::PanelOnly);
+        UnionPainter unionPainter(painter, m_elementProperties);
+        unionPainter.setParts(UnionPainter::Parts::PanelOnly);
+        unionPainter.setRect(m_styleOption->rect);
+        unionPainter.draw();
     }
 }
 
@@ -328,6 +338,19 @@ void AbstractElement::drawTextAtRect(QPainter *painter, const QString &text, con
         painter->setFont(font);
         m_style->drawItemText(painter, rect.toRect(), textFlags, m_styleOption->palette, enabled, elidedText(text, rect, property));
         painter->restore();
+    }
+}
+
+void AbstractElement::updateGraphicsEffect(const QRectF &rect, const Union::StylePropertyGroupPtr &properties) const
+{
+    const auto property = defaultPropertyGroup(properties);
+    if (m_styleOption && property) {
+        if (auto widget = qobject_cast<QWidget *>(m_styleOption->styleObject)) {
+            if (auto graphics = qobject_cast<UnionGraphicsEffect *>(widget->graphicsEffect())) {
+                graphics->setDrawRect(rect);
+                graphics->setProperties(property);
+            }
+        }
     }
 }
 

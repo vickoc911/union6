@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ToolBarElement.h"
-#include "BackgroundDrawing.h"
 #include "StyleUtils.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -121,14 +121,18 @@ QRectF ToolBarElement::handleSeparatorRect(qreal extent) const
 void ToolBarElement::drawHandle(QPainter *painter) const
 {
     if (m_isValid && m_styleOption && m_handleProperties) {
-        drawBackgroundRectangle(painter, handleSeparatorRect(handleExtent()), m_handleProperties);
+        UnionPainter unionPainter(painter, m_handleProperties);
+        unionPainter.setRect(handleSeparatorRect(handleExtent()));
+        unionPainter.draw();
     }
 }
 
 void ToolBarElement::drawSeparator(QPainter *painter) const
 {
     if (m_isValid && m_styleOption && m_separatorProperties) {
-        drawBackgroundRectangle(painter, handleSeparatorRect(separatorExtent()), m_handleProperties);
+        UnionPainter unionPainter(painter, m_separatorProperties);
+        unionPainter.setRect(handleSeparatorRect(separatorExtent()));
+        unionPainter.draw();
     }
 }
 
