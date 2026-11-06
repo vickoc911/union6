@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "CheckBoxElement.h"
+#include "UnionPainter.h"
 #include "UnionStyle.h"
 #include <QApplication>
 #include <QDebug>
@@ -38,6 +39,7 @@ void CheckBoxElement::update()
     }
     updateSubElementList();
     layout();
+    updateGraphicsEffect(m_buttonOption->rect);
 }
 
 void CheckBoxElement::draw(QPainter *painter, DrawEnums enums) const
@@ -106,9 +108,9 @@ void CheckBoxElement::updateSubElementList()
 
 void CheckBoxElement::drawIndicator(QPainter *painter) const
 {
-    UnionPainter b(painter, m_indicatorProperties, m_styleOption, m_widget);
-    b.setRect(subElementRect(QStyle::SE_CheckBoxIndicator));
-    b.draw();
+    UnionPainter unionPainter(painter, m_indicatorProperties);
+    unionPainter.setRect(subElementRect(QStyle::SE_CheckBoxIndicator));
+    unionPainter.draw();
 }
 
 Union::IdentifierList CheckBoxElement::elementHints() const

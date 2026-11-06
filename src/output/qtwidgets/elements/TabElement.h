@@ -5,7 +5,7 @@
 
 #include "AbstractElement.h"
 #include "ElementCache.h"
-#include "UnionPainter.h"
+
 #include <QIcon>
 #include <QObject>
 #include <QStyleOption>
