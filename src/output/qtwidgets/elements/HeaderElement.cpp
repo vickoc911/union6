@@ -12,6 +12,14 @@
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
 
+HeaderElement::HeaderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
+    : AbstractElement(option, style, widget)
+    , m_headerOption(qstyleoption_cast<const QStyleOptionHeader *>(option))
+    , m_isHorizontal(false)
+{
+    update();
+}
+
 HeaderElement::HeaderElement(const QStyleOptionHeader *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
     , m_headerOption(option)
@@ -86,7 +94,9 @@ void HeaderElement::draw(QPainter *painter, DrawEnums enums) const
         drawBackground(painter);
         break;
     case QStyle::CE_HeaderLabel:
-        drawText(painter);
+        // Headerlabel can be drawn anywhere in custom controls,
+        // so rely on default behavior for them.
+        m_style->QCommonStyle::drawControl(QStyle::CE_HeaderLabel, m_styleOption, painter, m_widget);
         break;
     case QStyle::CE_HeaderEmptyArea:
         drawBackground(painter);
@@ -151,13 +161,13 @@ QRectF HeaderElement::subElementRect(QStyle::SubElement element) const
         }
     }
 
-    return rect;
+    return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, rect);
 }
 
 QSizeF HeaderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
 {
     if (!m_isValid || !m_headerOption) {
-        return QSizeF();
+        return contentsSizeFromStyle;
     }
     // Copied from Breeze
     const qreal arrowWidth = subElementRect(QStyle::SE_HeaderArrow).width();
@@ -232,5 +242,5 @@ qreal HeaderElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
 
 QString HeaderElement::fallbackElementName([[maybe_unused]] const QStyleOption *opt) const
 {
-    return ElementString::Header;
+    return ElementString::HeaderViewDelegate;
 }
