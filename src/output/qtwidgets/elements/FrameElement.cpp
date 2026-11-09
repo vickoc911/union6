@@ -292,16 +292,7 @@ qreal FrameElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
             }
         }
 
-        if (qobject_cast<const QTabWidget *>(m_widget) || qobject_cast<const QTextBrowser *>(m_widget)) {
-            return frameWidth;
-        }
-
-        if (m_widget->inherits("QComboBoxPrivateContainer") || m_widget->inherits("KCompletionBox")) {
-            return frameWidth;
-        }
-
-        // fallback
-        return 0;
+        return frameWidth;
     }
     return 0;
 }
