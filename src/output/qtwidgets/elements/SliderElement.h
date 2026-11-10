@@ -33,7 +33,7 @@ public:
     SliderElement(const QStyleOptionSlider *option, const UnionStyle *style, const QWidget *widget = nullptr);
     ~SliderElement() override;
 
-    void update() override;
+    void update(const QStyleOption *option) override;
     void layout() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
 

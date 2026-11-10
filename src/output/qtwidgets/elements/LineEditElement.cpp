@@ -22,14 +22,14 @@ LineEditElement::LineEditElement(const QStyleOptionFrame *option, const UnionSty
     , m_frameOption(option)
     , m_hasFrame(true)
 {
-    update();
+    update(option);
 }
 
 LineEditElement::~LineEditElement()
 {
 }
 
-void LineEditElement::update()
+void LineEditElement::update(const QStyleOption *option)
 {
     if (const auto lineEdit = qobject_cast<const QLineEdit *>(m_widget)) {
         m_hasFrame = lineEdit->hasFrame();

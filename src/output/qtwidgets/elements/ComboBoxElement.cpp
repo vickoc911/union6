@@ -18,10 +18,10 @@ ComboBoxElement::ComboBoxElement(const QStyleOptionComboBox *option, const Union
     , m_editable(false)
     , m_hasFrame(true)
 {
-    update();
+    update(option);
 }
 
-void ComboBoxElement::update()
+void ComboBoxElement::update(const QStyleOption *option)
 {
     if (!m_styleOption) {
         return;

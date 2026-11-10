@@ -24,7 +24,7 @@ FrameElement::FrameElement(const QStyleOptionFrame *option, const UnionStyle *st
     : AbstractElement(option, style, widget)
     , m_frameOption(option)
 {
-    update();
+    update(option);
     if (m_elementProperties && m_frameOption) {
         m_shadowWidget = qobject_cast<QWidget *>(m_frameOption->styleObject);
         if (m_shadowWidget) {
@@ -37,7 +37,7 @@ FrameElement::~FrameElement()
 {
 }
 
-void FrameElement::update()
+void FrameElement::update(const QStyleOption *option)
 {
     updateSubElementList();
     layout();

@@ -21,14 +21,14 @@ ToolBarElement::ToolBarElement(const QStyleOption *option, const UnionStyle *sty
     , m_toolBarOption(qstyleoption_cast<const QStyleOptionToolBar *>(option))
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 ToolBarElement::~ToolBarElement()
 {
 }
 
-void ToolBarElement::update()
+void ToolBarElement::update(const QStyleOption *option)
 {
     updateSubElementList();
     layout();

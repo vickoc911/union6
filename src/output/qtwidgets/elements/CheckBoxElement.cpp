@@ -12,32 +12,40 @@
 
 using namespace Qt::StringLiterals;
 
-CheckBoxElement::CheckBoxElement(const QStyleOptionButton *option, const UnionStyle *style, const QWidget *widget)
+CheckBoxElement::CheckBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_buttonOption(option)
+    , m_buttonOption(qstyleoption_cast<const QStyleOptionButton *>(option))
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 CheckBoxElement::~CheckBoxElement()
 {
 }
 
-void CheckBoxElement::update()
+void CheckBoxElement::update(const QStyleOption *option)
+{
+    AbstractElement::update(option);
+    if (const auto newOpt = qstyleoption_cast<const QStyleOptionButton *>(option)) {
+        m_buttonOption = newOpt;
+    }
+    if (m_buttonOption) {
+        setIcon(m_buttonOption->icon);
+        setText(m_buttonOption->text);
+        updateSubElementList();
+        updateGraphicsEffect(m_buttonOption->rect);
+    }
+    layout();
+}
+
+void CheckBoxElement::layout()
 {
     m_indicatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::CheckBox, ElementString::Indicator});
     if (!m_indicatorElementList.isEmpty()) {
         m_indicatorProperties = queryProperties(m_indicatorElementList);
     }
-
-    if (m_buttonOption) {
-        setIcon(m_buttonOption->icon);
-        setText(m_buttonOption->text);
-    }
-    updateSubElementList();
-    layout();
-    updateGraphicsEffect(m_buttonOption->rect);
+    AbstractElement::layout();
 }
 
 void CheckBoxElement::draw(QPainter *painter, DrawEnums enums) const
@@ -93,14 +101,13 @@ void CheckBoxElement::updateSubElementList()
 {
     m_subElementList.clear();
     m_subElementList.append(ElementString::Indicator);
-    if (!m_buttonOption) {
-        return;
-    }
-    if (!m_buttonOption->icon.isNull()) {
-        m_subElementList.append(ElementString::Icon);
-    }
-    if (!m_buttonOption->text.isEmpty()) {
-        m_subElementList.append(ElementString::Text);
+    if (m_buttonOption) {
+        if (!m_buttonOption->icon.isNull()) {
+            m_subElementList.append(ElementString::Icon);
+        }
+        if (!m_buttonOption->text.isEmpty()) {
+            m_subElementList.append(ElementString::Text);
+        }
     }
 }
 
@@ -114,15 +121,14 @@ void CheckBoxElement::drawIndicator(QPainter *painter) const
 Union::IdentifierList CheckBoxElement::elementHints() const
 {
     Union::IdentifierList hints;
-    if (!m_buttonOption) {
-        return hints;
-    }
-    if (!m_buttonOption->icon.isNull()) {
-        hints.append(u"with-icon"_s);
-    }
-    // Used for "partial" checkbox
-    if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
-        hints.append(u"indeterminate"_s);
+    if (m_buttonOption) {
+        if (!m_buttonOption->icon.isNull()) {
+            hints.append(u"with-icon"_s);
+        }
+        // Used for "partial" checkbox
+        if (m_buttonOption->state.testFlag(QStyle::State_NoChange)) {
+            hints.append(u"indeterminate"_s);
+        }
     }
     return hints;
 }

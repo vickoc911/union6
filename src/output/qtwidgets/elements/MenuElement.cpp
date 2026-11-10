@@ -18,7 +18,7 @@ MenuElement::MenuElement(const QStyleOption *option, const UnionStyle *style, co
     : AbstractElement(option, style, widget)
     , m_menuOption(option)
 {
-    update();
+    update(option);
     if (m_elementProperties && m_menuOption) {
         m_shadowRenderer = std::make_unique<ShadowRenderer>(m_elementProperties);
         m_shadowWidget = qobject_cast<QWidget *>(m_menuOption->styleObject);
@@ -29,7 +29,7 @@ MenuElement::~MenuElement()
 {
 }
 
-void MenuElement::update()
+void MenuElement::update(const QStyleOption *option)
 {
     updateSubElementList();
     layout();

@@ -146,8 +146,11 @@ void AbstractElement::updateSubElementList()
 {
 }
 
-void AbstractElement::update()
+void AbstractElement::update(const QStyleOption *option)
 {
+    if (option) {
+        m_styleOption = option;
+    }
 }
 
 void AbstractElement::draw(QPainter *painter, DrawEnums enums) const

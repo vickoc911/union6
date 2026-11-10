@@ -17,14 +17,14 @@ FocusElement::FocusElement(const QStyleOptionFocusRect *option, const UnionStyle
     : AbstractElement(option, style, widget)
     , m_focusOption(option)
 {
-    update();
+    update(option);
 }
 
 FocusElement::~FocusElement()
 {
 }
 
-void FocusElement::update()
+void FocusElement::update(const QStyleOption *option)
 {
     layout();
     updateGraphicsEffect(m_styleOption->rect);

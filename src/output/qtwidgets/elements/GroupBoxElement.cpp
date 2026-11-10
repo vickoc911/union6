@@ -19,14 +19,14 @@ GroupBoxElement::GroupBoxElement(const QStyleOptionGroupBox *option, const Union
     , m_isCheckable(false)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 GroupBoxElement::~GroupBoxElement()
 {
 }
 
-void GroupBoxElement::update()
+void GroupBoxElement::update(const QStyleOption *option)
 {
     // This info is only in the widget itself
     if (!m_styleOption) {

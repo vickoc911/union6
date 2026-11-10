@@ -16,14 +16,14 @@ MenuBarItemElement::MenuBarItemElement(const QStyleOptionMenuItem *option, const
     , m_menuItemOption(option)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 MenuBarItemElement::~MenuBarItemElement()
 {
 }
 
-void MenuBarItemElement::update()
+void MenuBarItemElement::update(const QStyleOption *option)
 {
     if (!m_menuItemOption) {
         return;

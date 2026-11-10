@@ -24,14 +24,14 @@ ItemViewElement::ItemViewElement(const QStyleOptionViewItem *option, const Union
     : AbstractElement(option, style, widget)
     , m_viewItemOption(option)
 {
-    update();
+    update(option);
 }
 
 ItemViewElement::~ItemViewElement()
 {
 }
 
-void ItemViewElement::update()
+void ItemViewElement::update(const QStyleOption *option)
 {
     if (!m_viewItemOption) {
         return;

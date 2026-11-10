@@ -18,14 +18,14 @@ DockWidgetElement::DockWidgetElement(const QStyleOptionDockWidget *option, const
     , m_dockWidgetOption(option)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 DockWidgetElement::~DockWidgetElement()
 {
 }
 
-void DockWidgetElement::update()
+void DockWidgetElement::update(const QStyleOption *option)
 {
     setIcon(QIcon());
     setText(m_dockWidgetOption->title);

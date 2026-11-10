@@ -17,7 +17,7 @@ HeaderElement::HeaderElement(const QStyleOption *option, const UnionStyle *style
     , m_headerOption(qstyleoption_cast<const QStyleOptionHeader *>(option))
     , m_isHorizontal(false)
 {
-    update();
+    update(option);
 }
 
 HeaderElement::HeaderElement(const QStyleOptionHeader *option, const UnionStyle *style, const QWidget *widget)
@@ -25,14 +25,14 @@ HeaderElement::HeaderElement(const QStyleOptionHeader *option, const UnionStyle 
     , m_headerOption(option)
     , m_isHorizontal(false)
 {
-    update();
+    update(option);
 }
 
 HeaderElement::~HeaderElement()
 {
 }
 
-void HeaderElement::update()
+void HeaderElement::update(const QStyleOption *option)
 {
     if (!m_headerOption) {
         m_isValid = false;
