@@ -18,14 +18,14 @@ SpinBoxElement::SpinBoxElement(const QStyleOptionSpinBox *option, const UnionSty
     , m_hasButtons(true)
     , m_hasFrame(true)
 {
-    update();
+    update(option);
 }
 
 SpinBoxElement::~SpinBoxElement()
 {
 }
 
-void SpinBoxElement::update()
+void SpinBoxElement::update(const QStyleOption *option)
 {
     if (!m_spinBoxOption) {
         return;

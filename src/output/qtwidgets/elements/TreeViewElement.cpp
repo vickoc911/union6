@@ -18,14 +18,14 @@ TreeViewElement::TreeViewElement(const QStyleOption *option, const UnionStyle *s
     , m_treeViewOption(option)
     , m_itemIsOpen(false)
 {
-    update();
+    update(option);
 }
 
 TreeViewElement::~TreeViewElement()
 {
 }
 
-void TreeViewElement::update()
+void TreeViewElement::update(const QStyleOption *option)
 {
     if (!m_styleOption) {
         return;

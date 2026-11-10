@@ -17,14 +17,14 @@ TitleBarElement::TitleBarElement(const QStyleOptionTitleBar *option, const Union
     , m_titleBarOption(option)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 TitleBarElement::~TitleBarElement()
 {
 }
 
-void TitleBarElement::update()
+void TitleBarElement::update(const QStyleOption *option)
 {
     if (!m_titleBarOption) {
         return;
