@@ -16,9 +16,8 @@
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
 
-MenuItemElement::MenuItemElement(const QStyleOptionMenuItem *option, const UnionStyle *style, const QWidget *widget)
+MenuItemElement::MenuItemElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
-    , m_menuItemOption(option)
     , m_isSeparator(false)
     , m_hasSubMenu(false)
     , m_hasCheckBox(false)
@@ -28,42 +27,44 @@ MenuItemElement::MenuItemElement(const QStyleOptionMenuItem *option, const Union
 {
     setFlag(AbstractElementFlag::ContentsSizeIncludesAveragePadding);
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 MenuItemElement::~MenuItemElement()
 {
 }
 
-void MenuItemElement::update()
+void MenuItemElement::update(const QStyleOption *option)
 {
-    if (!m_menuItemOption) {
-        return;
+    AbstractElement::update(option);
+    if (const auto newOpt = qstyleoption_cast<const QStyleOptionMenuItem *>(option)) {
+        m_menuItemOption = newOpt;
     }
-    m_isSeparator = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator);
-    m_hasSubMenu = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu);
-    m_hasCheckBox = (m_menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive);
-    m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
-    m_hasCheckableItems = m_menuItemOption->menuHasCheckableItems;
+    if (m_menuItemOption) {
+        m_isSeparator = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::Separator);
+        m_hasSubMenu = (m_menuItemOption->menuItemType == QStyleOptionMenuItem::SubMenu);
+        m_hasCheckBox = (m_menuItemOption->checkType == QStyleOptionMenuItem::NonExclusive);
+        m_hasRadioButton = (m_menuItemOption->checkType == QStyleOptionMenuItem::Exclusive);
+        m_hasCheckableItems = m_menuItemOption->menuHasCheckableItems;
 
-    if (m_hasSubMenu) {
-        m_arrowElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem, ElementString::Arrow});
-        m_arrowProperties = queryProperties(m_arrowElementList);
-        m_subMenuArrow = m_style->unionIcon(m_arrowProperties, u"arrow-right-symbolic"_s);
-    }
-    if (m_hasCheckBox || m_hasRadioButton) {
-        QStyleOptionButton button;
-        button.initFrom(m_widget);
-        m_checkElementList =
-            prepareElements(&button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator});
-        m_checkProperties = queryProperties(m_checkElementList);
-    }
+        if (m_hasSubMenu) {
+            m_arrowElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem, ElementString::Arrow});
+            m_arrowProperties = queryProperties(m_arrowElementList);
+            m_subMenuArrow = m_style->unionIcon(m_arrowProperties, u"arrow-right-symbolic"_s);
+        }
+        if (m_hasCheckBox || m_hasRadioButton) {
+            QStyleOptionButton button;
+            button.initFrom(m_widget);
+            m_checkElementList =
+                prepareElements(&button, m_widget, {m_hasCheckBox ? ElementString::CheckBox : ElementString::RadioButton, ElementString::Indicator});
+            m_checkProperties = queryProperties(m_checkElementList);
+        }
 
-    if (!QApplication::testAttribute(Qt::AA_DontShowIconsInMenus)) {
-        setIcon(m_menuItemOption->icon);
+        if (!QApplication::testAttribute(Qt::AA_DontShowIconsInMenus)) {
+            setIcon(m_menuItemOption->icon);
+        }
+        setText(m_menuItemOption->text);
     }
-    setText(m_menuItemOption->text);
-
     updateSubElementList();
     layout();
 }
@@ -132,8 +133,8 @@ void MenuItemElement::updateSubElementList()
 
 void MenuItemElement::layout()
 {
-    m_elementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem});
-    m_separatorElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuSeparator});
+    m_elementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem});
+    m_separatorElementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuSeparator});
 
     if (!m_separatorElementList.isEmpty()) {
         m_separatorProperties = queryProperties(m_separatorElementList);
@@ -141,8 +142,7 @@ void MenuItemElement::layout()
 
     if (!m_elementList.isEmpty()) {
         m_elementProperties = queryProperties(m_elementList);
-        m_layoutMap = layoutMap(m_menuItemOption, m_subElementList);
-
+        m_layoutMap = layoutMap(m_styleOption, m_subElementList);
         // IconRect in MenuItemElements are the maximum size by default.
         // Instead center the icon rectangle within the maximum size rect.
         const auto iconsize = iconSize();
@@ -150,14 +150,13 @@ void MenuItemElement::layout()
             auto iconRect = m_layoutMap[ElementString::Icon].rect;
             m_layoutMap[ElementString::Icon].rect = centerRect(iconRect, iconsize.width(), iconsize.height());
         }
-
         m_isValid = true;
     } else {
         m_isValid = false;
     }
 
     if (!m_shortcutText.isEmpty()) {
-        m_shortcutElementList = prepareElements(m_menuItemOption, m_widget, {ElementString::MenuItem, ElementString::ShortcutText});
+        m_shortcutElementList = prepareElements(m_styleOption, m_widget, {ElementString::MenuItem, ElementString::ShortcutText});
         m_shortcutProperties = queryProperties(m_shortcutElementList);
     }
 }
@@ -261,14 +260,13 @@ void MenuItemElement::drawSubMenuArrow(QPainter *painter) const
 Union::IdentifierList MenuItemElement::elementHints() const
 {
     Union::IdentifierList hints;
-    if (!m_menuItemOption) {
-        return hints;
-    }
-    if (m_hasSubMenu) {
-        hints.append(u"with-submenu"_s);
-    }
-    if (m_isSeparator && !m_menuItemOption->text.isEmpty()) {
-        hints.append(u"with-title"_s);
+    if (m_menuItemOption) {
+        if (m_hasSubMenu) {
+            hints.append(u"with-submenu"_s);
+        }
+        if (m_isSeparator && !m_menuItemOption->text.isEmpty()) {
+            hints.append(u"with-title"_s);
+        }
     }
     return hints;
 }
@@ -278,7 +276,6 @@ qreal MenuItemElement::pixelMetric(QStyle::PixelMetric pixelMetric) const
     switch (pixelMetric) {
     case QStyle::PM_MenuButtonIndicator:
         if (m_hasSubMenu) {
-            qWarning() << m_layoutMap[ElementString::Arrow].rect.width();
             return m_layoutMap[ElementString::Arrow].rect.width();
         }
     default:
