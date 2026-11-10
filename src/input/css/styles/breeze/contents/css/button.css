@@ -116,17 +116,22 @@ toolbutton.raised
         icon-color: var(--button-active-text-color);
     }
 
-    &.with-menu-button > indicator {
-        visibility: visible;
-        width: var(--icon-size-small);
-        height: var(--icon-size-small);
-        /* half of small-spacing */
-        padding-left: var(--toolbutton-menu-padding);
-        padding-right: var(--toolbutton-menu-padding);
-        layout-alignment: content end fill 0;
-        icon-name: "arrow-down";
-        icon-color: var(--button-active-text-color);
-        border-left:  var(--button-border);
+    &.with-menu-button {
+        /* Ensure we have enough room for the items inside */
+        /* Button width (32) + indicator width (16)*/
+        width: 48px;
+        & > indicator {
+            visibility: visible;
+            width: var(--icon-size-small);
+            height: var(--icon-size-small);
+            /* half of small-spacing */
+            padding-left: var(--toolbutton-menu-padding);
+            padding-right: var(--toolbutton-menu-padding);
+            layout-alignment: content end fill 0;
+            icon-name: "arrow-down";
+            icon-color: var(--button-active-text-color);
+            border-left:  var(--button-border);
+        }
     }
 
     &.menu-open {
