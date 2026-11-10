@@ -16,14 +16,14 @@ RubberBandElement::RubberBandElement(const QStyleOptionRubberBand *option, const
     : AbstractElement(option, style, widget)
     , m_rubberBandOption(option)
 {
-    update();
+    update(option);
 }
 
 RubberBandElement::~RubberBandElement()
 {
 }
 
-void RubberBandElement::update()
+void RubberBandElement::update(const QStyleOption *option)
 {
     layout();
 }

@@ -16,14 +16,14 @@ TabCloseButtonElement::TabCloseButtonElement(const QStyleOption *option, const U
     : AbstractElement(option, style, widget)
     , m_widgetOption(option)
 {
-    update();
+    update(option);
 }
 
 TabCloseButtonElement::~TabCloseButtonElement()
 {
 }
 
-void TabCloseButtonElement::update()
+void TabCloseButtonElement::update(const QStyleOption *option)
 {
     layout();
 }

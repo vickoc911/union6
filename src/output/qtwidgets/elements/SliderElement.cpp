@@ -21,14 +21,14 @@ SliderElement::SliderElement(const QStyleOptionSlider *option, const UnionStyle 
     , m_isInverted(false)
     , m_isReverse(false)
 {
-    update();
+    update(option);
 }
 
 SliderElement::~SliderElement()
 {
 }
 
-void SliderElement::update()
+void SliderElement::update(const QStyleOption *option)
 {
     if (!m_sliderOption) {
         return;

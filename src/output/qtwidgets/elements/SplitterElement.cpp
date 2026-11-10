@@ -17,14 +17,14 @@ SplitterElement::SplitterElement(const QStyleOption *option, const UnionStyle *s
     : AbstractElement(option, style, widget)
     , m_splitterOption(option)
 {
-    update();
+    update(option);
 }
 
 SplitterElement::~SplitterElement()
 {
 }
 
-void SplitterElement::update()
+void SplitterElement::update(const QStyleOption *option)
 {
     layout();
 }

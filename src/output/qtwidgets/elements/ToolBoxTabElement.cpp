@@ -18,14 +18,14 @@ ToolBoxTabElement::ToolBoxTabElement(const QStyleOptionToolBox *option, const Un
     , m_toolBoxOption(option)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 ToolBoxTabElement::~ToolBoxTabElement()
 {
 }
 
-void ToolBoxTabElement::update()
+void ToolBoxTabElement::update(const QStyleOption *option)
 {
     if (!m_toolBoxOption) {
         return;

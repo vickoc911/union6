@@ -22,14 +22,14 @@ ToolButtonElement::ToolButtonElement(const QStyleOptionToolButton *option, const
     , m_hasText(false)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 ToolButtonElement::~ToolButtonElement()
 {
 }
 
-void ToolButtonElement::update()
+void ToolButtonElement::update(const QStyleOption *option)
 {
     if (!m_toolButtonOption) {
         return;

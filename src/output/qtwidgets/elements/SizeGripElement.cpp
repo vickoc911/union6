@@ -18,7 +18,7 @@ SizeGripElement::SizeGripElement(const QStyleOptionSizeGrip *option, const Union
     : AbstractElement(option, style, widget)
     , m_sizeGripOption(option)
 {
-    update();
+    update(option);
 }
 
 SizeGripElement::~SizeGripElement()
@@ -38,7 +38,7 @@ void SizeGripElement::draw(QPainter *painter, DrawEnums enums) const
     }
 }
 
-void SizeGripElement::update()
+void SizeGripElement::update(const QStyleOption *option)
 {
     layout();
 }

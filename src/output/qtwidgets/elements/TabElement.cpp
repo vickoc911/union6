@@ -21,14 +21,14 @@ TabElement::TabElement(const QStyleOptionTab *option, const UnionStyle *style, c
 {
     setFlag(AbstractElementFlag::ContentsSizeIncludesAveragePadding);
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 TabElement::~TabElement()
 {
 }
 
-void TabElement::update()
+void TabElement::update(const QStyleOption *option)
 {
     if (!m_tabOption) {
         return;

@@ -17,14 +17,14 @@ StatusBarElement::StatusBarElement(const QStyleOption *option, const UnionStyle 
     : AbstractElement(option, style, widget)
     , m_statusBarOption(option)
 {
-    update();
+    update(option);
 }
 
 StatusBarElement::~StatusBarElement()
 {
 }
 
-void StatusBarElement::update()
+void StatusBarElement::update(const QStyleOption *option)
 {
     updateSubElementList();
     layout();

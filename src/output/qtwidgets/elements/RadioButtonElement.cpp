@@ -17,14 +17,14 @@ RadioButtonElement::RadioButtonElement(const QStyleOptionButton *option, const U
     , m_buttonOption(option)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 RadioButtonElement::~RadioButtonElement()
 {
 }
 
-void RadioButtonElement::update()
+void RadioButtonElement::update(const QStyleOption *option)
 {
     if (!m_buttonOption) {
         return;

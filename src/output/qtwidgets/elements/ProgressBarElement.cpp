@@ -20,14 +20,14 @@ ProgressBarElement::ProgressBarElement(const QStyleOptionProgressBar *option, co
     , m_isHorizontal(true)
 {
     setFlag(AbstractElementFlag::DrawMnemonics);
-    update();
+    update(option);
 }
 
 ProgressBarElement::~ProgressBarElement()
 {
 }
 
-void ProgressBarElement::update()
+void ProgressBarElement::update(const QStyleOption *option)
 {
     if (!m_progressBarOption) {
         return;
