@@ -99,8 +99,8 @@ QSizeF ToolButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) cons
         auto diff = m_mainButtonRect.size() - size;
         size = (m_mainButtonRect | m_menuButtonRect).size() - diff;
     }
-    if (size.width() < m_toolButtonOption->iconSize.width()) {
-        size.setWidth(m_toolButtonOption->iconSize.width());
+    if (arrowStyle() == ArrowStyle::MenuButton && m_toolButtonOption) {
+        size.rwidth() += m_toolButtonOption->iconSize.width() / 2.0;
     }
     return size;
 }
