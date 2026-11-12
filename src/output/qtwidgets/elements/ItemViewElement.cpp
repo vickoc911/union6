@@ -108,7 +108,7 @@ void ItemViewElement::drawIndicator(QPainter *painter) const
             break;
         }
         checkbox.state.setFlag(QStyle::State_Enabled, m_viewItemOption->state.testFlag(QStyle::State_Enabled));
-        checkbox.rect = subElementRect(QStyle::SE_ItemViewItemCheckIndicator).toRect();
+        checkbox.rect = visualRect(subElementRect(QStyle::SE_ItemViewItemCheckIndicator)).toRect();
         painter->save();
         m_style->drawPrimitive(QStyle::PE_IndicatorItemViewItemCheck, &checkbox, painter);
         painter->restore();
@@ -267,13 +267,13 @@ Union::IdentifierVariantHash ItemViewElement::elementAttributes() const
             map[u"position"_s] = QVariant(u"invalid"_s);
             break;
         case QStyleOptionViewItem::Beginning:
-            map[u"position"_s] = QVariant(u"beginning"_s);
+            map[u"position"_s] = m_viewItemOption->direction == Qt::RightToLeft ? QVariant(u"end"_s) : QVariant(u"beginning"_s);
             break;
         case QStyleOptionViewItem::Middle:
             map[u"position"_s] = QVariant(u"middle"_s);
             break;
         case QStyleOptionViewItem::End:
-            map[u"position"_s] = QVariant(u"end"_s);
+            map[u"position"_s] = m_viewItemOption->direction == Qt::RightToLeft ? QVariant(u"beginning"_s) : QVariant(u"end"_s);
             break;
         case QStyleOptionViewItem::OnlyOne:
             map[u"position"_s] = QVariant(u"onlyone"_s);
