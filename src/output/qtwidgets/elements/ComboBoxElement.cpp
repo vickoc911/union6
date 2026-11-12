@@ -11,6 +11,7 @@
 #include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 ComboBoxElement::ComboBoxElement(const QStyleOptionComboBox *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)

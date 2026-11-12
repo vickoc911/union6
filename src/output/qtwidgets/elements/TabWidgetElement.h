@@ -8,6 +8,11 @@
 #include <QObject>
 #include <QStyleOption>
 
+namespace Union
+{
+namespace Widgets
+{
+
 class UnionStyle;
 class TabWidgetElement;
 
@@ -40,3 +45,6 @@ private:
 
     const QStyleOptionTabWidgetFrame *m_tabFrameOption = nullptr;
 };
+
+}
+}

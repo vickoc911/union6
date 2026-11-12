@@ -12,6 +12,7 @@
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 TabElement::TabElement(const QStyleOptionTab *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)

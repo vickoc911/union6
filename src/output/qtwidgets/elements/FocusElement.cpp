@@ -12,6 +12,7 @@
 #include "SharedNames.h"
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 FocusElement::FocusElement(const QStyleOptionFocusRect *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)

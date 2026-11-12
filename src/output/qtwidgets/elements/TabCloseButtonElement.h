@@ -8,6 +8,11 @@
 #include <QObject>
 #include <QStyleOption>
 
+namespace Union
+{
+namespace Widgets
+{
+
 class UnionStyle;
 class TabCloseButtonElement;
 
@@ -39,3 +44,5 @@ public:
 private:
     const QStyleOption *m_widgetOption = nullptr;
 };
+}
+}
