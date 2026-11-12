@@ -111,7 +111,7 @@ void ProgressBarElement::layout()
     }
 }
 
-QSizeF ProgressBarElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ProgressBarElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     // If the bar is vertical, make sure text has room
     auto size = applyPaddingToSize(contentsSizeFromStyle);

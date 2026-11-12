@@ -87,7 +87,7 @@ void ButtonElement::updateSubElementList()
     }
 }
 
-QSizeF ButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ButtonElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     auto size = applyPaddingToSize(contentsSizeFromStyle);
     // Since text and icon are parts of background, we need to apply the indicator width and spacing from background

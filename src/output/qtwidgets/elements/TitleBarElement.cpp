@@ -117,7 +117,7 @@ void TitleBarElement::layout()
     }
 }
 
-QSizeF TitleBarElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF TitleBarElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     return contentsSizeFromStyle;
 }
