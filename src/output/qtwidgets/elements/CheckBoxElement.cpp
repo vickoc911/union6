@@ -58,7 +58,7 @@ void CheckBoxElement::draw(QPainter *painter, DrawEnums enums) const
     }
 }
 
-QSizeF CheckBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF CheckBoxElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     auto size = applyPaddingToSize(contentsSizeFromStyle);
     // Ensure indicator size is taken into account with the label
