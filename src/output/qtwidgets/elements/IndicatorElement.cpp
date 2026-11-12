@@ -49,7 +49,7 @@ void IndicatorElement::draw(QPainter *painter, DrawEnums enums) const
     }
 }
 
-void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const
+void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIconName, const QStringList &targetHierarchy) const
 {
     auto properties = queryProperties(prepareElements(m_indicatorOption, m_widget, targetHierarchy));
     auto icon = m_style->unionIcon(properties, defaultIconName);

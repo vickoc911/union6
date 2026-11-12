@@ -291,7 +291,7 @@ void AbstractElement::drawIndicator(QPainter *painter) const
     }
 }
 
-void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect, const Union::StylePropertyGroupPtr &properties) const
+void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF &rect, const Union::StylePropertyGroupPtr &properties) const
 {
     if (m_isValid) {
         const auto property = defaultPropertyGroup(properties);
@@ -460,7 +460,7 @@ QString AbstractElement::elidedText(const QString &text, const QRectF &textRect,
     return text;
 }
 
-QSizeF AbstractElement::querySize(QStringList targetHierarchy) const
+QSizeF AbstractElement::querySize(const QStringList &targetHierarchy) const
 {
     auto elements = prepareElements(m_styleOption, m_widget, targetHierarchy);
     if (elements.isEmpty()) {
@@ -472,7 +472,7 @@ QSizeF AbstractElement::querySize(QStringList targetHierarchy) const
     return QSize(width, height);
 }
 
-Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy) const
+Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, const QWidget *widget, const QStringList &targetHierarchy) const
 {
     Union::ElementList elements;
     QStringList elementTypes = {};
