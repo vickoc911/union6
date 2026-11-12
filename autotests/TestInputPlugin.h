@@ -168,8 +168,6 @@ struct TestStyleLoader : public Union::StyleLoader {
 };
 
 struct TestInputPlugin : public Union::InputPlugin {
-    Q_OBJECT
-
     Union::StylePackage::Error validatePackage([[maybe_unused]] const Union::StylePackage &package) override
     {
         if (!std::filesystem::exists(package.path() / "contents" / "test")) {
