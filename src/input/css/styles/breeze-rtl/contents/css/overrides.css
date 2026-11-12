@@ -32,3 +32,26 @@ menuitem {
     }
 }
 
+toolbutton.raised {
+    &.with-menu-button > indicator {
+        border-left: none;
+        border-right: var(--button-border);
+    }
+    &.menu-open {
+        & > indicator {
+            border: var(--button-border-highlight);
+            border-radius: var(--corner-radius);
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+        }
+    }
+}
+
+toolbutton {
+    &.with-menu-button > indicator {
+        border-right: none;
+        &:hovered {
+            border-right: var(--button-border-highlight);
+        }
+    }
+}
