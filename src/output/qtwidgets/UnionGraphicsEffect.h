@@ -3,12 +3,14 @@
 
 #pragma once
 
-#include <ElementQuery.h>
 #include <QGraphicsDropShadowEffect>
-#include <QGraphicsEffect>
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
+
+#include <properties/StylePropertyGroup.h>
+
+namespace Union
+{
+namespace Widgets
+{
 
 class UnionGraphicsEffect : public QGraphicsDropShadowEffect
 {
@@ -30,3 +32,5 @@ private:
     QMarginsF m_outlineSize;
     QRectF m_drawRect;
 };
+}
+}

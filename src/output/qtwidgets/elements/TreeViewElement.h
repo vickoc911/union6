@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class TreeViewElement;
 
 namespace ElementCache
@@ -47,3 +48,6 @@ private:
     Union::ElementList m_indicatorElementList;
     Union::StylePropertyGroupPtr m_indicatorProperties = nullptr;
 };
+
+}
+}

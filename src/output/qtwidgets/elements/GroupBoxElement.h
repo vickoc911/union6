@@ -4,13 +4,14 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class GroupBoxElement;
+
 namespace ElementCache
 {
 namespace detail
@@ -45,3 +46,5 @@ private:
     const QStyleOptionGroupBox *m_groupBoxOption = nullptr;
     bool m_isCheckable;
 };
+}
+}

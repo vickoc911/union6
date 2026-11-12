@@ -7,11 +7,9 @@
 #include <QCoreApplication>
 #include <QQmlEngine>
 
-#include <Element.h>
 #include <EventHelper.h>
 #include <PlatformPlugin.h>
 #include <StyleRegistry.h>
-#include <StyleRule.h>
 
 using namespace Union;
 using namespace Union::Quick;
@@ -109,7 +107,7 @@ bool StyleHints::spellCheckEnabled() const
     return m_spellCheckEnabled;
 }
 
-void StyleHints::setSpellCheckEnabled(const bool &enabled)
+void StyleHints::setSpellCheckEnabled(bool enabled)
 {
     if (m_spellCheckEnabled != enabled) {
         m_spellCheckEnabled = enabled;

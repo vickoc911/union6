@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class IndicatorElement;
 
 namespace ElementCache
@@ -45,7 +46,8 @@ public:
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
-    void drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const;
+    void drawElement(QPainter *painter, const QString &defaultIconName, const QStringList &targetHierarchy) const;
+
     int m_listViewIconSize = 0;
     int m_smallIconSize = 0;
     int m_iconViewIconSize = 0;
@@ -53,3 +55,5 @@ private:
     int m_messageBoxIconSize = 0;
     int m_textCursorWidth = 0;
 };
+}
+}

@@ -4,12 +4,13 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
 #include "ShadowRenderer.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class FrameElement;
 
 namespace ElementCache
@@ -57,3 +58,5 @@ private:
     std::shared_ptr<ShadowRenderer> m_shadowRenderer;
     QWidget *m_shadowWidget;
 };
+}
+}

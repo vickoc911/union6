@@ -2,18 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ButtonElement.h"
-#include "SharedNames.h"
-#include "StyleUtils.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
-
-#include "PropertiesTypes.h"
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 ButtonElement::ButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -96,7 +88,7 @@ void ButtonElement::updateSubElementList()
     }
 }
 
-QSizeF ButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ButtonElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     if (m_buttonOption) {
         auto size = applyPaddingToSize(contentsSizeFromStyle);

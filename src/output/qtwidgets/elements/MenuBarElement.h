@@ -4,12 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class MenuBarElement;
 
 namespace ElementCache
@@ -41,3 +41,5 @@ public:
     QString fallbackElementName(const QStyleOption *opt) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 };
+}
+}

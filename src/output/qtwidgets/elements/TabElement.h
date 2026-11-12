@@ -4,12 +4,11 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
 class TabElement;
 
 namespace ElementCache
@@ -42,7 +41,7 @@ public:
     void drawText(QPainter *painter) const override;
 
     QRectF subElementRect(QStyle::SubElement element) const override;
-    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(QSizeF contentsSizeFromStyle) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
@@ -60,3 +59,6 @@ private:
     int hSpace() const;
     int vSpace() const;
 };
+
+}
+}

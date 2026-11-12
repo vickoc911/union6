@@ -2,15 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "RadioButtonElement.h"
-#include "SharedNames.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 RadioButtonElement::RadioButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -79,7 +73,7 @@ void RadioButtonElement::draw(QPainter *painter, DrawEnums enums) const
     }
 }
 
-QSizeF RadioButtonElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF RadioButtonElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     auto size = applyPaddingToSize(contentsSizeFromStyle);
     // Ensure indicator size is taken into account with the label

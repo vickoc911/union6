@@ -34,7 +34,7 @@ void showCommandHelp(QCommandLineParser *parser, const QString &command, const Q
 }
 
 [[nodiscard]] std::unique_ptr<QCommandLineParser>
-parseCommand(const QString &command, const QStringList &arguments, std::function<void(QCommandLineParser *)> customiseFunction)
+parseCommand(const QString &command, const QStringList &arguments, const std::function<void(QCommandLineParser *)> &customiseFunction)
 {
     auto commandParser = std::make_unique<QCommandLineParser>();
     commandParser->addOption({u"help"_s, u"Displays help for the current command."_s});
@@ -47,7 +47,7 @@ parseCommand(const QString &command, const QStringList &arguments, std::function
     if (!commandParser->parse(argumentsWithApplication)) {
         QString errorMessage;
         if (!commandParser->unknownOptionNames().isEmpty()) {
-            errorMessage = u"Unknown option for command "_s + command + u": " + commandParser->unknownOptionNames().first();
+            errorMessage = u"Unknown option for command "_s + command + u": " + commandParser->unknownOptionNames().constFirst();
         }
 
         showCommandHelp(commandParser.get(), command, errorMessage, 1);
@@ -60,7 +60,7 @@ parseCommand(const QString &command, const QStringList &arguments, std::function
     return commandParser;
 }
 
-void readInput(QString &output, QStringView message, std::function<bool(QString)> validationFunction, QString defaultValue = {})
+void readInput(QString &output, QStringView message, const std::function<bool(QString)> &validationFunction, const QString &defaultValue = {})
 {
     Q_ASSERT(!message.isEmpty());
 
@@ -68,7 +68,7 @@ void readInput(QString &output, QStringView message, std::function<bool(QString)
         QTextStream inputStream(stdin);
         QString input;
         while (input.isEmpty()) {
-            std::cout << message.toUtf8().data();
+            std::cout << message.toUtf8().constData();
             if (!defaultValue.isEmpty()) {
                 std::cout << " [Enter to use: " << qPrintable(defaultValue) << "]" << std::endl;
             } else {
@@ -90,7 +90,7 @@ void readInput(QString &output, QStringView message, std::function<bool(QString)
     }
 }
 
-void readInput(QString &output, QStringView message, QString defaultValue = {})
+void readInput(QString &output, QStringView message, const QString &defaultValue = {})
 {
     readInput(
         output,
@@ -124,7 +124,7 @@ int printPackageError(const Union::StylePackage &package)
     return 0;
 }
 
-int printErrorCode(const Union::StylePackage &package, const std::error_code &errorCode)
+int printErrorCode(const Union::StylePackage &package, std::error_code errorCode)
 {
     std::cerr << "Operation on package " << package.path() << " failed: " << errorCode.message() << "\n";
     return errorCode.value();
@@ -146,7 +146,7 @@ std::pair<QTemporaryDir, fs::path> extractStyleArchive(const fs::path &path, std
         return std::make_pair(std::move(tempDir), fs::path{});
     } else {
         QList<fs::path> paths;
-        for (auto entry : fs::directory_iterator(tempPath)) {
+        for (const auto &entry : fs::directory_iterator(tempPath)) {
             paths.append(tempPath / entry.path());
         }
 

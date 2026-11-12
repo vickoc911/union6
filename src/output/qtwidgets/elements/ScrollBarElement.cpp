@@ -2,17 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ScrollBarElement.h"
-#include "SharedNames.h"
-#include "StyleUtils.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include "elements/AbstractElement.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 ScrollBarElement::ScrollBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -115,7 +107,7 @@ void ScrollBarElement::updateSubElementList()
     m_subElementList.append(ElementString::Handle);
 }
 
-QSizeF ScrollBarElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ScrollBarElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     return contentsSizeFromStyle;
 }

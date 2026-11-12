@@ -2,14 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "MenuBarItemElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 MenuBarItemElement::MenuBarItemElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)

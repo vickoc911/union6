@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 // SPDX-FileCopyrightText: 2026 Arjen Hiemstra <ahiemstra@quantumproductions.info>
 
-#include <condition_variable>
-#include <mutex>
-
 #include <QStandardPaths>
 
 #include <StyleRegistry.h>
@@ -22,7 +19,7 @@ int handleInstallCommand([[maybe_unused]] const QStringList &arguments)
         showCommandHelp(parser.get(), u"install"_s, u"Invalid arguments for command \"install\""_s, 1);
     }
 
-    auto packageName = parser->positionalArguments().first();
+    auto packageName = parser->positionalArguments().constFirst();
     auto packagePath = fs::absolute(fs::path(packageName.toStdString()));
 
     Union::StylePackage package;
@@ -155,7 +152,7 @@ int handleInspectCommand([[maybe_unused]] const QStringList &arguments)
         showCommandHelp(parser.get(), u"inspect"_s, u"Invalid arguments for command \"inspect\""_s, 1);
     }
 
-    auto pathOrId = parser->positionalArguments().first();
+    auto pathOrId = parser->positionalArguments().constFirst();
     auto packagePath = fs::absolute(fs::path(pathOrId.toStdString()));
 
     Union::StylePackage package;
@@ -218,7 +215,7 @@ int handleListCommand([[maybe_unused]] const QStringList &arguments)
         return first.id() < second.name();
     });
 
-    for (const auto &package : packages) {
+    for (const auto &package : std::as_const(packages)) {
         if (!parser->isSet(u"details"_s)) {
             std::cout << "- " << qPrintable(package.id()) << ": " << qPrintable(package.name()) << "\n";
         } else {
@@ -248,7 +245,7 @@ int handleUpdateCommand([[maybe_unused]] const QStringList &arguments)
         showCommandHelp(parser.get(), u"update"_s, u"Invalid arguments for command \"update\""_s, 1);
     }
 
-    auto packageName = parser->positionalArguments().first();
+    auto packageName = parser->positionalArguments().constFirst();
     auto packagePath = fs::absolute(fs::path(packageName.toStdString()));
 
     Union::StylePackage package;
@@ -296,7 +293,7 @@ int handleUninstallCommand([[maybe_unused]] const QStringList &arguments)
         showCommandHelp(parser.get(), u"uninstall"_s, u"Invalid arguments for command \"uninstall\""_s, 1);
     }
 
-    auto style = parser->positionalArguments().first();
+    auto style = parser->positionalArguments().constFirst();
 
     auto handler = Union::StyleRegistry::instance()->packageHandler();
 
@@ -315,7 +312,7 @@ int handleUninstallCommand([[maybe_unused]] const QStringList &arguments)
     return 0;
 }
 
-int handlePackageCommand([[maybe_unused]] const QStringList arguments)
+int handlePackageCommand([[maybe_unused]] const QStringList &arguments)
 {
     auto parser = parseCommand(u"package"_s, arguments, [](QCommandLineParser *parser) {
         parser->setApplicationDescription(u"Package a style for easy sharing."_s);
@@ -326,7 +323,7 @@ int handlePackageCommand([[maybe_unused]] const QStringList arguments)
         showCommandHelp(parser.get(), u"inspect"_s, u"Invalid arguments for command \"inspect\""_s, 1);
     }
 
-    auto pathOrId = parser->positionalArguments().first();
+    auto pathOrId = parser->positionalArguments().constFirst();
 
     auto handler = Union::StyleRegistry::instance()->packageHandler();
 

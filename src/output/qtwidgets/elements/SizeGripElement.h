@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class SizeGripElement;
 
 namespace ElementCache
@@ -40,3 +41,5 @@ private:
     QString fallbackElementName(const QStyleOption *opt) const override;
     const QStyleOptionSizeGrip *m_sizeGripOption = nullptr;
 };
+}
+}

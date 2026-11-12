@@ -2,17 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "MenuElement.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QLineEdit>
-#include <QPainter>
-#include <QStyle>
-
-#include "ShadowRenderer.h"
-#include "SharedNames.h"
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 MenuElement::MenuElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -62,7 +54,7 @@ void MenuElement::updateSubElementList()
     m_subElementList.append(ElementString::Frame);
 }
 
-QSizeF MenuElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF MenuElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     return contentsSizeFromStyle;
 }

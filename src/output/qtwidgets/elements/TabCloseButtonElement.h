@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class TabCloseButtonElement;
 
 namespace ElementCache
@@ -36,3 +37,5 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 };
+}
+}

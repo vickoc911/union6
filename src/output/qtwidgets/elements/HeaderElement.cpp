@@ -2,15 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "HeaderElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 HeaderElement::HeaderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -155,7 +150,7 @@ QRectF HeaderElement::subElementRect(QStyle::SubElement element) const
     return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }
 
-QSizeF HeaderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF HeaderElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     if (!m_isValid || !m_headerOption) {
         return contentsSizeFromStyle;

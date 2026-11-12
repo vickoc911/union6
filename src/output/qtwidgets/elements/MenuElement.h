@@ -4,12 +4,13 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
 #include "ShadowRenderer.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class MenuElement;
 
 namespace ElementCache
@@ -38,7 +39,7 @@ public:
 
     void update(const QStyleOption *option) override;
     void draw(QPainter *painter, DrawEnums enums) const override;
-    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(QSizeF contentsSizeFromStyle) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
@@ -47,3 +48,5 @@ private:
     std::shared_ptr<ShadowRenderer> m_shadowRenderer;
     QWidget *m_shadowWidget;
 };
+}
+}

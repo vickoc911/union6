@@ -3,13 +3,20 @@
 
 #pragma once
 
-#include "StyleUtils.h"
-#include <ElementQuery.h>
-#include <QIcon>
-#include <QObject>
 #include <QStyleOption>
 
-class UnionStyle;
+#include <ElementQuery.h>
+
+#include "ElementCache.h"
+#include "StyleUtils.h"
+#include "UnionPainter.h"
+#include "UnionStyle.h"
+
+namespace Union
+{
+namespace Widgets
+{
+
 
 struct DrawEnums {
     int ControlElement = -1;
@@ -67,7 +74,7 @@ public:
     /*!
      * \brief Return the contents size of the element with padding applied by default.
      */
-    virtual QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const;
+    virtual QSizeF contentsSize(QSizeF contentsSizeFromStyle) const;
 
     /*!
      * \brief Return a subelement rectangle. If not found, empty QRectF() is returned instead.
@@ -160,13 +167,13 @@ protected:
     /*!
      * \brief Query the size of an element based on its hierarchy. Useful for one-off calculations.
      */
-    virtual QSizeF querySize(QStringList targetHierarchy) const;
+    virtual QSizeF querySize(const QStringList &targetHierarchy) const;
 
     /*!
      * \brief Prepares elements for a widget. Sometimes we cannot decipher the specific item from widget alone, such as itemviews.
      * In those cases you may need to manually choose a target hierarchy, such as {"ItemViewItem"}
      */
-    virtual Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy = {}) const;
+    virtual Union::ElementList prepareElements(const QStyleOption *opt, const QWidget *widget, const QStringList &targetHierarchy = {}) const;
 
     /*!
      * \brief The element name used by prepareElements() when there is no widget, such as when
@@ -216,7 +223,7 @@ protected:
     /*!
      * \brief Draw given icon at the rectangle. Handles the enabled status.
      */
-    void drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect, const Union::StylePropertyGroupPtr &properties = nullptr) const;
+    void drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF &rect, const Union::StylePropertyGroupPtr &properties = nullptr) const;
 
     /*!
      * \brief Draw text at the given rectangle. Handles coloring, elision and
@@ -250,7 +257,7 @@ protected:
 private:
     Union::Element::Ptr createElement(const QString &name) const;
 
-    LayoutBucket createBucket(const QList<LayoutItem> &items, const BucketType &type, const QRectF &containerRect) const;
+    LayoutBucket createBucket(const QList<LayoutItem> &items, BucketType type, const QRectF &containerRect) const;
     QRectF resizeBucket(const LayoutBucket &bucket) const;
     void mapBucketItems(LayoutBucket &bucket, QMap<QString, LayoutItem> &map) const;
 
@@ -260,4 +267,7 @@ private:
     std::unique_ptr<Union::ElementQuery> m_elementQuery;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractElement::AbstractElementFlags);
+}
+}
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Union::Widgets::AbstractElement::AbstractElementFlags);

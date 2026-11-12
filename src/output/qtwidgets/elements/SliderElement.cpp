@@ -2,17 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "SliderElement.h"
-#include "SharedNames.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include "elements/AbstractElement.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 SliderElement::SliderElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -134,7 +127,6 @@ void SliderElement::draw(QPainter *painter, DrawEnums enums) const
             // Offset the tickmarks to the center of the handle
             const int handleOffset(pixelMetric(QStyle::PM_SliderLength) / 2);
             int current(m_sliderOption->minimum);
-            auto tickmarkElements = m_tickElementList;
 
             // store tick lines
             QList<QRectF> ticks = tickLines();
@@ -180,7 +172,7 @@ void SliderElement::drawBackground(QPainter *painter) const
     unionPainter.draw();
 }
 
-QSizeF SliderElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF SliderElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     if (!m_sliderOption) {
         return applyPaddingToSize(contentsSizeFromStyle);

@@ -3,17 +3,23 @@
 
 #pragma once
 
-#include "qtwidgets_logging.h"
+#include <QMargins>
+#include <QPainterPath>
+
 #include <Element.h>
 #include <properties/SizePropertyGroup.h>
 #include <properties/StylePropertyGroup.h>
 
 #include "SharedNames.h"
-#include <QMargins>
-#include <QPainterPath>
-#include <QStyleOption>
+
+#include "qtwidgets_logging.h"
 
 class QStyleOption;
+
+namespace Union
+{
+namespace Widgets
+{
 
 enum class BucketType {
     Start,
@@ -75,4 +81,6 @@ QRectF centerRect(const QRectF &rect, qreal width, qreal height);
 QString styleOptionToElementName(const QStyleOption *option);
 
 // Calculates the bounding box rectangle from items inside layoutMap
-QRectF unifiedRect(QMap<QString, LayoutItem> layoutMap);
+QRectF unifiedRect(const QMap<QString, LayoutItem> &layoutMap);
+}
+}

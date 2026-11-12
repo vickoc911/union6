@@ -2,20 +2,14 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "LineEditElement.h"
-#include "FrameElement.h"
-#include "SharedNames.h"
-#include "StyleUtils.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
+
 #include <QLineEdit>
-#include <QPainter>
-#include <QStyle>
-#include <QTableWidget>
+
+#include "FrameElement.h"
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 LineEditElement::LineEditElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -94,7 +88,7 @@ void LineEditElement::updateSubElementList()
     m_subElementList.append(ElementString::TextField);
 }
 
-QSizeF LineEditElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF LineEditElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     // LineEdit wants much more simplified size in Widgets, we ignore the width/height set in CSS.
     QMarginsF padding =

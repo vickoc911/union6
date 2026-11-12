@@ -2,15 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "CheckBoxElement.h"
-#include "SharedNames.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 CheckBoxElement::CheckBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -71,7 +65,7 @@ void CheckBoxElement::draw(QPainter *painter, DrawEnums enums) const
     }
 }
 
-QSizeF CheckBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF CheckBoxElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     auto size = applyPaddingToSize(contentsSizeFromStyle);
     // Ensure indicator size is taken into account with the label

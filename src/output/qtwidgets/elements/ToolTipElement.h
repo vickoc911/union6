@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class ToolTipElement;
 
 namespace ElementCache
@@ -41,3 +42,6 @@ private:
     void layout() override;
     const QStyleOptionFrame *m_frameOption = nullptr;
 };
+
+}
+}

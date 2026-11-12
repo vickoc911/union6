@@ -2,16 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "TabElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
-#include <QTabBar>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 TabElement::TabElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -184,7 +178,7 @@ void TabElement::layout()
     }
 }
 
-QSizeF TabElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF TabElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     // Follow what Breeze does here
     if (m_isValid && m_styleOption) {

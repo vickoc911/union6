@@ -2,15 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "IndicatorElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QLineEdit>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 IndicatorElement::IndicatorElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -52,7 +46,7 @@ void IndicatorElement::draw(QPainter *painter, DrawEnums enums) const
     }
 }
 
-void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIconName, QStringList targetHierarchy) const
+void IndicatorElement::drawElement(QPainter *painter, const QString &defaultIconName, const QStringList &targetHierarchy) const
 {
     if (m_styleOption) {
         auto properties = queryProperties(prepareElements(m_styleOption, m_widget, targetHierarchy));

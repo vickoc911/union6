@@ -4,11 +4,11 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
 class StatusBarElement;
 
 namespace ElementCache
@@ -41,3 +41,5 @@ private:
     Union::ElementList m_contentElementList;
     Union::StylePropertyGroupPtr m_contentProperties = nullptr;
 };
+}
+}

@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class TabBarElement;
 
 namespace ElementCache
@@ -48,3 +49,5 @@ private:
     const QStyleOptionTabBarBase *m_tabBarOption = nullptr;
     qreal scrollButtonWidth() const;
 };
+}
+}

@@ -2,19 +2,18 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "AbstractElement.h"
-#include "SharedNames.h"
-#include "UnionGraphicsEffect.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include "qtwidgets_logging.h"
+
 #include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
+
 #include <StyleRegistry.h>
+
+#include "UnionGraphicsEffect.h"
+
+#include "qtwidgets_logging.h"
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 AbstractElement::AbstractElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : QObject(nullptr)
@@ -107,7 +106,7 @@ void AbstractElement::layout()
     }
 }
 
-QSizeF AbstractElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF AbstractElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     return applyPaddingToSize(contentsSizeFromStyle);
 }
@@ -296,7 +295,7 @@ void AbstractElement::drawIndicator(QPainter *painter) const
     }
 }
 
-void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF rect, const Union::StylePropertyGroupPtr &properties) const
+void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const QRectF &rect, const Union::StylePropertyGroupPtr &properties) const
 {
     if (m_isValid) {
         const auto property = defaultPropertyGroup(properties);
@@ -465,7 +464,7 @@ QString AbstractElement::elidedText(const QString &text, const QRectF &textRect,
     return text;
 }
 
-QSizeF AbstractElement::querySize(QStringList targetHierarchy) const
+QSizeF AbstractElement::querySize(const QStringList &targetHierarchy) const
 {
     auto elements = prepareElements(m_styleOption, m_widget, targetHierarchy);
     if (elements.isEmpty()) {
@@ -477,7 +476,7 @@ QSizeF AbstractElement::querySize(QStringList targetHierarchy) const
     return QSize(width, height);
 }
 
-Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, const QWidget *widget, QStringList targetHierarchy) const
+Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, const QWidget *widget, const QStringList &targetHierarchy) const
 {
     Union::ElementList elements;
     QStringList elementTypes = {};
@@ -498,14 +497,14 @@ Union::ElementList AbstractElement::prepareElements(const QStyleOption *opt, con
     if (elementTypes.isEmpty()) {
         elementTypes.append(targetHierarchy);
     } else {
-        for (const auto &target : targetHierarchy) {
+        for (const auto &target : std::as_const(targetHierarchy)) {
             if (elementTypes.last() != target) {
                 elementTypes.append(target);
             }
         }
     }
 
-    for (const auto &elementType : elementTypes) {
+    for (const auto &elementType : std::as_const(elementTypes)) {
         elements.append(createElement(elementType));
     }
     return elements;
@@ -548,7 +547,7 @@ QMap<QString, LayoutItem> AbstractElement::layoutMap(const QStyleOption *opt, co
     const QRectF availableSpace = backgroundRectangle(opt, m_elementProperties).marginsRemoved(padding());
 
     // Prepare all subelements
-    for (const auto &subElement : subElements) {
+    for (const auto &subElement : std::as_const(subElements)) {
         // NOTE: Currently text and icon are part of the main element, but eventually
         // will be moved as their own elements
         if (subElement != ElementString::Icon && subElement != ElementString::Text) {
@@ -713,7 +712,7 @@ Union::Element::Ptr AbstractElement::createElement(const QString &name) const
     return unionElement;
 }
 
-LayoutBucket AbstractElement::createBucket(const QList<LayoutItem> &items, const BucketType &type, const QRectF &containerRect) const
+LayoutBucket AbstractElement::createBucket(const QList<LayoutItem> &items, BucketType type, const QRectF &containerRect) const
 {
     LayoutBucket bucket;
     bucket.type = type;

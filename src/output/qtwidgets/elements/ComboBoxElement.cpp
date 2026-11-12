@@ -2,15 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ComboBoxElement.h"
-#include "SharedNames.h"
-#include "StyleUtils.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 ComboBoxElement::ComboBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -97,7 +91,7 @@ void ComboBoxElement::updateSubElementList()
     m_subElementList.append(ElementString::Indicator);
 }
 
-QSizeF ComboBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ComboBoxElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     // Follow the contents width
     auto size = applyPaddingToSize(contentsSizeFromStyle);

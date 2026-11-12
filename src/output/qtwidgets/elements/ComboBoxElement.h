@@ -4,13 +4,14 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class ComboBoxElement;
+
 namespace ElementCache
 {
 namespace detail
@@ -36,7 +37,7 @@ public:
     void draw(QPainter *painter, DrawEnums enums) const override;
 
     QRectF subControlRect(QStyle::SubControl subControl) const override;
-    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(QSizeF contentsSizeFromStyle) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
@@ -52,3 +53,6 @@ private:
     Union::ElementList m_indicatorElementList;
     Union::StylePropertyGroupPtr m_indicatorProperties = nullptr;
 };
+
+}
+}

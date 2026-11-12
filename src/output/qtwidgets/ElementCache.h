@@ -3,10 +3,14 @@
 
 #pragma once
 
-#include "elements/AbstractElement.h"
 #include <QStyleOption>
 
 #include <LruCache.h>
+
+namespace Union
+{
+namespace Widgets
+{
 
 class AbstractElement;
 class UnionStyle;
@@ -61,5 +65,8 @@ static std::shared_ptr<AbstractElement> element(int enumValue, size_t hash, cons
 inline static void clear()
 {
     detail::s_elementCache.clear();
+}
+}
+
 }
 }

@@ -2,16 +2,12 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "TreeViewElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
+
 #include <QApplication>
-#include <QDebug>
-#include <QLineEdit>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 TreeViewElement::TreeViewElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -85,7 +81,6 @@ void TreeViewElement::drawIndicator(QPainter *painter) const
     auto icon = m_style->unionIcon(m_indicatorProperties, defaultIconName);
     const bool enabled = m_styleOption->state.testFlag(QStyle::State_Enabled);
 
-    const QPalette activePalette = m_styleOption->palette;
     const qreal dpr = painter->device() ? painter->device()->devicePixelRatioF() : qApp->devicePixelRatio();
     QSize iconSize = size.toSize().boundedTo(m_styleOption->rect.size());
     if (iconSize.isEmpty()) {

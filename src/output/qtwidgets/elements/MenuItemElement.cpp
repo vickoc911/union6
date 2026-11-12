@@ -2,19 +2,12 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "MenuItemElement.h"
-#include "PropertiesTypes.h"
-#include "SharedNames.h"
-#include "StyleUtils.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include "elements/AbstractElement.h"
+
 #include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 MenuItemElement::MenuItemElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -160,7 +153,7 @@ void MenuItemElement::layout()
     }
 }
 
-QSizeF MenuItemElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF MenuItemElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     QSizeF preferredSize = contentsSizeFromStyle;
     // Handle separator separately (pun not intended)

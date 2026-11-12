@@ -4,12 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class MenuItemElement;
 
 namespace ElementCache
@@ -36,7 +36,7 @@ public:
     void layout() override;
     void draw(QPainter *painter, DrawEnums enums) const override;
 
-    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(QSizeF contentsSizeFromStyle) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
@@ -66,3 +66,5 @@ private:
     QString m_shortcutText;
     QIcon m_subMenuArrow;
 };
+}
+}

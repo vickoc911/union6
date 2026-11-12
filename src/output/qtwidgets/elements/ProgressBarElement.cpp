@@ -2,17 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ProgressBarElement.h"
-#include "SharedNames.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include "elements/AbstractElement.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 ProgressBarElement::ProgressBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -119,7 +112,7 @@ void ProgressBarElement::layout()
     }
 }
 
-QSizeF ProgressBarElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ProgressBarElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     // If the bar is vertical, make sure text has room
     auto size = applyPaddingToSize(contentsSizeFromStyle);

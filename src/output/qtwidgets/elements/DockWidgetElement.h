@@ -4,12 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include <ElementCache.h>
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class DockWidgetElement;
 
 namespace ElementCache
@@ -51,3 +51,5 @@ private:
     QString fallbackElementName(const QStyleOption *opt) const override;
     const QStyleOptionDockWidget *m_dockWidgetOption = nullptr;
 };
+}
+}

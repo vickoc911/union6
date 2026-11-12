@@ -2,15 +2,10 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "SpinBoxElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 SpinBoxElement::SpinBoxElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -83,7 +78,7 @@ void SpinBoxElement::updateSubElementList()
     m_subElementList.append(ElementString::Indicator);
 }
 
-QSizeF SpinBoxElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF SpinBoxElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     const int frameWidth = m_style->pixelMetric(QStyle::PM_SpinBoxFrameWidth, m_styleOption, m_widget);
     auto size = contentsSizeFromStyle;
@@ -134,7 +129,7 @@ QRectF SpinBoxElement::subControlRect(QStyle::SubControl subControl) const
     return m_style->QCommonStyle::subControlRect(QStyle::CC_SpinBox, qstyleoption_cast<const QStyleOptionSpinBox *>(m_styleOption), subControl, m_widget);
 }
 
-void SpinBoxElement::drawSpinIndicator(QPainter *painter, const QStyle::PrimitiveElement &primitive) const
+void SpinBoxElement::drawSpinIndicator(QPainter *painter, QStyle::PrimitiveElement primitive) const
 {
     if (!m_isValid || !m_styleOption) {
         return;

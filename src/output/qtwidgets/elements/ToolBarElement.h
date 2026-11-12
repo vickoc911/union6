@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class ToolBarElement;
 
 namespace ElementCache
@@ -62,3 +63,5 @@ private:
 
     qreal extent(Union::StylePropertyGroupPtr properties) const;
 };
+}
+}

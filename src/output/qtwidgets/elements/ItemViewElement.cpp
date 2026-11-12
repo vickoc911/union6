@@ -2,19 +2,14 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ItemViewElement.h"
-#include "SharedNames.h"
-#include "UnionPainter.h"
-#include "UnionStyle.h"
-#include <QApplication>
-#include <QDebug>
+
 #include <QListView>
-#include <QPainter>
-#include <QStyle>
 #include <QTableView>
 #include <QTreeView>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 // ItemViewElements are often used in many weird ways within applications, so we need to ensure they're
 // backwards compatible. This means we can't give them custom layouts without breaking everything.
@@ -113,7 +108,7 @@ void ItemViewElement::drawIndicator(QPainter *painter) const
     }
 }
 
-QSizeF ItemViewElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF ItemViewElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     const QSizeF commonSize = m_style->QCommonStyle::sizeFromContents(QStyle::CT_ItemViewItem, m_styleOption, contentsSizeFromStyle.toSize(), m_widget);
     return applyPaddingToSize(commonSize);

@@ -4,12 +4,11 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QIcon>
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
 
 class HeaderElement;
 
@@ -31,7 +30,6 @@ namespace detail
     template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderDefaultSectionSizeVertical> : public TypeHelper<HeaderElement, QStyleOption>{};
     template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderGripMargin> : public TypeHelper<HeaderElement, QStyleOption>{};
     template<> struct EnumToType<QStyle::PixelMetric, QStyle::PM_HeaderMarkSize> : public TypeHelper<HeaderElement, QStyleOption>{};
-
 /* clang-format on */
 }
 }
@@ -50,7 +48,7 @@ public:
     void drawText(QPainter *painter) const override;
 
     QRectF subElementRect(QStyle::SubElement element) const override;
-    QSizeF contentsSize(const QSizeF &contentsSizeFromStyle) const override;
+    QSizeF contentsSize(QSizeF contentsSizeFromStyle) const override;
     qreal pixelMetric(QStyle::PixelMetric pixelMetric) const override;
 
 private:
@@ -61,3 +59,6 @@ private:
     QIcon sortIndicator();
     bool m_isHorizontal;
 };
+
+}
+}

@@ -2,15 +2,9 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "TitleBarElement.h"
-#include "SharedNames.h"
-#include "UnionStyle.h"
-#include "elements/AbstractElement.h"
-#include <QApplication>
-#include <QDebug>
-#include <QPainter>
-#include <QStyle>
 
 using namespace Qt::StringLiterals;
+using namespace Union::Widgets;
 
 TitleBarElement::TitleBarElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -125,7 +119,7 @@ void TitleBarElement::layout()
     }
 }
 
-QSizeF TitleBarElement::contentsSize(const QSizeF &contentsSizeFromStyle) const
+QSizeF TitleBarElement::contentsSize(QSizeF contentsSizeFromStyle) const
 {
     return contentsSizeFromStyle;
 }

@@ -5,9 +5,14 @@
 
 #include <QEvent>
 #include <QObject>
-#include <QPoint>
+#include <QPointF>
 #include <QTimer>
 #include <QWidget>
+
+namespace Union
+{
+namespace Widgets
+{
 
 class DragEventFilter : public QObject
 {
@@ -18,7 +23,7 @@ public:
         Dragging,
         Unlocked
     };
-    Q_ENUMS(DragState)
+    Q_ENUM(DragState)
 
     explicit DragEventFilter(QObject *parent);
 
@@ -41,3 +46,6 @@ private:
     DragState m_currentState;
     QWidget *m_dragWidget;
 };
+
+}
+}

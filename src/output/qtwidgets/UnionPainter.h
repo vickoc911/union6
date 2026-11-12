@@ -3,11 +3,16 @@
 
 #pragma once
 
+#include <QPainter>
 #include <QPainterPath>
 #include <QStyle>
+
 #include <properties/StylePropertyGroup.h>
 
-class QPainter;
+namespace Union
+{
+namespace Widgets
+{
 
 struct Line {
     qreal size = 0.0;
@@ -44,7 +49,7 @@ public:
     /*!
      * \brief Generates a QPainterPath to use with outlines and rounded corners.
      */
-    static QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii);
+    static QPainterPath unevenRadiiRectPath(const QRectF &rect, const Union::Properties::CornersPropertyGroup::CornerRadii &cornerRadii);
 
     void setParts(Parts parts);
     void setOverrideBackgroundColor(const QColor &color);
@@ -66,7 +71,7 @@ private:
      * \brief Constrains the corner radii to not go over the rectangle's size or under zero.
      */
     Union::Properties::CornersPropertyGroup::CornerRadii constrainRadii(const QRectF &rect,
-                                                                        const Union::Properties::CornersPropertyGroup::CornerRadii cornerRadii);
+                                                                        const Union::Properties::CornersPropertyGroup::CornerRadii &cornerRadii);
 
     /*!
      * \brief Draw a Union LineProperty.
@@ -85,3 +90,5 @@ private:
     QRectF m_drawRect;
     QColor m_overrideColor;
 };
+}
+}

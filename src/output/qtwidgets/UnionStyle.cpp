@@ -3,50 +3,6 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "UnionStyle.h"
-#include "SharedNames.h"
-#include "StyleUtils.h"
-
-#include "elements/AbstractElement.h"
-#include "elements/ButtonElement.h"
-#include "elements/CheckBoxElement.h"
-#include "elements/ComboBoxElement.h"
-#include "elements/DockWidgetElement.h"
-#include "elements/FocusElement.h"
-#include "elements/FrameElement.h"
-#include "elements/GroupBoxElement.h"
-#include "elements/HeaderElement.h"
-#include "elements/IndicatorElement.h"
-#include "elements/ItemViewElement.h"
-#include "elements/LineEditElement.h"
-#include "elements/MenuBarElement.h"
-#include "elements/MenuBarItemElement.h"
-#include "elements/MenuElement.h"
-#include "elements/MenuItemElement.h"
-#include "elements/ProgressBarElement.h"
-#include "elements/RadioButtonElement.h"
-#include "elements/RubberBandElement.h"
-#include "elements/ScrollAreaCornerElement.h"
-#include "elements/ScrollBarElement.h"
-#include "elements/SizeGripElement.h"
-#include "elements/SliderElement.h"
-#include "elements/SpinBoxElement.h"
-#include "elements/SplitterElement.h"
-#include "elements/StatusBarElement.h"
-#include "elements/TabBarElement.h"
-#include "elements/TabCloseButtonElement.h"
-#include "elements/TabElement.h"
-#include "elements/TabWidgetElement.h"
-#include "elements/TitleBarElement.h"
-#include "elements/ToolBarElement.h"
-#include "elements/ToolBoxTabElement.h"
-#include "elements/ToolButtonElement.h"
-#include "elements/ToolTipElement.h"
-#include "elements/TreeViewElement.h"
-#include "elements/WidgetElement.h"
-
-#include <ElementQuery.h>
-#include <QApplication>
-#include <StyleRegistry.h>
 
 #include <QAbstractScrollArea>
 #include <QAbstractSpinBox>
@@ -108,11 +64,54 @@
 #include <QWidget>
 #include <QWidgetAction>
 
+#include <StyleRegistry.h>
+
 #include "ElementCache.h"
+#include "SharedNames.h"
+#include "StyleUtils.h"
 #include "UnionGraphicsEffect.h"
+
+#include "elements/AbstractElement.h"
+#include "elements/ButtonElement.h"
+#include "elements/CheckBoxElement.h"
+#include "elements/ComboBoxElement.h"
+#include "elements/DockWidgetElement.h"
+#include "elements/FocusElement.h"
+#include "elements/FrameElement.h"
+#include "elements/GroupBoxElement.h"
+#include "elements/HeaderElement.h"
+#include "elements/IndicatorElement.h"
+#include "elements/ItemViewElement.h"
+#include "elements/LineEditElement.h"
+#include "elements/MenuBarElement.h"
+#include "elements/MenuBarItemElement.h"
+#include "elements/MenuElement.h"
+#include "elements/MenuItemElement.h"
+#include "elements/ProgressBarElement.h"
+#include "elements/RadioButtonElement.h"
+#include "elements/RubberBandElement.h"
+#include "elements/ScrollAreaCornerElement.h"
+#include "elements/ScrollBarElement.h"
+#include "elements/SizeGripElement.h"
+#include "elements/SliderElement.h"
+#include "elements/SpinBoxElement.h"
+#include "elements/SplitterElement.h"
+#include "elements/StatusBarElement.h"
+#include "elements/TabBarElement.h"
+#include "elements/TabCloseButtonElement.h"
+#include "elements/TabElement.h"
+#include "elements/TabWidgetElement.h"
+#include "elements/TitleBarElement.h"
+#include "elements/ToolBarElement.h"
+#include "elements/ToolBoxTabElement.h"
+#include "elements/ToolButtonElement.h"
+#include "elements/ToolTipElement.h"
+#include "elements/TreeViewElement.h"
+#include "elements/WidgetElement.h"
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
+using namespace Union::Widgets;
 
 enum class EnumContext {
     ControlElement = 1,
@@ -244,7 +243,7 @@ UnionStyle::hitTestComplexControl(ComplexControl control, const QStyleOptionComp
         auto grooveRect = subControlRect(CC_ScrollBar, option, SC_ScrollBarGroove, widget);
         if (grooveRect.contains(point)) {
             const auto sliderRect = subControlRect(CC_ScrollBar, option, SC_ScrollBarSlider, widget);
-            const auto precedes = [](const QStyleOptionComplex *option, QPoint point, QRectF rect) {
+            const auto precedes = [](const QStyleOptionComplex *option, QPoint point, const QRectF &rect) {
                 if (option->state & QStyle::State_Horizontal) {
                     if (option->direction == Qt::LeftToRight) {
                         return point.x() < rect.right();
@@ -263,10 +262,12 @@ UnionStyle::hitTestComplexControl(ComplexControl control, const QStyleOptionComp
                 return SC_ScrollBarAddPage;
             }
         }
+        break;
     }
     default:
-        return QCommonStyle::hitTestComplexControl(control, option, point, widget);
+        break;
     }
+    return QCommonStyle::hitTestComplexControl(control, option, point, widget);
 }
 
 void UnionStyle::drawPrimitive(QStyle::PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const

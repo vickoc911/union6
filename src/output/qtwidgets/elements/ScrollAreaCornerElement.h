@@ -4,11 +4,12 @@
 #pragma once
 
 #include "AbstractElement.h"
-#include "ElementCache.h"
-#include <QObject>
-#include <QStyleOption>
 
-class UnionStyle;
+namespace Union
+{
+namespace Widgets
+{
+
 class ScrollAreaCornerElement;
 
 namespace ElementCache
@@ -36,3 +37,5 @@ public:
 private:
     QString fallbackElementName(const QStyleOption *opt) const override;
 };
+}
+}

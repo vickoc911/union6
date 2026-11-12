@@ -18,11 +18,13 @@
 // This implementation has been copied over from Breeze.
 
 #include "BoxShadowRenderer.h"
-#include "ShadowRenderer.h"
-#include "UnionPainter.h"
 
 #include <QPainter>
 #include <QtMath>
+
+#include "UnionPainter.h"
+
+using namespace Union::Widgets;
 
 static inline int calculateBlurRadius(qreal stdDev)
 {
@@ -109,7 +111,7 @@ static inline void boxBlurRowAlpha(const uint8_t *src,
                                    int width,
                                    int horizontalStride,
                                    int verticalStride,
-                                   const BoxLobes &lobes,
+                                   BoxLobes lobes,
                                    bool transposeInput,
                                    bool transposeOutput)
 {
@@ -170,7 +172,7 @@ static inline void boxBlurRowAlpha(const uint8_t *src,
  * @param rect Specifies what part of the image to blur. If nothing is provided, then
  *    the whole alpha channel of the input image will be blurred.
  **/
-static inline void boxBlurAlpha(QImage &image, int radius, const QRect &rect = {})
+static inline void boxBlurAlpha(QImage &image, int radius, QRect rect = {})
 {
     if (radius < 2) {
         return;
@@ -290,7 +292,7 @@ static void renderShadow(QPainter *painter, const QRectF &rect, const BoxShadowR
     painter->drawImage(shadowRect, shadowImage);
 }
 
-void BoxShadowRenderer::setBoxSize(const QSizeF &size)
+void BoxShadowRenderer::setBoxSize(QSizeF size)
 {
     m_boxSize = size;
 }
@@ -334,7 +336,7 @@ QSize BoxShadowRenderer::calculateMinimumBoxSize(const BoxShadowRenderer::Shadow
     return 2 * blurExtent + spreadExtent + QSize(1, 1);
 }
 
-QSizeF BoxShadowRenderer::calculateMinimumShadowTextureSize(const QSizeF &boxSize, const BoxShadowRenderer::Shadow &shadow)
+QSizeF BoxShadowRenderer::calculateMinimumShadowTextureSize(QSizeF boxSize, const BoxShadowRenderer::Shadow &shadow)
 {
     // Give the shadow a lot of room
     const QSize blurExtent = 4 * calculateBlurExtent((shadow.blur));
