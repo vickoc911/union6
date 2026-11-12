@@ -237,6 +237,18 @@ protected:
      */
     void updateGraphicsEffect(const QRectF &rect, const Union::StylePropertyGroupPtr &properties = nullptr) const;
 
+    /*!
+     * \brief Helper method for returning visualRect from style(),
+     * using styleoption direction.
+     */
+    QRectF visualRect(const QRectF &rect) const;
+
+    /*!
+     * \brief Get the text flags from the properties. Also ensures we have the
+     * alignment set correctly according to styleoption direction.
+     */
+    int textFlagsFromProperties(const Union::StylePropertyGroupPtr &properties) const;
+
     const QStyleOption *m_styleOption = nullptr;
     const UnionStyle *m_style = nullptr;
     const QWidget *m_widget = nullptr;

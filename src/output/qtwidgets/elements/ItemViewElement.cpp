@@ -51,24 +51,27 @@ void ItemViewElement::layout()
         m_elementProperties = queryProperties(m_elementList);
         if (m_viewItemOption) {
             auto opt = *m_viewItemOption;
-            opt.rect = backgroundRectangle(m_viewItemOption, m_elementProperties).toRect();
+            opt.rect = visualRect(backgroundRectangle(m_viewItemOption, m_elementProperties).toRect()).toRect();
             m_layoutMap[ElementString::Text].rect = m_style->QCommonStyle::subElementRect(QStyle::SE_ItemViewItemText, &opt, m_widget);
             m_layoutMap[ElementString::Icon].rect = m_style->QCommonStyle::subElementRect(QStyle::SE_ItemViewItemDecoration, &opt, m_widget);
-            m_layoutMap[ElementString::CheckBox].rect = m_style->QCommonStyle::subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &opt, m_widget);
+            m_layoutMap[ElementString::CheckBox].rect =
+                visualRect(m_style->QCommonStyle::subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &opt, m_widget));
 
             // Apply our spacing
+            auto textRect = visualRect(m_layoutMap[ElementString::Text].rect);
+            const auto iconRect = visualRect(m_layoutMap[ElementString::Icon].rect);
             switch (m_viewItemOption->decorationPosition) {
             case QStyleOptionViewItem::Left:
-                m_layoutMap[ElementString::Text].rect.moveLeft(m_layoutMap[ElementString::Icon].rect.right() + spacing());
+                textRect.moveLeft(iconRect.right() + spacing());
                 break;
             case QStyleOptionViewItem::Right:
-                m_layoutMap[ElementString::Text].rect.moveRight(m_layoutMap[ElementString::Icon].rect.left() - spacing());
+                textRect.moveRight(iconRect.left() - spacing());
                 break;
             case QStyleOptionViewItem::Top:
-                m_layoutMap[ElementString::Text].rect.moveTop(m_layoutMap[ElementString::Icon].rect.bottom() + spacing());
+                textRect.moveTop(iconRect.bottom() + spacing());
                 break;
             case QStyleOptionViewItem::Bottom:
-                m_layoutMap[ElementString::Text].rect.moveBottom(m_layoutMap[ElementString::Icon].rect.top() - spacing());
+                textRect.moveBottom(iconRect.top() - spacing());
                 break;
             }
         } else {
@@ -131,7 +134,7 @@ QRectF ItemViewElement::subElementRect(QStyle::SubElement element) const
             rect = centerRect(rect, width(m_indicatorProperties), height(m_indicatorProperties));
             rect.moveCenter(QPointF(rect.center().x() + spacing() / 2.0, rect.center().y()));
         }
-        return rect;
+        return visualRect(rect);
     }
     return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }
@@ -260,13 +263,13 @@ Union::IdentifierVariantHash ItemViewElement::elementAttributes() const
             map[u"position"_s] = QVariant(u"invalid"_s);
             break;
         case QStyleOptionViewItem::Beginning:
-            map[u"position"_s] = QVariant(u"beginning"_s);
+            map[u"position"_s] = m_viewItemOption->direction == Qt::RightToLeft ? QVariant(u"end"_s) : QVariant(u"beginning"_s);
             break;
         case QStyleOptionViewItem::Middle:
             map[u"position"_s] = QVariant(u"middle"_s);
             break;
         case QStyleOptionViewItem::End:
-            map[u"position"_s] = QVariant(u"end"_s);
+            map[u"position"_s] = m_viewItemOption->direction == Qt::RightToLeft ? QVariant(u"beginning"_s) : QVariant(u"end"_s);
             break;
         case QStyleOptionViewItem::OnlyOne:
             map[u"position"_s] = QVariant(u"onlyone"_s);

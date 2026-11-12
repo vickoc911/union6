@@ -77,7 +77,7 @@ void LineEditElement::drawBackground(QPainter *painter) const
         UnionPainter unionPainter(painter, m_elementProperties);
         unionPainter.setParts(m_hasFrame ? UnionPainter::Parts::All : UnionPainter::Parts::PanelOnly);
         unionPainter.setOverrideBackgroundColor(backgroundOverride);
-        unionPainter.setRect(m_styleOption->rect);
+        unionPainter.setRect(visualRect(m_styleOption->rect));
         unionPainter.draw();
     }
 }
@@ -108,7 +108,7 @@ QRectF LineEditElement::subElementRect(QStyle::SubElement element) const
 {
     if (m_isValid && m_frameOption && element == QStyle::SE_LineEditContents) {
         auto rect = backgroundRectangle(m_frameOption, m_elementProperties).toRect();
-        return rect.marginsRemoved(padding().toMargins());
+        return visualRect(rect.marginsRemoved(padding().toMargins()));
     }
     return m_style->QCommonStyle::subElementRect(element, m_styleOption, m_widget);
 }

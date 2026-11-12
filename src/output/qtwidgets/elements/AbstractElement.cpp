@@ -313,7 +313,7 @@ void AbstractElement::drawIconAtRect(QPainter *painter, const QIcon &icon, const
         auto iconSize = rect.size();
         const QPixmap pixmap = unionIcon.pixmap(iconSize.toSize(), dpr, enabled ? QIcon::Normal : QIcon::Disabled);
         painter->save();
-        m_style->drawItemPixmap(painter, rect, Qt::AlignCenter, pixmap);
+        m_style->drawItemPixmap(painter, visualRect(rect).toRect(), Qt::AlignCenter, pixmap);
         painter->restore();
     }
 }
@@ -339,7 +339,7 @@ void AbstractElement::drawTextAtRect(QPainter *painter, const QString &text, con
         painter->save();
         painter->setPen(textColor);
         painter->setFont(font);
-        m_style->drawItemText(painter, rect.toRect(), textFlags, m_styleOption->palette, enabled, elidedText(text, rect, property));
+        m_style->drawItemText(painter, visualRect(rect).toRect(), textFlags, m_styleOption->palette, enabled, elidedText(text, rect, property));
         painter->restore();
     }
 }
@@ -860,4 +860,35 @@ Union::StylePropertyGroupPtr AbstractElement::defaultPropertyGroup(Union::StyleP
         return m_elementProperties;
     }
     return properties;
+}
+
+QRectF AbstractElement::visualRect(const QRectF &rect) const
+{
+    if (m_style && m_styleOption) {
+        return m_style->visualRect(m_styleOption->direction, m_styleOption->rect, rect);
+    }
+    return rect;
+}
+
+int AbstractElement::textFlagsFromProperties(const Union::StylePropertyGroupPtr &properties) const
+{
+    int textFlags = Qt::AlignVCenter;
+    auto horizontalAlignment = toQtHorizontalAlignment(
+        properties->safePropertyLookup(Alignment::Start, &StylePropertyGroup::layout, &LayoutPropertyGroup::alignment, &AlignmentPropertyGroup::horizontal));
+    auto verticalAlignment = toQtVerticalAlignment(
+        properties->safePropertyLookup(Alignment::Center, &StylePropertyGroup::layout, &LayoutPropertyGroup::alignment, &AlignmentPropertyGroup::vertical));
+    if (m_styleOption) {
+        horizontalAlignment = m_style->visualAlignment(m_styleOption->direction, horizontalAlignment);
+        verticalAlignment = m_style->visualAlignment(m_styleOption->direction, verticalAlignment);
+    }
+    const auto textAlign = horizontalAlignment | verticalAlignment;
+    auto textWrap =
+        toQtWrapMode(properties->safePropertyLookup(Union::Properties::TextWrapMode::NoWrap, &StylePropertyGroup::text, &TextPropertyGroup::wrapMode));
+    textFlags |= textAlign;
+    // Do not add wrap flags if we get DontClip
+    // This could be done better
+    if (textWrap != Qt::TextDontClip) {
+        textFlags |= textWrap;
+    }
+    return textFlags;
 }
