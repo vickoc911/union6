@@ -1,0 +1,258 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/* nodes with no Union equivalent. $ vars get replaced at gen time */
+
+* {
+    -gtk-secondary-caret-color: @theme_selected_bg_color;
+}
+
+.background {
+    color: @theme_fg_color;
+    background-color: @theme_bg_color;
+}
+
+.background:backdrop:not(tooltip) {
+    color: @theme_unfocused_fg_color;
+    background-color: @theme_unfocused_bg_color;
+}
+
+label:disabled {
+    color: @insensitive_fg_color;
+}
+
+label.error,
+.error {
+    color: @error_color;
+}
+
+label.warning,
+.warning {
+    color: @warning_color;
+}
+
+label.success,
+.success {
+    color: @success_color;
+}
+
+.osd {
+    color: @active_complementary_foreground_text;
+    background-color: @active_complementary_background_normal;
+}
+
+.large-title,
+.title-1 {
+    font-weight: $heading-weight;
+    font-size: $heading-1-size;
+}
+
+.title-2 {
+    font-weight: $heading-weight;
+    font-size: $heading-2-size;
+}
+
+.title-3 {
+    font-weight: $heading-weight;
+    font-size: $heading-3-size;
+}
+
+.title-4 {
+    font-weight: $heading-weight;
+    font-size: $heading-4-size;
+}
+
+.heading,
+label.title {
+    font-weight: $heading-weight;
+}
+
+.monospace {
+    font-family: monospace;
+}
+
+.numeric {
+    font-feature-settings: "tnum";
+}
+
+headerbar .title {
+    padding: 0 $spacing-large;
+    font-weight: $heading-weight;
+}
+
+headerbar .subtitle {
+    font-size: smaller;
+}
+
+/* the side padding is on the label so it survives apps overriding button padding */
+stackswitcher > button.text-button {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+entry.error {
+    color: @error_color;
+    border-color: @error_color;
+}
+
+entry.warning {
+    color: @warning_color;
+    border-color: @warning_color;
+}
+
+textview {
+    caret-color: currentColor;
+}
+
+/* the on/off glyphs aren't part of the Union switch, hide them without making the track taller */
+switch image {
+    margin: calc(-0.5 * $icon-size) 0;
+    color: transparent;
+}
+
+/* GTK sizes the progress node by its min size but Union fills the bar */
+progressbar.horizontal > trough > progress {
+    min-height: $progress-thickness;
+}
+
+progressbar.vertical > trough > progress {
+    min-width: $progress-thickness;
+}
+
+progressbar > text {
+    font-size: smaller;
+}
+
+progressbar.osd > trough {
+    border-radius: 0;
+    background: none;
+}
+
+progressbar.osd > trough > progress {
+    border-radius: 0;
+}
+
+scrollbar.overlay-indicator:not(.hovering) {
+    background: none;
+}
+
+scrollbar.vertical slider {
+    min-height: calc(2 * $scrollbar-size);
+}
+
+scrollbar.horizontal slider {
+    min-width: calc(2 * $scrollbar-size);
+}
+
+/*
+ * GTK can't select a tab by what's in it so the length goes on the label.
+ * Labels on left & right tabs aren't rotated either, so every tab is as long
+ * as a top one
+ */
+notebook > header > tabs > tab {
+    min-height: $tab-height;
+}
+
+notebook > header > tabs > tab > label,
+notebook > header > tabs > tab > box > label:only-child {
+    min-width: $tab-width;
+}
+
+/* next to an icon or close button */
+notebook > header > tabs > tab > box > label {
+    min-width: calc($tab-width - $tab-button-size - $spacing);
+}
+
+notebook > header > tabs > tab button.flat {
+    padding: 0;
+}
+
+notebook > header.top > tabs > arrow.down,
+notebook > header.bottom > tabs > arrow.down {
+    -gtk-icon-source: $arrow-left;
+}
+
+notebook > header.top > tabs > arrow.up,
+notebook > header.bottom > tabs > arrow.up {
+    -gtk-icon-source: $arrow-right;
+}
+
+notebook > header.left > tabs > arrow.down,
+notebook > header.right > tabs > arrow.down {
+    -gtk-icon-source: $arrow-up;
+}
+
+notebook > header.left > tabs > arrow.up,
+notebook > header.right > tabs > arrow.up {
+    -gtk-icon-source: $arrow-down;
+}
+
+popover.menu label.title {
+    padding: $spacing $spacing-large;
+    font-weight: $heading-weight;
+}
+
+treeview.view {
+    border-left-color: @borders;
+    border-top-color: @borders;
+}
+
+treeview.view.separator {
+    min-height: $separator-width;
+    color: @borders;
+}
+
+separator {
+    min-width: $separator-width;
+    min-height: $separator-width;
+    background-color: @borders;
+}
+
+paned.horizontal > separator {
+    min-width: $splitter-width;
+}
+
+paned.vertical > separator {
+    min-height: $splitter-width;
+}
+
+separator.spacer {
+    background: none;
+}
+
+searchbar > revealer > box {
+    box-shadow: inset 0 -$border-width @borders;
+}
+
+spinner {
+    opacity: 0;
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $busy-icon;
+}
+
+spinner:checked {
+    opacity: 1;
+    animation: union-spin 1s linear infinite;
+}
+
+@keyframes union-spin {
+    to {
+        -gtk-icon-transform: rotate(1turn);
+    }
+}
+
+colorswatch,
+colorswatch > overlay {
+    border-radius: $radius;
+}
+
+colorswatch > overlay {
+    box-shadow: inset 0 0 0 $border-width @borders;
+}
+
+colorswatch:selected > overlay {
+    box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
+}

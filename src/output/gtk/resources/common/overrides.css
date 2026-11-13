@@ -1,0 +1,76 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/*  selectors that have to win over union generated rules */
+
+.linked:not(.vertical) > button:not(:last-child):not(:only-child),
+.linked:not(.vertical) > entry:not(:last-child):not(:only-child),
+.linked:not(.vertical) > spinbutton:not(:last-child):not(:only-child),
+.linked:not(.vertical) > combobox:not(:last-child):not(:only-child) > box > button.combo {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.linked:not(.vertical) > button:not(:first-child):not(:only-child),
+.linked:not(.vertical) > entry:not(:first-child):not(:only-child),
+.linked:not(.vertical) > spinbutton:not(:first-child):not(:only-child),
+.linked:not(.vertical) > combobox:not(:first-child):not(:only-child) > box > button.combo {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.linked:not(.vertical) > :not(:first-child) {
+    margin-left: -$border-width;
+}
+
+.linked.vertical > button:not(:last-child):not(:only-child),
+.linked.vertical > entry:not(:last-child):not(:only-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.linked.vertical > button:not(:first-child):not(:only-child),
+.linked.vertical > entry:not(:first-child):not(:only-child) {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.linked.vertical > :not(:first-child) {
+    margin-top: -$border-width;
+}
+
+spinbutton.vertical > button {
+    padding: $spacing;
+}
+
+/* the tab bar line is the page edge on the tab side, top & left headers come before the stack */
+notebook.frame > header.top + stack {
+    border-top-width: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+notebook.frame > header.left + stack {
+    border-left-width: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* bottom & right headers come after it so they overlap the page edge like the Union tab widget inset */
+notebook.frame > header.bottom {
+    margin-top: -$border-width;
+}
+
+notebook.frame > header.right {
+    margin-left: -$border-width;
+}
+
+/*
+ * apps ask for round buttons with .circular, only the button rule sets corners so it doesn't need to fight.
+ * GTK shrinks a radius that's too big to half the height like Union does, so wide ones are pills
+ */
+button.circular {
+    border-radius: $round-button-radius;
+}

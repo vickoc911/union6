@@ -3,3 +3,7 @@
 
 add_subdirectory(ruleinspector)
 add_subdirectory(styletool)
+
+if (BUILD_OUTPUT_GTK)
+    add_subdirectory(gtktheme)
+endif()

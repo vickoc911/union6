@@ -1,0 +1,53 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/*  selectors that have to win over union generated rules */
+
+/*
+ * Window controls get stretched to the header bar height so the image inside
+ * is the button you actually see
+ */
+
+headerbar windowcontrols > button,
+headerbar windowcontrols > button:hover,
+headerbar windowcontrols > button:active,
+headerbar windowcontrols > button:backdrop,
+headerbar windowcontrols > button:focus-visible,
+.titlebar windowcontrols > button,
+.titlebar windowcontrols > button:hover,
+.titlebar windowcontrols > button:active,
+.titlebar windowcontrols > button:backdrop,
+.titlebar windowcontrols > button:focus-visible {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    background: none;
+    box-shadow: none;
+    outline-width: 0;
+}
+
+.linked:not(.vertical) > menubutton:not(:last-child):not(:only-child) > button,
+.linked:not(.vertical) > dropdown:not(:last-child):not(:only-child) > button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.linked:not(.vertical) > menubutton:not(:first-child):not(:only-child) > button,
+.linked:not(.vertical) > dropdown:not(:first-child):not(:only-child) > button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* popover menu items in button rows don't need a min width */
+popover.menu box.inline-buttons modelbutton,
+popover.menu box.circular-buttons modelbutton {
+    min-width: 0;
+}
+
+row:selected link,
+row:selected button.link {
+    color: currentColor;
+}

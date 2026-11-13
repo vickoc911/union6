@@ -47,6 +47,7 @@ option(BUILD_INPUT_PLASMASVG "Build the PlasmaSVG input plugin" OFF)
 option(BUILD_OUTPUT_QTQUICK "Build the QtQuick output" ON)
 cmake_dependent_option(BUILD_OUTPUT_KIRIGAMI "Build the Kirigami output. Requires QtQuick output." ON "BUILD_OUTPUT_QTQUICK" OFF)
 option(BUILD_OUTPUT_QTWIDGETS "Build the QtWidgets output" ON)
+cmake_dependent_option(BUILD_OUTPUT_GTK "Build the GTK output. Requires tools." ON "BUILD_TOOLS" OFF)
 
 set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprecated API excluded from the build [default=0].")
 
@@ -100,7 +101,7 @@ if (BUILD_INPUT_PLASMASVG)
     find_package(ryml REQUIRED)
 endif()
 
-if (BUILD_PLATFORM_PLASMA)
+if (BUILD_PLATFORM_PLASMA OR BUILD_OUTPUT_GTK)
     find_package(Qt6DBus ${QT_MIN_VERSION} CONFIG REQUIRED)
     find_package(KF6 ${KF6_MIN_VERSION} REQUIRED COMPONENTS WindowSystem)
     set_package_properties(KF6WindowSystem PROPERTIES TYPE REQUIRED PURPOSE "KWindowSystem is used for drawing menu shadows")

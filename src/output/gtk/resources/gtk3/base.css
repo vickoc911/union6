@@ -1,0 +1,304 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/* GTK 3 nodes with no Union equivalent. $ vars get replaced at gen time */
+
+.view,
+textview text,
+iconview {
+    color: @theme_text_color;
+    background-color: @theme_base_color;
+}
+
+.view:disabled,
+textview text:disabled {
+    color: @insensitive_fg_color;
+    background-color: @insensitive_base_color;
+}
+
+.view:selected,
+iconview:selected {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+selection,
+label selection,
+entry selection,
+textview text selection {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+.dim-label,
+label.separator,
+scale value,
+headerbar .subtitle {
+    opacity: $dim-opacity;
+}
+
+*:link,
+button.link:link {
+    color: @link_color;
+}
+
+*:visited,
+button.link:visited {
+    color: @link_visited_color;
+}
+
+/*
+ * GTK 3 draws the frame & shadow of CSD windows on the decoration node. The
+ * margin is the resize area, same width as GTK 4
+ */
+decoration {
+    margin: 12px;
+    border-radius: $radius $radius 0 0;
+    box-shadow: $window-shadow, 0 0 0 $border-width @borders;
+}
+
+decoration:backdrop {
+    box-shadow: $window-shadow, 0 0 0 $border-width @unfocused_borders;
+}
+
+messagedialog.csd decoration {
+    border-radius: $radius;
+}
+
+.maximized decoration,
+.fullscreen decoration,
+.tiled decoration,
+.tiled-top decoration,
+.tiled-left decoration,
+.tiled-right decoration,
+.tiled-bottom decoration {
+    border-radius: 0;
+    box-shadow: 0 0 0 $border-width @borders;
+}
+
+.maximized decoration,
+.fullscreen decoration,
+.ssd decoration,
+.popup decoration,
+tooltip decoration {
+    box-shadow: none;
+}
+
+/* without compositing the resize area gets drawn around the window */
+.solid-csd decoration {
+    margin: 0;
+    padding: $spacing;
+    border-radius: 0;
+    background-color: @theme_bg_color;
+    box-shadow: inset 0 0 0 $border-width @borders;
+}
+
+entry image {
+    min-width: $icon-size;
+    min-height: $icon-size;
+}
+
+entry image.left {
+    margin-right: $spacing-medium;
+}
+
+entry image.right {
+    margin-left: $spacing-medium;
+}
+
+entry progress {
+    border-bottom: $progress-thickness solid @theme_selected_bg_color;
+    background: none;
+    box-shadow: none;
+}
+
+spinbutton entry {
+    padding: 0 $spacing-medium;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+spinbutton.vertical entry {
+    padding: 0;
+}
+
+/* same spacing Breeze has next to a check box */
+checkbutton > check:dir(ltr),
+radiobutton > radio:dir(ltr),
+menuitem check:dir(ltr),
+menuitem radio:dir(ltr),
+modelbutton check:dir(ltr),
+modelbutton radio:dir(ltr) {
+    margin-right: $indicator-spacing;
+}
+
+checkbutton > check:dir(rtl),
+radiobutton > radio:dir(rtl),
+menuitem check:dir(rtl),
+menuitem radio:dir(rtl),
+modelbutton check:dir(rtl),
+modelbutton radio:dir(rtl) {
+    margin-left: $indicator-spacing;
+}
+
+scale trough > fill {
+    border-radius: $radius;
+}
+
+levelbar.discrete.horizontal block {
+    margin: 0 $border-width;
+}
+
+levelbar.discrete.vertical block {
+    margin: $border-width 0;
+}
+
+levelbar block.low {
+    background-color: @warning_color;
+}
+
+levelbar block.empty {
+    background: none;
+    box-shadow: none;
+}
+
+/* the frame in GTK 3 status bars is just a container, the bar draws the line */
+statusbar frame > border {
+    border-style: none;
+}
+
+/* GTK 3 draws a grip on paned handles, the Union splitter is just a line */
+paned > separator {
+    -gtk-icon-source: none;
+}
+
+/* Union scroll bars don't have buttons */
+scrollbar {
+    -GtkScrollbar-has-backward-stepper: false;
+    -GtkScrollbar-has-forward-stepper: false;
+    background-color: @theme_base_color;
+}
+
+scrolledwindow overshoot,
+scrolledwindow undershoot {
+    background: none;
+}
+
+/* no border-spacing for boxes in GTK 3 */
+notebook > header > tabs > tab button.flat {
+    margin-left: $spacing;
+}
+
+/* GTK 4 apps put margins on the notification box themselves, GTK 3 ones don't */
+frame.app-notification > border {
+    padding: $spacing-large;
+}
+
+/* GTK 3 popovers hold widgets like a little dialog */
+popover.background {
+    padding: $dialog-padding;
+}
+
+popover list {
+    background: none;
+}
+
+modelbutton arrow,
+menuitem arrow {
+    min-width: $icon-size;
+    min-height: $icon-size;
+}
+
+modelbutton arrow {
+    -gtk-icon-source: $arrow-right;
+}
+
+modelbutton arrow:dir(rtl) {
+    -gtk-icon-source: $arrow-left;
+}
+
+menuitem accelerator {
+    margin-left: $shortcut-spacing;
+}
+
+menubar {
+    padding: 0;
+}
+
+list,
+treeview.view {
+    color: @theme_text_color;
+    background-color: @theme_base_color;
+}
+
+.navigation-sidebar,
+stacksidebar list {
+    color: @theme_fg_color;
+    background-color: @theme_bg_color;
+}
+
+/* margins are what separate the navigation sidebar rows */
+stacksidebar list separator {
+    min-height: 0;
+    background: none;
+}
+
+expander arrow,
+treeview.view.expander {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $arrow-right;
+}
+
+expander arrow:dir(rtl),
+treeview.view.expander:dir(rtl) {
+    -gtk-icon-source: $arrow-left;
+}
+
+expander arrow:checked,
+treeview.view.expander:checked {
+    -gtk-icon-source: $arrow-down;
+}
+
+expander title > arrow {
+    margin-right: $spacing;
+}
+
+frame.flat > border,
+scrolledwindow.frame.flat {
+    border-style: none;
+}
+
+searchbar > revealer > box {
+    padding: $spacing;
+}
+
+/* GTK 3 calendars don't have nodes for days */
+calendar {
+    padding: $spacing;
+}
+
+calendar.header {
+    border-bottom: $border-width solid @borders;
+}
+
+calendar:selected {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+    border-radius: $radius;
+}
+
+*:drop(active) {
+    box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
+}
+
+image:disabled {
+    opacity: $dim-opacity;
+}
+
+buttonbox {
+    -GtkButtonBox-child-min-height: 0;
+}

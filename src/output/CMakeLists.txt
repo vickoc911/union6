@@ -9,6 +9,10 @@ if (BUILD_OUTPUT_QTWIDGETS)
     add_subdirectory(qtwidgets)
 endif()
 
+if (BUILD_OUTPUT_GTK)
+    add_subdirectory(gtk)
+endif()
+
 if (BUILD_OUTPUT_KIRIGAMI)
     add_subdirectory(kirigami)
 endif()

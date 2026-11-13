@@ -1,0 +1,402 @@
+/*
+ * SPDX-License-Identifier: LGPL-2.1-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
+ * SPDX-FileCopyrightText: 2026 Kylie <kyliepc@proton.me>
+ */
+
+/* GTK 4 nodes with no Union equivalent. $ vars get replaced at gen time */
+
+.view,
+textview > text,
+iconview {
+    color: @theme_text_color;
+    background-color: @theme_base_color;
+}
+
+.view:disabled,
+textview > text:disabled {
+    color: @insensitive_fg_color;
+    background-color: @insensitive_base_color;
+}
+
+.view:selected,
+iconview:selected {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+selection,
+label > selection,
+text > selection,
+textview > text > selection {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+text > block-cursor {
+    color: @theme_base_color;
+    background-color: currentColor;
+}
+
+.dim-label,
+label.separator,
+scale > value,
+headerbar .subtitle {
+    opacity: $dim-opacity;
+}
+
+.accent {
+    color: @theme_selected_bg_color;
+}
+
+.caption {
+    font-size: smaller;
+}
+
+.caption-heading {
+    font-size: smaller;
+    font-weight: $heading-weight;
+}
+
+link,
+button.link {
+    color: @link_color;
+}
+
+link:visited,
+button.link:visited {
+    color: @link_visited_color;
+}
+
+button.link > label {
+    text-decoration-line: underline;
+}
+
+window.csd {
+    border-radius: $radius $radius 0 0;
+    box-shadow: $window-shadow, 0 0 0 $border-width @borders;
+}
+
+window.csd:backdrop {
+    box-shadow: $window-shadow, 0 0 0 $border-width @unfocused_borders;
+}
+
+window.csd.dialog.message {
+    border-radius: $radius;
+}
+
+window.maximized,
+window.fullscreen,
+window.tiled,
+window.tiled-top,
+window.tiled-left,
+window.tiled-right,
+window.tiled-bottom {
+    border-radius: 0;
+    box-shadow: 0 0 0 $border-width @borders;
+}
+
+window.maximized,
+window.fullscreen {
+    box-shadow: none;
+}
+
+window.solid-csd {
+    border-radius: 0;
+    padding: $spacing;
+    box-shadow: inset 0 0 0 $border-width @borders;
+}
+
+headerbar > windowhandle > box > box.start,
+headerbar > windowhandle > box > box.end,
+headerbar > windowhandle > box > box.start > box,
+headerbar > windowhandle > box > box.end > box {
+    border-spacing: $spacing;
+}
+
+windowcontrols {
+    border-spacing: $spacing;
+}
+
+button > box,
+menubutton > button > box,
+dropdown > button > box {
+    border-spacing: $spacing;
+}
+
+menubutton arrow {
+    min-width: $icon-size;
+    min-height: $icon-size;
+}
+
+menubutton arrow.down {
+    -gtk-icon-source: $arrow-down;
+}
+
+menubutton arrow.up {
+    -gtk-icon-source: $arrow-up;
+}
+
+menubutton arrow.left {
+    -gtk-icon-source: $arrow-left;
+}
+
+menubutton arrow.right {
+    -gtk-icon-source: $arrow-right;
+}
+
+dropdown > popover listview > row image {
+    -gtk-icon-size: $icon-size;
+}
+
+/* GTK sizes icons asked for as normal or large with these classes */
+.normal-icons {
+    -gtk-icon-size: $icon-size;
+}
+
+.large-icons {
+    -gtk-icon-size: $icon-size-large;
+}
+
+iconview {
+    -gtk-icon-size: $iconview-icon-size;
+}
+
+entry > image {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-size: $icon-size;
+}
+
+entry > image.left {
+    margin-right: $spacing-medium;
+}
+
+entry > image.right {
+    margin-left: $spacing-medium;
+}
+
+entry > progress {
+    border-bottom: $progress-thickness solid @theme_selected_bg_color;
+    background: none;
+    box-shadow: none;
+}
+
+spinbutton > text {
+    padding: 0 $spacing-medium;
+}
+
+spinbutton.vertical > text {
+    padding: 0;
+}
+
+/* match the spacing Breeze has next to a check box */
+checkbutton {
+    border-spacing: $indicator-spacing;
+}
+
+scale > trough > fill {
+    border-radius: $radius;
+}
+
+levelbar.discrete.horizontal > trough > block {
+    margin: 0 $border-width;
+}
+
+levelbar.discrete.vertical > trough > block {
+    margin: $border-width 0;
+}
+
+levelbar > trough > block.low {
+    background-color: @warning_color;
+}
+
+levelbar > trough > block.empty {
+    background: none;
+    box-shadow: none;
+}
+
+/*
+ * GTK puts hovered scroll bars on top of the content, Union has them next to
+ * it on the view background
+ */
+scrollbar {
+    background-color: @theme_base_color;
+}
+
+scrolledwindow > overshoot,
+scrolledwindow > undershoot {
+    background: none;
+}
+
+notebook > header > tabs > tab > box {
+    border-spacing: $spacing;
+}
+
+/* only draw the popover contents, the rest is room for the shadow */
+popover.background,
+popover.background:backdrop {
+    background: none;
+}
+
+/* popovers hold widgets like a little dialog */
+popover > contents {
+    padding: $dialog-padding;
+}
+
+/* lists in popovers use the popover's colour */
+popover list,
+popover listview {
+    background: none;
+}
+
+popover.menu modelbutton > box {
+    border-spacing: $menu-spacing;
+}
+
+popover.menu modelbutton > accelerator {
+    margin-left: $shortcut-spacing;
+}
+
+popover.menu modelbutton check.left,
+popover.menu modelbutton radio.left,
+popover.menu modelbutton arrow.left {
+    margin-right: $indicator-spacing;
+}
+
+popover.menu modelbutton check.right,
+popover.menu modelbutton radio.right,
+popover.menu modelbutton arrow.right {
+    margin-left: $indicator-spacing;
+}
+
+popover.menu modelbutton arrow {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $arrow-right;
+}
+
+popover.menu modelbutton arrow.left {
+    -gtk-icon-source: $arrow-left;
+}
+
+popover.menu box.inline-buttons {
+    padding: 0 $spacing-large;
+    border-spacing: $spacing;
+}
+
+tooltip > box {
+    border-spacing: $spacing-medium;
+}
+
+list,
+listview,
+columnview,
+gridview,
+treeview.view {
+    color: @theme_text_color;
+    background-color: @theme_base_color;
+}
+
+listview > row,
+gridview > child {
+    padding: $spacing;
+}
+
+.navigation-sidebar,
+stacksidebar > scrolledwindow > list {
+    color: @theme_fg_color;
+    background-color: @theme_bg_color;
+}
+
+list.boxed-list {
+    border: $border-width solid @borders;
+    border-radius: $radius;
+}
+
+columnview.column-separators > listview > row > cell {
+    box-shadow: inset -$border-width 0 @borders;
+}
+
+expander,
+treeexpander > expander,
+treeview.view.expander {
+    min-width: $icon-size;
+    min-height: $icon-size;
+    -gtk-icon-source: $arrow-right;
+}
+
+expander:dir(rtl),
+treeexpander > expander:dir(rtl),
+treeview.view.expander:dir(rtl) {
+    -gtk-icon-source: $arrow-left;
+}
+
+expander:checked,
+treeexpander > expander:checked,
+treeview.view.expander:checked {
+    -gtk-icon-source: $arrow-down;
+}
+
+expander-widget > box > title {
+    border-radius: $radius;
+}
+
+expander-widget > box > title > expander {
+    margin-right: $spacing;
+}
+
+frame.flat,
+scrolledwindow.frame.flat {
+    border-style: none;
+}
+
+.toolbar,
+actionbar > revealer > box,
+searchbar > revealer > box {
+    border-spacing: $spacing;
+}
+
+searchbar > revealer > box {
+    padding: $spacing;
+}
+
+infobar > revealer > box {
+    border-spacing: $spacing-medium;
+}
+
+calendar > header {
+    border-bottom: $border-width solid @borders;
+}
+
+calendar > grid {
+    padding: $spacing;
+}
+
+calendar > grid > label {
+    padding: $spacing;
+    border-radius: $radius;
+}
+
+calendar > grid > label:selected {
+    color: @theme_selected_fg_color;
+    background-color: @theme_selected_bg_color;
+}
+
+popover.emoji-picker emoji {
+    padding: $spacing-medium;
+    border-radius: $radius;
+    font-size: x-large;
+}
+
+:drop(active) {
+    box-shadow: inset 0 0 0 $focus-width @theme_selected_bg_color;
+}
+
+dnd {
+    -gtk-icon-size: $icon-size-large;
+}
+
+picture:disabled,
+image:disabled {
+    opacity: $dim-opacity;
+}
