@@ -953,6 +953,21 @@ bool UnionStyle::eventFilter(QObject *object, QEvent *event)
         setMnemonics(false);
         break;
 
+    case QEvent::Show:
+    case QEvent::Hide:
+        // When a tool button on a horizontal toolbar is shown or hidden, the
+        // group position (see ToolButtonElement::elementHints()) of its
+        // neighbors can change even though their geometry stays the same, so
+        // force the toolbar to repaint them.
+        if (auto *toolButton = qobject_cast<QToolButton *>(object)) {
+            if (auto *toolBar = qobject_cast<QToolBar *>(toolButton->parentWidget())) {
+                if (toolBar->orientation() == Qt::Horizontal) {
+                    toolBar->update();
+                }
+            }
+        }
+        break;
+
     default:
         break;
     }

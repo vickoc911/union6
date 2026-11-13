@@ -2,10 +2,30 @@
 // SPDX-FileCopyrightText: 2026 Akseli Lahtinen <akselmo@akselmo.dev>
 
 #include "ToolButtonElement.h"
+#include <QToolBar>
+#include <QToolButton>
 
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
 using namespace Union::Widgets;
+
+namespace
+{
+
+    // Group toolbuttom: Checks whether the toolbar has a direct toolbutton child 1px away from the given position.
+    bool hasAdjacentToolButton(const QToolBar *toolBar, int x, int y, int height)
+    {
+        const auto *child = toolBar->childAt(x, y);
+        if (!child || child->parentWidget() != toolBar || child->height() != height) {
+            return false;
+        }
+        if (child->objectName() == u"qt_toolbar_ext_button"_s) {
+            return false;
+        }
+        return qobject_cast<const QToolButton *>(child) != nullptr;
+    }
+
+} // namespace
 
 ToolButtonElement::ToolButtonElement(const QStyleOption *option, const UnionStyle *style, const QWidget *widget)
     : AbstractElement(option, style, widget)
@@ -244,6 +264,28 @@ Union::IdentifierList ToolButtonElement::elementHints() const
     // If menuButton is pressed, both sunken and raised are active
     if (m_toolButtonOption->state.testFlags({QStyle::State_Sunken, QStyle::State_Raised})) {
         hints.append(u"menu-open"_s);
+    }
+
+    // Group toolbuttom: Position within a row of adjacent tool buttons on a horizontal toolbar,
+    // like Kvantum's group_toolbar_buttons option. Themes can style the
+    // group-* hints to render adjacent buttons as one connected bar.
+    if (m_widget) {
+        if (const auto *toolBar = qobject_cast<const QToolBar *>(m_widget->parentWidget())) {
+            if (toolBar->orientation() == Qt::Horizontal && m_widget->objectName() != u"qt_toolbar_ext_button"_s) {
+                const QRect g = m_widget->geometry();
+                const bool hasLeft = hasAdjacentToolButton(toolBar, g.x() - 1, g.y(), g.height());
+                const bool hasRight = hasAdjacentToolButton(toolBar, g.x() + g.width() + 1, g.y(), g.height());
+                if (hasLeft && hasRight) {
+                    hints.append(u"group-middle"_s);
+                } else if (hasLeft) {
+                    hints.append(u"group-end"_s);
+                } else if (hasRight) {
+                    hints.append(u"group-start"_s);
+                } else {
+                    hints.append(u"group-solo"_s);
+                }
+            }
+        }
     }
 
     return hints;
