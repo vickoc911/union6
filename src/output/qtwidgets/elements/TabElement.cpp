@@ -65,10 +65,10 @@ void TabElement::draw(QPainter *painter, DrawEnums enums) const
     // The effect painter gets upset at saveAndRotatePainter
     auto saveAndRotatePainter = [this](QPainter *painter) {
         painter->save();
-        QRect tabRect = m_tabOption->rect;
+        QRect tabRect = m_styleOption->rect;
         if (m_isVertical) {
             int newX, newY, newRot;
-            if (m_tabOption->shape == QTabBar::RoundedEast || m_tabOption->shape == QTabBar::TriangularEast) {
+            if (m_shape == QTabBar::RoundedEast || m_shape == QTabBar::TriangularEast) {
                 newX = tabRect.width() + tabRect.x();
                 newY = tabRect.y();
                 newRot = 90;
