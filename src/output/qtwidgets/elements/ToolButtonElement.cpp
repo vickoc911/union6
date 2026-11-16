@@ -5,6 +5,8 @@
 #include <QToolBar>
 #include <QToolButton>
 
+#include <limits>
+
 using namespace Qt::StringLiterals;
 using namespace Union::Properties;
 using namespace Union::Widgets;
@@ -12,18 +14,33 @@ using namespace Union::Widgets;
 namespace
 {
 
-    // Group toolbuttom: Checks whether the toolbar has a direct toolbutton child 1px away from the given position.
-    bool hasAdjacentToolButton(const QToolBar *toolBar, int x, int y, int height)
-    {
-        const auto *child = toolBar->childAt(x, y);
-        if (!child || child->parentWidget() != toolBar || child->height() != height) {
-            return false;
+// Finds the toolbutton that directly touches the given side of `widget` inside `toolBar`.
+// A group is broken by anything sitting between two buttons (separators, handles,
+// the extension button or inter-button spacing), so a neighbor only counts when it
+// is the closest toolbutton on that side and sits flush against the widget.
+const QToolButton *touchingToolButton(const QToolBar *toolBar, const QWidget *widget, bool rightSide)
+{
+    const QRect g = widget->geometry();
+    const QToolButton *neighbor = nullptr;
+    int neighborGap = std::numeric_limits<int>::max();
+    for (const auto *child : toolBar->findChildren<const QToolButton *>(QString(), Qt::FindDirectChildrenOnly)) {
+        if (child == widget || !child->isVisible() || child->objectName() == u"qt_toolbar_ext_button"_s) {
+            continue;
         }
-        if (child->objectName() == u"qt_toolbar_ext_button"_s) {
-            return false;
+        const QRect c = child->geometry();
+        // Only buttons on the same row at the same height can form a connected bar.
+        if (c.y() != g.y() || c.height() != g.height()) {
+            continue;
         }
-        return qobject_cast<const QToolButton *>(child) != nullptr;
+        const int gap = rightSide ? c.left() - g.right() - 1 : g.left() - c.right() - 1;
+        if (gap < 0 || gap >= neighborGap) {
+            continue;
+        }
+        neighbor = child;
+        neighborGap = gap;
     }
+    return neighborGap == 0 ? neighbor : nullptr;
+}
 
 } // namespace
 
@@ -266,15 +283,14 @@ Union::IdentifierList ToolButtonElement::elementHints() const
         hints.append(u"menu-open"_s);
     }
 
-    // Group toolbuttom: Position within a row of adjacent tool buttons on a horizontal toolbar,
+    // Position within a row of adjacent tool buttons on a horizontal toolbar,
     // like Kvantum's group_toolbar_buttons option. Themes can style the
     // group-* hints to render adjacent buttons as one connected bar.
     if (m_widget) {
         if (const auto *toolBar = qobject_cast<const QToolBar *>(m_widget->parentWidget())) {
             if (toolBar->orientation() == Qt::Horizontal && m_widget->objectName() != u"qt_toolbar_ext_button"_s) {
-                const QRect g = m_widget->geometry();
-                const bool hasLeft = hasAdjacentToolButton(toolBar, g.x() - 1, g.y(), g.height());
-                const bool hasRight = hasAdjacentToolButton(toolBar, g.x() + g.width() + 1, g.y(), g.height());
+                const bool hasLeft = touchingToolButton(toolBar, m_widget, false) != nullptr;
+                const bool hasRight = touchingToolButton(toolBar, m_widget, true) != nullptr;
                 if (hasLeft && hasRight) {
                     hints.append(u"group-middle"_s);
                 } else if (hasLeft) {
